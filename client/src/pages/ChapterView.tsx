@@ -13,7 +13,7 @@ interface ChapterViewProps {
   chapterId: number;
   onBack: () => void;
   showTransliteration: boolean;
-  onNavigate: (page: string, chapterId?: number) => void;
+  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
   reciter: string;
   speed: string;
   autoScroll: boolean;
@@ -169,8 +169,11 @@ export default function ChapterView({
       <BottomNav
         activeTab="surah"
         onTabChange={(tab) => {
-          if (tab === "settings") onNavigate("settings");
-          if (tab === "home" || tab === "surah") onBack();
+          if (tab === "settings") {
+            onNavigate("settings", undefined, "settings");
+          } else {
+            onBack();
+          }
         }}
       />
     </div>

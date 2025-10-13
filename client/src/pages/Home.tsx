@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import { chapters } from "@/lib/quranData";
 
 interface HomeProps {
-  onNavigate: (page: string, chapterId?: number) => void;
+  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
   activeTab?: "home" | "surah";
 }
 
@@ -67,8 +67,11 @@ export default function Home({ onNavigate, activeTab = "home" }: HomeProps) {
       <BottomNav
         activeTab={activeTab}
         onTabChange={(tab) => {
-          if (tab === "settings") onNavigate("settings");
-          if (tab === "home" || tab === "surah") onNavigate("home");
+          if (tab === "settings") {
+            onNavigate("settings", undefined, "settings");
+          } else {
+            onNavigate("home", undefined, tab);
+          }
         }}
       />
     </div>

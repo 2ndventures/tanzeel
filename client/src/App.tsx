@@ -30,10 +30,15 @@ function App() {
     }
   }, [darkMode]);
 
-  const handleNavigate = (page: string, chapterId?: number) => {
+  const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => {
     setCurrentPage(page as Page);
-    if (page === "settings") setActiveTab("settings");
-    else if (page === "home") setActiveTab("home");
+    if (tab) {
+      setActiveTab(tab);
+    } else if (page === "settings") {
+      setActiveTab("settings");
+    } else if (page === "home") {
+      setActiveTab("home");
+    }
     if (chapterId) setSelectedChapter(chapterId);
   };
 
