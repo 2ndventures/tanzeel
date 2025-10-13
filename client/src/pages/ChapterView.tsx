@@ -43,7 +43,8 @@ export default function ChapterView({
 
   // Update bookmark when chapter changes
   useEffect(() => {
-    setBookmarkedVerse(getChapterBookmark(chapterId));
+    const saved = getChapterBookmark(chapterId);
+    setBookmarkedVerse(saved);
   }, [chapterId]);
   
   const {
@@ -56,6 +57,7 @@ export default function ChapterView({
     togglePlayPause,
     seek,
     setSpeed,
+    seekToVerse,
     nextVerse,
     previousVerse,
   } = useAudioPlayer(audioUrl, verseTimestamps, (verse) => {
@@ -84,14 +86,23 @@ export default function ChapterView({
     setSpeed(nextSpeed);
   };
 
-  // Update bookmark display when current verse changes
-  const isCurrentVerseBookmarked = isBookmarked(chapterId, currentVerse);
+  // Show bookmark as filled if there's any bookmark for this chapter
+  const hasChapterBookmark = bookmarkedVerse !== null;
 
   const toggleBookmark = () => {
-    if (isCurrentVerseBookmarked) {
+    const currentIsBookmarked = isBookmarked(chapterId, currentVerse);
+    
+    // If current verse is bookmarked, remove it
+    if (currentIsBookmarked) {
       removeBookmark(chapterId, currentVerse);
       setBookmarkedVerse(null);
-    } else {
+    } 
+    // If there's a saved bookmark for a different verse, seek to it
+    else if (bookmarkedVerse && bookmarkedVerse !== currentVerse) {
+      seekToVerse(bookmarkedVerse);
+    } 
+    // Otherwise, bookmark the current verse
+    else {
       saveBookmark(chapterId, currentVerse);
       setBookmarkedVerse(currentVerse);
     }
@@ -116,7 +127,7 @@ export default function ChapterView({
             onClick={toggleBookmark}
             data-testid="button-bookmark"
           >
-            <Bookmark className={`w-6 h-6 ${isCurrentVerseBookmarked ? 'fill-primary text-primary' : 'text-foreground'}`} />
+            <Bookmark className={`w-6 h-6 ${hasChapterBookmark ? 'fill-primary text-primary' : 'text-foreground'}`} />
           </button>
         </div>
       </header>
