@@ -1,8 +1,10 @@
 # Overview
 
-This is a Quran Reading application that provides users with the ability to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. The application features a modern, dark-themed interface built with React and TypeScript, utilizing shadcn/ui components for a polished user experience.
+This is a Quran Reading application that provides users with the ability to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. The application features a modern, dark-themed interface (#1a1f2e background, #252d3d cards, #4d7cfe accent) built with React and TypeScript, utilizing shadcn/ui components for a polished user experience.
 
-The app includes chapter browsing, verse-by-verse reading with synchronized audio playback, customizable display settings, and bookmark functionality for tracking reading progress.
+The app includes chapter browsing, verse-by-verse reading with synchronized audio playback (karaoke-style highlighting), customizable display settings, and bookmark functionality for tracking reading progress.
+
+**Current Status**: Fully functional with HTML5 audio playback, verse timing synchronization, bookmarks, and all settings operational. Mock audio system (silent WAV generation) enables full testing without external audio files.
 
 # User Preferences
 
@@ -57,14 +59,21 @@ Preferred communication style: Simple, everyday language.
 ## Audio Playback System
 
 **Custom Audio Hook**: `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization. It handles:
-- Play/pause functionality
-- Seeking and progress tracking
-- Playback speed adjustment
-- Verse-timestamp synchronization for highlighting currently playing verses
-- Repeat functionality
-- Auto-scroll coordination
+- Play/pause functionality with HTML5 Audio API
+- Seeking and progress tracking with real-time updates
+- Playback speed adjustment (1.0x, 1.25x, 1.5x, 1.75x, 2.0x)
+- Verse-timestamp synchronization for karaoke-style highlighting
+- Repeat functionality (loops chapter when enabled)
+- Auto-scroll coordination (scrolls to currently playing verse)
+- Prev/Next verse navigation
 
-**Audio Sources**: Uses CDN-hosted Quran recitations with multiple reciter support (Alafasy, Sudais, Ghamadi). Verse timestamps are defined per chapter to sync audio with text display.
+**Audio Sources**: Mock audio system generates silent WAV files dynamically:
+- Duration calculated from verse timestamps (ensures sync across all chapters)
+- Blob URL caching prevents memory leaks
+- Revocation mechanism for cleanup when switching chapters/reciters
+- In production: would use CDN-hosted Quran recitations (Alafasy, Sudais, Ghamadi)
+
+**Audio Lifecycle Management**: Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
 
 ## Data Management
 
