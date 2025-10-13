@@ -49,23 +49,27 @@ export default function ChapterView({ chapterId, onBack, showTransliteration }: 
             />
           ))}
         </div>
-        <div className="h-32" />
+        <div className="h-40" />
       </ScrollArea>
 
-      <AudioPlayer
-        currentTime={currentTime}
-        duration={205}
-        isPlaying={isPlaying}
-        speed={speed}
-        onPlayPause={() => setIsPlaying(!isPlaying)}
-        onSeek={setCurrentTime}
-        onSpeedChange={() => {
-          const newSpeed = speed === 1.0 ? 1.5 : speed === 1.5 ? 2.0 : 1.0;
-          setSpeed(newSpeed);
-        }}
-        onPrevious={() => console.log('Previous verse')}
-        onNext={() => console.log('Next verse')}
-      />
+      <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 pointer-events-none">
+        <div className="pointer-events-auto max-w-md mx-auto">
+          <AudioPlayer
+            currentTime={currentTime}
+            duration={205}
+            isPlaying={isPlaying}
+            speed={speed}
+            onPlayPause={() => setIsPlaying(!isPlaying)}
+            onSeek={setCurrentTime}
+            onSpeedChange={() => {
+              const newSpeed = speed === 1.0 ? 1.5 : speed === 1.5 ? 2.0 : 1.0;
+              setSpeed(newSpeed);
+            }}
+            onPrevious={() => console.log('Previous verse')}
+            onNext={() => console.log('Next verse')}
+          />
+        </div>
+      </div>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="bg-card border-t border-border p-4 space-y-3">
+    <div className="bg-card border border-border rounded-xl p-4 space-y-3">
       <div className="flex items-center gap-2">
         <span className="text-xs text-muted-foreground w-10" data-testid="text-current-time">
           {formatTime(currentTime)}
