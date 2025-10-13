@@ -71,6 +71,7 @@ export default function AudioPlayer({
             variant="ghost"
             size="icon"
             onClick={onPrevious}
+            className="rounded-full"
             data-testid="button-previous"
           >
             <SkipBack className="w-5 h-5" />
@@ -97,6 +98,7 @@ export default function AudioPlayer({
             variant="ghost"
             size="icon"
             onClick={onNext}
+            className="rounded-full"
             data-testid="button-next"
           >
             <SkipForward className="w-5 h-5" />
