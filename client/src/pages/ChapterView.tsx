@@ -3,7 +3,7 @@ import { ArrowLeft, Bookmark } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import BottomNav from "@/components/BottomNav";
-import { alFatihahVerses } from "@/lib/quranData";
+import { getChapterVerses, getChapterInfo } from "@/lib/quranData";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
@@ -32,6 +32,8 @@ export default function ChapterView({
   const scrollRef = useRef<HTMLDivElement>(null);
   const [bookmarked, setBookmarked] = useState(false);
   
+  const chapterInfo = getChapterInfo(chapterId);
+  const verses = getChapterVerses(chapterId);
   const audioUrl = getChapterAudioUrl(chapterId, reciter);
   const verseTimestamps = getVerseTimestamps(chapterId);
   
@@ -85,7 +87,7 @@ export default function ChapterView({
             <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
           <h1 className="text-xl font-semibold text-foreground" data-testid="text-chapter-title">
-            Al-Fatihah
+            {chapterInfo?.arabicName || 'Al-Fatihah'}
           </h1>
           <button 
             className="p-2 hover-elevate active-elevate-2 rounded-md" 
@@ -99,7 +101,7 @@ export default function ChapterView({
 
       <ScrollArea className="flex-1" ref={scrollRef}>
         <div className="divide-y divide-border">
-          {alFatihahVerses.map((verse) => (
+          {verses.map((verse) => (
             <VerseCard
               key={verse.number}
               verseNumber={verse.number}
