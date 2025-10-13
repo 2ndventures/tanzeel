@@ -12,6 +12,7 @@ type Page = "home" | "chapter" | "settings";
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
+  const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
   const [darkMode, setDarkMode] = useState(true);
   const [transliteration, setTransliteration] = useState(false);
   const [font, setFont] = useState("System");
@@ -31,6 +32,8 @@ function App() {
 
   const handleNavigate = (page: string, chapterId?: number) => {
     setCurrentPage(page as Page);
+    if (page === "settings") setActiveTab("settings");
+    else if (page === "home") setActiveTab("home");
     if (chapterId) setSelectedChapter(chapterId);
   };
 
@@ -39,18 +42,25 @@ function App() {
       <TooltipProvider>
         <div className="min-h-screen">
           {currentPage === "home" && (
-            <Home onNavigate={handleNavigate} />
+            <Home onNavigate={handleNavigate} activeTab={activeTab === "settings" ? "home" : activeTab} />
           )}
           {currentPage === "chapter" && (
             <ChapterView
               chapterId={selectedChapter}
-              onBack={() => setCurrentPage("home")}
+              onBack={() => {
+                setCurrentPage("home");
+                setActiveTab("surah");
+              }}
               showTransliteration={transliteration}
+              onNavigate={handleNavigate}
             />
           )}
           {currentPage === "settings" && (
             <Settings
-              onBack={() => setCurrentPage("home")}
+              onBack={() => {
+                setCurrentPage("home");
+                setActiveTab("home");
+              }}
               darkMode={darkMode}
               onDarkModeChange={setDarkMode}
               transliteration={transliteration}

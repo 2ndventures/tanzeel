@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, Bookmark } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
+import BottomNav from "@/components/BottomNav";
 import { alFatihahVerses } from "@/lib/quranData";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -9,15 +10,16 @@ interface ChapterViewProps {
   chapterId: number;
   onBack: () => void;
   showTransliteration: boolean;
+  onNavigate: (page: string, chapterId?: number) => void;
 }
 
-export default function ChapterView({ chapterId, onBack, showTransliteration }: ChapterViewProps) {
+export default function ChapterView({ chapterId, onBack, showTransliteration, onNavigate }: ChapterViewProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(83);
   const [speed, setSpeed] = useState(1.0);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pb-20">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between p-4">
           <button 
@@ -52,7 +54,7 @@ export default function ChapterView({ chapterId, onBack, showTransliteration }: 
         <div className="h-40" />
       </ScrollArea>
 
-      <div className="fixed bottom-0 left-0 right-0 px-4 pb-4 pointer-events-none">
+      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 pointer-events-none">
         <div className="pointer-events-auto max-w-md mx-auto">
           <AudioPlayer
             currentTime={currentTime}
@@ -70,6 +72,14 @@ export default function ChapterView({ chapterId, onBack, showTransliteration }: 
           />
         </div>
       </div>
+
+      <BottomNav
+        activeTab="surah"
+        onTabChange={(tab) => {
+          if (tab === "settings") onNavigate("settings");
+          if (tab === "home" || tab === "surah") onBack();
+        }}
+      />
     </div>
   );
 }

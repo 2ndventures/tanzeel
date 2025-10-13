@@ -7,9 +7,10 @@ import { chapters } from "@/lib/quranData";
 
 interface HomeProps {
   onNavigate: (page: string, chapterId?: number) => void;
+  activeTab?: "home" | "surah";
 }
 
-export default function Home({ onNavigate }: HomeProps) {
+export default function Home({ onNavigate, activeTab = "home" }: HomeProps) {
   const [searchQuery, setSearchQuery] = useState("");
   
   const filteredChapters = chapters.filter((chapter) =>
@@ -64,10 +65,10 @@ export default function Home({ onNavigate }: HomeProps) {
       </div>
 
       <BottomNav
-        activeTab="home"
+        activeTab={activeTab}
         onTabChange={(tab) => {
           if (tab === "settings") onNavigate("settings");
-          if (tab === "surah") onNavigate("home");
+          if (tab === "home" || tab === "surah") onNavigate("home");
         }}
       />
     </div>
