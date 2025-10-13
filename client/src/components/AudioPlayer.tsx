@@ -53,18 +53,20 @@ export default function AudioPlayer({
         </span>
       </div>
       
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onSpeedChange}
-          className="text-sm font-medium min-w-12"
-          data-testid="button-speed"
-        >
-          {speed.toFixed(2)}x
-        </Button>
+      <div className="grid grid-cols-3 items-center">
+        <div className="flex justify-start">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onSpeedChange}
+            className="text-sm font-medium min-w-12"
+            data-testid="button-speed"
+          >
+            {speed.toFixed(2)}x
+          </Button>
+        </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <Button
             variant="ghost"
             size="icon"
@@ -101,13 +103,15 @@ export default function AudioPlayer({
           </Button>
         </div>
         
-        <Button
-          variant="ghost"
-          size="icon"
-          data-testid="button-more"
-        >
-          <MoreVertical className="w-5 h-5" />
-        </Button>
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            size="icon"
+            data-testid="button-more"
+          >
+            <MoreVertical className="w-5 h-5" />
+          </Button>
+        </div>
       </div>
     </div>
   );
