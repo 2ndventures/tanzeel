@@ -8,6 +8,7 @@ interface AudioPlayerProps {
   duration?: number;
   isPlaying?: boolean;
   speed?: number;
+  isLoading?: boolean;
   onPlayPause?: () => void;
   onSeek?: (time: number) => void;
   onSpeedChange?: () => void;
@@ -20,6 +21,7 @@ export default function AudioPlayer({
   duration = 205,
   isPlaying = false,
   speed = 1.0,
+  isLoading = false,
   onPlayPause,
   onSeek,
   onSpeedChange,
@@ -56,10 +58,10 @@ export default function AudioPlayer({
           variant="ghost"
           size="sm"
           onClick={onSpeedChange}
-          className="text-sm font-medium"
+          className="text-sm font-medium min-w-12"
           data-testid="button-speed"
         >
-          {speed}x
+          {speed.toFixed(2)}x
         </Button>
         
         <div className="flex items-center gap-2">
@@ -77,9 +79,12 @@ export default function AudioPlayer({
             size="icon"
             className="w-12 h-12 rounded-full"
             onClick={onPlayPause}
+            disabled={isLoading}
             data-testid="button-play-pause"
           >
-            {isPlaying ? (
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+            ) : isPlaying ? (
               <Pause className="w-5 h-5" />
             ) : (
               <Play className="w-5 h-5 ml-0.5" />

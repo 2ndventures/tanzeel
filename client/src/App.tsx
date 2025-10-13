@@ -53,6 +53,10 @@ function App() {
               }}
               showTransliteration={transliteration}
               onNavigate={handleNavigate}
+              reciter={reciter}
+              speed={speed}
+              autoScroll={autoScroll}
+              repeat={repeat}
             />
           )}
           {currentPage === "settings" && (
