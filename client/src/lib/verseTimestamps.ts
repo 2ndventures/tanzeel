@@ -16,22 +16,72 @@ export const alFatihahTimestamps: VerseTimestamp[] = [
   { verse: 7, start: 32.5, end: 42.0 },
 ];
 
+// Store created blob URLs for cleanup
+const audioBlobCache = new Map<string, string>();
+
 // For demo purposes - mock audio URL
 // In production, use actual Quran recitation URLs
 export const getChapterAudioUrl = (chapterId: number, reciter: string = 'alafasy') => {
-  // This would normally point to a real audio file
-  // For demo, we'll use a placeholder that returns a valid audio URL
-  const reciterPaths: { [key: string]: string } = {
-    'Alafasy': 'alafasy',
-    'Sudais': 'sudais',
-    'Ghamadi': 'ghamadi',
+  // For demo purposes, we use a minimal WAV file
+  // In production, this would point to actual Quran recitation CDN
+  
+  const cacheKey = `${chapterId}-${reciter}`;
+  
+  // Return cached URL if exists
+  if (audioBlobCache.has(cacheKey)) {
+    return audioBlobCache.get(cacheKey)!;
+  }
+  
+  // Get verse timestamps for this chapter to determine audio duration
+  const timestamps = getVerseTimestamps(chapterId);
+  const duration = Math.ceil(timestamps[timestamps.length - 1]?.end || 60) + 2; // Add 2s buffer
+  
+  // Minimal silent WAV at 8kHz (smaller, loads faster)
+  const sampleRate = 8000;
+  const numSamples = sampleRate * duration;
+  
+  // Pre-compute WAV file size
+  const dataSize = numSamples * 2;
+  const fileSize = 44 + dataSize;
+  
+  const buffer = new ArrayBuffer(fileSize);
+  const view = new DataView(buffer);
+  
+  // WAV header (optimized)
+  const writeStr = (pos: number, str: string) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(pos + i, str.charCodeAt(i));
   };
   
-  const reciterPath = reciterPaths[reciter] || 'alafasy';
+  writeStr(0, 'RIFF');
+  view.setUint32(4, fileSize - 8, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);          // fmt chunk size
+  view.setUint16(20, 1, true);           // PCM
+  view.setUint16(22, 1, true);           // mono
+  view.setUint32(24, sampleRate, true);  // sample rate
+  view.setUint32(28, sampleRate * 2, true); // byte rate
+  view.setUint16(32, 2, true);           // block align
+  view.setUint16(34, 16, true);          // bits per sample
+  writeStr(36, 'data');
+  view.setUint32(40, dataSize, true);
   
-  // Using a public domain audio file for demo
-  // In production, replace with actual Quran audio CDN
-  return `https://cdn.islamic.network/quran/audio-surah/128/${reciterPath}/${chapterId}.mp3`;
+  // Silent samples (already 0 from ArrayBuffer)
+  
+  const blobUrl = URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+  audioBlobCache.set(cacheKey, blobUrl);
+  
+  return blobUrl;
+};
+
+// Cleanup function to revoke blob URLs when needed
+export const revokeChapterAudioUrl = (chapterId: number, reciter: string = 'alafasy') => {
+  const cacheKey = `${chapterId}-${reciter}`;
+  const url = audioBlobCache.get(cacheKey);
+  if (url) {
+    URL.revokeObjectURL(url);
+    audioBlobCache.delete(cacheKey);
+  }
 };
 
 export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
