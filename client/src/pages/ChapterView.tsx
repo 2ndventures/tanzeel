@@ -17,6 +17,19 @@ export default function ChapterView({ chapterId, onBack, showTransliteration, on
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(83);
   const [speed, setSpeed] = useState(1.0);
+  const [currentVerse, setCurrentVerse] = useState(3);
+
+  // Simulate verse progression based on time (for demo)
+  // In real app, this would sync with actual audio timestamps
+  const getVerseFromTime = (time: number) => {
+    if (time < 20) return 1;
+    if (time < 45) return 2;
+    if (time < 70) return 3;
+    if (time < 95) return 4;
+    if (time < 130) return 5;
+    if (time < 160) return 6;
+    return 7;
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20">
@@ -48,6 +61,7 @@ export default function ChapterView({ chapterId, onBack, showTransliteration, on
               transliteration={verse.transliteration}
               translation={verse.translation}
               showTransliteration={showTransliteration}
+              isPlaying={isPlaying && getVerseFromTime(currentTime) === verse.number}
             />
           ))}
         </div>
