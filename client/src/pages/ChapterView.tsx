@@ -7,6 +7,7 @@ import { getChapterVerses, getChapterInfo } from "@/lib/quranData";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
+import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -30,12 +31,20 @@ export default function ChapterView({
   repeat
 }: ChapterViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [bookmarked, setBookmarked] = useState(false);
-  
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
   const audioUrl = getChapterAudioUrl(chapterId, reciter);
   const verseTimestamps = getVerseTimestamps(chapterId);
+  
+  // Initialize bookmark state from localStorage
+  const [bookmarkedVerse, setBookmarkedVerse] = useState<number | null>(
+    () => getChapterBookmark(chapterId)
+  );
+
+  // Update bookmark when chapter changes
+  useEffect(() => {
+    setBookmarkedVerse(getChapterBookmark(chapterId));
+  }, [chapterId]);
   
   const {
     isPlaying,
@@ -56,7 +65,7 @@ export default function ChapterView({
         verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-  });
+  }, repeat);
 
   // Update speed when settings change
   useEffect(() => {
@@ -75,6 +84,19 @@ export default function ChapterView({
     setSpeed(nextSpeed);
   };
 
+  // Update bookmark display when current verse changes
+  const isCurrentVerseBookmarked = isBookmarked(chapterId, currentVerse);
+
+  const toggleBookmark = () => {
+    if (isCurrentVerseBookmarked) {
+      removeBookmark(chapterId, currentVerse);
+      setBookmarkedVerse(null);
+    } else {
+      saveBookmark(chapterId, currentVerse);
+      setBookmarkedVerse(currentVerse);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col pb-20">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
@@ -91,10 +113,10 @@ export default function ChapterView({
           </h1>
           <button 
             className="p-2 hover-elevate active-elevate-2 rounded-md" 
-            onClick={() => setBookmarked(!bookmarked)}
+            onClick={toggleBookmark}
             data-testid="button-bookmark"
           >
-            <Bookmark className={`w-6 h-6 ${bookmarked ? 'fill-primary text-primary' : 'text-foreground'}`} />
+            <Bookmark className={`w-6 h-6 ${isCurrentVerseBookmarked ? 'fill-primary text-primary' : 'text-foreground'}`} />
           </button>
         </div>
       </header>
