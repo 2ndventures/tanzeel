@@ -4,7 +4,7 @@ This is a Quran Reading application that provides users with the ability to read
 
 The app includes chapter browsing, verse-by-verse reading with synchronized audio playback (karaoke-style highlighting), customizable display settings, and bookmark functionality for tracking reading progress.
 
-**Current Status**: Fully functional with HTML5 audio playback, verse timing synchronization, bookmarks, and all settings operational. Mock audio system (silent WAV generation) enables full testing without external audio files.
+**Current Status**: Fully functional with real Quran audio recitation from Islamic Network CDN, verse timing synchronization, bookmarks, and all settings operational. Backend audio proxy handles CORS and provides seamless audio streaming. Complete Quran data (all 114 chapters, 6,236 verses) with Arabic text, English translations, and transliterations.
 
 # User Preferences
 
@@ -67,17 +67,18 @@ Preferred communication style: Simple, everyday language.
 - Auto-scroll coordination (scrolls to currently playing verse)
 - Prev/Next verse navigation
 
-**Audio Sources**: Mock audio system generates silent WAV files dynamically:
-- Duration calculated from verse timestamps (ensures sync across all chapters)
-- Blob URL caching prevents memory leaks
-- Revocation mechanism for cleanup when switching chapters/reciters
-- In production: would use CDN-hosted Quran recitations (Alafasy, Sudais, Ghamadi)
+**Audio Sources**: Real Quran recitation audio from Islamic Network CDN:
+- Backend proxy endpoint (`/api/audio/{reciter}/{chapter}`) fetches from cdn.islamic.network
+- Solves CORS issues by streaming audio through Express server
+- Three reciters available: Alafasy (Mishary Rashid Alafasy), Sudais (Abdur-Rahman Al-Sudais), Ghamadi (Saad Al-Ghamadi)
+- Automatic fallback to Alafasy if selected reciter's audio is unavailable
+- Verse timestamps for Al-Fatihah manually tuned to match Alafasy recitation; other chapters use approximate 8-second intervals
 
 **Audio Lifecycle Management**: Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
 
 ## Data Management
 
-**Quran Data**: Static data for chapters and verses stored in `client/src/lib/quranData.ts`. This includes chapter metadata (Arabic names, English names, verse counts, revelation types) and verse content (Arabic text, transliteration, translation).
+**Quran Data**: Complete static data for all 114 chapters (6,236 total verses) stored in `client/src/lib/quranData.ts`. Fetched from Al-Quran Cloud API with Sahih International translation. This includes chapter metadata (Arabic names, English names, verse counts, revelation types) and verse content (Arabic text, English transliteration, English translation). File size: 38,699 lines of TypeScript.
 
 **Local Storage**: Client-side persistence for:
 - User preferences (theme, transliteration, font, reciter, speed settings)
@@ -135,6 +136,15 @@ Preferred communication style: Simple, everyday language.
 - **date-fns**: Date manipulation and formatting
 - **vaul**: Drawer component primitive
 
-## Note on External APIs
+## External APIs & Data Sources
 
-The application is configured to use external Quran recitation audio CDNs (e.g., islamic.network) for audio playback. These are referenced in `client/src/lib/verseTimestamps.ts` but may need updating with production-ready CDN URLs.
+**Audio CDN**: Islamic Network CDN (cdn.islamic.network) provides authentic Quran recitations:
+- Accessed via backend proxy at `/api/audio/{reciter}/{chapter}`
+- Three reciters available with automatic fallback to Alafasy
+- High-quality 128kbps MP3 format
+
+**Quran Text Data**: Al-Quran Cloud API (api.alquran.cloud):
+- Used to fetch complete Quran text, translations, and transliterations
+- Sahih International English translation
+- English transliteration included
+- Data fetched once and stored statically in quranData.ts (no runtime API calls)
