@@ -56,6 +56,7 @@ export function useAudioPlayer(
   useEffect(() => {
     const audio = new Audio(audioUrl);
     audio.preload = 'metadata';
+    audio.crossOrigin = 'anonymous'; // Enable CORS for external audio
     audioRef.current = audio;
 
     // Reset state when audio URL changes
@@ -102,7 +103,9 @@ export function useAudioPlayer(
       }
     };
 
-    const handleError = () => {
+    const handleError = (e: Event) => {
+      console.error('Audio loading error:', e);
+      console.error('Failed audio URL:', audioUrl);
       setState(prev => ({
         ...prev,
         error: 'Failed to load audio',
