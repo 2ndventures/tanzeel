@@ -78,7 +78,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Data Management
 
-**Quran Data**: Complete static data for all 114 chapters (6,236 total verses) stored in `client/src/lib/quranData.ts`. Fetched from Al-Quran Cloud API with Sahih International translation. This includes chapter metadata (Arabic names, English names, verse counts, revelation types) and verse content (Arabic text, English transliteration, English translation). File size: 38,699 lines of TypeScript.
+**Quran Data**: Complete static data for all 114 chapters (6,236 total verses) stored in `client/src/lib/quranData.ts`. Fetched from Al-Quran Cloud API with Sahih International translation using the `en.transliteration` edition (NOT `en.transliteration.v2` which returns Arabic script). This includes chapter metadata (Arabic names, English names, verse counts, revelation types) and verse content (Arabic text, English transliteration in Latin characters, English translation). File size: 38,699 lines of TypeScript.
 
 **Local Storage**: Client-side persistence for:
 - User preferences (theme, transliteration, font, reciter, speed settings)
@@ -145,6 +145,7 @@ Preferred communication style: Simple, everyday language.
 
 **Quran Text Data**: Al-Quran Cloud API (api.alquran.cloud):
 - Used to fetch complete Quran text, translations, and transliterations
-- Sahih International English translation
-- English transliteration included
+- Sahih International English translation (edition: `en.sahih`)
+- English transliteration in Latin characters (edition: `en.transliteration`)
+  - **Important**: Use `en.transliteration` NOT `en.transliteration.v2` - the v2 edition returns Arabic script instead of Latin transliterations
 - Data fetched once and stored statically in quranData.ts (no runtime API calls)
