@@ -5,15 +5,15 @@ export interface VerseTimestamp {
 }
 
 // Verse timestamps for Al-Fatihah (Mishary Rashid Alafasy)
-// Audio includes "A'udhu billahi" preamble (~2.5s) before Bismillah (verse 1)
+// Audio includes preamble (~6s) before Bismillah (verse 1)
 export const alFatihahTimestamps: VerseTimestamp[] = [
-  { verse: 1, start: 2.5, end: 8 },      // Bismillaahir Rahmaanir Raheem
-  { verse: 2, start: 8, end: 13.5 },     // Alhamdu lillaahi Rabbil 'aalameen
-  { verse: 3, start: 13.5, end: 17 },    // Ar-Rahmaanir-Raheem
-  { verse: 4, start: 17, end: 21.5 },    // Maaliki Yawmid-Deen
-  { verse: 5, start: 21.5, end: 28 },    // Iyyaaka na'budu wa iyyaaka nasta'een
-  { verse: 6, start: 28, end: 35.5 },    // Ihdinas-Siraatal-Mustaqeem
-  { verse: 7, start: 35.5, end: 54.5 },  // Siraatal-lazeena an'amta 'alaihim... (extends to end of audio)
+  { verse: 1, start: 6, end: 11.5 },     // Bismillaahir Rahmaanir Raheem
+  { verse: 2, start: 11.5, end: 17 },    // Alhamdu lillaahi Rabbil 'aalameen
+  { verse: 3, start: 17, end: 20.5 },    // Ar-Rahmaanir-Raheem
+  { verse: 4, start: 20.5, end: 25 },    // Maaliki Yawmid-Deen
+  { verse: 5, start: 25, end: 31.5 },    // Iyyaaka na'budu wa iyyaaka nasta'een
+  { verse: 6, start: 31.5, end: 39 },    // Ihdinas-Siraatal-Mustaqeem
+  { verse: 7, start: 39, end: 58 },      // Siraatal-lazeena an'amta 'alaihim... (extends to end of audio)
 ];
 
 // Real Quran recitation audio proxied through our backend
