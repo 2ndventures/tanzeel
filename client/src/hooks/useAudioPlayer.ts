@@ -7,6 +7,8 @@ interface AudioPlayerState {
   speed: number;
   isLoading: boolean;
   error: string | null;
+  currentVerse: number;
+  isInVerseRange: boolean;
 }
 
 interface VerseTimestamp {
@@ -35,10 +37,9 @@ export function useAudioPlayer(
     speed: 1.0,
     isLoading: true,
     error: null,
+    currentVerse: 1,
+    isInVerseRange: true,
   });
-
-  const [currentVerse, setCurrentVerse] = useState<number>(1);
-  const [isInVerseRange, setIsInVerseRange] = useState<boolean>(true);
 
   // Keep refs up to date
   useEffect(() => {
@@ -66,8 +67,10 @@ export function useAudioPlayer(
       currentTime: 0,
       isPlaying: false,
       isLoading: true,
+      currentVerse: 1,
+      isInVerseRange: true,
+      error: null, // Clear any previous errors when loading new audio
     }));
-    setCurrentVerse(1);
     currentVerseRef.current = 1;
 
     const handleLoadedMetadata = () => {
@@ -82,29 +85,40 @@ export function useAudioPlayer(
     };
 
     const handleTimeUpdate = () => {
-      setState(prev => ({ ...prev, currentTime: audio.currentTime }));
-
+      const currentTime = audio.currentTime;
+      
       // Update current verse based on timestamp
       const verse = verseTimestampsRef.current.find(
-        v => audio.currentTime >= v.start && audio.currentTime < v.end
+        v => currentTime >= v.start && currentTime < v.end
       );
       
       if (verse) {
         // We're in a valid verse timestamp range
-        setIsInVerseRange(true);
+        const verseChanged = verse.verse !== currentVerseRef.current;
         
-        if (verse.verse !== currentVerseRef.current) {
+        if (verseChanged) {
           currentVerseRef.current = verse.verse;
-          setCurrentVerse(verse.verse);
+          
+          // Atomic state update - all changes in one setState call
+          setState(prev => ({ 
+            ...prev, 
+            currentTime, 
+            currentVerse: verse.verse,
+            isInVerseRange: true,
+          }));
+          
           onVerseChangeRef.current?.(verse.verse);
           
           // Log verse changes to help verify timing sync
           const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
-          console.log(`✓ ${verseLabel} highlighting at ${audio.currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
+          console.log(`✓ ${verseLabel} highlighting at ${currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
+        } else {
+          // Same verse, just update time
+          setState(prev => ({ ...prev, currentTime }));
         }
       } else {
         // We're in a gap (no timestamp defined) - turn off highlighting but keep currentVerse for navigation
-        setIsInVerseRange(false);
+        setState(prev => ({ ...prev, currentTime, isInVerseRange: false }));
       }
     };
 
@@ -203,26 +217,24 @@ export function useAudioPlayer(
   }, [seek]);
 
   const nextVerse = useCallback(() => {
-    const nextVerseNum = currentVerse + 1;
+    const nextVerseNum = state.currentVerse + 1;
     const verse = verseTimestampsRef.current.find(v => v.verse === nextVerseNum);
     if (verse) {
       seek(verse.start);
     }
-  }, [currentVerse, seek]);
+  }, [state.currentVerse, seek]);
 
   const previousVerse = useCallback(() => {
     // Allow going back to verse 0 (preamble) if it exists
-    const prevVerseNum = Math.max(0, currentVerse - 1);
+    const prevVerseNum = Math.max(0, state.currentVerse - 1);
     const verse = verseTimestampsRef.current.find(v => v.verse === prevVerseNum);
     if (verse) {
       seek(verse.start);
     }
-  }, [currentVerse, seek]);
+  }, [state.currentVerse, seek]);
 
   return {
     ...state,
-    currentVerse,
-    isInVerseRange,
     play,
     pause,
     togglePlayPause,

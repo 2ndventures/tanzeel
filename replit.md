@@ -58,14 +58,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Audio Playback System
 
-**Custom Audio Hook**: `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization. It handles:
+**Custom Audio Hook**: `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization using atomic state updates. It handles:
 - Play/pause functionality with HTML5 Audio API
 - Seeking and progress tracking with real-time updates
 - Playback speed adjustment (1.0x, 1.25x, 1.5x, 1.75x, 2.0x)
 - Verse-timestamp synchronization for karaoke-style highlighting
 - Repeat functionality (loops chapter when enabled)
 - Auto-scroll coordination (scrolls to currently playing verse)
-- Prev/Next verse navigation
+- Prev/Next verse navigation (supports seeking to preamble/verse 0)
+- Gap detection (turns off highlighting in untimed regions while preserving navigation)
+
+**State Management**: All audio state (isPlaying, currentTime, currentVerse, isInVerseRange, error, etc.) is consolidated in a single atomic state object. This ensures:
+- All state updates are synchronized in a single render cycle
+- No mismatched state values during highlighting checks
+- Proper error recovery when switching chapters (errors are cleared on new audio load)
 
 **Audio Sources**: Real Quran recitation audio from Islamic Network CDN:
 - Backend proxy endpoint (`/api/audio/{reciter}/{chapter}`) fetches from cdn.islamic.network
@@ -73,14 +79,24 @@ Preferred communication style: Simple, everyday language.
 - Three reciters available: Alafasy (Mishary Rashid Alafasy), Sudais (Abdur-Rahman Al-Sudais), Ghamadi (Saad Al-Ghamadi)
 - Automatic fallback to Alafasy if selected reciter's audio is unavailable
 
+**Preamble Implementation**:
+- **Visual Display**: "A'udhu billahi min ash-shaytan ir-rajim" (seeking refuge) displayed as "Preamble" (verse 0)
+- **Arabic Text**: "أَعُوذُ بِٱللَّهِ مِنَ ٱلشَّيۡطَٰنِ ٱلرَّجِيمِ"
+- **English Translation**: "I seek refuge in Allah from Satan, the expelled."
+- **Audio Timing**: Preamble included in audio for most chapters before verse 1
+
 **Verse Timestamp Synchronization**:
-- **Preamble Display**: "A'udhu billahi min ash-shaytan ir-rajim" (seeking refuge) is now displayed as "Preamble" (verse 0) before verse 1 for all chapters that include it in audio, ensuring visual-audio synchronicity
-- **Chapter 1 (Al-Fatihah)**: Includes preamble (verse 0: 0-6s), then verses 1-7 with fine-tuned timestamps (Verse 1: 6-11.5s, Verse 2: 11.5-17s, etc.)
-- **Chapters 2-8, 10-114**: Audio includes ~3-second preamble before verse 1, displayed as "Preamble" on screen and highlighted during recitation
+- **Chapter 1 (Al-Fatihah)**: 6-second preamble (verse 0: 0-6s), then verses 1-7 with fine-tuned timestamps (Verse 1: 6-11.5s, Verse 2: 11.5-17s, etc.)
+- **Chapters 2-8, 10-114**: 3-second preamble before verse 1, displayed and highlighted during recitation
 - **Chapter 9 (At-Tawbah)**: No preamble, timestamps start directly with verse 1 at 0s (uses ~8s average per verse)
+- **Gap Handling**: `isInVerseRange` flag tracks whether current playback time is within a valid verse timestamp range
+  - When true: highlighting is active
+  - When false (gaps/untimed regions): highlighting turns off but navigation functions still work
 - Console logging tracks verse/preamble changes with format: `✓ Preamble/Verse N highlighting at Xs (expected: X-Xs)`
 
-**Audio Lifecycle Management**: Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
+**Audio Lifecycle Management**: 
+- Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
+- Error state is explicitly cleared when loading new audio to ensure proper recovery across chapter changes
 
 ## Data Management
 
