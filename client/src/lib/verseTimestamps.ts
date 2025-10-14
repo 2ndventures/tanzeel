@@ -13,7 +13,7 @@ export const alFatihahTimestamps: VerseTimestamp[] = [
   { verse: 4, start: 14.5, end: 19 },    // Maaliki Yawmid-Deen
   { verse: 5, start: 19, end: 25.5 },    // Iyyaaka na'budu wa iyyaaka nasta'een
   { verse: 6, start: 25.5, end: 33 },    // Ihdinas-Siraatal-Mustaqeem
-  { verse: 7, start: 33, end: 48 },      // Siraatal-lazeena an'amta 'alaihim...
+  { verse: 7, start: 33, end: 52 },      // Siraatal-lazeena an'amta 'alaihim... (extends to end of audio)
 ];
 
 // Real Quran recitation audio proxied through our backend

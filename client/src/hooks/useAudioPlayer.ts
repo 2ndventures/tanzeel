@@ -87,6 +87,7 @@ export function useAudioPlayer(
       const verse = verseTimestampsRef.current.find(
         v => audio.currentTime >= v.start && audio.currentTime < v.end
       );
+      
       if (verse && verse.verse !== currentVerseRef.current) {
         currentVerseRef.current = verse.verse;
         setCurrentVerse(verse.verse);
