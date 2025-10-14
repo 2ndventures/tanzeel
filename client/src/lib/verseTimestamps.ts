@@ -5,15 +5,15 @@ export interface VerseTimestamp {
 }
 
 // Verse timestamps for Al-Fatihah (Mishary Rashid Alafasy)
-// Updated for actual Alafasy CDN recitation timing
+// Fine-tuned timing to match actual Alafasy CDN recitation
 export const alFatihahTimestamps: VerseTimestamp[] = [
-  { verse: 1, start: 0, end: 7 },
-  { verse: 2, start: 7, end: 14 },
-  { verse: 3, start: 14, end: 18 },
-  { verse: 4, start: 18, end: 23 },
-  { verse: 5, start: 23, end: 30 },
-  { verse: 6, start: 30, end: 38 },
-  { verse: 7, start: 38, end: 51 },
+  { verse: 1, start: 0, end: 5.5 },      // Bismillaahir Rahmaanir Raheem
+  { verse: 2, start: 5.5, end: 11 },     // Alhamdu lillaahi Rabbil 'aalameen
+  { verse: 3, start: 11, end: 14.5 },    // Ar-Rahmaanir-Raheem
+  { verse: 4, start: 14.5, end: 19 },    // Maaliki Yawmid-Deen
+  { verse: 5, start: 19, end: 25.5 },    // Iyyaaka na'budu wa iyyaaka nasta'een
+  { verse: 6, start: 25.5, end: 33 },    // Ihdinas-Siraatal-Mustaqeem
+  { verse: 7, start: 33, end: 48 },      // Siraatal-lazeena an'amta 'alaihim...
 ];
 
 // Real Quran recitation audio proxied through our backend
