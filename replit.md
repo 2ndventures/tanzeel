@@ -74,11 +74,11 @@ Preferred communication style: Simple, everyday language.
 - Automatic fallback to Alafasy if selected reciter's audio is unavailable
 
 **Verse Timestamp Synchronization**:
-- **Chapter 1 (Al-Fatihah)**: Manually fine-tuned timestamps to match Alafasy recitation (Verse 1: 0-5.5s, Verse 2: 5.5-11s, Verse 3: 11-14.5s, Verse 4: 14.5-19s, Verse 5: 19-25.5s, Verse 6: 25.5-33s, Verse 7: 33-52s)
-- **Chapters 2-8, 10-114**: Audio includes 3-second Bismillah preamble before verse 1, timestamps offset accordingly (verse 1 starts at 3s, uses ~8s average per verse)
-- **Chapter 9 (At-Tawbah)**: No Bismillah, timestamps start at 0s (uses ~8s average per verse)
-- Preamble detection: When audio time is in preamble (before first verse), currentVerse is set to 0 and no highlighting occurs
-- Console logging tracks verse changes with format: `✓ Verse N highlighting at Xs (expected: X-Xs)`
+- **Preamble Display**: "A'udhu billahi min ash-shaytan ir-rajim" (seeking refuge) is now displayed as "Preamble" (verse 0) before verse 1 for all chapters that include it in audio, ensuring visual-audio synchronicity
+- **Chapter 1 (Al-Fatihah)**: Includes preamble (verse 0: 0-6s), then verses 1-7 with fine-tuned timestamps (Verse 1: 6-11.5s, Verse 2: 11.5-17s, etc.)
+- **Chapters 2-8, 10-114**: Audio includes ~3-second preamble before verse 1, displayed as "Preamble" on screen and highlighted during recitation
+- **Chapter 9 (At-Tawbah)**: No preamble, timestamps start directly with verse 1 at 0s (uses ~8s average per verse)
+- Console logging tracks verse/preamble changes with format: `✓ Preamble/Verse N highlighting at Xs (expected: X-Xs)`
 
 **Audio Lifecycle Management**: Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
 

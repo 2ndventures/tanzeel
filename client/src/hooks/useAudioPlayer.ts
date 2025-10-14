@@ -38,6 +38,7 @@ export function useAudioPlayer(
   });
 
   const [currentVerse, setCurrentVerse] = useState<number>(1);
+  const [isInVerseRange, setIsInVerseRange] = useState<boolean>(true);
 
   // Keep refs up to date
   useEffect(() => {
@@ -88,18 +89,22 @@ export function useAudioPlayer(
         v => audio.currentTime >= v.start && audio.currentTime < v.end
       );
       
-      if (verse && verse.verse !== currentVerseRef.current) {
-        currentVerseRef.current = verse.verse;
-        setCurrentVerse(verse.verse);
-        onVerseChangeRef.current?.(verse.verse);
+      if (verse) {
+        // We're in a valid verse timestamp range
+        setIsInVerseRange(true);
         
-        // Log verse changes to help verify timing sync
-        console.log(`✓ Verse ${verse.verse} highlighting at ${audio.currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
-      } else if (!verse && currentVerseRef.current !== 0 && currentVerseRef.current !== null) {
-        // Log when we're in a gap (like Bismillah preamble)
-        console.log(`⏸ Preamble/gap at ${audio.currentTime.toFixed(1)}s - no verse highlighted`);
-        currentVerseRef.current = 0;
-        setCurrentVerse(0);
+        if (verse.verse !== currentVerseRef.current) {
+          currentVerseRef.current = verse.verse;
+          setCurrentVerse(verse.verse);
+          onVerseChangeRef.current?.(verse.verse);
+          
+          // Log verse changes to help verify timing sync
+          const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
+          console.log(`✓ ${verseLabel} highlighting at ${audio.currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
+        }
+      } else {
+        // We're in a gap (no timestamp defined) - turn off highlighting but keep currentVerse for navigation
+        setIsInVerseRange(false);
       }
     };
 
@@ -206,7 +211,8 @@ export function useAudioPlayer(
   }, [currentVerse, seek]);
 
   const previousVerse = useCallback(() => {
-    const prevVerseNum = Math.max(1, currentVerse - 1);
+    // Allow going back to verse 0 (preamble) if it exists
+    const prevVerseNum = Math.max(0, currentVerse - 1);
     const verse = verseTimestampsRef.current.find(v => v.verse === prevVerseNum);
     if (verse) {
       seek(verse.start);
@@ -216,6 +222,7 @@ export function useAudioPlayer(
   return {
     ...state,
     currentVerse,
+    isInVerseRange,
     play,
     pause,
     togglePlayPause,

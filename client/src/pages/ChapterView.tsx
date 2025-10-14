@@ -53,6 +53,7 @@ export default function ChapterView({
     duration,
     speed,
     currentVerse,
+    isInVerseRange,
     isLoading,
     togglePlayPause,
     seek,
@@ -143,7 +144,7 @@ export default function ChapterView({
               transliteration={PREAMBLE_TEXT.transliteration}
               translation={PREAMBLE_TEXT.translation}
               showTransliteration={showTransliteration}
-              isPlaying={isPlaying && currentVerse === 0}
+              isPlaying={isPlaying && isInVerseRange && currentVerse === 0}
             />
           )}
           
@@ -155,7 +156,7 @@ export default function ChapterView({
               transliteration={verse.transliteration}
               translation={verse.translation}
               showTransliteration={showTransliteration}
-              isPlaying={isPlaying && currentVerse === verse.number}
+              isPlaying={isPlaying && isInVerseRange && currentVerse === verse.number}
             />
           ))}
         </div>
