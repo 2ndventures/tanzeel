@@ -72,7 +72,13 @@ Preferred communication style: Simple, everyday language.
 - Solves CORS issues by streaming audio through Express server
 - Three reciters available: Alafasy (Mishary Rashid Alafasy), Sudais (Abdur-Rahman Al-Sudais), Ghamadi (Saad Al-Ghamadi)
 - Automatic fallback to Alafasy if selected reciter's audio is unavailable
-- Verse timestamps for Al-Fatihah manually fine-tuned to match Alafasy recitation timing (Verse 1: 0-5.5s, Verse 2: 5.5-11s, Verse 3: 11-14.5s, Verse 4: 14.5-19s, Verse 5: 19-25.5s, Verse 6: 25.5-33s, Verse 7: 33-52s); other chapters use approximate 8-second intervals
+
+**Verse Timestamp Synchronization**:
+- **Chapter 1 (Al-Fatihah)**: Manually fine-tuned timestamps to match Alafasy recitation (Verse 1: 0-5.5s, Verse 2: 5.5-11s, Verse 3: 11-14.5s, Verse 4: 14.5-19s, Verse 5: 19-25.5s, Verse 6: 25.5-33s, Verse 7: 33-52s)
+- **Chapters 2-8, 10-114**: Audio includes 3-second Bismillah preamble before verse 1, timestamps offset accordingly (verse 1 starts at 3s, uses ~8s average per verse)
+- **Chapter 9 (At-Tawbah)**: No Bismillah, timestamps start at 0s (uses ~8s average per verse)
+- Preamble detection: When audio time is in preamble (before first verse), currentVerse is set to 0 and no highlighting occurs
+- Console logging tracks verse changes with format: `✓ Verse N highlighting at Xs (expected: X-Xs)`
 
 **Audio Lifecycle Management**: Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
 

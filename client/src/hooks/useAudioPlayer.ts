@@ -92,6 +92,14 @@ export function useAudioPlayer(
         currentVerseRef.current = verse.verse;
         setCurrentVerse(verse.verse);
         onVerseChangeRef.current?.(verse.verse);
+        
+        // Log verse changes to help verify timing sync
+        console.log(`✓ Verse ${verse.verse} highlighting at ${audio.currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
+      } else if (!verse && currentVerseRef.current !== 0 && currentVerseRef.current !== null) {
+        // Log when we're in a gap (like Bismillah preamble)
+        console.log(`⏸ Preamble/gap at ${audio.currentTime.toFixed(1)}s - no verse highlighted`);
+        currentVerseRef.current = 0;
+        setCurrentVerse(0);
       }
     };
 

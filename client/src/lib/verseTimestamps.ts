@@ -37,6 +37,10 @@ export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
     return alFatihahTimestamps;
   }
   
+  // For chapters 2+, audio includes Bismillah preamble (~3 seconds) before verse 1
+  // Chapter 9 (At-Tawbah) does NOT have Bismillah, so no offset
+  const preambleOffset = chapterId === 9 ? 0 : 3;
+  
   // For other chapters, generate approximate timestamps
   // In production, use actual verse timing data
   const verseCount = getVerseCount(chapterId);
@@ -44,8 +48,8 @@ export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
   
   return Array.from({ length: verseCount }, (_, i) => ({
     verse: i + 1,
-    start: i * avgVerseDuration,
-    end: (i + 1) * avgVerseDuration,
+    start: preambleOffset + (i * avgVerseDuration),
+    end: preambleOffset + ((i + 1) * avgVerseDuration),
   }));
 };
 
