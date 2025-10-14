@@ -4,9 +4,17 @@ export interface VerseTimestamp {
   end: number;
 }
 
+// Preamble text recited before chapters
+export const PREAMBLE_TEXT = {
+  arabic: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ",
+  transliteration: "A'udhu billahi min ash-shaytan ir-rajim",
+  translation: "I seek refuge with Allah from Satan, the expelled",
+};
+
 // Verse timestamps for Al-Fatihah (Mishary Rashid Alafasy)
-// Audio includes preamble (~6s) before Bismillah (verse 1)
+// Includes preamble as verse 0
 export const alFatihahTimestamps: VerseTimestamp[] = [
+  { verse: 0, start: 0, end: 6 },        // A'udhu billahi (preamble)
   { verse: 1, start: 6, end: 11.5 },     // Bismillaahir Rahmaanir Raheem
   { verse: 2, start: 11.5, end: 17 },    // Alhamdu lillaahi Rabbil 'aalameen
   { verse: 3, start: 17, end: 20.5 },    // Ar-Rahmaanir-Raheem
@@ -37,20 +45,32 @@ export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
     return alFatihahTimestamps;
   }
   
-  // For chapters 2+, audio includes Bismillah preamble (~3 seconds) before verse 1
-  // Chapter 9 (At-Tawbah) does NOT have Bismillah, so no offset
-  const preambleOffset = chapterId === 9 ? 0 : 3;
-  
   // For other chapters, generate approximate timestamps
   // In production, use actual verse timing data
   const verseCount = getVerseCount(chapterId);
   const avgVerseDuration = 8; // seconds per verse (approximate)
   
-  return Array.from({ length: verseCount }, (_, i) => ({
-    verse: i + 1,
-    start: preambleOffset + (i * avgVerseDuration),
-    end: preambleOffset + ((i + 1) * avgVerseDuration),
-  }));
+  // Chapter 9 (At-Tawbah) does NOT have Bismillah preamble
+  const hasPreamble = chapterId !== 9;
+  const preambleDuration = hasPreamble ? 3 : 0;
+  
+  const timestamps: VerseTimestamp[] = [];
+  
+  // Add preamble (A'udhu billahi) for chapters that have it
+  if (hasPreamble) {
+    timestamps.push({ verse: 0, start: 0, end: preambleDuration });
+  }
+  
+  // Add verse timestamps
+  for (let i = 0; i < verseCount; i++) {
+    timestamps.push({
+      verse: i + 1,
+      start: preambleDuration + (i * avgVerseDuration),
+      end: preambleDuration + ((i + 1) * avgVerseDuration),
+    });
+  }
+  
+  return timestamps;
 };
 
 function getVerseCount(chapterId: number): number {
