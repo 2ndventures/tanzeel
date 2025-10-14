@@ -6,7 +6,7 @@ import BottomNav from "@/components/BottomNav";
 import { getChapterVerses, getChapterInfo } from "@/lib/quranData";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
+import { getChapterAudioUrl, getVerseTimestamps, PREAMBLE_TEXT } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 
 interface ChapterViewProps {
@@ -134,6 +134,19 @@ export default function ChapterView({
 
       <ScrollArea className="flex-1" ref={scrollRef}>
         <div className="divide-y divide-border">
+          {/* Display preamble (A'udhu billahi) if chapter audio includes it */}
+          {verseTimestamps.some(v => v.verse === 0) && (
+            <VerseCard
+              key={0}
+              verseNumber={0}
+              arabicText={PREAMBLE_TEXT.arabic}
+              transliteration={PREAMBLE_TEXT.transliteration}
+              translation={PREAMBLE_TEXT.translation}
+              showTransliteration={showTransliteration}
+              isPlaying={isPlaying && currentVerse === 0}
+            />
+          )}
+          
           {verses.map((verse) => (
             <VerseCard
               key={verse.number}

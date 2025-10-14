@@ -30,7 +30,7 @@ export default function VerseCard({
             }`} 
             data-testid={`text-verse-number-${verseNumber}`}
           >
-            Verse {verseNumber}
+            {verseNumber === 0 ? 'Preamble' : `Verse ${verseNumber}`}
           </span>
         </div>
         <p 
