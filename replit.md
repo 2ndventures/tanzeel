@@ -72,7 +72,7 @@ Preferred communication style: Simple, everyday language.
 - Solves CORS issues by streaming audio through Express server
 - Three reciters available: Alafasy (Mishary Rashid Alafasy), Sudais (Abdur-Rahman Al-Sudais), Ghamadi (Saad Al-Ghamadi)
 - Automatic fallback to Alafasy if selected reciter's audio is unavailable
-- Verse timestamps for Al-Fatihah manually tuned to match Alafasy recitation; other chapters use approximate 8-second intervals
+- Verse timestamps for Al-Fatihah manually fine-tuned to match Alafasy recitation timing (Verse 1: 0-5.5s, Verse 2: 5.5-11s, Verse 3: 11-14.5s, Verse 4: 14.5-19s, Verse 5: 19-25.5s, Verse 6: 25.5-33s, Verse 7: 33-52s); other chapters use approximate 8-second intervals
 
 **Audio Lifecycle Management**: Audio element only recreates when audioUrl changes, not on speed/repeat/timestamp updates (prevents playback interruption)
 
