@@ -19,7 +19,7 @@ export default function VerseCard({
     <div 
       className={`space-y-4 p-4 transition-all duration-300 ${
         isPlaying ? 'bg-primary/10 border-l-4 border-l-primary' : ''
-      }`} 
+      }`}
       data-testid={`card-verse-${verseNumber}`}
     >
       <div className="space-y-3">
