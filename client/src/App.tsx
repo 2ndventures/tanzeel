@@ -62,6 +62,8 @@ function App() {
               speed={speed}
               autoScroll={autoScroll}
               repeat={repeat}
+              onAutoScrollChange={setAutoScroll}
+              onRepeatChange={setRepeat}
             />
           )}
           {currentPage === "settings" && (

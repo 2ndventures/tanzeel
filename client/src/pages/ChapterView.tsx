@@ -4,7 +4,6 @@ import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import BottomNav from "@/components/BottomNav";
 import { getChapterVerses, getChapterInfo } from "@/lib/quranData";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, getVerseTimestamps, PREAMBLE_TEXT } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
@@ -18,6 +17,8 @@ interface ChapterViewProps {
   speed: string;
   autoScroll: boolean;
   repeat: boolean;
+  onAutoScrollChange: (enabled: boolean) => void;
+  onRepeatChange: (enabled: boolean) => void;
 }
 
 export default function ChapterView({ 
@@ -28,9 +29,10 @@ export default function ChapterView({
   reciter,
   speed: initialSpeed,
   autoScroll,
-  repeat
+  repeat,
+  onAutoScrollChange,
+  onRepeatChange
 }: ChapterViewProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
   const audioUrl = getChapterAudioUrl(chapterId, reciter);
@@ -62,32 +64,22 @@ export default function ChapterView({
     nextVerse,
     previousVerse,
   } = useAudioPlayer(audioUrl, verseTimestamps, (verse) => {
-    if (autoScroll && scrollRef.current) {
-      // Use requestAnimationFrame to ensure DOM is ready and we get current scroll position
+    if (autoScroll) {
+      // Use requestAnimationFrame to ensure DOM is ready
       requestAnimationFrame(() => {
         const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
         
-        if (verseElement && scrollRef.current) {
-          // Get the ScrollArea viewport (the actual scrolling container)
-          const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (verseElement) {
+          // Calculate offset from top of viewport
+          const rect = verseElement.getBoundingClientRect();
+          // Account for the sticky header (60px) to position verse at top below header
+          const headerHeight = 60;
+          const offset = rect.top - headerHeight;
           
-          if (viewport) {
-            // Calculate verse position relative to the viewport
-            const verseRect = verseElement.getBoundingClientRect();
-            const viewportRect = viewport.getBoundingClientRect();
-            const currentScroll = viewport.scrollTop;
-            const targetScroll = currentScroll + (verseRect.top - viewportRect.top);
-            
-            console.log('📜 Auto-scroll:', {
-              verse,
-              currentScroll,
-              targetScroll,
-              offset: verseRect.top - viewportRect.top
-            });
-            
-            // Scroll the viewport to position verse at top
-            viewport.scrollTo({ top: targetScroll, behavior: 'smooth' });
-          }
+          console.log('📜 Auto-scroll verse', verse, 'offset:', offset);
+          
+          // Scroll window to bring verse to top (below header)
+          window.scrollBy({ top: offset, behavior: 'smooth' });
         }
       });
     }
@@ -156,7 +148,7 @@ export default function ChapterView({
         </div>
       </header>
 
-      <ScrollArea className="flex-1" ref={scrollRef}>
+      <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-border">
           {/* Display preamble (A'udhu billahi) if chapter audio includes it */}
           {verseTimestamps.some(v => v.verse === 0) && (
@@ -184,7 +176,7 @@ export default function ChapterView({
           ))}
         </div>
         <div className="h-40" />
-      </ScrollArea>
+      </div>
 
       <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 pointer-events-none">
         <div className="pointer-events-auto max-w-md mx-auto">
@@ -194,11 +186,15 @@ export default function ChapterView({
             isPlaying={isPlaying}
             speed={speed}
             isLoading={isLoading}
+            autoScroll={autoScroll}
+            repeat={repeat}
             onPlayPause={togglePlayPause}
             onSeek={seek}
             onSpeedChange={cycleSpeed}
             onPrevious={previousVerse}
             onNext={nextVerse}
+            onAutoScrollChange={onAutoScrollChange}
+            onRepeatChange={onRepeatChange}
           />
         </div>
       </div>

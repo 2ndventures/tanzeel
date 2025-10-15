@@ -1,7 +1,15 @@
-import { useState, useRef, useEffect } from "react";
 import { Play, Pause, SkipBack, SkipForward, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
 
 interface AudioPlayerProps {
   currentTime?: number;
@@ -9,11 +17,15 @@ interface AudioPlayerProps {
   isPlaying?: boolean;
   speed?: number;
   isLoading?: boolean;
+  autoScroll?: boolean;
+  repeat?: boolean;
   onPlayPause?: () => void;
   onSeek?: (time: number) => void;
   onSpeedChange?: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
+  onAutoScrollChange?: (enabled: boolean) => void;
+  onRepeatChange?: (enabled: boolean) => void;
 }
 
 export default function AudioPlayer({
@@ -22,11 +34,15 @@ export default function AudioPlayer({
   isPlaying = false,
   speed = 1.0,
   isLoading = false,
+  autoScroll = false,
+  repeat = false,
   onPlayPause,
   onSeek,
   onSpeedChange,
   onPrevious,
   onNext,
+  onAutoScrollChange,
+  onRepeatChange,
 }: AudioPlayerProps) {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -106,13 +122,45 @@ export default function AudioPlayer({
         </div>
         
         <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="icon"
-            data-testid="button-more"
-          >
-            <MoreVertical className="w-5 h-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                data-testid="button-more"
+              >
+                <MoreVertical className="w-5 h-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Playback Settings</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="flex items-center justify-between"
+                onSelect={(e) => e.preventDefault()}
+                data-testid="menu-item-auto-scroll"
+              >
+                <span>Auto-scroll</span>
+                <Switch 
+                  checked={autoScroll} 
+                  onCheckedChange={onAutoScrollChange}
+                  data-testid="switch-auto-scroll"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between"
+                onSelect={(e) => e.preventDefault()}
+                data-testid="menu-item-repeat"
+              >
+                <span>Repeat</span>
+                <Switch 
+                  checked={repeat} 
+                  onCheckedChange={onRepeatChange}
+                  data-testid="switch-repeat"
+                />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
