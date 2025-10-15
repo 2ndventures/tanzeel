@@ -198,19 +198,13 @@ export default function AudioPlayer({
               <DropdownMenuItem 
                 className="flex items-center justify-between cursor-pointer"
                 onSelect={(e) => e.preventDefault()}
-                onClick={() => {
-                  console.log('🔄 Auto-scroll clicked, current:', autoScroll, 'changing to:', !autoScroll);
-                  onAutoScrollChange?.(!autoScroll);
-                }}
+                onClick={() => onAutoScrollChange?.(!autoScroll)}
                 data-testid="menu-item-auto-scroll"
               >
                 <span>Auto-scroll</span>
                 <Switch 
                   checked={autoScroll} 
-                  onCheckedChange={(checked) => {
-                    console.log('🔄 Auto-scroll switch changed to:', checked);
-                    onAutoScrollChange?.(checked);
-                  }}
+                  onCheckedChange={onAutoScrollChange}
                   onClick={(e) => e.stopPropagation()}
                   data-testid="switch-auto-scroll"
                 />
@@ -218,19 +212,13 @@ export default function AudioPlayer({
               <DropdownMenuItem 
                 className="flex items-center justify-between cursor-pointer"
                 onSelect={(e) => e.preventDefault()}
-                onClick={() => {
-                  console.log('🔁 Repeat clicked, current:', repeat, 'changing to:', !repeat);
-                  onRepeatChange?.(!repeat);
-                }}
+                onClick={() => onRepeatChange?.(!repeat)}
                 data-testid="menu-item-repeat"
               >
                 <span>Repeat</span>
                 <Switch 
                   checked={repeat} 
-                  onCheckedChange={(checked) => {
-                    console.log('🔁 Repeat switch changed to:', checked);
-                    onRepeatChange?.(checked);
-                  }}
+                  onCheckedChange={onRepeatChange}
                   onClick={(e) => e.stopPropagation()}
                   data-testid="switch-repeat"
                 />
@@ -238,19 +226,13 @@ export default function AudioPlayer({
               <DropdownMenuItem 
                 className="flex items-center justify-between cursor-pointer"
                 onSelect={(e) => e.preventDefault()}
-                onClick={() => {
-                  console.log('▶️ Autoplay clicked, current:', autoplay, 'changing to:', !autoplay);
-                  onAutoplayChange?.(!autoplay);
-                }}
+                onClick={() => onAutoplayChange?.(!autoplay)}
                 data-testid="menu-item-autoplay"
               >
                 <span>Autoplay</span>
                 <Switch 
                   checked={autoplay} 
-                  onCheckedChange={(checked) => {
-                    console.log('▶️ Autoplay switch changed to:', checked);
-                    onAutoplayChange?.(checked);
-                  }}
+                  onCheckedChange={onAutoplayChange}
                   onClick={(e) => e.stopPropagation()}
                   data-testid="switch-autoplay"
                 />
