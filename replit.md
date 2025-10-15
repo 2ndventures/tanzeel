@@ -25,6 +25,11 @@ The app includes chapter browsing, verse-by-verse reading with synchronized audi
   - When enabled, playback starts automatically when chapter loads (once audio is ready)
   - When disabled, users must manually press play button
   - Smart trigger prevents multiple autoplay attempts per chapter
+- **Playback Settings Dropdown**: All 6 setting toggles now accessible in AudioPlayer "More" dropdown for quick access during playback:
+  - Theme (Dark/Light mode), Transliteration, Translation, Auto-scroll, Repeat, and Autoplay toggles
+  - Click anywhere on menu item row to toggle (not just the tiny switch)
+  - State flows from App → ChapterView → AudioPlayer for centralized control
+  - Provides quick settings access without leaving playback screen
 
 # User Preferences
 
