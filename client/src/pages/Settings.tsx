@@ -21,6 +21,8 @@ interface SettingsProps {
   onAutoScrollChange: (value: boolean) => void;
   repeat: boolean;
   onRepeatChange: (value: boolean) => void;
+  autoplay: boolean;
+  onAutoplayChange: (value: boolean) => void;
   translation: string;
   onTranslationChange: (value: string) => void;
 }
@@ -43,6 +45,8 @@ export default function Settings({
   onAutoScrollChange,
   repeat,
   onRepeatChange,
+  autoplay,
+  onAutoplayChange,
   translation,
   onTranslationChange,
 }: SettingsProps) {
@@ -163,6 +167,14 @@ export default function Settings({
                 value={repeat}
                 onToggle={onRepeatChange}
                 testId="toggle-repeat"
+              />
+              <SettingItem
+                label="Autoplay"
+                sublabel="Off"
+                type="toggle"
+                value={autoplay}
+                onToggle={onAutoplayChange}
+                testId="toggle-autoplay"
               />
             </div>
           </div>
