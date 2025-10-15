@@ -12,144 +12,13 @@ export interface Reciter {
 }
 
 export const RECITERS: Reciter[] = [
-  // Featured reciters (most popular)
+  // NOTE: Currently only Alafasy has full surah audio files at 128kbps on Islamic Network CDN
+  // Other reciters may fallback to Alafasy if audio is unavailable
   {
     id: "ar.alafasy",
-    name: "Mishary Rashid al-Afasy",
+    name: "Mishary Alafasy",
     arabicName: "مشاري العفاسي",
-    style: "Murattal",
     featured: true,
-  },
-  {
-    id: "ar.abdurrahmaansudais",
-    name: "Abdur-Rahman as-Sudais",
-    arabicName: "عبدالرحمن السديس",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.shaatree",
-    name: "Abu Bakr al-Shatri",
-    arabicName: "أبو بكر الشاطري",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.husary",
-    name: "Mahmoud Khalil Al-Husary",
-    arabicName: "محمود خليل الحصري",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.mahermuaiqly",
-    name: "Maher al-Muaiqly",
-    arabicName: "ماهر المعيقلي",
-    style: "Murattal",
-    featured: true,
-  },
-  
-  // AbdulBaset AbdulSamad variations
-  {
-    id: "ar.abdulsamad",
-    name: "AbdulBaset AbdulSamad",
-    arabicName: "عبدالباسط عبدالصمد",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.abdulbasitmurattal",
-    name: "AbdulBaset AbdulSamad - Mujawwad",
-    arabicName: "عبد الباسط عبد الصمد المرتل",
-    style: "Mujawwad",
-  },
-  
-  // Minshawi variations
-  {
-    id: "ar.minshawi",
-    name: "Mohamed Siddiq al-Minshawi",
-    arabicName: "محمد صديق المنشاوي",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.minshawimujawwad",
-    name: "Mohamed Siddiq al-Minshawi - Mujawwad",
-    arabicName: "محمد صديق المنشاوي (المجود)",
-    style: "Mujawwad",
-  },
-  
-  // Husary variations
-  {
-    id: "ar.husarymujawwad",
-    name: "Mahmoud Khalil Al-Husary - Mujawwad",
-    arabicName: "محمود خليل الحصري (المجود)",
-    style: "Mujawwad",
-  },
-  
-  // Other popular reciters
-  {
-    id: "ar.ahmedajamy",
-    name: "Ahmed ibn Ali al-Ajamy",
-    arabicName: "أحمد بن علي العجمي",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.hanirifai",
-    name: "Hani ar-Rifai",
-    arabicName: "هاني الرفاعي",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.saoodshuraym",
-    name: "Sa'ud ash-Shuraym",
-    arabicName: "سعود الشريم",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.muhammadayyoub",
-    name: "Muhammad Ayyoub",
-    arabicName: "محمد أيوب",
-    style: "Murattal",
-  },
-  {
-    id: "ar.muhammadjibreel",
-    name: "Muhammad Jibreel",
-    arabicName: "محمد جبريل",
-    style: "Murattal",
-  },
-  {
-    id: "ar.abdullahbasfar",
-    name: "Abdullah Basfar",
-    arabicName: "عبد الله بصفر",
-    style: "Murattal",
-  },
-  {
-    id: "ar.hudhaify",
-    name: "Ali al-Hudhaify",
-    arabicName: "علي بن عبدالرحمن الحذيفي",
-    style: "Murattal",
-  },
-  {
-    id: "ar.ibrahimakhbar",
-    name: "Ibrahim Akhdar",
-    arabicName: "إبراهيم الأخضر",
-    style: "Murattal",
-  },
-  {
-    id: "ar.aymanswoaid",
-    name: "Ayman Sowaid",
-    arabicName: "أيمن سويد",
-    style: "Murattal",
-  },
-  {
-    id: "ar.parhizgar",
-    name: "Shahriar Parhizgar",
-    arabicName: "شهریار پرهیزگار",
-    style: "Murattal",
   },
 ];
 
@@ -171,11 +40,9 @@ export const getReciterById = (id: string): Reciter | undefined => {
 // Get reciter display name
 export const getReciterDisplayName = (id: string): string => {
   const reciter = getReciterById(id);
-  if (!reciter) return "Mishary Rashid al-Afasy"; // Default
+  if (!reciter) return "Mishary Rashid Alafasy"; // Default
   
-  return reciter.style 
-    ? `${reciter.name} - ${reciter.style}`
-    : reciter.name;
+  return reciter.name;
 };
 
 // Default reciter
