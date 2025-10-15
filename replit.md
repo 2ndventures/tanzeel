@@ -22,7 +22,23 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 ## Audio Playback System
 
-A custom `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization. It supports play/pause, seeking, playback speed adjustment, verse-timestamp synchronization for karaoke-style highlighting, repeat functionality, auto-scroll, and prev/next verse navigation. Audio sources are from the Islamic Network CDN, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse. Verse timestamp synchronization is meticulously managed for accurate highlighting across all chapters, including special handling for Chapter 9 and preambles.
+A custom `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization. It supports play/pause, seeking, playback speed adjustment, verse-timestamp synchronization for karaoke-style highlighting, repeat functionality, auto-scroll, and prev/next verse navigation. 
+
+### Reciter System
+The application supports 20+ professional Quran reciters from the Islamic Network API, configurable via Settings. Available reciters include:
+- **Mishary Rashid Alafasy** (default, ar.alafasy)
+- **Abu Bakr al-Shatri** (ar.shaatree)
+- **Mahmoud Khalil Al-Husary** (ar.husary, ar.husarymujawwad)
+- **Abdur-Rahman as-Sudais** (ar.abdurrahmaansudais)
+- **Maher Al-Muaiqly** (ar.mahermuaiqly)
+- **Sa'd al-Ghamdi** (ar.saadalghamadi)
+- **Hani ar-Rifai** (ar.hanialrifai)
+- **Khalil al-Husary** (ar.husarypublisher)
+- Plus 12 more reciters with various styles (Murattal, Mujawwad, Warsh, etc.)
+
+Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, and Islamic Network API identifiers. Selected reciter persists in localStorage with backward compatibility for legacy names. The backend audio proxy (`/api/audio/{reciter}/{chapter}`) automatically falls back to Alafasy if requested reciter is unavailable.
+
+Audio sources are from the Islamic Network CDN, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse. Verse timestamp synchronization is meticulously managed for accurate highlighting across all chapters, including special handling for Chapter 9 and preambles.
 
 ## Data Management
 

@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 interface VerseCardProps {
   verseNumber: number;
   arabicText: string;
@@ -6,6 +8,8 @@ interface VerseCardProps {
   showTransliteration: boolean;
   showTranslation: boolean;
   isPlaying?: boolean;
+  isCurrentVerse?: boolean;
+  isInVerseRange?: boolean;
   onClick?: () => void;
 }
 
@@ -17,17 +21,28 @@ export default function VerseCard({
   showTransliteration,
   showTranslation,
   isPlaying = false,
+  isCurrentVerse = false,
+  isInVerseRange = false,
   onClick,
 }: VerseCardProps) {
-  // Log to verify prop value
-  if (isPlaying) {
-    console.log(`📍 VerseCard ${verseNumber} received isPlaying=true`);
-  }
+  // Calculate if this verse should be highlighted
+  const shouldHighlight = isPlaying && isCurrentVerse && isInVerseRange;
+  
+  //Use state to ensure re-renders
+  const [highlighted, setHighlighted] = useState(shouldHighlight);
+  
+  // Update highlighted state when shouldHighlight changes
+  useEffect(() => {
+    setHighlighted(shouldHighlight);
+    if (shouldHighlight) {
+      console.log(`📍 Highlighting verse ${verseNumber}: isPlaying=${isPlaying}, isCurrentVerse=${isCurrentVerse}, isInVerseRange=${isInVerseRange}`);
+    }
+  }, [shouldHighlight, isPlaying, isCurrentVerse, isInVerseRange, verseNumber]);
   
   // Use inline styles + data attribute for highlighting to bypass className issues
-  const highlightStyles: React.CSSProperties = isPlaying ? {
-    backgroundColor: 'hsla(var(--primary) / 0.1)',
-    borderLeft: '4px solid hsl(var(--primary))',
+  const highlightStyles: React.CSSProperties = highlighted ? {
+    backgroundColor: 'rgba(77, 124, 254, 0.1)', // #4d7cfe with 10% opacity
+    borderLeft: '4px solid #4d7cfe', // primary color
   } : {};
   
   return (
@@ -35,14 +50,14 @@ export default function VerseCard({
       className="space-y-4 p-4 transition-all duration-300 cursor-pointer hover-elevate"
       style={highlightStyles}
       data-testid={`card-verse-${verseNumber}`}
-      data-playing={isPlaying ? 'true' : 'false'}
+      data-playing={highlighted ? 'true' : 'false'}
       onClick={onClick}
     >
       <div className="space-y-3">
         <div className="flex items-start gap-2">
           <span 
             className={`font-semibold text-sm flex-shrink-0 transition-colors ${
-              isPlaying ? 'text-primary' : 'text-primary'
+              highlighted ? 'text-primary' : 'text-primary'
             }`} 
             data-testid={`text-verse-number-${verseNumber}`}
           >
@@ -51,7 +66,7 @@ export default function VerseCard({
         </div>
         <p 
           className={`text-2xl md:text-3xl leading-loose font-arabic text-right transition-colors ${
-            isPlaying ? 'text-primary' : 'text-foreground'
+            highlighted ? 'text-primary' : 'text-foreground'
           }`}
           dir="rtl"
           data-testid={`text-arabic-${verseNumber}`}
@@ -61,7 +76,7 @@ export default function VerseCard({
         {showTransliteration && transliteration && (
           <p 
             className={`text-sm italic transition-colors ${
-              isPlaying ? 'text-primary/80' : 'text-muted-foreground'
+              highlighted ? 'text-primary/80' : 'text-muted-foreground'
             }`} 
             data-testid={`text-transliteration-${verseNumber}`}
           >
@@ -71,7 +86,7 @@ export default function VerseCard({
         {showTranslation && (
           <p 
             className={`text-base transition-colors ${
-              isPlaying ? 'text-foreground' : 'text-foreground'
+              highlighted ? 'text-foreground' : 'text-foreground'
             }`} 
             data-testid={`text-translation-${verseNumber}`}
           >
