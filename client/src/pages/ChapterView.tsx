@@ -188,19 +188,25 @@ export default function ChapterView({
 
       <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-border">
-          {verses.map((verse) => (
-            <VerseCard
-              key={verse.number}
-              verseNumber={verse.number}
-              arabicText={verse.arabicText}
-              transliteration={verse.transliteration}
-              translation={verse.translation}
-              showTransliteration={showTransliteration}
-              showTranslation={showTranslation}
-              isPlaying={isPlaying && isInVerseRange && currentVerse === verse.number}
-              onClick={() => handleVerseClick(verse.number)}
-            />
-          ))}
+          {verses.map((verse) => {
+            const shouldHighlight = isPlaying && isInVerseRange && currentVerse === verse.number;
+            if (shouldHighlight) {
+              console.log(`🎨 Highlighting verse ${verse.number}: isPlaying=${isPlaying}, isInVerseRange=${isInVerseRange}, currentVerse=${currentVerse}`);
+            }
+            return (
+              <VerseCard
+                key={verse.number}
+                verseNumber={verse.number}
+                arabicText={verse.arabicText}
+                transliteration={verse.transliteration}
+                translation={verse.translation}
+                showTransliteration={showTransliteration}
+                showTranslation={showTranslation}
+                isPlaying={shouldHighlight}
+                onClick={() => handleVerseClick(verse.number)}
+              />
+            );
+          })}
         </div>
         <div className="h-40" />
       </div>

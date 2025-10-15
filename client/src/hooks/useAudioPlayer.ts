@@ -100,11 +100,13 @@ export function useAudioPlayer(
           currentVerseRef.current = verse.verse;
           
           // Atomic state update - all changes in one setState call
+          // IMPORTANT: Maintain isPlaying state during verse changes
           setState(prev => ({ 
             ...prev, 
             currentTime, 
             currentVerse: verse.verse,
             isInVerseRange: true,
+            isPlaying: !audio.paused, // Sync with actual audio state
           }));
           
           onVerseChangeRef.current?.(verse.verse);
@@ -113,12 +115,12 @@ export function useAudioPlayer(
           const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
           console.log(`✓ ${verseLabel} highlighting at ${currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
         } else {
-          // Same verse, just update time
-          setState(prev => ({ ...prev, currentTime }));
+          // Same verse, just update time and sync isPlaying
+          setState(prev => ({ ...prev, currentTime, isPlaying: !audio.paused }));
         }
       } else {
         // We're in a gap (no timestamp defined) - turn off highlighting but keep currentVerse for navigation
-        setState(prev => ({ ...prev, currentTime, isInVerseRange: false }));
+        setState(prev => ({ ...prev, currentTime, isInVerseRange: false, isPlaying: !audio.paused }));
       }
     };
 

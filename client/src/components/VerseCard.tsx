@@ -19,12 +19,23 @@ export default function VerseCard({
   isPlaying = false,
   onClick,
 }: VerseCardProps) {
+  // Log to verify prop value
+  if (isPlaying) {
+    console.log(`📍 VerseCard ${verseNumber} received isPlaying=true`);
+  }
+  
+  // Use inline styles + data attribute for highlighting to bypass className issues
+  const highlightStyles: React.CSSProperties = isPlaying ? {
+    backgroundColor: 'hsla(var(--primary) / 0.1)',
+    borderLeft: '4px solid hsl(var(--primary))',
+  } : {};
+  
   return (
     <div 
-      className={`space-y-4 p-4 transition-all duration-300 cursor-pointer hover-elevate ${
-        isPlaying ? 'bg-primary/10 border-l-4 border-l-primary' : ''
-      }`}
+      className="space-y-4 p-4 transition-all duration-300 cursor-pointer hover-elevate"
+      style={highlightStyles}
       data-testid={`card-verse-${verseNumber}`}
+      data-playing={isPlaying ? 'true' : 'false'}
       onClick={onClick}
     >
       <div className="space-y-3">
