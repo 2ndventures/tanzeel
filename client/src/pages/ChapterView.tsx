@@ -191,24 +191,22 @@ export default function ChapterView({
         <div className="h-40" />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 z-10">
-        <AudioPlayer
-          currentTime={currentTime}
-          duration={duration || 0}
-          isPlaying={isPlaying}
-          speed={speed}
-          isLoading={isLoading}
-          autoScroll={autoScroll}
-          repeat={repeat}
-          onPlayPause={togglePlayPause}
-          onSeek={seek}
-          onSpeedChange={cycleSpeed}
-          onPrevious={previousVerse}
-          onNext={nextVerse}
-          onAutoScrollChange={onAutoScrollChange}
-          onRepeatChange={onRepeatChange}
-        />
-      </div>
+      <AudioPlayer
+        currentTime={currentTime}
+        duration={duration || 0}
+        isPlaying={isPlaying}
+        speed={speed}
+        isLoading={isLoading}
+        autoScroll={autoScroll}
+        repeat={repeat}
+        onPlayPause={togglePlayPause}
+        onSeek={seek}
+        onSpeedChange={cycleSpeed}
+        onPrevious={previousVerse}
+        onNext={nextVerse}
+        onAutoScrollChange={onAutoScrollChange}
+        onRepeatChange={onRepeatChange}
+      />
     </div>
   );
 }

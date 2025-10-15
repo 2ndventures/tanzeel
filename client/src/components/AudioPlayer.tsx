@@ -51,25 +51,26 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="bg-card border-t border-border px-4 py-4 space-y-4">
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground w-12" data-testid="text-current-time">
-          {formatTime(currentTime)}
-        </span>
-        <Slider
-          value={[currentTime]}
-          max={duration}
-          step={1}
-          onValueChange={(value) => onSeek?.(value[0])}
-          className="flex-1"
-          data-testid="slider-audio-progress"
-        />
-        <span className="text-sm text-muted-foreground w-12 text-right" data-testid="text-duration">
-          {formatTime(duration)}
-        </span>
-      </div>
-      
-      <div className="grid grid-cols-3 items-center">
+    <div className="fixed inset-x-0 bottom-0 z-10">
+      <div className="bg-card border-t border-border px-4 py-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-muted-foreground w-12" data-testid="text-current-time">
+            {formatTime(currentTime)}
+          </span>
+          <Slider
+            value={[currentTime]}
+            max={duration}
+            step={1}
+            onValueChange={(value) => onSeek?.(value[0])}
+            className="flex-1"
+            data-testid="slider-audio-progress"
+          />
+          <span className="text-sm text-muted-foreground w-12 text-right" data-testid="text-duration">
+            {formatTime(duration)}
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-3 items-center">
         <div className="flex justify-start">
           <Button
             variant="ghost"
@@ -164,6 +165,7 @@ export default function AudioPlayer({
           </DropdownMenu>
         </div>
       </div>
+    </div>
     </div>
   );
 }
