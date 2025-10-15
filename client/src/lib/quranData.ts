@@ -13,6 +13,12 @@ export interface Verse {
   translation: string;
 }
 
+
+// Utility function to remove "سُورَةُ" prefix from Arabic chapter names
+// to match quran.com display format
+export function getDisplayArabicName(arabicName: string): string {
+  return arabicName.replace(/^سُورَةُ\s+/, '');
+}
 export const chapters: Chapter[] = [
   {
     "id": 1,

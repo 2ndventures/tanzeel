@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Bookmark } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
-import { getChapterVerses, getChapterInfo } from "@/lib/quranData";
+import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { getChapterAudioUrl, getVerseTimestamps, PREAMBLE_TEXT } from "@/lib/verseTimestamps";
+import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 
 interface ChapterViewProps {
@@ -174,7 +174,7 @@ export default function ChapterView({
             <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
           <h1 className="text-xl font-semibold text-foreground" data-testid="text-chapter-title">
-            {chapterInfo?.arabicName || 'Al-Fatihah'}
+            {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
           </h1>
           <button 
             className="p-2 hover-elevate active-elevate-2 rounded-md" 
@@ -188,21 +188,6 @@ export default function ChapterView({
 
       <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-border">
-          {/* Display preamble (A'udhu billahi) if chapter audio includes it */}
-          {verseTimestamps.some(v => v.verse === 0) && (
-            <VerseCard
-              key={0}
-              verseNumber={0}
-              arabicText={PREAMBLE_TEXT.arabic}
-              transliteration={PREAMBLE_TEXT.transliteration}
-              translation={PREAMBLE_TEXT.translation}
-              showTransliteration={showTransliteration}
-              showTranslation={showTranslation}
-              isPlaying={isPlaying && isInVerseRange && currentVerse === 0}
-              onClick={() => handleVerseClick(0)}
-            />
-          )}
-          
           {verses.map((verse) => (
             <VerseCard
               key={verse.number}

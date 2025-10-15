@@ -1,5 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { getDisplayArabicName } from "@/lib/quranData";
 
 interface ChapterCardProps {
   number: number;
@@ -29,7 +30,7 @@ export default function ChapterCard({
       </div>
       <div className="flex-1 min-w-0">
         <h3 className="font-semibold text-foreground" data-testid={`text-chapter-name-${number}`}>
-          {arabicName}
+          {getDisplayArabicName(arabicName)}
         </h3>
         <p className="text-sm text-muted-foreground">
           {englishName} • {verseCount} verses
