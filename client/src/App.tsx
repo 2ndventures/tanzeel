@@ -15,6 +15,7 @@ function App() {
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
   const [darkMode, setDarkMode] = useState(true);
   const [transliteration, setTransliteration] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(true);
   const [font, setFont] = useState("System");
   const [reciter, setReciter] = useState("Alafasy");
   const [speed, setSpeed] = useState("Normal");
@@ -57,6 +58,7 @@ function App() {
                 setActiveTab("surah");
               }}
               showTransliteration={transliteration}
+              showTranslation={showTranslation}
               onNavigate={handleNavigate}
               reciter={reciter}
               speed={speed}
@@ -76,6 +78,8 @@ function App() {
               onDarkModeChange={setDarkMode}
               transliteration={transliteration}
               onTransliterationChange={setTransliteration}
+              showTranslation={showTranslation}
+              onShowTranslationChange={setShowTranslation}
               font={font}
               onFontChange={setFont}
               reciter={reciter}

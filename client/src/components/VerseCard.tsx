@@ -4,7 +4,9 @@ interface VerseCardProps {
   transliteration?: string;
   translation: string;
   showTransliteration: boolean;
+  showTranslation: boolean;
   isPlaying?: boolean;
+  onClick?: () => void;
 }
 
 export default function VerseCard({
@@ -13,14 +15,17 @@ export default function VerseCard({
   transliteration,
   translation,
   showTransliteration,
+  showTranslation,
   isPlaying = false,
+  onClick,
 }: VerseCardProps) {
   return (
     <div 
-      className={`space-y-4 p-4 transition-all duration-300 ${
+      className={`space-y-4 p-4 transition-all duration-300 cursor-pointer hover-elevate ${
         isPlaying ? 'bg-primary/10 border-l-4 border-l-primary' : ''
       }`}
       data-testid={`card-verse-${verseNumber}`}
+      onClick={onClick}
     >
       <div className="space-y-3">
         <div className="flex items-start gap-2">
@@ -52,14 +57,16 @@ export default function VerseCard({
             {transliteration}
           </p>
         )}
-        <p 
-          className={`text-base transition-colors ${
-            isPlaying ? 'text-foreground' : 'text-foreground'
-          }`} 
-          data-testid={`text-translation-${verseNumber}`}
-        >
-          {translation}
-        </p>
+        {showTranslation && (
+          <p 
+            className={`text-base transition-colors ${
+              isPlaying ? 'text-foreground' : 'text-foreground'
+            }`} 
+            data-testid={`text-translation-${verseNumber}`}
+          >
+            {translation}
+          </p>
+        )}
       </div>
     </div>
   );

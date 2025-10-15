@@ -9,6 +9,8 @@ interface SettingsProps {
   onDarkModeChange: (value: boolean) => void;
   transliteration: boolean;
   onTransliterationChange: (value: boolean) => void;
+  showTranslation: boolean;
+  onShowTranslationChange: (value: boolean) => void;
   font: string;
   onFontChange: (value: string) => void;
   reciter: string;
@@ -29,6 +31,8 @@ export default function Settings({
   onDarkModeChange,
   transliteration,
   onTransliterationChange,
+  showTranslation,
+  onShowTranslationChange,
   font,
   onFontChange,
   reciter,
@@ -91,6 +95,27 @@ export default function Settings({
                 onToggle={onTransliterationChange}
                 testId="toggle-transliteration"
               />
+              <SettingItem
+                label="Translation"
+                sublabel="On"
+                type="toggle"
+                value={showTranslation}
+                onToggle={onShowTranslationChange}
+                testId="toggle-translation"
+              />
+              <SettingItem
+                label="Language"
+                sublabel="English"
+                type="select"
+                value={translation}
+                options={[
+                  { value: "English", label: "English" },
+                  { value: "Urdu", label: "Urdu" },
+                  { value: "French", label: "French" },
+                ]}
+                onSelect={onTranslationChange}
+                testId="select-language"
+              />
             </div>
           </div>
 
@@ -138,25 +163,6 @@ export default function Settings({
                 value={repeat}
                 onToggle={onRepeatChange}
                 testId="toggle-repeat"
-              />
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold text-foreground mb-3">Content</h2>
-            <div className="space-y-1 divide-y divide-border">
-              <SettingItem
-                label="Translations"
-                sublabel="English"
-                type="select"
-                value={translation}
-                options={[
-                  { value: "English", label: "English" },
-                  { value: "Urdu", label: "Urdu" },
-                  { value: "French", label: "French" },
-                ]}
-                onSelect={onTranslationChange}
-                testId="select-translation"
               />
             </div>
           </div>

@@ -12,6 +12,7 @@ interface ChapterViewProps {
   chapterId: number;
   onBack: () => void;
   showTransliteration: boolean;
+  showTranslation: boolean;
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
   reciter: string;
   speed: string;
@@ -25,6 +26,7 @@ export default function ChapterView({
   chapterId, 
   onBack, 
   showTransliteration, 
+  showTranslation,
   onNavigate,
   reciter,
   speed: initialSpeed,
@@ -124,8 +126,16 @@ export default function ChapterView({
     }
   };
 
+  const handleVerseClick = (verseNumber: number) => {
+    // Seek to the clicked verse and start playback
+    seekToVerse(verseNumber);
+    if (!isPlaying) {
+      togglePlayPause();
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-20">
+    <div className="min-h-screen bg-background flex flex-col pb-36">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between p-4">
           <button 
@@ -159,7 +169,9 @@ export default function ChapterView({
               transliteration={PREAMBLE_TEXT.transliteration}
               translation={PREAMBLE_TEXT.translation}
               showTransliteration={showTransliteration}
+              showTranslation={showTranslation}
               isPlaying={isPlaying && isInVerseRange && currentVerse === 0}
+              onClick={() => handleVerseClick(0)}
             />
           )}
           
@@ -171,32 +183,32 @@ export default function ChapterView({
               transliteration={verse.transliteration}
               translation={verse.translation}
               showTransliteration={showTransliteration}
+              showTranslation={showTranslation}
               isPlaying={isPlaying && isInVerseRange && currentVerse === verse.number}
+              onClick={() => handleVerseClick(verse.number)}
             />
           ))}
         </div>
         <div className="h-40" />
       </div>
 
-      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 pointer-events-none">
-        <div className="pointer-events-auto max-w-md mx-auto">
-          <AudioPlayer
-            currentTime={currentTime}
-            duration={duration || 0}
-            isPlaying={isPlaying}
-            speed={speed}
-            isLoading={isLoading}
-            autoScroll={autoScroll}
-            repeat={repeat}
-            onPlayPause={togglePlayPause}
-            onSeek={seek}
-            onSpeedChange={cycleSpeed}
-            onPrevious={previousVerse}
-            onNext={nextVerse}
-            onAutoScrollChange={onAutoScrollChange}
-            onRepeatChange={onRepeatChange}
-          />
-        </div>
+      <div className="fixed bottom-16 left-0 right-0 z-10">
+        <AudioPlayer
+          currentTime={currentTime}
+          duration={duration || 0}
+          isPlaying={isPlaying}
+          speed={speed}
+          isLoading={isLoading}
+          autoScroll={autoScroll}
+          repeat={repeat}
+          onPlayPause={togglePlayPause}
+          onSeek={seek}
+          onSpeedChange={cycleSpeed}
+          onPrevious={previousVerse}
+          onNext={nextVerse}
+          onAutoScrollChange={onAutoScrollChange}
+          onRepeatChange={onRepeatChange}
+        />
       </div>
 
       <BottomNav
