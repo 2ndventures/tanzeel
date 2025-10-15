@@ -25,18 +25,20 @@ export default function ChapterCard({
       onClick={onClick}
       data-testid={`card-chapter-${number}`}
     >
-      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary font-semibold flex-shrink-0">
-        {number}
-      </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-foreground" data-testid={`text-chapter-name-${number}`}>
-          {getDisplayArabicName(arabicName)}
-        </h3>
+      <div className="flex-1">
+        <div className="flex items-center justify-between gap-4 mb-1">
+          <h3 className="font-semibold text-foreground" data-testid={`text-chapter-name-${number}`}>
+            {englishName}
+          </h3>
+          <p className="font-arabic text-xl text-foreground">
+            {getDisplayArabicName(arabicName)}
+          </p>
+        </div>
         <p className="text-sm text-muted-foreground">
-          {englishName} • {verseCount} verses
+          {verseCount} verses
         </p>
       </div>
-      <div className="text-muted-foreground">
+      <div className="text-muted-foreground flex-shrink-0">
         <ChevronRight className="w-5 h-5" />
       </div>
     </Card>
