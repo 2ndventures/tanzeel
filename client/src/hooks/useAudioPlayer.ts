@@ -24,7 +24,7 @@ export function useAudioPlayer(
   repeat: boolean = false
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const currentVerseRef = useRef<number>(1);
+  const currentVerseRef = useRef<number>(0); // Start with preamble (verse 0)
   const onVerseChangeRef = useRef(onVerseChange);
   const repeatRef = useRef(repeat);
   const speedRef = useRef(1.0);
@@ -37,8 +37,8 @@ export function useAudioPlayer(
     speed: 1.0,
     isLoading: true,
     error: null,
-    currentVerse: 1,
-    isInVerseRange: true,
+    currentVerse: 0, // Start with preamble (verse 0)
+    isInVerseRange: true, // Start true - we know time 0 is in preamble range
   });
 
   // Keep refs up to date
@@ -67,11 +67,11 @@ export function useAudioPlayer(
       currentTime: 0,
       isPlaying: false,
       isLoading: true,
-      currentVerse: 1,
-      isInVerseRange: true,
+      currentVerse: 0, // Start with preamble (verse 0)
+      isInVerseRange: true, // Start true - time 0 is in preamble range
       error: null, // Clear any previous errors when loading new audio
     }));
-    currentVerseRef.current = 1;
+    currentVerseRef.current = 0;
 
     const handleLoadedMetadata = () => {
       // Restore playback speed from ref
@@ -142,7 +142,46 @@ export function useAudioPlayer(
     };
 
     const handlePlay = () => {
-      setState(prev => ({ ...prev, isPlaying: true }));
+      console.log('🎵 handlePlay fired, currentTime:', audio.currentTime);
+      
+      // Immediately check which verse we're in when playback starts
+      // This ensures we don't miss the preamble if timeUpdate fires late
+      const currentTime = audio.currentTime;
+      const verse = verseTimestampsRef.current.find(
+        v => currentTime >= v.start && currentTime < v.end
+      );
+      
+      console.log('🔍 Found verse:', verse, 'timestamps:', verseTimestampsRef.current.slice(0, 3));
+      
+      if (verse) {
+        const verseChanged = verse.verse !== currentVerseRef.current;
+        currentVerseRef.current = verse.verse;
+        
+        // Update state with verse info and isPlaying=true in single atomic update
+        setState(prev => ({ 
+          ...prev, 
+          currentTime, 
+          currentVerse: verse.verse,
+          isInVerseRange: true,
+          isPlaying: true,
+        }));
+        
+        console.log(`📝 State updated: currentVerse=${verse.verse}, isInVerseRange=true, isPlaying=true`);
+        
+        // Only call onVerseChange and log if verse actually changed
+        if (verseChanged) {
+          onVerseChangeRef.current?.(verse.verse);
+          
+          const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
+          console.log(`✓ ${verseLabel} highlighting at ${currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s) [on play]`);
+        } else {
+          console.log(`⏭️ Verse ${verse.verse} already current, skipped onVerseChange callback`);
+        }
+      } else {
+        console.log('⚠️ No verse found at currentTime:', currentTime);
+        // No verse found, just set isPlaying
+        setState(prev => ({ ...prev, isPlaying: true }));
+      }
     };
 
     const handlePause = () => {

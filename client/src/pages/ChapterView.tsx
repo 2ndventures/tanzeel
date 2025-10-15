@@ -65,7 +65,7 @@ export default function ChapterView({
     if (autoScroll && scrollRef.current) {
       const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
       if (verseElement) {
-        verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        verseElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   }, repeat);
