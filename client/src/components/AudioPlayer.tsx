@@ -51,8 +51,8 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-10">
-      <div className="bg-card border-t border-border px-4 py-4 space-y-4">
+    <div className="fixed inset-x-0 bottom-0 z-10" data-testid="audio-player-wrapper">
+      <div className="bg-card border-t border-border px-4 py-4 space-y-4" data-testid="audio-player-content">
         <div className="flex items-center gap-3">
           <span className="text-sm text-muted-foreground w-12" data-testid="text-current-time">
             {formatTime(currentTime)}
