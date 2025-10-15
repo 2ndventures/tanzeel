@@ -51,9 +51,9 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="bg-card border-t border-border px-4 py-3 space-y-3">
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground w-10" data-testid="text-current-time">
+    <div className="bg-card border-t border-border px-4 py-4 space-y-4">
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-muted-foreground w-12" data-testid="text-current-time">
           {formatTime(currentTime)}
         </span>
         <Slider
@@ -64,7 +64,7 @@ export default function AudioPlayer({
           className="flex-1"
           data-testid="slider-audio-progress"
         />
-        <span className="text-xs text-muted-foreground w-10 text-right" data-testid="text-duration">
+        <span className="text-sm text-muted-foreground w-12 text-right" data-testid="text-duration">
           {formatTime(duration)}
         </span>
       </div>
@@ -73,40 +73,40 @@ export default function AudioPlayer({
         <div className="flex justify-start">
           <Button
             variant="ghost"
-            size="sm"
+            size="default"
             onClick={onSpeedChange}
-            className="text-sm font-medium min-w-12"
+            className="text-base font-medium min-w-16 h-11"
             data-testid="button-speed"
           >
             {speed.toFixed(2)}x
           </Button>
         </div>
         
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={onPrevious}
-            className="rounded-full"
+            className="rounded-full w-11 h-11"
             data-testid="button-previous"
           >
-            <SkipBack className="w-5 h-5" />
+            <SkipBack className="w-6 h-6" />
           </Button>
           
           <Button
             variant="default"
             size="icon"
-            className="w-12 h-12 rounded-full"
+            className="w-16 h-16 rounded-full"
             onClick={onPlayPause}
             disabled={isLoading}
             data-testid="button-play-pause"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              <div className="w-7 h-7 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
             ) : isPlaying ? (
-              <Pause className="w-5 h-5" />
+              <Pause className="w-7 h-7" />
             ) : (
-              <Play className="w-5 h-5 ml-0.5" />
+              <Play className="w-7 h-7 ml-0.5" />
             )}
           </Button>
           
@@ -114,10 +114,10 @@ export default function AudioPlayer({
             variant="ghost"
             size="icon"
             onClick={onNext}
-            className="rounded-full"
+            className="rounded-full w-11 h-11"
             data-testid="button-next"
           >
-            <SkipForward className="w-5 h-5" />
+            <SkipForward className="w-6 h-6" />
           </Button>
         </div>
         
@@ -127,9 +127,10 @@ export default function AudioPlayer({
               <Button
                 variant="ghost"
                 size="icon"
+                className="w-11 h-11"
                 data-testid="button-more"
               >
-                <MoreVertical className="w-5 h-5" />
+                <MoreVertical className="w-6 h-6" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">

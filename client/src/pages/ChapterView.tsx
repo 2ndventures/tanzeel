@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Bookmark } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
-import BottomNav from "@/components/BottomNav";
 import { getChapterVerses, getChapterInfo } from "@/lib/quranData";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, getVerseTimestamps, PREAMBLE_TEXT } from "@/lib/verseTimestamps";
@@ -135,7 +134,7 @@ export default function ChapterView({
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-36">
+    <div className="min-h-screen bg-background flex flex-col pb-24">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between p-4">
           <button 
@@ -192,7 +191,7 @@ export default function ChapterView({
         <div className="h-40" />
       </div>
 
-      <div className="fixed bottom-16 left-0 right-0 z-10">
+      <div className="fixed bottom-0 left-0 right-0 z-10">
         <AudioPlayer
           currentTime={currentTime}
           duration={duration || 0}
@@ -210,17 +209,6 @@ export default function ChapterView({
           onRepeatChange={onRepeatChange}
         />
       </div>
-
-      <BottomNav
-        activeTab="surah"
-        onTabChange={(tab) => {
-          if (tab === "settings") {
-            onNavigate("settings", undefined, "settings");
-          } else {
-            onBack();
-          }
-        }}
-      />
     </div>
   );
 }
