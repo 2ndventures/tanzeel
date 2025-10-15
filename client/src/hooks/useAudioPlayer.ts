@@ -142,16 +142,12 @@ export function useAudioPlayer(
     };
 
     const handlePlay = () => {
-      console.log('🎵 handlePlay fired, currentTime:', audio.currentTime);
-      
       // Immediately check which verse we're in when playback starts
       // This ensures we don't miss the preamble if timeUpdate fires late
       const currentTime = audio.currentTime;
       const verse = verseTimestampsRef.current.find(
         v => currentTime >= v.start && currentTime < v.end
       );
-      
-      console.log('🔍 Found verse:', verse, 'timestamps:', verseTimestampsRef.current.slice(0, 3));
       
       if (verse) {
         const verseChanged = verse.verse !== currentVerseRef.current;
@@ -166,19 +162,14 @@ export function useAudioPlayer(
           isPlaying: true,
         }));
         
-        console.log(`📝 State updated: currentVerse=${verse.verse}, isInVerseRange=true, isPlaying=true`);
-        
         // Only call onVerseChange and log if verse actually changed
         if (verseChanged) {
           onVerseChangeRef.current?.(verse.verse);
           
           const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
           console.log(`✓ ${verseLabel} highlighting at ${currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s) [on play]`);
-        } else {
-          console.log(`⏭️ Verse ${verse.verse} already current, skipped onVerseChange callback`);
         }
       } else {
-        console.log('⚠️ No verse found at currentTime:', currentTime);
         // No verse found, just set isPlaying
         setState(prev => ({ ...prev, isPlaying: true }));
       }

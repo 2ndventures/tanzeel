@@ -63,9 +63,21 @@ export default function ChapterView({
     previousVerse,
   } = useAudioPlayer(audioUrl, verseTimestamps, (verse) => {
     if (autoScroll && scrollRef.current) {
+      // Find the verse element
       const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
       if (verseElement) {
-        verseElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Get the ScrollArea viewport (the actual scrolling container)
+        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
+        if (viewport) {
+          // Calculate verse position relative to the viewport
+          const verseRect = verseElement.getBoundingClientRect();
+          const viewportRect = viewport.getBoundingClientRect();
+          const scrollTop = viewport.scrollTop;
+          const targetScrollTop = scrollTop + (verseRect.top - viewportRect.top);
+          
+          // Scroll the viewport to position verse at top
+          viewport.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
+        }
       }
     }
   }, repeat);
