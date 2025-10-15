@@ -19,6 +19,10 @@ interface AudioPlayerProps {
   isLoading?: boolean;
   autoScroll?: boolean;
   repeat?: boolean;
+  darkMode?: boolean;
+  transliteration?: boolean;
+  showTranslation?: boolean;
+  autoplay?: boolean;
   onPlayPause?: () => void;
   onSeek?: (time: number) => void;
   onSpeedChange?: () => void;
@@ -26,6 +30,10 @@ interface AudioPlayerProps {
   onNext?: () => void;
   onAutoScrollChange?: (enabled: boolean) => void;
   onRepeatChange?: (enabled: boolean) => void;
+  onDarkModeChange?: (enabled: boolean) => void;
+  onTransliterationChange?: (enabled: boolean) => void;
+  onShowTranslationChange?: (enabled: boolean) => void;
+  onAutoplayChange?: (enabled: boolean) => void;
 }
 
 export default function AudioPlayer({
@@ -36,6 +44,10 @@ export default function AudioPlayer({
   isLoading = false,
   autoScroll = false,
   repeat = false,
+  darkMode = false,
+  transliteration = false,
+  showTranslation = false,
+  autoplay = false,
   onPlayPause,
   onSeek,
   onSpeedChange,
@@ -43,6 +55,10 @@ export default function AudioPlayer({
   onNext,
   onAutoScrollChange,
   onRepeatChange,
+  onDarkModeChange,
+  onTransliterationChange,
+  onShowTranslationChange,
+  onAutoplayChange,
 }: AudioPlayerProps) {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -140,6 +156,42 @@ export default function AudioPlayer({
               <DropdownMenuItem 
                 className="flex items-center justify-between"
                 onSelect={(e) => e.preventDefault()}
+                data-testid="menu-item-theme"
+              >
+                <span>Theme</span>
+                <Switch 
+                  checked={darkMode} 
+                  onCheckedChange={onDarkModeChange}
+                  data-testid="switch-theme"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between"
+                onSelect={(e) => e.preventDefault()}
+                data-testid="menu-item-transliteration"
+              >
+                <span>Transliteration</span>
+                <Switch 
+                  checked={transliteration} 
+                  onCheckedChange={onTransliterationChange}
+                  data-testid="switch-transliteration"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between"
+                onSelect={(e) => e.preventDefault()}
+                data-testid="menu-item-translation"
+              >
+                <span>Translation</span>
+                <Switch 
+                  checked={showTranslation} 
+                  onCheckedChange={onShowTranslationChange}
+                  data-testid="switch-translation"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between"
+                onSelect={(e) => e.preventDefault()}
                 data-testid="menu-item-auto-scroll"
               >
                 <span>Auto-scroll</span>
@@ -159,6 +211,18 @@ export default function AudioPlayer({
                   checked={repeat} 
                   onCheckedChange={onRepeatChange}
                   data-testid="switch-repeat"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between"
+                onSelect={(e) => e.preventDefault()}
+                data-testid="menu-item-autoplay"
+              >
+                <span>Autoplay</span>
+                <Switch 
+                  checked={autoplay} 
+                  onCheckedChange={onAutoplayChange}
+                  data-testid="switch-autoplay"
                 />
               </DropdownMenuItem>
             </DropdownMenuContent>
