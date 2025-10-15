@@ -1,18 +1,21 @@
 # Overview
 
-This is a Quran Reading application that provides users with the ability to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. The application features a modern, dark-themed interface (#1a1f2e background, #252d3d cards, #4d7cfe accent) built with React and TypeScript, utilizing shadcn/ui components for a polished user experience.
+This is a **mobile-first** Quran Reading application that provides users with the ability to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. The application features a modern, dark-themed interface (#1a1f2e background, #252d3d cards, #4d7cfe accent) built with React and TypeScript, utilizing shadcn/ui components for a polished user experience.
 
 The app includes chapter browsing, verse-by-verse reading with synchronized audio playback (karaoke-style highlighting), customizable display settings, and bookmark functionality for tracking reading progress.
+
+**Primary Focus**: Mobile experience is the top priority. All UI/UX decisions, layouts, and interactions are designed and optimized for mobile devices first.
 
 **Current Status**: Fully functional with real Quran audio recitation from Islamic Network CDN, verse timing synchronization, bookmarks, and all settings operational. Backend audio proxy handles CORS and provides seamless audio streaming. Complete Quran data (all 114 chapters, 6,236 verses) with Arabic text, English translations, and transliterations.
 
 **Recent Updates (October 15, 2025)**:
+- **Mobile-First Approach**: All UI/UX now prioritizes mobile experience with optimized layouts and interactions
 - **Verse Selection**: Click any verse card to instantly seek to and play from that verse
 - **Bottom Navigation Removed**: BottomNav removed from ChapterView for cleaner playback experience; users navigate back using header button
 - **AudioPlayer Positioning**: Fixed at screen bottom (bottom-0) with full width, positioned below all content
 - **Enhanced Accessibility**: Significantly larger playback controls meeting WCAG 2.1 Level AAA standards:
-  - Play/Pause button: 64×64px (w-16 h-16) with 28px icons
-  - Previous/Next buttons: 44×44px (w-11 h-11) with 24px icons  
+  - Play/Pause button: 64×64px (w-16 h-16) with 28px icons - perfectly circular on mobile with `flex-shrink-0` and `aspect-square`
+  - Previous/Next buttons: 44×44px (w-11 h-11) with 24px icons - circular shape maintained on all devices
   - Speed and More buttons: 44×44px minimum touch targets
   - Improved spacing (gap-3) and padding (py-4) for better usability
   - Larger text sizes (text-sm for times, text-base for speed) for improved readability
