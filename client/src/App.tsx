@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
+import { DEFAULT_RECITER, getLegacyReciterId } from "@/lib/reciters";
 
 type Page = "home" | "chapter" | "settings";
 
@@ -17,7 +18,19 @@ function App() {
   const [transliteration, setTransliteration] = useState(false);
   const [showTranslation, setShowTranslation] = useState(true);
   const [font, setFont] = useState("System");
-  const [reciter, setReciter] = useState("Alafasy");
+  const [reciter, setReciter] = useState(() => {
+    const saved = localStorage.getItem('reciter');
+    if (saved) {
+      // Handle legacy reciter names (Alafasy, Sudais, Ghamadi)
+      if (['Alafasy', 'Sudais', 'Ghamadi'].includes(saved)) {
+        const newId = getLegacyReciterId(saved);
+        localStorage.setItem('reciter', newId);
+        return newId;
+      }
+      return saved;
+    }
+    return DEFAULT_RECITER;
+  });
   const [speed, setSpeed] = useState("Normal");
   const [autoScroll, setAutoScroll] = useState(false);
   const [repeat, setRepeat] = useState(false);
@@ -38,6 +51,10 @@ function App() {
   useEffect(() => {
     localStorage.setItem('autoplay', JSON.stringify(autoplay));
   }, [autoplay]);
+
+  useEffect(() => {
+    localStorage.setItem('reciter', reciter);
+  }, [reciter]);
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => {
     setCurrentPage(page as Page);

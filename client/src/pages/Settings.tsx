@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react";
 import SettingItem from "@/components/SettingItem";
 import BottomNav from "@/components/BottomNav";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { getAllReciters, getReciterDisplayName } from "@/lib/reciters";
 
 interface SettingsProps {
   onBack: () => void;
@@ -50,6 +51,12 @@ export default function Settings({
   translation,
   onTranslationChange,
 }: SettingsProps) {
+  const allReciters = getAllReciters();
+  const reciterOptions = allReciters.map(r => ({
+    value: r.id,
+    label: r.style ? `${r.name} - ${r.style}` : r.name,
+  }));
+
   return (
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
@@ -128,14 +135,10 @@ export default function Settings({
             <div className="space-y-1 divide-y divide-border">
               <SettingItem
                 label="Reciter"
-                sublabel="Mishary Rashid Alafasy"
+                sublabel={getReciterDisplayName(reciter)}
                 type="select"
                 value={reciter}
-                options={[
-                  { value: "Alafasy", label: "Alafasy" },
-                  { value: "Sudais", label: "Sudais" },
-                  { value: "Ghamadi", label: "Ghamadi" },
-                ]}
+                options={reciterOptions}
                 onSelect={onReciterChange}
                 testId="select-reciter"
               />
