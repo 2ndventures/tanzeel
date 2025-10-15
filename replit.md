@@ -8,7 +8,14 @@ The app includes chapter browsing, verse-by-verse reading with synchronized audi
 
 **Recent Updates (October 15, 2025)**:
 - **Verse Selection**: Click any verse card to instantly seek to and play from that verse
-- **Full-Width AudioPlayer**: Redesigned from floating card to fixed full-width bar positioned directly above navigation
+- **Bottom Navigation Removed**: BottomNav removed from ChapterView for cleaner playback experience; users navigate back using header button
+- **AudioPlayer Positioning**: Fixed at screen bottom (bottom-0) with full width, positioned below all content
+- **Enhanced Accessibility**: Significantly larger playback controls meeting WCAG 2.1 Level AAA standards:
+  - Play/Pause button: 64×64px (w-16 h-16) with 28px icons
+  - Previous/Next buttons: 44×44px (w-11 h-11) with 24px icons  
+  - Speed and More buttons: 44×44px minimum touch targets
+  - Improved spacing (gap-3) and padding (py-4) for better usability
+  - Larger text sizes (text-sm for times, text-base for speed) for improved readability
 - **Enhanced Settings**: Reorganized settings with new Translation toggle for showing/hiding translations, Language selector moved to Display section, Content section removed
 
 # User Preferences
