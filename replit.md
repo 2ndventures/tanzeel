@@ -6,6 +6,11 @@ The app includes chapter browsing, verse-by-verse reading with synchronized audi
 
 **Current Status**: Fully functional with real Quran audio recitation from Islamic Network CDN, verse timing synchronization, bookmarks, and all settings operational. Backend audio proxy handles CORS and provides seamless audio streaming. Complete Quran data (all 114 chapters, 6,236 verses) with Arabic text, English translations, and transliterations.
 
+**Recent Updates (October 15, 2025)**:
+- **Verse Selection**: Click any verse card to instantly seek to and play from that verse
+- **Full-Width AudioPlayer**: Redesigned from floating card to fixed full-width bar positioned directly above navigation
+- **Enhanced Settings**: Reorganized settings with new Translation toggle for showing/hiding translations, Language selector moved to Display section, Content section removed
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
