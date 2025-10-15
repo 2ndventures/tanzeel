@@ -73,8 +73,13 @@ function App() {
               autoScroll={autoScroll}
               repeat={repeat}
               autoplay={autoplay}
+              darkMode={darkMode}
               onAutoScrollChange={setAutoScroll}
               onRepeatChange={setRepeat}
+              onAutoplayChange={setAutoplay}
+              onDarkModeChange={setDarkMode}
+              onTransliterationChange={setTransliteration}
+              onShowTranslationChange={setShowTranslation}
             />
           )}
           {currentPage === "settings" && (

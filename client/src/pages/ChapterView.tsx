@@ -18,8 +18,13 @@ interface ChapterViewProps {
   autoScroll: boolean;
   repeat: boolean;
   autoplay: boolean;
+  darkMode: boolean;
   onAutoScrollChange: (enabled: boolean) => void;
   onRepeatChange: (enabled: boolean) => void;
+  onAutoplayChange: (enabled: boolean) => void;
+  onDarkModeChange: (enabled: boolean) => void;
+  onTransliterationChange: (enabled: boolean) => void;
+  onShowTranslationChange: (enabled: boolean) => void;
 }
 
 export default function ChapterView({ 
@@ -33,8 +38,13 @@ export default function ChapterView({
   autoScroll,
   repeat,
   autoplay,
+  darkMode,
   onAutoScrollChange,
-  onRepeatChange
+  onRepeatChange,
+  onAutoplayChange,
+  onDarkModeChange,
+  onTransliterationChange,
+  onShowTranslationChange
 }: ChapterViewProps) {
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
@@ -218,6 +228,10 @@ export default function ChapterView({
         isLoading={isLoading}
         autoScroll={autoScroll}
         repeat={repeat}
+        darkMode={darkMode}
+        transliteration={showTransliteration}
+        showTranslation={showTranslation}
+        autoplay={autoplay}
         onPlayPause={togglePlayPause}
         onSeek={seek}
         onSpeedChange={cycleSpeed}
@@ -225,6 +239,10 @@ export default function ChapterView({
         onNext={nextVerse}
         onAutoScrollChange={onAutoScrollChange}
         onRepeatChange={onRepeatChange}
+        onDarkModeChange={onDarkModeChange}
+        onTransliterationChange={onTransliterationChange}
+        onShowTranslationChange={onShowTranslationChange}
+        onAutoplayChange={onAutoplayChange}
       />
     </div>
   );
