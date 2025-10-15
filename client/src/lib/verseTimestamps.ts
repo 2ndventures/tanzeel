@@ -25,15 +25,11 @@ export const alFatihahTimestamps: VerseTimestamp[] = [
 ];
 
 // Real Quran recitation audio proxied through our backend
-export const getChapterAudioUrl = (chapterId: number, reciter: string = 'Alafasy') => {
-  // Map reciter names to CDN identifiers
-  const reciterMap: { [key: string]: string } = {
-    'Alafasy': 'ar.alafasy',
-    'Sudais': 'ar.abdurrahmaansudais',
-    'Ghamadi': 'ar.shaatree',
-  };
-  
-  const reciterId = reciterMap[reciter] || 'ar.alafasy';
+export const getChapterAudioUrl = (chapterId: number, reciter: string = 'ar.alafasy') => {
+  // Reciter parameter is now already an API identifier (e.g., "ar.alafasy")
+  // Validate it has correct format, otherwise use default
+  const isValidReciterId = /^(ar|en|fa|ur|zh|fr|ru)\..+/.test(reciter);
+  const reciterId = isValidReciterId ? reciter : 'ar.alafasy';
   
   // Use our backend proxy to avoid CORS issues
   // Backend fetches from: https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3
