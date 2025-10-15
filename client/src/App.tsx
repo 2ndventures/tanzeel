@@ -21,6 +21,10 @@ function App() {
   const [speed, setSpeed] = useState("Normal");
   const [autoScroll, setAutoScroll] = useState(false);
   const [repeat, setRepeat] = useState(false);
+  const [autoplay, setAutoplay] = useState(() => {
+    const saved = localStorage.getItem('autoplay');
+    return saved ? JSON.parse(saved) : false;
+  });
   const [translation, setTranslation] = useState("English");
 
   useEffect(() => {
@@ -30,6 +34,10 @@ function App() {
       document.documentElement.classList.remove("dark");
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('autoplay', JSON.stringify(autoplay));
+  }, [autoplay]);
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => {
     setCurrentPage(page as Page);
@@ -64,6 +72,7 @@ function App() {
               speed={speed}
               autoScroll={autoScroll}
               repeat={repeat}
+              autoplay={autoplay}
               onAutoScrollChange={setAutoScroll}
               onRepeatChange={setRepeat}
             />
@@ -90,6 +99,8 @@ function App() {
               onAutoScrollChange={setAutoScroll}
               repeat={repeat}
               onRepeatChange={setRepeat}
+              autoplay={autoplay}
+              onAutoplayChange={setAutoplay}
               translation={translation}
               onTranslationChange={setTranslation}
             />
