@@ -62,45 +62,34 @@ export default function ChapterView({
     nextVerse,
     previousVerse,
   } = useAudioPlayer(audioUrl, verseTimestamps, (verse) => {
-    console.log('🔄 Auto-scroll callback fired for verse:', verse);
-    console.log('  autoScroll enabled?', autoScroll);
-    console.log('  scrollRef.current?', !!scrollRef.current);
-    
     if (autoScroll && scrollRef.current) {
-      // Find the verse element
-      const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
-      console.log('  verse element found?', !!verseElement);
-      
-      if (verseElement) {
-        // Get the ScrollArea viewport (the actual scrolling container)
-        const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-        console.log('  viewport found?', !!viewport);
+      // Use requestAnimationFrame to ensure DOM is ready and we get current scroll position
+      requestAnimationFrame(() => {
+        const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
         
-        if (viewport) {
-          // Calculate verse position relative to the viewport
-          const verseRect = verseElement.getBoundingClientRect();
-          const viewportRect = viewport.getBoundingClientRect();
-          const scrollTop = viewport.scrollTop;
-          const targetScrollTop = scrollTop + (verseRect.top - viewportRect.top);
+        if (verseElement && scrollRef.current) {
+          // Get the ScrollArea viewport (the actual scrolling container)
+          const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
           
-          console.log('  Scroll calculation:', {
-            currentScrollTop: scrollTop,
-            targetScrollTop,
-            verseTop: verseRect.top,
-            viewportTop: viewportRect.top
-          });
-          
-          // Scroll the viewport to position verse at top
-          viewport.scrollTo({ top: targetScrollTop, behavior: 'smooth' });
-          console.log('  ✅ Scroll executed');
-        } else {
-          console.log('  ❌ Viewport not found in scrollRef');
+          if (viewport) {
+            // Calculate verse position relative to the viewport
+            const verseRect = verseElement.getBoundingClientRect();
+            const viewportRect = viewport.getBoundingClientRect();
+            const currentScroll = viewport.scrollTop;
+            const targetScroll = currentScroll + (verseRect.top - viewportRect.top);
+            
+            console.log('📜 Auto-scroll:', {
+              verse,
+              currentScroll,
+              targetScroll,
+              offset: verseRect.top - viewportRect.top
+            });
+            
+            // Scroll the viewport to position verse at top
+            viewport.scrollTo({ top: targetScroll, behavior: 'smooth' });
+          }
         }
-      } else {
-        console.log('  ❌ Verse element not found');
-      }
-    } else {
-      console.log('  ❌ Auto-scroll disabled or scrollRef not available');
+      });
     }
   }, repeat);
 
