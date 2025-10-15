@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Bookmark } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -17,6 +17,7 @@ interface ChapterViewProps {
   speed: string;
   autoScroll: boolean;
   repeat: boolean;
+  autoplay: boolean;
   onAutoScrollChange: (enabled: boolean) => void;
   onRepeatChange: (enabled: boolean) => void;
 }
@@ -31,6 +32,7 @@ export default function ChapterView({
   speed: initialSpeed,
   autoScroll,
   repeat,
+  autoplay,
   onAutoScrollChange,
   onRepeatChange
 }: ChapterViewProps) {
@@ -95,6 +97,23 @@ export default function ChapterView({
     };
     setSpeed(speedMap[initialSpeed] || 1.0);
   }, [initialSpeed, setSpeed]);
+
+  // Track if autoplay has been triggered for this chapter
+  const autoplayTriggeredRef = useRef(false);
+
+  // Reset autoplay trigger when chapter changes
+  useEffect(() => {
+    autoplayTriggeredRef.current = false;
+  }, [chapterId]);
+
+  // Autoplay effect - starts playback when chapter loads if autoplay is enabled
+  useEffect(() => {
+    if (autoplay && !isPlaying && !isLoading && duration > 0 && !autoplayTriggeredRef.current) {
+      console.log('🎵 Autoplay triggered for chapter', chapterId);
+      autoplayTriggeredRef.current = true;
+      togglePlayPause();
+    }
+  }, [autoplay, isPlaying, isLoading, duration, chapterId, togglePlayPause]);
 
   const cycleSpeed = () => {
     const speeds = [1.0, 1.25, 1.5, 1.75, 2.0];
