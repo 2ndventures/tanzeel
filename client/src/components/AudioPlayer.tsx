@@ -87,7 +87,7 @@ export default function AudioPlayer({
             variant="ghost"
             size="icon"
             onClick={onPrevious}
-            className="rounded-full w-11 h-11"
+            className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
             data-testid="button-previous"
           >
             <SkipBack className="w-6 h-6" />
@@ -96,7 +96,7 @@ export default function AudioPlayer({
           <Button
             variant="default"
             size="icon"
-            className="w-16 h-16 rounded-full"
+            className="w-16 h-16 rounded-full flex-shrink-0 aspect-square"
             onClick={onPlayPause}
             disabled={isLoading}
             data-testid="button-play-pause"
@@ -114,7 +114,7 @@ export default function AudioPlayer({
             variant="ghost"
             size="icon"
             onClick={onNext}
-            className="rounded-full w-11 h-11"
+            className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
             data-testid="button-next"
           >
             <SkipForward className="w-6 h-6" />
@@ -127,7 +127,7 @@ export default function AudioPlayer({
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-11 h-11"
+                className="w-11 h-11 flex-shrink-0 aspect-square"
                 data-testid="button-more"
               >
                 <MoreVertical className="w-6 h-6" />
