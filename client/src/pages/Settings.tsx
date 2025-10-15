@@ -170,7 +170,7 @@ export default function Settings({
               />
               <SettingItem
                 label="Autoplay"
-                sublabel="Off"
+                sublabel={autoplay ? "On" : "Off"}
                 type="toggle"
                 value={autoplay}
                 onToggle={onAutoplayChange}

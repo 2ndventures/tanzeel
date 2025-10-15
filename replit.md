@@ -20,6 +20,11 @@ The app includes chapter browsing, verse-by-verse reading with synchronized audi
   - Improved spacing (gap-3) and padding (py-4) for better usability
   - Larger text sizes (text-sm for times, text-base for speed) for improved readability
 - **Enhanced Settings**: Reorganized settings with new Translation toggle for showing/hiding translations, Language selector moved to Display section, Content section removed
+- **Autoplay Feature**: Added autoplay toggle in Settings (Audio section) to automatically start playback when opening a chapter
+  - Toggle persists in localStorage
+  - When enabled, playback starts automatically when chapter loads (once audio is ready)
+  - When disabled, users must manually press play button
+  - Smart trigger prevents multiple autoplay attempts per chapter
 
 # User Preferences
 
