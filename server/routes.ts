@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { Readable, pipeline } from "stream";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -25,10 +26,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let response = await fetch(audioUrl, fetchOptions);
       
       // If not found, fallback to Alafasy (most complete collection)
-      if (!response.ok && reciter !== 'ar.alafasy') {
+      // But preserve 416 Range Not Satisfiable errors (client needs to retry)
+      if (!response.ok && response.status !== 416 && reciter !== 'ar.alafasy') {
         console.log(`Audio not found for ${reciter}, falling back to Alafasy`);
         audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${chapter}.mp3`;
         response = await fetch(audioUrl, fetchOptions);
+      }
+      
+      // Forward 416 Range Not Satisfiable directly to client
+      if (response.status === 416) {
+        res.status(416);
+        const contentRange = response.headers.get('Content-Range');
+        if (contentRange) {
+          res.setHeader('Content-Range', contentRange);
+        }
+        return res.send("Range Not Satisfiable");
       }
       
       if (!response.ok) {
@@ -55,20 +67,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.setHeader('Content-Range', contentRange);
       }
       
-      // Stream the response body directly to client
+      // Forward caching headers from CDN for better client-side caching
+      const cacheControl = response.headers.get('Cache-Control');
+      if (cacheControl) {
+        res.setHeader('Cache-Control', cacheControl);
+      }
+      
+      const etag = response.headers.get('ETag');
+      if (etag) {
+        res.setHeader('ETag', etag);
+      }
+      
+      // Stream the response body directly to client using Node.js streams
       if (response.body) {
-        const reader = response.body.getReader();
+        // Convert Web ReadableStream to Node.js Readable stream for better backpressure handling
+        const nodeStream = Readable.fromWeb(response.body as any);
         
-        const stream = async () => {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            res.write(value);
+        // Use pipeline for proper error handling and cleanup on both streams
+        pipeline(nodeStream, res, (error) => {
+          if (error) {
+            console.error('Streaming error:', error);
+            // Destroy response to close connection and notify client
+            res.destroy(error);
           }
-          res.end();
-        };
+        });
         
-        await stream();
+        // Handle client disconnect - stop upstream download
+        res.on('close', () => {
+          if (!nodeStream.destroyed) {
+            nodeStream.destroy();
+          }
+        });
       } else {
         // Fallback for environments without streaming support
         const buffer = await response.arrayBuffer();
