@@ -35,22 +35,24 @@ The application implements **HTTP Range Request streaming** (similar to Spotify)
 - **Edge Case Handling**: Properly forwards 416 Range Not Satisfiable responses
 
 ### Reciter System
-The application supports **10 professional reciters** from the Islamic Network CDN, all with complete surah-level audio files at 128kbps quality. Eight featured reciters are prominently displayed in the UI:
+The application supports **10 professional reciters** from the Islamic Network CDN, all with complete surah-level audio files at 128kbps quality. All reciter IDs have been verified against the CDN manifest. Eight featured reciters are prominently displayed in the UI:
 
 **Featured Reciters:**
 1. **Mishary Rashid Alafasy** (ar.alafasy) - Murattal - Default
-2. **Abdul Basit Abdul Samad** (ar.abdulbasit) - Mujawwad
-3. **Mahmoud Khalil Al-Hussary** (ar.husary) - Murattal
-4. **Mohamed Siddiq El-Minshawi** (ar.minshawi) - Mujawwad
-5. **Saad Al-Ghamdi** (ar.saadalghamidi) - Murattal
-6. **Maher Al-Muaiqly** (ar.mahermuaiqly) - Murattal
-7. **Abdul Rahman Al-Sudais** (ar.abdurrahmaansudais) - Murattal
-8. **Abdul Bari Mohammed** (ar.abdulbarimohammed) - Murattal
+2. **Abdul Basit Abdul Samad** (ar.abdulbasitmurattal) - Murattal
+3. **Mohamed Siddiq El-Minshawi** (ar.muhammadsiddiqalminshawimujawwad) - Mujawwad
+4. **Saud Al-Shuraim** (ar.saudalshuraim) - Murattal
+5. **Abdul Bari Mohammed** (ar.abdulbarimohammed) - Murattal
+6. **Yasser Al-Dosari** (ar.yasseraldossari) - Murattal
+7. **Ibrahim Al-Dosari** (ar.ibrahimaldossari) - Murattal
+8. **Nasser Al-Qatami** (ar.nasseralqatami) - Murattal
 
-Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, recitation styles, and Islamic Network API identifiers. Selected reciter persists in localStorage with robust backward compatibility:
+Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, recitation styles, and verified Islamic Network CDN identifiers. Selected reciter persists in localStorage with robust backward compatibility:
 - Legacy string names ("Alafasy", "Sudais", "Ghamadi") are automatically migrated to proper API identifiers
+- Old incorrect API IDs (ar.abdulbasit, ar.husary, ar.minshawi, ar.saadalghamidi, ar.mahermuaiqly, ar.abdurrahmaansudais) are migrated to valid alternatives
 - Invalid or removed reciter IDs are validated and reset to default
 - Whitespace is trimmed from saved values
+- Migration is logged to console for debugging
 
 Users can select reciters from:
 1. **ChapterView menu**: Three-dot menu → Reciter submenu with checkmarks
