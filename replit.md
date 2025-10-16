@@ -35,9 +35,26 @@ The application implements **HTTP Range Request streaming** (similar to Spotify)
 - **Edge Case Handling**: Properly forwards 416 Range Not Satisfiable responses
 
 ### Reciter System
-Currently, only **Mishary Rashid Alafasy** (ar.alafasy) is available due to Islamic Network CDN limitations - it's the only reciter with complete surah-level audio files at 128kbps quality. The backend automatically falls back to Alafasy if other reciters are requested but unavailable.
+The application supports **10 professional reciters** from the Islamic Network CDN, all with complete surah-level audio files at 128kbps quality. Eight featured reciters are prominently displayed in the UI:
 
-Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, and Islamic Network API identifiers. Selected reciter persists in localStorage with backward compatibility for legacy names.
+**Featured Reciters:**
+1. **Mishary Rashid Alafasy** (ar.alafasy) - Murattal - Default
+2. **Abdul Basit Abdul Samad** (ar.abdulbasit) - Mujawwad
+3. **Mahmoud Khalil Al-Hussary** (ar.husary) - Murattal
+4. **Mohamed Siddiq El-Minshawi** (ar.minshawi) - Mujawwad
+5. **Saad Al-Ghamdi** (ar.saadalghamidi) - Murattal
+6. **Maher Al-Muaiqly** (ar.mahermuaiqly) - Murattal
+7. **Abdul Rahman Al-Sudais** (ar.abdurrahmaansudais) - Murattal
+8. **Abdul Bari Mohammed** (ar.abdulbarimohammed) - Murattal
+
+Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, recitation styles, and Islamic Network API identifiers. Selected reciter persists in localStorage with robust backward compatibility:
+- Legacy string names ("Alafasy", "Sudais", "Ghamadi") are automatically migrated to proper API identifiers
+- Invalid or removed reciter IDs are validated and reset to default
+- Whitespace is trimmed from saved values
+
+Users can select reciters from:
+1. **ChapterView menu**: Three-dot menu → Reciter submenu with checkmarks
+2. **Settings page**: Audio section → Reciter dropdown
 
 Audio sources are from the Islamic Network CDN at `https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3`, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse. Verse timestamp synchronization is meticulously managed for accurate highlighting across all chapters, including special handling for Chapter 9 and preambles.
 
