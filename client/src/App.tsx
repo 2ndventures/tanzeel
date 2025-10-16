@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
-import { DEFAULT_RECITER, getLegacyReciterId } from "@/lib/reciters";
+import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId } from "@/lib/reciters";
 
 type Page = "home" | "chapter" | "settings";
 
@@ -21,13 +21,24 @@ function App() {
   const [reciter, setReciter] = useState(() => {
     const saved = localStorage.getItem('reciter');
     if (saved) {
+      const trimmedId = saved.trim();
+      
       // Handle legacy reciter names (Alafasy, Sudais, Ghamadi)
-      if (['Alafasy', 'Sudais', 'Ghamadi'].includes(saved)) {
-        const newId = getLegacyReciterId(saved);
+      if (['Alafasy', 'Sudais', 'Ghamadi'].includes(trimmedId)) {
+        const newId = getLegacyReciterId(trimmedId);
         localStorage.setItem('reciter', newId);
         return newId;
       }
-      return saved;
+      
+      // Validate that the reciter ID exists in our current RECITERS list
+      if (isValidReciterId(trimmedId)) {
+        return trimmedId;
+      }
+      
+      // If reciter ID is invalid/removed, reset to default
+      console.log(`Reciter ID "${trimmedId}" not found, resetting to default`);
+      localStorage.setItem('reciter', DEFAULT_RECITER);
+      return DEFAULT_RECITER;
     }
     return DEFAULT_RECITER;
   });

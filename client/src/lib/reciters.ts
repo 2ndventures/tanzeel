@@ -100,6 +100,11 @@ export const getReciterById = (id: string): Reciter | undefined => {
   return RECITERS.find(r => r.id === id);
 };
 
+// Check if reciter ID is valid (exists in RECITERS)
+export const isValidReciterId = (id: string): boolean => {
+  return RECITERS.some(r => r.id === id);
+};
+
 // Get reciter display name
 export const getReciterDisplayName = (id: string): string => {
   const reciter = getReciterById(id);
@@ -115,7 +120,7 @@ export const DEFAULT_RECITER = "ar.alafasy";
 export const LEGACY_RECITER_MAP: Record<string, string> = {
   "Alafasy": "ar.alafasy",
   "Sudais": "ar.abdurrahmaansudais",
-  "Ghamadi": "ar.shaatree", // Using Shatri as closest alternative
+  "Ghamadi": "ar.saadalghamidi", // Saad Al-Ghamdi
 };
 
 // Convert legacy reciter name to API identifier
