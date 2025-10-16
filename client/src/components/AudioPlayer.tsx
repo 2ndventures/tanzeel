@@ -1,15 +1,13 @@
-import { Play, Pause, SkipBack, SkipForward, MoreVertical } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
 
 interface AudioPlayerProps {
   currentTime?: number;
@@ -17,23 +15,13 @@ interface AudioPlayerProps {
   isPlaying?: boolean;
   speed?: number;
   isLoading?: boolean;
-  autoScroll?: boolean;
   repeat?: boolean;
-  darkMode?: boolean;
-  transliteration?: boolean;
-  showTranslation?: boolean;
-  autoplay?: boolean;
   onPlayPause?: () => void;
   onSeek?: (time: number) => void;
-  onSpeedChange?: () => void;
+  onSpeedChange?: (speed: number) => void;
   onPrevious?: () => void;
   onNext?: () => void;
-  onAutoScrollChange?: (enabled: boolean) => void;
   onRepeatChange?: (enabled: boolean) => void;
-  onDarkModeChange?: (enabled: boolean) => void;
-  onTransliterationChange?: (enabled: boolean) => void;
-  onShowTranslationChange?: (enabled: boolean) => void;
-  onAutoplayChange?: (enabled: boolean) => void;
 }
 
 export default function AudioPlayer({
@@ -42,24 +30,18 @@ export default function AudioPlayer({
   isPlaying = false,
   speed = 1.0,
   isLoading = false,
-  autoScroll = false,
   repeat = false,
-  darkMode = false,
-  transliteration = false,
-  showTranslation = false,
-  autoplay = false,
   onPlayPause,
   onSeek,
   onSpeedChange,
   onPrevious,
   onNext,
-  onAutoScrollChange,
   onRepeatChange,
-  onDarkModeChange,
-  onTransliterationChange,
-  onShowTranslationChange,
-  onAutoplayChange,
 }: AudioPlayerProps) {
+  const [isSpeedMenuOpen, setIsSpeedMenuOpen] = useState(false);
+  
+  // Speed options from 0.5 to 2.0 in 0.25 increments
+  const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -88,15 +70,33 @@ export default function AudioPlayer({
         
         <div className="grid grid-cols-3 items-center">
         <div className="flex justify-start">
-          <Button
-            variant="ghost"
-            size="default"
-            onClick={onSpeedChange}
-            className="text-base font-medium min-w-16 h-11"
-            data-testid="button-speed"
-          >
-            {speed.toFixed(2)}x
-          </Button>
+          <DropdownMenu open={isSpeedMenuOpen} onOpenChange={setIsSpeedMenuOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="default"
+                className="text-base font-medium min-w-16 h-11"
+                data-testid="button-speed"
+              >
+                {speed.toFixed(2)}x
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-32">
+              {speedOptions.map((speedOption) => (
+                <DropdownMenuItem
+                  key={speedOption}
+                  className="cursor-pointer justify-center"
+                  onClick={() => {
+                    onSpeedChange?.(speedOption);
+                    setIsSpeedMenuOpen(false);
+                  }}
+                  data-testid={`speed-option-${speedOption}`}
+                >
+                  {speedOption.toFixed(2)}x
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         <div className="flex items-center justify-center gap-3">
@@ -139,106 +139,15 @@ export default function AudioPlayer({
         </div>
         
         <div className="flex justify-end">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-11 h-11 flex-shrink-0 aspect-square"
-                data-testid="button-more"
-              >
-                <MoreVertical className="w-6 h-6" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Playback Settings</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onDarkModeChange?.(!darkMode)}
-                data-testid="menu-item-theme"
-              >
-                <span>Theme</span>
-                <Switch 
-                  checked={darkMode} 
-                  onCheckedChange={onDarkModeChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-theme"
-                />
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onTransliterationChange?.(!transliteration)}
-                data-testid="menu-item-transliteration"
-              >
-                <span>Transliteration</span>
-                <Switch 
-                  checked={transliteration} 
-                  onCheckedChange={onTransliterationChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-transliteration"
-                />
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onShowTranslationChange?.(!showTranslation)}
-                data-testid="menu-item-translation"
-              >
-                <span>Translation</span>
-                <Switch 
-                  checked={showTranslation} 
-                  onCheckedChange={onShowTranslationChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-translation"
-                />
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onAutoScrollChange?.(!autoScroll)}
-                data-testid="menu-item-auto-scroll"
-              >
-                <span>Auto-scroll</span>
-                <Switch 
-                  checked={autoScroll} 
-                  onCheckedChange={onAutoScrollChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-auto-scroll"
-                />
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onRepeatChange?.(!repeat)}
-                data-testid="menu-item-repeat"
-              >
-                <span>Repeat</span>
-                <Switch 
-                  checked={repeat} 
-                  onCheckedChange={onRepeatChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-repeat"
-                />
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onAutoplayChange?.(!autoplay)}
-                data-testid="menu-item-autoplay"
-              >
-                <span>Autoplay</span>
-                <Switch 
-                  checked={autoplay} 
-                  onCheckedChange={onAutoplayChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-autoplay"
-                />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`w-11 h-11 flex-shrink-0 aspect-square ${repeat ? 'text-primary' : ''}`}
+            onClick={() => onRepeatChange?.(!repeat)}
+            data-testid="button-repeat"
+          >
+            <Repeat className="w-6 h-6" />
+          </Button>
         </div>
       </div>
     </div>

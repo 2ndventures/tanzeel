@@ -1,11 +1,20 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Bookmark } from "lucide-react";
+import { ArrowLeft, Bookmark, MoreVertical } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -76,37 +85,53 @@ export default function ChapterView({
     seekToVerse,
     nextVerse,
     previousVerse,
-  } = useAudioPlayer(audioUrl, verseTimestamps, (verse) => {
-    if (autoScroll) {
-      // Use requestAnimationFrame to ensure DOM is ready
-      requestAnimationFrame(() => {
-        const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
-        
-        if (verseElement) {
-          // Calculate offset from top of viewport
-          const rect = verseElement.getBoundingClientRect();
-          // Account for the sticky header (60px) to position verse at top below header
-          const headerHeight = 60;
-          const offset = rect.top - headerHeight;
+  } = useAudioPlayer(
+    audioUrl, 
+    verseTimestamps, 
+    (verse) => {
+      if (autoScroll) {
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+          const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
           
-          console.log('📜 Auto-scroll verse', verse, 'offset:', offset);
-          
-          // Scroll window to bring verse to top (below header)
-          window.scrollBy({ top: offset, behavior: 'smooth' });
-        }
-      });
+          if (verseElement) {
+            // Calculate offset from top of viewport
+            const rect = verseElement.getBoundingClientRect();
+            // Account for the sticky header (60px) to position verse at top below header
+            const headerHeight = 60;
+            const offset = rect.top - headerHeight;
+            
+            console.log('📜 Auto-scroll verse', verse, 'offset:', offset);
+            
+            // Scroll window to bring verse to top (below header)
+            window.scrollBy({ top: offset, behavior: 'smooth' });
+          }
+        });
+      }
+    }, 
+    repeat,
+    () => {
+      // Auto-play next surah when current one ends (if autoplay is enabled and not repeating)
+      if (autoplay && !repeat) {
+        console.log('🎵 Auto-playing next surah after completion of chapter', chapterId);
+        goToNextSurah();
+      }
     }
-  }, repeat);
+  );
 
-  // Update speed when settings change
+
+  // Update speed when settings change (map string to numeric value)
   useEffect(() => {
     const speedMap: { [key: string]: number } = {
       'Slow': 0.75,
       'Normal': 1.0,
       'Fast': 1.25,
     };
-    setSpeed(speedMap[initialSpeed] || 1.0);
-  }, [initialSpeed, setSpeed]);
+    const mappedSpeed = speedMap[initialSpeed];
+    if (mappedSpeed && mappedSpeed !== speed) {
+      setSpeed(mappedSpeed);
+    }
+  }, [initialSpeed, speed, setSpeed]);
 
   // Track if autoplay has been triggered for this chapter
   const autoplayTriggeredRef = useRef(false);
@@ -124,13 +149,6 @@ export default function ChapterView({
       togglePlayPause();
     }
   }, [autoplay, isPlaying, isLoading, duration, chapterId, togglePlayPause]);
-
-  const cycleSpeed = () => {
-    const speeds = [1.0, 1.25, 1.5, 1.75, 2.0];
-    const currentIndex = speeds.indexOf(speed);
-    const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
-    setSpeed(nextSpeed);
-  };
 
   // Show bookmark as filled if there's any bookmark for this chapter
   const hasChapterBookmark = bookmarkedVerse !== null;
@@ -162,10 +180,24 @@ export default function ChapterView({
     }
   };
 
+  const goToNextSurah = () => {
+    const nextChapterId = chapterId + 1;
+    if (nextChapterId <= 114) {
+      onNavigate('chapter', nextChapterId);
+    }
+  };
+
+  const goToPreviousSurah = () => {
+    const prevChapterId = chapterId - 1;
+    if (prevChapterId >= 1) {
+      onNavigate('chapter', prevChapterId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 pb-2">
           <button 
             className="p-2 hover-elevate active-elevate-2 rounded-md"
             onClick={onBack}
@@ -173,16 +205,114 @@ export default function ChapterView({
           >
             <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
-          <h1 className="text-xl font-semibold text-foreground" data-testid="text-chapter-title">
-            {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
-          </h1>
-          <button 
-            className="p-2 hover-elevate active-elevate-2 rounded-md" 
-            onClick={toggleBookmark}
-            data-testid="button-bookmark"
-          >
-            <Bookmark className={`w-6 h-6 ${hasChapterBookmark ? 'fill-primary text-primary' : 'text-foreground'}`} />
-          </button>
+          <div className="flex flex-col items-center flex-1 mx-2">
+            <div className="flex items-center gap-3">
+              <h1 className="text-lg font-semibold text-foreground" data-testid="text-chapter-title-english">
+                {chapterInfo?.englishName || 'Al-Fatihah'}
+              </h1>
+              <h2 className="text-xl font-semibold text-foreground font-arabic" data-testid="text-chapter-title-arabic">
+                {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
+              </h2>
+            </div>
+            {chapterId !== 9 && (
+              <p className="text-base font-arabic text-foreground mt-1" data-testid="text-bismillah">
+                بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+              </p>
+            )}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button 
+                className="p-2 hover-elevate active-elevate-2 rounded-md" 
+                data-testid="button-menu"
+              >
+                <MoreVertical className="w-6 h-6 text-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onClick={toggleBookmark}
+                data-testid="menu-item-bookmark"
+              >
+                <span>Bookmark</span>
+                <Bookmark className={`w-4 h-4 ${hasChapterBookmark ? 'fill-primary text-primary' : ''}`} />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => onDarkModeChange?.(!darkMode)}
+                data-testid="menu-item-theme"
+              >
+                <span>Theme</span>
+                <Switch 
+                  checked={darkMode} 
+                  onCheckedChange={onDarkModeChange}
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid="switch-theme"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => onTransliterationChange?.(!showTransliteration)}
+                data-testid="menu-item-transliteration"
+              >
+                <span>Transliteration</span>
+                <Switch 
+                  checked={showTransliteration} 
+                  onCheckedChange={onTransliterationChange}
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid="switch-transliteration"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => onShowTranslationChange?.(!showTranslation)}
+                data-testid="menu-item-translation"
+              >
+                <span>Translation</span>
+                <Switch 
+                  checked={showTranslation} 
+                  onCheckedChange={onShowTranslationChange}
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid="switch-translation"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => onAutoScrollChange?.(!autoScroll)}
+                data-testid="menu-item-auto-scroll"
+              >
+                <span>Auto-scroll</span>
+                <Switch 
+                  checked={autoScroll} 
+                  onCheckedChange={onAutoScrollChange}
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid="switch-auto-scroll"
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onSelect={(e) => e.preventDefault()}
+                onClick={() => onAutoplayChange?.(!autoplay)}
+                data-testid="menu-item-autoplay"
+              >
+                <span>Autoplay</span>
+                <Switch 
+                  checked={autoplay} 
+                  onCheckedChange={onAutoplayChange}
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid="switch-autoplay"
+                />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -214,23 +344,13 @@ export default function ChapterView({
         isPlaying={isPlaying}
         speed={speed}
         isLoading={isLoading}
-        autoScroll={autoScroll}
         repeat={repeat}
-        darkMode={darkMode}
-        transliteration={showTransliteration}
-        showTranslation={showTranslation}
-        autoplay={autoplay}
         onPlayPause={togglePlayPause}
         onSeek={seek}
-        onSpeedChange={cycleSpeed}
-        onPrevious={previousVerse}
-        onNext={nextVerse}
-        onAutoScrollChange={onAutoScrollChange}
+        onSpeedChange={setSpeed}
+        onPrevious={goToPreviousSurah}
+        onNext={goToNextSurah}
         onRepeatChange={onRepeatChange}
-        onDarkModeChange={onDarkModeChange}
-        onTransliterationChange={onTransliterationChange}
-        onShowTranslationChange={onShowTranslationChange}
-        onAutoplayChange={onAutoplayChange}
       />
     </div>
   );

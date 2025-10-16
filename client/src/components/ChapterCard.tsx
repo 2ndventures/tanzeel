@@ -25,8 +25,8 @@ export default function ChapterCard({
       onClick={onClick}
       data-testid={`card-chapter-${number}`}
     >
-      <div className="flex-1">
-        <div className="flex items-center justify-between gap-4 mb-1">
+      <div className="flex-1 flex flex-col items-center">
+        <div className="flex items-center gap-4 mb-1">
           <h3 className="font-semibold text-foreground" data-testid={`text-chapter-name-${number}`}>
             {englishName}
           </h3>

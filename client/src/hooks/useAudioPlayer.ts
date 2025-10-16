@@ -21,11 +21,13 @@ export function useAudioPlayer(
   audioUrl: string,
   verseTimestamps: VerseTimestamp[],
   onVerseChange?: (verse: number) => void,
-  repeat: boolean = false
+  repeat: boolean = false,
+  onEnded?: () => void
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentVerseRef = useRef<number>(0); // Start with preamble (verse 0)
   const onVerseChangeRef = useRef(onVerseChange);
+  const onEndedRef = useRef(onEnded);
   const repeatRef = useRef(repeat);
   const speedRef = useRef(1.0);
   const verseTimestampsRef = useRef(verseTimestamps);
@@ -45,6 +47,10 @@ export function useAudioPlayer(
   useEffect(() => {
     onVerseChangeRef.current = onVerseChange;
   }, [onVerseChange]);
+
+  useEffect(() => {
+    onEndedRef.current = onEnded;
+  }, [onEnded]);
 
   useEffect(() => {
     repeatRef.current = repeat;
@@ -130,6 +136,8 @@ export function useAudioPlayer(
         audio.play();
       } else {
         setState(prev => ({ ...prev, isPlaying: false }));
+        // Call onEnded callback if provided (for auto-play next surah)
+        onEndedRef.current?.();
       }
     };
 
