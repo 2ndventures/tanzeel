@@ -25,6 +25,9 @@ export default function ChapterCard({
       onClick={onClick}
       data-testid={`card-chapter-${number}`}
     >
+      <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" data-testid={`text-chapter-number-${number}`}>
+        <span className="text-sm font-semibold text-primary">{number}</span>
+      </div>
       <div className="flex-1 flex flex-col items-center">
         <div className="flex items-center gap-4 mb-1">
           <h3 className="font-semibold text-foreground" data-testid={`text-chapter-name-${number}`}>
