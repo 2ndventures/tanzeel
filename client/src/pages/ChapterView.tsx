@@ -382,10 +382,15 @@ export default function ChapterView({
       <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-border">
           {verses.map((verse) => {
-            // Remove Bismillah from first verse since it's already in the header
-            // Chapter 9 (At-Tawbah) doesn't have Bismillah, so skip it
+            // For Chapter 1 (Al-Fatihah), verse 1 IS the Bismillah
+            // Since Bismillah is already in header, skip displaying verse 1 for Chapter 1
+            if (chapterId === 1 && verse.number === 1) {
+              return null;
+            }
+            
+            // For other chapters (except 9), remove Bismillah prefix from verse 1
             let arabicText = verse.arabicText;
-            if (verse.number === 1 && chapterId !== 9) {
+            if (verse.number === 1 && chapterId !== 9 && chapterId !== 1) {
               const bismillah = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
               arabicText = arabicText.replace(bismillah, '').trim();
             }
