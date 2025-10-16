@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Bookmark, MoreVertical } from "lucide-react";
+import { ArrowLeft, Bookmark, MoreVertical, ChevronRight, Check } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
+import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 
@@ -34,6 +38,7 @@ interface ChapterViewProps {
   onDarkModeChange: (enabled: boolean) => void;
   onTransliterationChange: (enabled: boolean) => void;
   onShowTranslationChange: (enabled: boolean) => void;
+  onReciterChange: (reciter: string) => void;
 }
 
 export default function ChapterView({ 
@@ -53,7 +58,8 @@ export default function ChapterView({
   onAutoplayChange,
   onDarkModeChange,
   onTransliterationChange,
-  onShowTranslationChange
+  onShowTranslationChange,
+  onReciterChange
 }: ChapterViewProps) {
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
@@ -242,6 +248,33 @@ export default function ChapterView({
                 <span>Bookmark</span>
                 <Bookmark className={`w-4 h-4 ${hasChapterBookmark ? 'fill-primary text-primary' : ''}`} />
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger data-testid="menu-item-reciter">
+                  <span>Reciter</span>
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {getReciterById(reciter)?.name || 'Mishary Alafasy'}
+                  </span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuLabel>Select Reciter</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {getFeaturedReciters().map((r) => (
+                    <DropdownMenuItem
+                      key={r.id}
+                      onClick={() => onReciterChange(r.id)}
+                      className="flex items-center justify-between cursor-pointer"
+                      data-testid={`reciter-option-${r.id}`}
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-sm">{r.name}</span>
+                        <span className="text-xs text-muted-foreground">{r.arabicName}</span>
+                      </div>
+                      {reciter === r.id && <Check className="w-4 h-4 ml-2 text-primary" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
                 className="flex items-center justify-between cursor-pointer"

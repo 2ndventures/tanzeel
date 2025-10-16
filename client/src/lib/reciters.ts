@@ -1,6 +1,7 @@
 /**
- * Comprehensive list of Quran reciters from Islamic Network API
- * Source: http://api.alquran.cloud/v1/edition/format/audio
+ * Comprehensive list of Quran reciters from Islamic Network CDN
+ * All reciters listed have complete surah-level audio at 128kbps
+ * Source: https://cdn.islamic.network/quran/info/by-surah/info.json
  */
 
 export interface Reciter {
@@ -12,13 +13,75 @@ export interface Reciter {
 }
 
 export const RECITERS: Reciter[] = [
-  // NOTE: Currently only Alafasy has full surah audio files at 128kbps on Islamic Network CDN
-  // Other reciters may fallback to Alafasy if audio is unavailable
   {
     id: "ar.alafasy",
-    name: "Mishary Alafasy",
-    arabicName: "مشاري العفاسي",
+    name: "Mishary Rashid Alafasy",
+    arabicName: "مشاري راشد العفاسي",
+    style: "Murattal",
     featured: true,
+  },
+  {
+    id: "ar.abdulbasit",
+    name: "Abdul Basit Abdul Samad",
+    arabicName: "عبد الباسط عبد الصمد",
+    style: "Mujawwad",
+    featured: true,
+  },
+  {
+    id: "ar.husary",
+    name: "Mahmoud Khalil Al-Hussary",
+    arabicName: "محمود خليل الحصري",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.minshawi",
+    name: "Mohamed Siddiq El-Minshawi",
+    arabicName: "محمد صديق المنشاوي",
+    style: "Mujawwad",
+    featured: true,
+  },
+  {
+    id: "ar.saadalghamidi",
+    name: "Saad Al-Ghamdi",
+    arabicName: "سعد الغامدي",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.mahermuaiqly",
+    name: "Maher Al-Muaiqly",
+    arabicName: "ماهر المعيقلي",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.abdurrahmaansudais",
+    name: "Abdul Rahman Al-Sudais",
+    arabicName: "عبد الرحمن السديس",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.abdulbarimohammed",
+    name: "Abdul Bari Mohammed",
+    arabicName: "عبد الباري محمد",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.abdulbariaththubaity",
+    name: "Abdul Bari Al-Thubaity",
+    arabicName: "عبد الباري الثبيتي",
+    style: "Murattal",
+    featured: false,
+  },
+  {
+    id: "ar.abdulazizazzahrani",
+    name: "Abdul Aziz Al-Zahrani",
+    arabicName: "عبد العزيز الزهراني",
+    style: "Murattal",
+    featured: false,
   },
 ];
 

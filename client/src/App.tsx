@@ -97,6 +97,7 @@ function App() {
               onDarkModeChange={setDarkMode}
               onTransliterationChange={setTransliteration}
               onShowTranslationChange={setShowTranslation}
+              onReciterChange={setReciter}
             />
           )}
           {currentPage === "settings" && (
