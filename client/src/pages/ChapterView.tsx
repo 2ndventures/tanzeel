@@ -191,6 +191,7 @@ export default function ChapterView({
           {verses.map((verse) => (
             <VerseCard
               key={verse.number}
+              chapterId={chapterId}
               verseNumber={verse.number}
               arabicText={verse.arabicText}
               transliteration={verse.transliteration}

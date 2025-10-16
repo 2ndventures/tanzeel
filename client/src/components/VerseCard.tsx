@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 interface VerseCardProps {
+  chapterId: number;
   verseNumber: number;
   arabicText: string;
   transliteration?: string;
@@ -14,6 +15,7 @@ interface VerseCardProps {
 }
 
 export default function VerseCard({
+  chapterId,
   verseNumber,
   arabicText,
   transliteration,
@@ -61,7 +63,7 @@ export default function VerseCard({
             }`} 
             data-testid={`text-verse-number-${verseNumber}`}
           >
-            {verseNumber === 0 ? 'Preamble' : `Verse ${verseNumber}`}
+            {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
           </span>
         </div>
         <p 

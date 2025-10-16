@@ -32,7 +32,7 @@ function App() {
     return DEFAULT_RECITER;
   });
   const [speed, setSpeed] = useState("Normal");
-  const [autoScroll, setAutoScroll] = useState(false);
+  const [autoScroll, setAutoScroll] = useState(true);
   const [repeat, setRepeat] = useState(false);
   const [autoplay, setAutoplay] = useState(() => {
     const saved = localStorage.getItem('autoplay');
