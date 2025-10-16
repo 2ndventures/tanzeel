@@ -24,21 +24,22 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 A custom `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization. It supports play/pause, seeking, playback speed adjustment, verse-timestamp synchronization for karaoke-style highlighting, repeat functionality, auto-scroll, and prev/next verse navigation. 
 
+### Audio Streaming System
+The application implements **HTTP Range Request streaming** (similar to Spotify) for instant audio playback, allowing long chapters (30-60MB) to start playing immediately without full download. The backend proxy at `/api/audio/{reciter}/{chapter}` supports:
+
+- **Progressive Download**: Forwards Range headers from browser to CDN, enabling chunked audio delivery
+- **206 Partial Content**: Properly handles partial content responses for streaming
+- **Backpressure Handling**: Uses Node.js `stream.pipeline()` for efficient memory usage
+- **Error Recovery**: Graceful handling of CDN failures and client disconnects
+- **Cache Optimization**: Forwards CDN cache headers (Cache-Control, ETag) for client-side caching
+- **Edge Case Handling**: Properly forwards 416 Range Not Satisfiable responses
+
 ### Reciter System
-The application supports 20+ professional Quran reciters from the Islamic Network API, configurable via Settings. Available reciters include:
-- **Mishary Rashid Alafasy** (default, ar.alafasy)
-- **Abu Bakr al-Shatri** (ar.shaatree)
-- **Mahmoud Khalil Al-Husary** (ar.husary, ar.husarymujawwad)
-- **Abdur-Rahman as-Sudais** (ar.abdurrahmaansudais)
-- **Maher Al-Muaiqly** (ar.mahermuaiqly)
-- **Sa'd al-Ghamdi** (ar.saadalghamadi)
-- **Hani ar-Rifai** (ar.hanialrifai)
-- **Khalil al-Husary** (ar.husarypublisher)
-- Plus 12 more reciters with various styles (Murattal, Mujawwad, Warsh, etc.)
+Currently, only **Mishary Rashid Alafasy** (ar.alafasy) is available due to Islamic Network CDN limitations - it's the only reciter with complete surah-level audio files at 128kbps quality. The backend automatically falls back to Alafasy if other reciters are requested but unavailable.
 
-Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, and Islamic Network API identifiers. Selected reciter persists in localStorage with backward compatibility for legacy names. The backend audio proxy (`/api/audio/{reciter}/{chapter}`) automatically falls back to Alafasy if requested reciter is unavailable.
+Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, and Islamic Network API identifiers. Selected reciter persists in localStorage with backward compatibility for legacy names.
 
-Audio sources are from the Islamic Network CDN, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse. Verse timestamp synchronization is meticulously managed for accurate highlighting across all chapters, including special handling for Chapter 9 and preambles.
+Audio sources are from the Islamic Network CDN at `https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3`, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse. Verse timestamp synchronization is meticulously managed for accurate highlighting across all chapters, including special handling for Chapter 9 and preambles.
 
 ## Data Management
 
