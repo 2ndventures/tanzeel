@@ -58,7 +58,27 @@ Users can select reciters from:
 1. **ChapterView menu**: Three-dot menu → Reciter submenu with checkmarks
 2. **Settings page**: Audio section → Reciter dropdown
 
-Audio sources are from the Islamic Network CDN at `https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3`, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse. Verse timestamp synchronization is meticulously managed for accurate highlighting across all chapters, including special handling for Chapter 9 and preambles.
+Audio sources are from the Islamic Network CDN at `https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3`, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse.
+
+### Verse Timestamp Synchronization System
+The application uses a **hybrid approach** for accurate verse-by-verse highlighting:
+
+- **Audio Source**: Islamic Network CDN (128kbps quality)
+- **Timestamp Source**: MP3Quran.net API (`/api/v3/ayat_timing?surah={chapter}&read={mp3QuranId}`)
+- **Reciter Mapping**: Each reciter has two identifiers:
+  - `id`: Islamic Network identifier for audio (e.g., "ar.alafasy")
+  - `mp3QuranId`: MP3Quran numeric ID for timestamps (e.g., 7)
+
+**Dynamic Timestamp Fetching:**
+- When users select a chapter or change reciters, the app fetches reciter-specific timestamps with millisecond precision
+- MP3Quran API returns `{ayah, start_time, end_time}` in milliseconds, converted to seconds
+- Falls back to approximate timing (8 sec/verse average) if fetch fails or reciter has no MP3Quran mapping
+- Console logs show fetching progress: `📡 Fetching timestamps` → `✓ Loaded {count} verse timestamps`
+
+**Special Handling:**
+- Chapter 9 (At-Tawbah) has no Bismillah preamble
+- Preamble (verse 0) represents "A'udhu billahi" audio intro
+- All 10 reciters mapped to MP3Quran IDs for accurate synchronization
 
 ## Data Management
 
@@ -115,4 +135,5 @@ All Quran data (114 chapters, 6,236 verses, Arabic text, English translations, t
 ## External APIs & Data Sources
 
 - **Islamic Network CDN**: Provides Quran recitation audio via `/api/audio/{reciter}/{chapter}` proxy.
+- **MP3Quran.net API**: Provides reciter-specific verse timestamps for accurate audio-to-verse synchronization.
 - **Al-Quran Cloud API**: Used to pre-fetch static Quran text data (Arabic, Sahih International English translation, `en.transliteration` transliteration).
