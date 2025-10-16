@@ -121,6 +121,7 @@ export default function ChapterView({
 
 
   // Update speed when settings change (map string to numeric value)
+  // Only run when initialSpeed changes, not when speed changes (to avoid overriding manual speed changes)
   useEffect(() => {
     const speedMap: { [key: string]: number } = {
       'Slow': 0.75,
@@ -128,10 +129,11 @@ export default function ChapterView({
       'Fast': 1.25,
     };
     const mappedSpeed = speedMap[initialSpeed];
-    if (mappedSpeed && mappedSpeed !== speed) {
+    if (mappedSpeed) {
+      console.log('Setting speed from settings:', mappedSpeed);
       setSpeed(mappedSpeed);
     }
-  }, [initialSpeed, speed, setSpeed]);
+  }, [initialSpeed, setSpeed]);
 
   // Track if autoplay has been triggered for this chapter
   const autoplayTriggeredRef = useRef(false);

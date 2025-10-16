@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 
 interface AudioPlayerProps {
   currentTime?: number;
@@ -38,8 +37,6 @@ export default function AudioPlayer({
   onNext,
   onRepeatChange,
 }: AudioPlayerProps) {
-  const [isSpeedMenuOpen, setIsSpeedMenuOpen] = useState(false);
-  
   // Speed options from 0.5 to 2.0 in 0.25 increments
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
   const formatTime = (seconds: number) => {
@@ -70,7 +67,7 @@ export default function AudioPlayer({
         
         <div className="grid grid-cols-3 items-center">
         <div className="flex justify-start">
-          <DropdownMenu open={isSpeedMenuOpen} onOpenChange={setIsSpeedMenuOpen}>
+          <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -86,9 +83,9 @@ export default function AudioPlayer({
                 <DropdownMenuItem
                   key={speedOption}
                   className="cursor-pointer justify-center"
-                  onClick={() => {
+                  onSelect={() => {
+                    console.log('Speed option selected:', speedOption);
                     onSpeedChange?.(speedOption);
-                    setIsSpeedMenuOpen(false);
                   }}
                   data-testid={`speed-option-${speedOption}`}
                 >
