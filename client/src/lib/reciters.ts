@@ -21,44 +21,23 @@ export const RECITERS: Reciter[] = [
     featured: true,
   },
   {
-    id: "ar.abdulbasit",
+    id: "ar.abdulbasitmurattal",
     name: "Abdul Basit Abdul Samad",
     arabicName: "عبد الباسط عبد الصمد",
-    style: "Mujawwad",
-    featured: true,
-  },
-  {
-    id: "ar.husary",
-    name: "Mahmoud Khalil Al-Hussary",
-    arabicName: "محمود خليل الحصري",
     style: "Murattal",
     featured: true,
   },
   {
-    id: "ar.minshawi",
+    id: "ar.muhammadsiddiqalminshawimujawwad",
     name: "Mohamed Siddiq El-Minshawi",
     arabicName: "محمد صديق المنشاوي",
     style: "Mujawwad",
     featured: true,
   },
   {
-    id: "ar.saadalghamidi",
-    name: "Saad Al-Ghamdi",
-    arabicName: "سعد الغامدي",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.mahermuaiqly",
-    name: "Maher Al-Muaiqly",
-    arabicName: "ماهر المعيقلي",
-    style: "Murattal",
-    featured: true,
-  },
-  {
-    id: "ar.abdurrahmaansudais",
-    name: "Abdul Rahman Al-Sudais",
-    arabicName: "عبد الرحمن السديس",
+    id: "ar.saudalshuraim",
+    name: "Saud Al-Shuraim",
+    arabicName: "سعود الشريم",
     style: "Murattal",
     featured: true,
   },
@@ -70,16 +49,37 @@ export const RECITERS: Reciter[] = [
     featured: true,
   },
   {
-    id: "ar.abdulbariaththubaity",
-    name: "Abdul Bari Al-Thubaity",
-    arabicName: "عبد الباري الثبيتي",
+    id: "ar.yasseraldossari",
+    name: "Yasser Al-Dosari",
+    arabicName: "ياسر الدوسري",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.ibrahimaldossari",
+    name: "Ibrahim Al-Dosari",
+    arabicName: "إبراهيم الدوسري",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.nasseralqatami",
+    name: "Nasser Al-Qatami",
+    arabicName: "ناصر القطامي",
+    style: "Murattal",
+    featured: true,
+  },
+  {
+    id: "ar.khaledalqahtani",
+    name: "Khaled Al-Qahtani",
+    arabicName: "خالد القحطاني",
     style: "Murattal",
     featured: false,
   },
   {
-    id: "ar.abdulazizazzahrani",
-    name: "Abdul Aziz Al-Zahrani",
-    arabicName: "عبد العزيز الزهراني",
+    id: "ar.waleednaehi",
+    name: "Waleed Al-Naehi",
+    arabicName: "وليد النعيحي",
     style: "Murattal",
     featured: false,
   },
@@ -118,9 +118,18 @@ export const DEFAULT_RECITER = "ar.alafasy";
 
 // Legacy mapping for backward compatibility
 export const LEGACY_RECITER_MAP: Record<string, string> = {
+  // Old string names
   "Alafasy": "ar.alafasy",
-  "Sudais": "ar.abdurrahmaansudais",
-  "Ghamadi": "ar.saadalghamidi", // Saad Al-Ghamdi
+  "Sudais": "ar.saudalshuraim",
+  "Ghamadi": "ar.yasseraldossari",
+  // Old incorrect API IDs that don't exist on CDN
+  "ar.abdulbasit": "ar.abdulbasitmurattal",
+  "ar.husary": "ar.alafasy", // Not available, fallback to default
+  "ar.minshawi": "ar.muhammadsiddiqalminshawimujawwad",
+  "ar.saadalghamidi": "ar.yasseraldossari", // Not available, use similar reciter
+  "ar.mahermuaiqly": "ar.alafasy", // Not available, fallback to default
+  "ar.abdurrahmaansudais": "ar.saudalshuraim", // Sudais alternative
+  "ar.shaatree": "ar.yasseraldossari", // Not available
 };
 
 // Convert legacy reciter name to API identifier

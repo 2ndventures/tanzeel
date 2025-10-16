@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
-import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId } from "@/lib/reciters";
+import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 
 type Page = "home" | "chapter" | "settings";
 
@@ -23,11 +23,13 @@ function App() {
     if (saved) {
       const trimmedId = saved.trim();
       
-      // Handle legacy reciter names (Alafasy, Sudais, Ghamadi)
-      if (['Alafasy', 'Sudais', 'Ghamadi'].includes(trimmedId)) {
-        const newId = getLegacyReciterId(trimmedId);
-        localStorage.setItem('reciter', newId);
-        return newId;
+      // Check if this is a legacy ID that needs migration
+      const migratedId = getLegacyReciterId(trimmedId);
+      if (migratedId !== DEFAULT_RECITER || trimmedId in LEGACY_RECITER_MAP) {
+        // Legacy ID found - migrate it
+        localStorage.setItem('reciter', migratedId);
+        console.log(`Migrated reciter from "${trimmedId}" to "${migratedId}"`);
+        return migratedId;
       }
       
       // Validate that the reciter ID exists in our current RECITERS list
