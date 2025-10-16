@@ -36,13 +36,38 @@ export const getChapterAudioUrl = (chapterId: number, reciter: string = 'ar.alaf
   return `/api/audio/${reciterId}/${chapterId}`;
 };
 
-export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
-  if (chapterId === 1) {
-    return alFatihahTimestamps;
+// Fetch reciter-specific timestamps from MP3Quran.net API
+export const fetchVerseTimestamps = async (
+  chapterId: number,
+  reciterId: number
+): Promise<VerseTimestamp[]> => {
+  try {
+    const response = await fetch(
+      `https://www.mp3quran.net/api/v3/ayat_timing?surah=${chapterId}&read=${reciterId}`
+    );
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch timestamps: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Convert MP3Quran format to our format
+    // MP3Quran uses milliseconds, we use seconds
+    return data.map((item: any) => ({
+      verse: item.ayah, // 0 for preamble, 1+ for verses
+      start: item.start_time / 1000, // Convert ms to seconds
+      end: item.end_time / 1000,
+    }));
+  } catch (error) {
+    console.error('Failed to fetch verse timestamps:', error);
+    // Return fallback timestamps
+    return getApproximateTimestamps(chapterId);
   }
-  
-  // For other chapters, generate approximate timestamps
-  // In production, use actual verse timing data
+};
+
+// Fallback: Generate approximate timestamps
+export const getApproximateTimestamps = (chapterId: number): VerseTimestamp[] => {
   const verseCount = getVerseCount(chapterId);
   const avgVerseDuration = 8; // seconds per verse (approximate)
   
@@ -67,6 +92,15 @@ export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
   }
   
   return timestamps;
+};
+
+// For backward compatibility and static usage
+export const getVerseTimestamps = (chapterId: number): VerseTimestamp[] => {
+  if (chapterId === 1) {
+    return alFatihahTimestamps;
+  }
+  
+  return getApproximateTimestamps(chapterId);
 };
 
 function getVerseCount(chapterId: number): number {

@@ -4,7 +4,7 @@ import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
-import { getChapterAudioUrl, getVerseTimestamps } from "@/lib/verseTimestamps";
+import { getChapterAudioUrl, fetchVerseTimestamps, getVerseTimestamps, VerseTimestamp } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import {
@@ -64,7 +64,35 @@ export default function ChapterView({
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
   const audioUrl = getChapterAudioUrl(chapterId, reciter);
-  const verseTimestamps = getVerseTimestamps(chapterId);
+  
+  // Fetch reciter-specific timestamps
+  const [verseTimestamps, setVerseTimestamps] = useState<VerseTimestamp[]>(() => getVerseTimestamps(chapterId));
+  const [isLoadingTimestamps, setIsLoadingTimestamps] = useState(false);
+
+  // Fetch timestamps when reciter or chapter changes
+  useEffect(() => {
+    const loadTimestamps = async () => {
+      const reciterInfo = getReciterById(reciter);
+      
+      // If reciter has MP3Quran ID, fetch accurate timestamps
+      if (reciterInfo?.mp3QuranId) {
+        setIsLoadingTimestamps(true);
+        console.log(`📡 Fetching timestamps for ${reciterInfo.name} (ID: ${reciterInfo.mp3QuranId}), Chapter ${chapterId}`);
+        
+        const timestamps = await fetchVerseTimestamps(chapterId, reciterInfo.mp3QuranId);
+        setVerseTimestamps(timestamps);
+        setIsLoadingTimestamps(false);
+        
+        console.log(`✓ Loaded ${timestamps.length} verse timestamps for ${reciterInfo.name}`);
+      } else {
+        // Fallback to approximate timestamps
+        console.log(`⚠️ No MP3Quran ID for ${reciterInfo?.name || reciter}, using approximate timestamps`);
+        setVerseTimestamps(getVerseTimestamps(chapterId));
+      }
+    };
+    
+    loadTimestamps();
+  }, [chapterId, reciter]);
   
   // Initialize bookmark state from localStorage
   const [bookmarkedVerse, setBookmarkedVerse] = useState<number | null>(
