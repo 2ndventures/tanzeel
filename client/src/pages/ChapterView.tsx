@@ -381,22 +381,32 @@ export default function ChapterView({
 
       <div className="flex-1 overflow-y-auto">
         <div className="divide-y divide-border">
-          {verses.map((verse) => (
-            <VerseCard
-              key={verse.number}
-              chapterId={chapterId}
-              verseNumber={verse.number}
-              arabicText={verse.arabicText}
-              transliteration={verse.transliteration}
-              translation={verse.translation}
-              showTransliteration={showTransliteration}
-              showTranslation={showTranslation}
-              isPlaying={isPlaying}
-              isCurrentVerse={currentVerse === verse.number}
-              isInVerseRange={isInVerseRange}
-              onClick={() => handleVerseClick(verse.number)}
-            />
-          ))}
+          {verses.map((verse) => {
+            // Remove Bismillah from first verse since it's already in the header
+            // Chapter 9 (At-Tawbah) doesn't have Bismillah, so skip it
+            let arabicText = verse.arabicText;
+            if (verse.number === 1 && chapterId !== 9) {
+              const bismillah = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
+              arabicText = arabicText.replace(bismillah, '').trim();
+            }
+            
+            return (
+              <VerseCard
+                key={verse.number}
+                chapterId={chapterId}
+                verseNumber={verse.number}
+                arabicText={arabicText}
+                transliteration={verse.transliteration}
+                translation={verse.translation}
+                showTransliteration={showTransliteration}
+                showTranslation={showTranslation}
+                isPlaying={isPlaying}
+                isCurrentVerse={currentVerse === verse.number}
+                isInVerseRange={isInVerseRange}
+                onClick={() => handleVerseClick(verse.number)}
+              />
+            );
+          })}
         </div>
         <div className="h-40" />
       </div>
