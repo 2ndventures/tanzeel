@@ -3,12 +3,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "@/pages/Home";
+import HomePage from "@/pages/HomePage";
+import SurahJuz from "@/pages/SurahJuz";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 
-type Page = "home" | "chapter" | "settings";
+type Page = "home" | "surah-juz" | "chapter" | "settings";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
@@ -75,6 +76,8 @@ function App() {
       setActiveTab(tab);
     } else if (page === "settings") {
       setActiveTab("settings");
+    } else if (page === "surah-juz") {
+      setActiveTab("surah");
     } else if (page === "home") {
       setActiveTab("home");
     }
@@ -86,13 +89,16 @@ function App() {
       <TooltipProvider>
         <div className="min-h-screen">
           {currentPage === "home" && (
-            <Home onNavigate={handleNavigate} activeTab={activeTab === "settings" ? "home" : activeTab} />
+            <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
+          )}
+          {currentPage === "surah-juz" && (
+            <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} />
           )}
           {currentPage === "chapter" && (
             <ChapterView
               chapterId={selectedChapter}
               onBack={() => {
-                setCurrentPage("home");
+                setCurrentPage("surah-juz");
                 setActiveTab("surah");
               }}
               showTransliteration={transliteration}
