@@ -391,10 +391,13 @@ export default function ChapterView({
             // For other chapters (except 9), remove Bismillah prefix from verse 1
             let arabicText = verse.arabicText;
             if (verse.number === 1 && chapterId !== 9 && chapterId !== 1) {
-              // Remove Bismillah: 38 characters + space = 39 characters to remove
-              const bismillahLength = 38; // "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ"
-              if (arabicText.length > bismillahLength) {
-                arabicText = arabicText.substring(bismillahLength).trim();
+              const BISMILLAH_PREFIX = "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ";
+              // Normalize both strings for Unicode comparison (handles different diacritic representations)
+              const normalizedText = arabicText.normalize('NFC');
+              const normalizedPrefix = BISMILLAH_PREFIX.normalize('NFC');
+              
+              if (normalizedText.startsWith(normalizedPrefix)) {
+                arabicText = normalizedText.slice(normalizedPrefix.length).trim();
               }
             }
             
