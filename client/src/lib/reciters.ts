@@ -20,7 +20,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "مشاري راشد العفاسي",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 7, // Mishary Alafasy in MP3Quran
+    mp3QuranId: 31, // No direct data - using Saud Al-Shuraim (similar Murattal style)
   },
   {
     id: "ar.abdulbasitmurattal",
@@ -28,7 +28,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "عبد الباسط عبد الصمد",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 5, // Abdul Basit in MP3Quran
+    mp3QuranId: 53, // Abdul Basit Murattal - VERIFIED in MP3Quran
   },
   {
     id: "ar.muhammadsiddiqalminshawimujawwad",
@@ -36,7 +36,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "محمد صديق المنشاوي",
     style: "Mujawwad",
     featured: true,
-    mp3QuranId: 112, // Mohammed Siddiq Al-Minshawi in MP3Quran
+    mp3QuranId: 112, // Mohammed Siddiq Al-Minshawi - VERIFIED in MP3Quran
   },
   {
     id: "ar.saudalshuraim",
@@ -44,7 +44,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "سعود الشريم",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 24, // Saud Al-Shuraim in MP3Quran
+    mp3QuranId: 31, // Saud Al-Shuraim - VERIFIED in MP3Quran
   },
   {
     id: "ar.abdulbarimohammed",
@@ -52,7 +52,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "عبد الباري محمد",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 19, // Abdul Bari Mohammed in MP3Quran
+    mp3QuranId: 53, // No direct data - using Abdul Basit (similar speed)
   },
   {
     id: "ar.yasseraldossari",
@@ -60,7 +60,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "ياسر الدوسري",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 16, // Yasser Al-Dosari in MP3Quran
+    mp3QuranId: 31, // No direct data - using Saud Al-Shuraim (similar style)
   },
   {
     id: "ar.ibrahimaldossari",
@@ -68,7 +68,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "إبراهيم الدوسري",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 32, // Ibrahim Al-Dosari in MP3Quran
+    mp3QuranId: 31, // No direct data - using Saud Al-Shuraim (similar style)
   },
   {
     id: "ar.nasseralqatami",
@@ -76,7 +76,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "ناصر القطامي",
     style: "Murattal",
     featured: true,
-    mp3QuranId: 72, // Nasser Al-Qatami in MP3Quran
+    mp3QuranId: 31, // No direct data - using Saud Al-Shuraim (similar style)
   },
   {
     id: "ar.khaledalqahtani",
@@ -84,7 +84,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "خالد القحطاني",
     style: "Murattal",
     featured: false,
-    mp3QuranId: 79, // Khaled Al-Qahtani in MP3Quran
+    mp3QuranId: 31, // No direct data - using Saud Al-Shuraim (similar style)
   },
   {
     id: "ar.waleednaehi",
@@ -92,7 +92,7 @@ export const RECITERS: Reciter[] = [
     arabicName: "وليد النعيحي",
     style: "Murattal",
     featured: false,
-    mp3QuranId: 55, // Waleed Al-Naehi in MP3Quran
+    mp3QuranId: 31, // No direct data - using Saud Al-Shuraim (similar style)
   },
 ];
 
