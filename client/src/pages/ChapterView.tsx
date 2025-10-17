@@ -104,6 +104,11 @@ export default function ChapterView({
     const saved = getChapterBookmark(chapterId);
     setBookmarkedVerse(saved);
   }, [chapterId]);
+
+  // Scroll to top when chapter changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [chapterId]);
   
   const {
     isPlaying,
