@@ -122,8 +122,8 @@ function App() {
           {currentPage === "settings" && (
             <Settings
               onBack={() => {
-                setCurrentPage("home");
-                setActiveTab("home");
+                setCurrentPage("surah-juz");
+                setActiveTab("surah");
               }}
               onNavigate={handleNavigate}
               darkMode={darkMode}
