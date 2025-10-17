@@ -6,6 +6,7 @@ import { getAllReciters, getReciterDisplayName } from "@/lib/reciters";
 
 interface SettingsProps {
   onBack: () => void;
+  onNavigate?: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
   darkMode: boolean;
   onDarkModeChange: (value: boolean) => void;
   transliteration: boolean;
@@ -30,6 +31,7 @@ interface SettingsProps {
 
 export default function Settings({
   onBack,
+  onNavigate,
   darkMode,
   onDarkModeChange,
   transliteration,
@@ -187,7 +189,15 @@ export default function Settings({
       <BottomNav
         activeTab="settings"
         onTabChange={(tab) => {
-          if (tab === "home" || tab === "surah") onBack();
+          if (onNavigate) {
+            if (tab === "home") {
+              onNavigate("home", undefined, "home");
+            } else if (tab === "surah") {
+              onNavigate("surah-juz", undefined, "surah");
+            }
+          } else {
+            if (tab === "home" || tab === "surah") onBack();
+          }
         }}
       />
     </div>

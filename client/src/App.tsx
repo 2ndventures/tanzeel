@@ -125,6 +125,7 @@ function App() {
                 setCurrentPage("home");
                 setActiveTab("home");
               }}
+              onNavigate={handleNavigate}
               darkMode={darkMode}
               onDarkModeChange={setDarkMode}
               transliteration={transliteration}
