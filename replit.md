@@ -10,7 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 
-The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a dark-themed, mobile-first design. State management is handled with React Hooks for local state and React Query for server state. Client-side navigation uses a simple page state system. Key patterns include Compound Components, Custom Hooks (e.g., `useAudioPlayer`, `useIsMobile`), and Controlled Components.
+The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a dark-themed, mobile-first design. State management is handled with React Hooks for local state and React Query for server state. Client-side navigation uses a simple page state system with three main screens:
+
+1. **HomePage** (`/pages/HomePage.tsx`): Simple landing screen with app title, "Start Reading" button, and bottom navigation
+2. **SurahJuz** (`/pages/SurahJuz.tsx`): Chapter list with search functionality, displays all 114 surahs
+3. **Settings** (`/pages/Settings.tsx`): Application settings and preferences
+
+Navigation flow: Home → Surah/Juz → Chapter View (reading screen). Bottom navigation allows switching between Home, Surah/Juz, and Settings tabs. ChapterView back button returns to Surah/Juz; Settings back button returns to Home.
+
+Key patterns include Compound Components, Custom Hooks (e.g., `useAudioPlayer`, `useIsMobile`), and Controlled Components.
 
 ## Backend Architecture
 
