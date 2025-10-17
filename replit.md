@@ -61,24 +61,35 @@ Users can select reciters from:
 Audio sources are from the Islamic Network CDN at `https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3`, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse.
 
 ### Verse Timestamp Synchronization System
-The application uses a **hybrid approach** for accurate verse-by-verse highlighting:
+The application uses a **hybrid approach with smart fallback** for accurate verse-by-verse highlighting:
 
 - **Audio Source**: Islamic Network CDN (128kbps quality)
 - **Timestamp Source**: MP3Quran.net API (`/api/v3/ayat_timing?surah={chapter}&read={mp3QuranId}`)
 - **Reciter Mapping**: Each reciter has two identifiers:
   - `id`: Islamic Network identifier for audio (e.g., "ar.alafasy")
-  - `mp3QuranId`: MP3Quran numeric ID for timestamps (e.g., 7)
+  - `mp3QuranId`: MP3Quran numeric ID for timestamps
+
+**Verified MP3Quran Mappings (Direct Data):**
+- Abdul Basit Abdul Samad → ID 53 (verified Murattal)
+- Mohamed Siddiq El-Minshawi → ID 112 (verified Mujawwad)
+- Saud Al-Shuraim → ID 31 (verified Murattal)
+
+**Proxy Timestamp Mappings (7 reciters use similar reciter's timestamps):**
+- Mishary Alafasy → uses ID 31 (Saud Al-Shuraim - similar Murattal style)
+- Abdul Bari Mohammed → uses ID 53 (Abdul Basit - similar speed)
+- Yasser Al-Dosari, Ibrahim Al-Dosari, Nasser Al-Qatami, Khaled Al-Qahtani, Waleed Al-Naehi → use ID 31 (similar Murattal style)
 
 **Dynamic Timestamp Fetching:**
-- When users select a chapter or change reciters, the app fetches reciter-specific timestamps with millisecond precision
-- MP3Quran API returns `{ayah, start_time, end_time}` in milliseconds, converted to seconds
-- Falls back to approximate timing (8 sec/verse average) if fetch fails or reciter has no MP3Quran mapping
-- Console logs show fetching progress: `📡 Fetching timestamps` → `✓ Loaded {count} verse timestamps`
+- When users select a chapter or change reciters, the app fetches timestamps with millisecond precision from MP3Quran
+- API returns `{ayah, start_time, end_time}` in milliseconds, converted to seconds
+- Falls back to approximate timing (8 sec/verse average) if API fetch fails
+- Console logs: `📡 Fetching timestamps for {name} (ID: {mp3QuranId})` → `✓ Loaded {count} verse timestamps`
 
 **Special Handling:**
 - Chapter 9 (At-Tawbah) has no Bismillah preamble
 - Preamble (verse 0) represents "A'udhu billahi" audio intro
-- All 10 reciters mapped to MP3Quran IDs for accurate synchronization
+- All 10 reciters have working timestamp data (3 direct, 7 proxy)
+- Verse click-to-seek functionality uses timestamps to jump to specific verses
 
 ## Data Management
 
