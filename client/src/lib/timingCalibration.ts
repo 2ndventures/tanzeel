@@ -19,11 +19,16 @@ export interface TimingOffset {
 export function getReciterOffset(reciterId: string): number {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return 0;
+    if (!stored) {
+      console.log(`📖 No stored offset for ${reciterId}, using 0ms`);
+      return 0;
+    }
     
     const offsets: TimingOffset[] = JSON.parse(stored);
     const offset = offsets.find(o => o.reciterId === reciterId);
-    return offset ? offset.offsetMs : 0;
+    const offsetMs = offset ? offset.offsetMs : 0;
+    console.log(`📖 Retrieved timing offset for ${reciterId}: ${offsetMs}ms`);
+    return offsetMs;
   } catch (error) {
     console.error('Failed to load timing offset:', error);
     return 0;

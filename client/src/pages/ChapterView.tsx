@@ -252,11 +252,13 @@ export default function ChapterView({
   // Timing calibration functions
   const adjustTimingOffset = (deltaMs: number) => {
     const newOffset = timingOffsetMs + deltaMs;
+    console.log(`🎯 Adjusting timing offset: ${timingOffsetMs}ms → ${newOffset}ms`);
     setTimingOffsetMs(newOffset);
     setReciterOffset(reciter, newOffset);
   };
 
   const resetTimingOffset = () => {
+    console.log(`🔄 Resetting timing offset from ${timingOffsetMs}ms to 0ms`);
     setTimingOffsetMs(0);
     resetReciterOffset(reciter);
   };
@@ -425,7 +427,7 @@ export default function ChapterView({
                   <DropdownMenuLabel>Adjust Sync Timing</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => adjustTimingOffset(-100)}
+                    onSelect={(e) => { e.preventDefault(); adjustTimingOffset(-100); }}
                     className="flex items-center gap-2 cursor-pointer"
                     data-testid="timing-adjust-minus-100"
                   >
@@ -433,7 +435,7 @@ export default function ChapterView({
                     <span>Earlier (-100ms)</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => adjustTimingOffset(-50)}
+                    onSelect={(e) => { e.preventDefault(); adjustTimingOffset(-50); }}
                     className="flex items-center gap-2 cursor-pointer"
                     data-testid="timing-adjust-minus-50"
                   >
@@ -441,7 +443,7 @@ export default function ChapterView({
                     <span>Earlier (-50ms)</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => adjustTimingOffset(50)}
+                    onSelect={(e) => { e.preventDefault(); adjustTimingOffset(50); }}
                     className="flex items-center gap-2 cursor-pointer"
                     data-testid="timing-adjust-plus-50"
                   >
@@ -449,7 +451,7 @@ export default function ChapterView({
                     <span>Later (+50ms)</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => adjustTimingOffset(100)}
+                    onSelect={(e) => { e.preventDefault(); adjustTimingOffset(100); }}
                     className="flex items-center gap-2 cursor-pointer"
                     data-testid="timing-adjust-plus-100"
                   >
@@ -458,7 +460,7 @@ export default function ChapterView({
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={resetTimingOffset}
+                    onSelect={(e) => { e.preventDefault(); resetTimingOffset(); }}
                     className="flex items-center gap-2 cursor-pointer"
                     data-testid="timing-reset"
                   >
