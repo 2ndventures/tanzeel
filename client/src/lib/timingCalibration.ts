@@ -24,13 +24,42 @@ export function getReciterOffset(reciterId: string): number {
       return 0;
     }
     
-    const offsets: TimingOffset[] = JSON.parse(stored);
+    // Parse stored data - handle both new array format and legacy object/primitive formats
+    let offsets: TimingOffset[];
+    const parsed = JSON.parse(stored);
+    
+    // If it's already an array, use it
+    if (Array.isArray(parsed)) {
+      offsets = parsed;
+    } 
+    // If it's an object (legacy map format: {reciterId: offsetMs}), migrate it
+    else if (typeof parsed === 'object' && parsed !== null) {
+      console.log(`📦 Migrating legacy timing offset object format to array structure`);
+      offsets = Object.entries(parsed).map(([key, value]) => ({
+        reciterId: key,
+        offsetMs: typeof value === 'number' ? value : parseInt(String(value), 10) || 0,
+        lastUpdated: new Date().toISOString(),
+      }));
+      // Save migrated data
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(offsets));
+      console.log(`✓ Migrated ${offsets.length} timing offset(s) to new format`);
+    }
+    // If it's a primitive (legacy single-value format without reciter context)
+    else {
+      console.warn(`⚠️ Found primitive timing offset value but cannot determine reciter association - clearing for fresh start. Legacy value was:`, parsed);
+      // Cannot reliably migrate a single primitive value without knowing which reciter it belongs to
+      localStorage.removeItem(STORAGE_KEY);
+      return 0;
+    }
+    
     const offset = offsets.find(o => o.reciterId === reciterId);
     const offsetMs = offset ? offset.offsetMs : 0;
     console.log(`📖 Retrieved timing offset for ${reciterId}: ${offsetMs}ms`);
     return offsetMs;
   } catch (error) {
-    console.error('Failed to load timing offset:', error);
+    console.error('Failed to load timing offset, clearing storage:', error);
+    // Clear corrupted storage
+    localStorage.removeItem(STORAGE_KEY);
     return 0;
   }
 }
@@ -41,7 +70,29 @@ export function getReciterOffset(reciterId: string): number {
 export function setReciterOffset(reciterId: string, offsetMs: number): void {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    let offsets: TimingOffset[] = stored ? JSON.parse(stored) : [];
+    let offsets: TimingOffset[] = [];
+    
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      
+      // If it's an array, use it
+      if (Array.isArray(parsed)) {
+        offsets = parsed;
+      } 
+      // If it's an object (legacy map format), migrate it
+      else if (typeof parsed === 'object' && parsed !== null) {
+        console.log(`📦 Migrating legacy object format during save`);
+        offsets = Object.entries(parsed).map(([key, value]) => ({
+          reciterId: key,
+          offsetMs: typeof value === 'number' ? value : parseInt(String(value), 10) || 0,
+          lastUpdated: new Date().toISOString(),
+        }));
+      }
+      // Otherwise, start fresh with empty array
+      else {
+        console.warn(`⚠️ Unexpected format during save, starting fresh`);
+      }
+    }
     
     // Remove existing offset for this reciter
     offsets = offsets.filter(o => o.reciterId !== reciterId);
@@ -61,10 +112,38 @@ export function setReciterOffset(reciterId: string, offsetMs: number): void {
 }
 
 /**
- * Reset the timing offset for a specific reciter
+ * Reset the timing offset for a specific reciter by removing the entry entirely
  */
 export function resetReciterOffset(reciterId: string): void {
-  setReciterOffset(reciterId, 0);
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      console.log(`✓ Reset timing offset for ${reciterId} (no stored data)`);
+      return;
+    }
+    
+    const parsed = JSON.parse(stored);
+    if (!Array.isArray(parsed)) {
+      // Legacy format - clear everything
+      localStorage.removeItem(STORAGE_KEY);
+      console.log(`✓ Reset timing offset for ${reciterId} (cleared legacy data)`);
+      return;
+    }
+    
+    // Remove the entry for this reciter
+    const offsets = parsed.filter((o: TimingOffset) => o.reciterId !== reciterId);
+    
+    if (offsets.length === 0) {
+      // If no offsets remain, remove the key entirely
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(offsets));
+    }
+    
+    console.log(`✓ Reset timing offset for ${reciterId} to 0ms`);
+  } catch (error) {
+    console.error('Failed to reset timing offset:', error);
+  }
 }
 
 /**

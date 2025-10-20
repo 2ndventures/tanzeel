@@ -99,6 +99,48 @@ The application uses a **hybrid approach with smart fallback** for accurate vers
 - All 10 reciters have working timestamp data (3 direct, 7 proxy)
 - Verse click-to-seek functionality uses timestamps to jump to specific verses
 
+### Timing Calibration System
+The application features a **per-reciter timing offset calibration system** to compensate for sync inaccuracies between audio and verse highlighting. This addresses timing drift that can occur with different reciters, longer surahs, or variations in timestamp precision.
+
+**Architecture** (`client/src/lib/timingCalibration.ts`):
+- **Storage**: localStorage-based persistence using JSON array format under key `quran_timing_offsets`
+- **Data Model**: `{ reciterId: string, offsetMs: number, lastUpdated: string }`
+- **Migration**: Defensive parsing handles legacy primitive formats, auto-migrates or clears invalid data
+- **Cleanup**: Reset operations completely remove entries instead of storing 0ms for cleaner storage
+
+**API Functions:**
+- `getReciterOffset(reciterId)`: Retrieves offset for reciter (default 0ms), handles legacy format migration
+- `setReciterOffset(reciterId, offsetMs)`: Saves offset with timestamp, validates array format
+- `resetReciterOffset(reciterId)`: Completely removes entry, clears storage if no offsets remain
+- `applyOffsetsToTimestamps(timestamps, offsetMs)`: Applies offset to verse timestamp array
+
+**UI Controls** (ChapterView menu):
+1. **Debug Mode** (`AudioDebugPanel.tsx`): Toggle to show real-time sync diagnostics
+   - Current playback time (seconds and milliseconds)
+   - Active highlighted verse
+   - Expected verse timing range
+   - Applied offset value
+   - Full verse timeline with timestamps
+2. **Timing Calibration** submenu:
+   - Earlier (-100ms, -50ms): Shift highlighting earlier if it's too late
+   - Later (+50ms, +100ms): Shift highlighting later if it's too early
+   - Reset to 0ms: Remove calibration offset
+   - Displays current offset in submenu header (e.g., "+50ms", "0ms")
+
+**Integration:**
+- `useAudioPlayer` hook accepts `timingOffsetMs` parameter
+- Offset is applied via `applyOffsetsToTimestamps()` before verse matching
+- ChapterView loads per-reciter offset on mount and reciter change
+- State updates are immediate with localStorage persistence
+- Menu items use `e.preventDefault()` to keep menu open during adjustments
+
+**Console Logging:**
+- `📖 Retrieved timing offset for {reciterId}: {offsetMs}ms` - On load
+- `🎯 Adjusting timing offset: {oldMs}ms → {newMs}ms` - On adjustment
+- `✓ Timing offset for {reciterId}: {offsetMs}ms` - On save
+- `🔄 Resetting timing offset from {oldMs}ms to 0ms` - On reset
+- `📦 Migrating legacy timing offset format` - On migration
+
 ## Data Management
 
 All Quran data (114 chapters, 6,236 verses, Arabic text, English translations, transliterations) is stored statically in `client/src/lib/quranData.ts`, sourced originally from Al-Quran Cloud API. Client-side persistence in local storage manages user preferences (theme, reciter, settings), bookmarks, and reading progress. A bookmark system allows saving and retrieving bookmarked verses.
