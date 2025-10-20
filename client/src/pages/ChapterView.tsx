@@ -67,11 +67,11 @@ export default function ChapterView({
   const reciterInfo = getReciterById(reciter);
   const everyAyahFolder = reciterInfo?.everyAyahFolder || 'Alafasy_128kbps';
   
-  // Generate audio URL for a specific verse
+  // Generate audio URL for a specific verse (using backend proxy)
   const getAudioUrl = (verseNum: number) => {
     const surahPadded = String(chapterId).padStart(3, '0');
     const ayahPadded = String(verseNum).padStart(3, '0');
-    return `https://everyayah.com/data/${everyAyahFolder}/${surahPadded}${ayahPadded}.mp3`;
+    return `/api/verse-audio/${everyAyahFolder}/${surahPadded}/${ayahPadded}`;
   };
   
   // Initialize bookmark state from localStorage

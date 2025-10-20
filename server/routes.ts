@@ -4,6 +4,42 @@ import { Readable, pipeline } from "stream";
 import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Verse-by-verse audio proxy for EveryAyah.com
+  app.get("/api/verse-audio/:reciterFolder/:surah/:ayah", async (req, res) => {
+    try {
+      const { reciterFolder, surah, ayah } = req.params;
+      
+      // Construct EveryAyah.com URL
+      const audioUrl = `https://everyayah.com/data/${reciterFolder}/${surah}${ayah}.mp3`;
+      console.log(`📡 Fetching verse audio: ${audioUrl}`);
+      
+      const response = await fetch(audioUrl);
+      
+      if (!response.ok) {
+        console.error(`❌ Verse audio not found: ${audioUrl}`);
+        return res.status(404).send("Verse audio not found");
+      }
+      
+      // Buffer the entire audio file (verse audio files are small: 50-200KB)
+      const buffer = await response.arrayBuffer();
+      console.log(`✓ Loaded verse audio: ${buffer.byteLength} bytes`);
+      
+      // Set headers for audio playback
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Length', buffer.byteLength.toString());
+      // Don't advertise Accept-Ranges since we're not implementing range requests
+      
+      // Set caching headers for better performance
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+      
+      // Send the audio buffer
+      res.send(Buffer.from(buffer));
+    } catch (error) {
+      console.error('❌ Verse audio proxy error:', error);
+      res.status(500).send("Failed to fetch verse audio");
+    }
+  });
+
   // Audio proxy route with HTTP Range Request streaming support
   app.get("/api/audio/:reciter/:chapter", async (req, res) => {
     try {
