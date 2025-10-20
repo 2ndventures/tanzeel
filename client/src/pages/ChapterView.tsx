@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Bookmark, MoreVertical, ChevronRight, Check } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -68,11 +68,11 @@ export default function ChapterView({
   const everyAyahFolder = reciterInfo?.everyAyahFolder || 'Alafasy_128kbps';
   
   // Generate audio URL for a specific verse (using backend proxy)
-  const getAudioUrl = (verseNum: number) => {
+  const getAudioUrl = useCallback((verseNum: number) => {
     const surahPadded = String(chapterId).padStart(3, '0');
     const ayahPadded = String(verseNum).padStart(3, '0');
     return `/api/verse-audio/${everyAyahFolder}/${surahPadded}/${ayahPadded}`;
-  };
+  }, [chapterId, everyAyahFolder]);
   
   // Initialize bookmark state from localStorage
   const [bookmarkedVerse, setBookmarkedVerse] = useState<number | null>(

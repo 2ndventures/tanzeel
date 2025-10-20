@@ -53,6 +53,8 @@ export default function VerseCard({
       style={highlightStyles}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
+      aria-current={highlighted ? 'true' : 'false'}
+      role="article"
       onClick={onClick}
     >
       <div className="space-y-3">

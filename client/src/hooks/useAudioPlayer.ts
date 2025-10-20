@@ -13,30 +13,32 @@ interface AudioPlayerState {
  * Each verse is a separate audio file from EveryAyah.com
  */
 export function useAudioPlayer(
-  getAudioUrl: (verse: number) => string, // Function to get audio URL for a specific verse
-  totalVerses: number, // Total number of verses in the chapter
-  initialVerse: number = 1, // Starting verse (default 1)
+  getAudioUrl: (verse: number) => string,
+  totalVerses: number,
+  initialVerse: number = 1,
   repeat: boolean = false,
   onVerseChange?: (verse: number) => void,
-  onEnded?: () => void // Called when all verses are finished
+  onEnded?: () => void
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const currentVerseRef = useRef<number>(initialVerse);
+  const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
-  const repeatRef = useRef(repeat);
   const speedRef = useRef(1.0);
-  const isPlayingRef = useRef(false); // Track intended playback state
-  
+
   const [state, setState] = useState<AudioPlayerState>({
     isPlaying: false,
     speed: 1.0,
-    isLoading: false,
+    isLoading: true,
     error: null,
     currentVerse: initialVerse,
   });
 
-  // Keep refs up to date
+  // Update refs when props change
+  useEffect(() => {
+    repeatRef.current = repeat;
+  }, [repeat]);
+
   useEffect(() => {
     onVerseChangeRef.current = onVerseChange;
   }, [onVerseChange]);
@@ -45,130 +47,119 @@ export function useAudioPlayer(
     onEndedRef.current = onEnded;
   }, [onEnded]);
 
-  useEffect(() => {
-    repeatRef.current = repeat;
-  }, [repeat]);
-
-  // Load and play a specific verse
-  const loadVerse = useCallback((verseNum: number, autoPlay: boolean = false) => {
+  // Load a specific verse
+  const loadVerse = useCallback((verseNum: number, shouldPlay: boolean = false) => {
     if (verseNum < 1 || verseNum > totalVerses) {
       console.warn(`Verse ${verseNum} out of range (1-${totalVerses})`);
       return;
     }
 
-    const audioUrl = getAudioUrl(verseNum);
-    console.log(`🎵 Loading verse ${verseNum}`);
-    console.log(`📍 Audio URL: ${audioUrl}`);
-    console.log(`📍 URL type: ${typeof audioUrl}`);
-    console.log(`📍 URL length: ${audioUrl?.length}`);
+    console.log(`🎵 Loading verse ${verseNum}/${totalVerses}`);
 
+    // Clean up previous audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      // Don't set src to '' as it triggers errors - just let it be garbage collected
+    }
+
+    // Update state
     setState(prev => ({
       ...prev,
+      currentVerse: verseNum,
       isLoading: true,
       error: null,
-      currentVerse: verseNum,
     }));
 
     // Create new audio element
     const audio = new Audio();
-    audio.preload = 'auto';
-    audio.playbackRate = speedRef.current;
+    const audioUrl = getAudioUrl(verseNum);
     
-    // Set up event listeners BEFORE setting src
-    const handleCanPlayThrough = () => {
-      console.log(`✓ Verse ${verseNum} ready to play`);
-      console.log(`📍 Audio element src after loading: ${audio.src}`);
+    console.log(`📍 Audio URL: ${audioUrl}`);
+
+    // Event handlers
+    const handleCanPlay = () => {
+      console.log(`✓ Verse ${verseNum} loaded and ready`);
       setState(prev => ({ ...prev, isLoading: false }));
       
-      if (autoPlay && isPlayingRef.current) {
+      if (shouldPlay) {
         audio.play().catch(err => {
-          console.error('Auto-play failed:', err);
-          setState(prev => ({ ...prev, isPlaying: false, error: 'Playback failed' }));
-          isPlayingRef.current = false;
+          console.error('Failed to play:', err);
+          setState(prev => ({ 
+            ...prev, 
+            isPlaying: false,
+            error: 'Playback failed'
+          }));
         });
       }
+    };
+
+    const handlePlay = () => {
+      console.log(`▶️ Playing verse ${verseNum}`);
+      setState(prev => ({ ...prev, isPlaying: true }));
+    };
+
+    const handlePause = () => {
+      console.log(`⏸️ Paused verse ${verseNum}`);
+      setState(prev => ({ ...prev, isPlaying: false }));
     };
 
     const handleEnded = () => {
       console.log(`✓ Verse ${verseNum} finished`);
       
       if (repeatRef.current) {
+        // Repeat current verse
         audio.currentTime = 0;
         audio.play();
       } else if (verseNum < totalVerses) {
-        onVerseChangeRef.current?.(verseNum + 1);
-        loadVerse(verseNum + 1, isPlayingRef.current);
+        // Move to next verse
+        const nextVerse = verseNum + 1;
+        onVerseChangeRef.current?.(nextVerse);
+        loadVerse(nextVerse, true);
       } else {
-        console.log('📖 Chapter finished');
+        // Chapter finished
+        console.log('📖 Chapter complete');
         setState(prev => ({ ...prev, isPlaying: false }));
-        isPlayingRef.current = false;
         onEndedRef.current?.();
       }
     };
 
     const handleError = (e: Event) => {
-      const audio = e.target as HTMLAudioElement;
-      const errorDetails = audio.error;
-      console.error('Audio loading error for verse', verseNum);
-      console.error('Failed audio URL:', audioUrl);
-      console.error('Error code:', errorDetails?.code);
-      console.error('Error message:', errorDetails?.message);
-      console.error('Network state:', audio.networkState);
-      console.error('Ready state:', audio.readyState);
-      console.error('Audio src:', audio.src);
+      const target = e.target as HTMLAudioElement;
+      const error = target.error;
       
-      let errorMessage = `Failed to load verse ${verseNum}`;
-      if (errorDetails) {
-        switch (errorDetails.code) {
-          case 1:
-            errorMessage = 'Audio loading aborted';
-            break;
-          case 2:
-            errorMessage = 'Network error loading audio';
-            break;
-          case 3:
-            errorMessage = 'Audio decoding error';
-            break;
-          case 4:
-            errorMessage = 'Audio format not supported';
-            break;
-        }
-      }
+      console.error('❌ Audio error for verse', verseNum);
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      console.error('URL:', audioUrl);
       
       setState(prev => ({
         ...prev,
-        error: errorMessage,
         isLoading: false,
         isPlaying: false,
+        error: `Failed to load verse ${verseNum}`,
       }));
-      isPlayingRef.current = false;
     };
-    
-    audio.addEventListener('canplaythrough', handleCanPlayThrough);
+
+    // Attach event listeners
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
-    
-    // Clean up old audio
-    if (audioRef.current) {
-      console.log('📍 Cleaning up old audio element');
-      audioRef.current.pause();
-      audioRef.current.src = '';
-    }
-    
-    // Set src and start loading
-    console.log('📍 About to set audio.src to:', audioUrl);
-    audio.src = audioUrl;
-    console.log('📍 After setting src, audio.src is:', audio.src);
-    console.log('📍 Calling audio.load()');
-    audio.load();
-    console.log('📍 After audio.load(), audio.src is:', audio.src);
-    console.log('📍 Audio element:', audio);
-    
-    audioRef.current = audio;
-    currentVerseRef.current = verseNum;
 
+    // Set source and load
+    audio.src = audioUrl;
+    audio.playbackRate = speedRef.current;
+    audio.load();
+
+    // Store reference
+    audioRef.current = audio;
+
+    // Cleanup function
     return () => {
-      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
@@ -176,65 +167,52 @@ export function useAudioPlayer(
 
   // Initialize with first verse
   useEffect(() => {
-    loadVerse(initialVerse, false);
+    const cleanup = loadVerse(initialVerse, false);
+    return cleanup;
   }, [initialVerse, loadVerse]);
 
-  // Play/pause
+  // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (!audioRef.current) {
-      console.warn('No audio element available');
+      console.warn('No audio element');
       return;
     }
 
     if (state.isPlaying) {
       audioRef.current.pause();
-      setState(prev => ({ ...prev, isPlaying: false }));
-      isPlayingRef.current = false;
-      console.log('⏸️ Paused');
     } else {
       audioRef.current.play().catch(err => {
         console.error('Playback failed:', err);
         setState(prev => ({ ...prev, error: 'Playback failed' }));
       });
-      setState(prev => ({ ...prev, isPlaying: true }));
-      isPlayingRef.current = true;
-      console.log('▶️ Playing');
     }
   }, [state.isPlaying]);
 
-  // Jump to a specific verse
+  // Jump to specific verse
   const seekToVerse = useCallback((verseNum: number) => {
     if (verseNum < 1 || verseNum > totalVerses) {
       console.warn(`Verse ${verseNum} out of range`);
       return;
     }
 
-    console.log(`⏭️ Jumping to verse ${verseNum}`);
-    const wasPlaying = isPlayingRef.current;
-    
-    // Stop current audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-    }
-    
-    // Load new verse
+    const wasPlaying = state.isPlaying;
     onVerseChangeRef.current?.(verseNum);
     loadVerse(verseNum, wasPlaying);
-  }, [loadVerse, totalVerses]);
+  }, [loadVerse, totalVerses, state.isPlaying]);
 
   // Next verse
   const nextVerse = useCallback(() => {
-    if (currentVerseRef.current < totalVerses) {
-      seekToVerse(currentVerseRef.current + 1);
+    if (state.currentVerse < totalVerses) {
+      seekToVerse(state.currentVerse + 1);
     }
-  }, [totalVerses, seekToVerse]);
+  }, [state.currentVerse, totalVerses, seekToVerse]);
 
   // Previous verse
   const prevVerse = useCallback(() => {
-    if (currentVerseRef.current > 1) {
-      seekToVerse(currentVerseRef.current - 1);
+    if (state.currentVerse > 1) {
+      seekToVerse(state.currentVerse - 1);
     }
-  }, [seekToVerse]);
+  }, [state.currentVerse, seekToVerse]);
 
   // Set playback speed
   const setSpeed = useCallback((newSpeed: number) => {
@@ -243,7 +221,7 @@ export function useAudioPlayer(
       audioRef.current.playbackRate = newSpeed;
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
-    console.log(`⚡ Playback speed: ${newSpeed}x`);
+    console.log(`⚡ Speed: ${newSpeed}x`);
   }, []);
 
   // Cleanup on unmount

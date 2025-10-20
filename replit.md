@@ -30,116 +30,82 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 ## Audio Playback System
 
-A custom `useAudioPlayer` hook manages audio state, playback controls, and verse synchronization. It supports play/pause, seeking, playback speed adjustment, verse-timestamp synchronization for karaoke-style highlighting, repeat functionality, auto-scroll, and prev/next verse navigation. 
+A custom `useAudioPlayer` hook manages audio state, playback controls, and verse progression. The system uses a **verse-by-verse architecture** where each verse is loaded and played individually, eliminating synchronization issues entirely.
 
-### Audio Streaming System
-The application implements **HTTP Range Request streaming** (similar to Spotify) for instant audio playback, allowing long chapters (30-60MB) to start playing immediately without full download. The backend proxy at `/api/audio/{reciter}/{chapter}` supports:
+### Verse-by-Verse Audio Architecture
 
-- **Progressive Download**: Forwards Range headers from browser to CDN, enabling chunked audio delivery
-- **206 Partial Content**: Properly handles partial content responses for streaming
-- **Backpressure Handling**: Uses Node.js `stream.pipeline()` for efficient memory usage
-- **Error Recovery**: Graceful handling of CDN failures and client disconnects
-- **Cache Optimization**: Forwards CDN cache headers (Cache-Control, ETag) for client-side caching
-- **Edge Case Handling**: Properly forwards 416 Range Not Satisfiable responses
+The application uses **individual MP3 files per verse** from EveryAyah.com, providing perfect synchronization between audio and text:
+
+**Audio Source**: EveryAyah.com CDN via backend proxy `/api/verse-audio/{reciter}/{surah}/{ayah}`
+- Each verse is a separate MP3 file (typically 100-300KB)
+- Individual files load quickly (~1-2 seconds)
+- No timestamp synchronization needed - audio and text are naturally synchronized
+- Backend proxy prevents CORS issues and adds caching headers
+
+**Playback Flow**:
+1. Load first verse MP3 and display "Loading..." state
+2. When audio is ready (`canplay` event), enable play button
+3. User clicks play → verse 1 audio plays, verse 1 card highlights
+4. When verse 1 ends (`ended` event) → automatically load and play verse 2
+5. Repeat until all verses in chapter are complete
+
+**State Management** (`useAudioPlayer` hook):
+- Uses `useRef` for speed to prevent dependency array issues
+- `useCallback` for stable function references to prevent infinite loops
+- Fresh `HTMLAudioElement` created for each verse
+- Cleanup avoids setting `src = ''` to prevent "Empty src" errors
+
+**Key Functions**:
+- `loadVerse(verseNum, autoPlay)`: Loads specific verse, optionally starts playback
+- `togglePlayPause()`: Play/pause current verse
+- `nextVerse()`: Skip to next verse
+- `prevVerse()`: Go to previous verse
+- `seekToVerse(verseNum)`: Jump to specific verse
 
 ### Reciter System
-The application supports **10 professional reciters** from the Islamic Network CDN, all with complete surah-level audio files at 128kbps quality. All reciter IDs have been verified against the CDN manifest. Eight featured reciters are prominently displayed in the UI:
+
+The application supports **10 professional reciters** from EveryAyah.com with complete Quran coverage:
 
 **Featured Reciters:**
-1. **Mishary Rashid Alafasy** (ar.alafasy) - Murattal - Default
-2. **Abdul Basit Abdul Samad** (ar.abdulbasitmurattal) - Murattal
-3. **Mohamed Siddiq El-Minshawi** (ar.muhammadsiddiqalminshawimujawwad) - Mujawwad
-4. **Saud Al-Shuraim** (ar.saudalshuraim) - Murattal
-5. **Abdul Bari Mohammed** (ar.abdulbarimohammed) - Murattal
-6. **Yasser Al-Dosari** (ar.yasseraldossari) - Murattal
-7. **Ibrahim Al-Dosari** (ar.ibrahimaldossari) - Murattal
-8. **Nasser Al-Qatami** (ar.nasseralqatami) - Murattal
+1. **Mishary Rashid Alafasy** - Alafasy_128kbps - Default
+2. **Abdul Basit Abdul Samad** - Abdul_Basit_Murattal_192kbps  
+3. **Mohamed Siddiq El-Minshawi** - Minshawy_Murattal_128kbps
+4. **Saud Al-Shuraim** - Saud_al-Shuraim_128kbps
+5. **Abdul Bari Mohammed** - Abdul_Bari_Mohammed_64kbps
+6. **Yasser Al-Dosari** - Yasser_Ad-Dussary_128kbps
+7. **Ibrahim Al-Dosari** - Ibrahim_Akhdar_32kbps
+8. **Nasser Al-Qatami** - Nasser_Alqatami_128kbps
 
-Reciter metadata is defined in `client/src/lib/reciters.ts` with display names, Arabic names, recitation styles, and verified Islamic Network CDN identifiers. Selected reciter persists in localStorage with robust backward compatibility:
-- Legacy string names ("Alafasy", "Sudais", "Ghamadi") are automatically migrated to proper API identifiers
-- Old incorrect API IDs (ar.abdulbasit, ar.husary, ar.minshawi, ar.saadalghamidi, ar.mahermuaiqly, ar.abdurrahmaansudais) are migrated to valid alternatives
-- Invalid or removed reciter IDs are validated and reset to default
-- Whitespace is trimmed from saved values
-- Migration is logged to console for debugging
+Reciter metadata is defined in `client/src/lib/reciters.ts` with:
+- Display names and Arabic names
+- EveryAyah folder names (e.g., "Alafasy_128kbps")
+- Recitation styles (Murattal, Mujawwad)
+- Quality levels (64kbps to 192kbps)
 
-Users can select reciters from:
+Selected reciter persists in localStorage. Users can select reciters from:
 1. **ChapterView menu**: Three-dot menu → Reciter submenu with checkmarks
 2. **Settings page**: Audio section → Reciter dropdown
 
-Audio sources are from the Islamic Network CDN at `https://cdn.islamic.network/quran/audio-surah/128/{reciter}/{chapter}.mp3`, proxied through the backend to prevent CORS issues. The system handles "A'udhu billahi" as audio-only preamble, not displayed as a verse.
+**Audio URL Format**: `https://www.everyayah.com/data/{reciter_folder}/{surah_padded}{ayah_padded}.mp3`
+- Example: `https://www.everyayah.com/data/Alafasy_128kbps/001001.mp3` (Surah 1, Verse 1)
+- Proxied through backend to prevent CORS: `/api/verse-audio/Alafasy_128kbps/001/001`
 
-### Verse Timestamp Synchronization System
-The application uses a **hybrid approach with smart fallback** for accurate verse-by-verse highlighting:
+### Verse Highlighting System
 
-- **Audio Source**: Islamic Network CDN (128kbps quality)
-- **Timestamp Source**: MP3Quran.net API (`/api/v3/ayat_timing?surah={chapter}&read={mp3QuranId}`)
-- **Reciter Mapping**: Each reciter has two identifiers:
-  - `id`: Islamic Network identifier for audio (e.g., "ar.alafasy")
-  - `mp3QuranId`: MP3Quran numeric ID for timestamps
+Verse highlighting is automatically synchronized with audio playback since each verse is a separate audio file:
 
-**Verified MP3Quran Mappings (Direct Data):**
-- Abdul Basit Abdul Samad → ID 53 (verified Murattal)
-- Mohamed Siddiq El-Minshawi → ID 112 (verified Mujawwad)
-- Saud Al-Shuraim → ID 31 (verified Murattal)
+**Visual Indicators**:
+- Blue left border (4px solid #4d7cfe)
+- Light blue background (rgba(77, 124, 254, 0.1))
+- Primary text color for verse number and Arabic text
 
-**Proxy Timestamp Mappings (7 reciters use similar reciter's timestamps):**
-- Mishary Alafasy → uses ID 31 (Saud Al-Shuraim - similar Murattal style)
-- Abdul Bari Mohammed → uses ID 53 (Abdul Basit - similar speed)
-- Yasser Al-Dosari, Ibrahim Al-Dosari, Nasser Al-Qatami, Khaled Al-Qahtani, Waleed Al-Naehi → use ID 31 (similar Murattal style)
+**Accessibility Attributes** (`VerseCard.tsx`):
+- `data-playing="true"` on currently playing verse
+- `aria-current="true"` for screen readers
+- `role="article"` for semantic structure
+- `data-testid="card-verse-{number}"` for testing
 
-**Dynamic Timestamp Fetching:**
-- When users select a chapter or change reciters, the app fetches timestamps with millisecond precision from MP3Quran
-- API returns `{ayah, start_time, end_time}` in milliseconds, converted to seconds
-- Falls back to approximate timing (8 sec/verse average) if API fetch fails
-- Console logs: `📡 Fetching timestamps for {name} (ID: {mp3QuranId})` → `✓ Loaded {count} verse timestamps`
-
-**Special Handling:**
-- Chapter 9 (At-Tawbah) has no Bismillah preamble
-- Preamble (verse 0) represents "A'udhu billahi" audio intro
-- All 10 reciters have working timestamp data (3 direct, 7 proxy)
-- Verse click-to-seek functionality uses timestamps to jump to specific verses
-
-### Timing Calibration System
-The application features a **per-reciter timing offset calibration system** to compensate for sync inaccuracies between audio and verse highlighting. This addresses timing drift that can occur with different reciters, longer surahs, or variations in timestamp precision.
-
-**Architecture** (`client/src/lib/timingCalibration.ts`):
-- **Storage**: localStorage-based persistence using JSON array format under key `quran_timing_offsets`
-- **Data Model**: `{ reciterId: string, offsetMs: number, lastUpdated: string }`
-- **Migration**: Defensive parsing handles legacy primitive formats, auto-migrates or clears invalid data
-- **Cleanup**: Reset operations completely remove entries instead of storing 0ms for cleaner storage
-
-**API Functions:**
-- `getReciterOffset(reciterId)`: Retrieves offset for reciter (default 0ms), handles legacy format migration
-- `setReciterOffset(reciterId, offsetMs)`: Saves offset with timestamp, validates array format
-- `resetReciterOffset(reciterId)`: Completely removes entry, clears storage if no offsets remain
-- `applyOffsetsToTimestamps(timestamps, offsetMs)`: Applies offset to verse timestamp array
-
-**UI Controls** (ChapterView menu):
-1. **Debug Mode** (`AudioDebugPanel.tsx`): Toggle to show real-time sync diagnostics
-   - Current playback time (seconds and milliseconds)
-   - Active highlighted verse
-   - Expected verse timing range
-   - Applied offset value
-   - Full verse timeline with timestamps
-2. **Timing Calibration** submenu:
-   - Earlier (-100ms, -50ms): Shift highlighting earlier if it's too late
-   - Later (+50ms, +100ms): Shift highlighting later if it's too early
-   - Reset to 0ms: Remove calibration offset
-   - Displays current offset in submenu header (e.g., "+50ms", "0ms")
-
-**Integration:**
-- `useAudioPlayer` hook accepts `timingOffsetMs` parameter
-- Offset is applied via `applyOffsetsToTimestamps()` before verse matching
-- ChapterView loads per-reciter offset on mount and reciter change
-- State updates are immediate with localStorage persistence
-- Menu items use `e.preventDefault()` to keep menu open during adjustments
-
-**Console Logging:**
-- `📖 Retrieved timing offset for {reciterId}: {offsetMs}ms` - On load
-- `🎯 Adjusting timing offset: {oldMs}ms → {newMs}ms` - On adjustment
-- `✓ Timing offset for {reciterId}: {offsetMs}ms` - On save
-- `🔄 Resetting timing offset from {oldMs}ms to 0ms` - On reset
-- `📦 Migrating legacy timing offset format` - On migration
+**Auto-Scroll**: When enabled, automatically scrolls to bring playing verse to top of viewport (below 60px header)
 
 ## Data Management
 
@@ -195,6 +161,5 @@ All Quran data (114 chapters, 6,236 verses, Arabic text, English translations, t
 
 ## External APIs & Data Sources
 
-- **Islamic Network CDN**: Provides Quran recitation audio via `/api/audio/{reciter}/{chapter}` proxy.
-- **MP3Quran.net API**: Provides reciter-specific verse timestamps for accurate audio-to-verse synchronization.
+- **EveryAyah.com CDN**: Provides individual verse-by-verse Quran recitation audio via `/api/verse-audio/{reciter}/{surah}/{ayah}` backend proxy. Each verse is a separate MP3 file for perfect synchronization.
 - **Al-Quran Cloud API**: Used to pre-fetch static Quran text data (Arabic, Sahih International English translation, `en.transliteration` transliteration).
