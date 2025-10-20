@@ -1,54 +1,39 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { applyOffsetsToTimestamps } from '@/lib/timingCalibration';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface AudioPlayerState {
   isPlaying: boolean;
-  currentTime: number;
-  duration: number;
   speed: number;
   isLoading: boolean;
   error: string | null;
   currentVerse: number;
-  isInVerseRange: boolean;
 }
 
-interface VerseTimestamp {
-  verse: number;
-  start: number;
-  end: number;
-}
-
+/**
+ * Hook for verse-by-verse audio playback
+ * Each verse is a separate audio file from EveryAyah.com
+ */
 export function useAudioPlayer(
-  audioUrl: string,
-  verseTimestamps: VerseTimestamp[],
-  onVerseChange?: (verse: number) => void,
+  getAudioUrl: (verse: number) => string, // Function to get audio URL for a specific verse
+  totalVerses: number, // Total number of verses in the chapter
+  initialVerse: number = 1, // Starting verse (default 1)
   repeat: boolean = false,
-  onEnded?: () => void,
-  timingOffsetMs: number = 0 // New parameter for timing calibration
+  onVerseChange?: (verse: number) => void,
+  onEnded?: () => void // Called when all verses are finished
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const currentVerseRef = useRef<number>(0); // Start with preamble (verse 0)
+  const currentVerseRef = useRef<number>(initialVerse);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
   const repeatRef = useRef(repeat);
   const speedRef = useRef(1.0);
-  
-  // Apply timing offset to timestamps
-  const adjustedTimestamps = useMemo(() => {
-    return applyOffsetsToTimestamps(verseTimestamps, timingOffsetMs);
-  }, [verseTimestamps, timingOffsetMs]);
-  
-  const verseTimestampsRef = useRef(adjustedTimestamps);
+  const isPlayingRef = useRef(false); // Track intended playback state
   
   const [state, setState] = useState<AudioPlayerState>({
     isPlaying: false,
-    currentTime: 0,
-    duration: 0,
     speed: 1.0,
-    isLoading: true,
+    isLoading: false,
     error: null,
-    currentVerse: 0, // Start with preamble (verse 0)
-    isInVerseRange: true, // Start true - we know time 0 is in preamble range
+    currentVerse: initialVerse,
   });
 
   // Keep refs up to date
@@ -64,232 +49,179 @@ export function useAudioPlayer(
     repeatRef.current = repeat;
   }, [repeat]);
 
-  useEffect(() => {
-    verseTimestampsRef.current = adjustedTimestamps;
-  }, [adjustedTimestamps]);
+  // Load and play a specific verse
+  const loadVerse = useCallback((verseNum: number, autoPlay: boolean = false) => {
+    if (verseNum < 1 || verseNum > totalVerses) {
+      console.warn(`Verse ${verseNum} out of range (1-${totalVerses})`);
+      return;
+    }
 
-  // Initialize audio element only when audioUrl changes
-  useEffect(() => {
-    const audio = new Audio(audioUrl);
-    audio.preload = 'metadata';
-    audio.crossOrigin = 'anonymous'; // Enable CORS for external audio
-    audioRef.current = audio;
+    const audioUrl = getAudioUrl(verseNum);
+    console.log(`🎵 Loading verse ${verseNum}: ${audioUrl}`);
 
-    // Reset state when audio URL changes
+    // Clean up existing audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
+
     setState(prev => ({
       ...prev,
-      currentTime: 0,
-      isPlaying: false,
       isLoading: true,
-      currentVerse: 0, // Start with preamble (verse 0)
-      isInVerseRange: true, // Start true - time 0 is in preamble range
-      error: null, // Clear any previous errors when loading new audio
+      error: null,
+      currentVerse: verseNum,
     }));
-    currentVerseRef.current = 0;
 
-    const handleLoadedMetadata = () => {
-      // Restore playback speed from ref
-      audio.playbackRate = speedRef.current;
-      
-      setState(prev => ({
-        ...prev,
-        duration: audio.duration,
-        isLoading: false,
-      }));
-    };
+    // Create new audio element
+    const audio = new Audio(audioUrl);
+    audio.preload = 'auto';
+    audio.playbackRate = speedRef.current;
+    audioRef.current = audio;
+    currentVerseRef.current = verseNum;
 
-    const handleTimeUpdate = () => {
-      const currentTime = audio.currentTime;
+    const handleCanPlayThrough = () => {
+      setState(prev => ({ ...prev, isLoading: false }));
       
-      // Update current verse based on timestamp
-      const verse = verseTimestampsRef.current.find(
-        v => currentTime >= v.start && currentTime < v.end
-      );
-      
-      if (verse) {
-        // We're in a valid verse timestamp range
-        const verseChanged = verse.verse !== currentVerseRef.current;
-        
-        if (verseChanged) {
-          currentVerseRef.current = verse.verse;
-          
-          // Atomic state update - all changes in one setState call
-          // IMPORTANT: Maintain isPlaying state during verse changes
-          setState(prev => ({ 
-            ...prev, 
-            currentTime, 
-            currentVerse: verse.verse,
-            isInVerseRange: true,
-            isPlaying: !audio.paused, // Sync with actual audio state
-          }));
-          
-          onVerseChangeRef.current?.(verse.verse);
-          
-          // Log verse changes to help verify timing sync
-          const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
-          console.log(`✓ ${verseLabel} highlighting at ${currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s)`);
-        } else {
-          // Same verse, just update time and sync isPlaying
-          setState(prev => ({ ...prev, currentTime, isPlaying: !audio.paused }));
-        }
-      } else {
-        // We're in a gap (no timestamp defined) - turn off highlighting but keep currentVerse for navigation
-        setState(prev => ({ ...prev, currentTime, isInVerseRange: false, isPlaying: !audio.paused }));
+      if (autoPlay && isPlayingRef.current) {
+        audio.play().catch(err => {
+          console.error('Auto-play failed:', err);
+          setState(prev => ({ ...prev, isPlaying: false, error: 'Playback failed' }));
+          isPlayingRef.current = false;
+        });
       }
     };
 
     const handleEnded = () => {
+      console.log(`✓ Verse ${verseNum} finished`);
+      
       if (repeatRef.current) {
+        // Repeat current verse
         audio.currentTime = 0;
         audio.play();
+      } else if (verseNum < totalVerses) {
+        // Auto-play next verse
+        onVerseChangeRef.current?.(verseNum + 1);
+        loadVerse(verseNum + 1, isPlayingRef.current);
       } else {
+        // Last verse finished
+        console.log('📖 Chapter finished');
         setState(prev => ({ ...prev, isPlaying: false }));
-        // Call onEnded callback if provided (for auto-play next surah)
+        isPlayingRef.current = false;
         onEndedRef.current?.();
       }
     };
 
     const handleError = (e: Event) => {
-      console.error('Audio loading error:', e);
+      console.error('Audio loading error for verse', verseNum, ':', e);
       console.error('Failed audio URL:', audioUrl);
       setState(prev => ({
         ...prev,
-        error: 'Failed to load audio',
+        error: `Failed to load verse ${verseNum}`,
         isLoading: false,
+        isPlaying: false,
       }));
+      isPlayingRef.current = false;
     };
 
-    const handlePlay = () => {
-      // Immediately check which verse we're in when playback starts
-      // This ensures we don't miss the preamble if timeUpdate fires late
-      const currentTime = audio.currentTime;
-      const verse = verseTimestampsRef.current.find(
-        v => currentTime >= v.start && currentTime < v.end
-      );
-      
-      if (verse) {
-        const verseChanged = verse.verse !== currentVerseRef.current;
-        currentVerseRef.current = verse.verse;
-        
-        // Update state with verse info and isPlaying=true in single atomic update
-        setState(prev => ({ 
-          ...prev, 
-          currentTime, 
-          currentVerse: verse.verse,
-          isInVerseRange: true,
-          isPlaying: true,
-        }));
-        
-        // Only call onVerseChange and log if verse actually changed
-        if (verseChanged) {
-          onVerseChangeRef.current?.(verse.verse);
-          
-          const verseLabel = verse.verse === 0 ? 'Preamble' : `Verse ${verse.verse}`;
-          console.log(`✓ ${verseLabel} highlighting at ${currentTime.toFixed(1)}s (expected: ${verse.start}-${verse.end}s) [on play]`);
-        }
-      } else {
-        // No verse found, just set isPlaying
-        setState(prev => ({ ...prev, isPlaying: true }));
-      }
-    };
-
-    const handlePause = () => {
-      setState(prev => ({ ...prev, isPlaying: false }));
-    };
-
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('canplaythrough', handleCanPlayThrough);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
 
     return () => {
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.pause();
-      audio.src = '';
     };
-  }, [audioUrl]);
+  }, [getAudioUrl, totalVerses]);
 
-  const play = useCallback(() => {
-    if (audioRef.current) {
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.error('Playback failed:', error);
-          setState(prev => ({ ...prev, isPlaying: false }));
-        });
-      }
+  // Initialize with first verse
+  useEffect(() => {
+    loadVerse(initialVerse, false);
+  }, [initialVerse, loadVerse]);
+
+  // Play/pause
+  const togglePlayPause = useCallback(() => {
+    if (!audioRef.current) {
+      console.warn('No audio element available');
+      return;
     }
-  }, []);
 
-  const pause = useCallback(() => {
+    if (state.isPlaying) {
+      audioRef.current.pause();
+      setState(prev => ({ ...prev, isPlaying: false }));
+      isPlayingRef.current = false;
+      console.log('⏸️ Paused');
+    } else {
+      audioRef.current.play().catch(err => {
+        console.error('Playback failed:', err);
+        setState(prev => ({ ...prev, error: 'Playback failed' }));
+      });
+      setState(prev => ({ ...prev, isPlaying: true }));
+      isPlayingRef.current = true;
+      console.log('▶️ Playing');
+    }
+  }, [state.isPlaying]);
+
+  // Jump to a specific verse
+  const seekToVerse = useCallback((verseNum: number) => {
+    if (verseNum < 1 || verseNum > totalVerses) {
+      console.warn(`Verse ${verseNum} out of range`);
+      return;
+    }
+
+    console.log(`⏭️ Jumping to verse ${verseNum}`);
+    const wasPlaying = isPlayingRef.current;
+    
+    // Stop current audio
     if (audioRef.current) {
       audioRef.current.pause();
     }
-  }, []);
+    
+    // Load new verse
+    onVerseChangeRef.current?.(verseNum);
+    loadVerse(verseNum, wasPlaying);
+  }, [loadVerse, totalVerses]);
 
-  const togglePlayPause = useCallback(() => {
-    if (state.isPlaying) {
-      pause();
-    } else {
-      play();
-    }
-  }, [state.isPlaying, play, pause]);
-
-  const seek = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setState(prev => ({ ...prev, currentTime: time }));
-    }
-  }, []);
-
-  const setSpeed = useCallback((speed: number) => {
-    if (audioRef.current) {
-      audioRef.current.playbackRate = speed;
-      speedRef.current = speed;
-      setState(prev => ({ ...prev, speed }));
-    }
-  }, []);
-
-  const seekToVerse = useCallback((verseNumber: number) => {
-    const verse = verseTimestampsRef.current.find(v => v.verse === verseNumber);
-    if (verse) {
-      seek(verse.start);
-    }
-  }, [seek]);
-
+  // Next verse
   const nextVerse = useCallback(() => {
-    const nextVerseNum = state.currentVerse + 1;
-    const verse = verseTimestampsRef.current.find(v => v.verse === nextVerseNum);
-    if (verse) {
-      seek(verse.start);
+    if (currentVerseRef.current < totalVerses) {
+      seekToVerse(currentVerseRef.current + 1);
     }
-  }, [state.currentVerse, seek]);
+  }, [totalVerses, seekToVerse]);
 
-  const previousVerse = useCallback(() => {
-    // Allow going back to verse 0 (preamble) if it exists
-    const prevVerseNum = Math.max(0, state.currentVerse - 1);
-    const verse = verseTimestampsRef.current.find(v => v.verse === prevVerseNum);
-    if (verse) {
-      seek(verse.start);
+  // Previous verse
+  const prevVerse = useCallback(() => {
+    if (currentVerseRef.current > 1) {
+      seekToVerse(currentVerseRef.current - 1);
     }
-  }, [state.currentVerse, seek]);
+  }, [seekToVerse]);
+
+  // Set playback speed
+  const setSpeed = useCallback((newSpeed: number) => {
+    speedRef.current = newSpeed;
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed;
+    }
+    setState(prev => ({ ...prev, speed: newSpeed }));
+    console.log(`⚡ Playback speed: ${newSpeed}x`);
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
 
   return {
     ...state,
-    play,
-    pause,
     togglePlayPause,
-    seek,
-    setSpeed,
     seekToVerse,
     nextVerse,
-    previousVerse,
+    prevVerse,
+    setSpeed,
   };
 }
