@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { applyOffsetsToTimestamps } from '@/lib/timingCalibration';
 
 interface AudioPlayerState {
   isPlaying: boolean;
@@ -22,7 +23,8 @@ export function useAudioPlayer(
   verseTimestamps: VerseTimestamp[],
   onVerseChange?: (verse: number) => void,
   repeat: boolean = false,
-  onEnded?: () => void
+  onEnded?: () => void,
+  timingOffsetMs: number = 0 // New parameter for timing calibration
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentVerseRef = useRef<number>(0); // Start with preamble (verse 0)
@@ -30,7 +32,13 @@ export function useAudioPlayer(
   const onEndedRef = useRef(onEnded);
   const repeatRef = useRef(repeat);
   const speedRef = useRef(1.0);
-  const verseTimestampsRef = useRef(verseTimestamps);
+  
+  // Apply timing offset to timestamps
+  const adjustedTimestamps = useMemo(() => {
+    return applyOffsetsToTimestamps(verseTimestamps, timingOffsetMs);
+  }, [verseTimestamps, timingOffsetMs]);
+  
+  const verseTimestampsRef = useRef(adjustedTimestamps);
   
   const [state, setState] = useState<AudioPlayerState>({
     isPlaying: false,
@@ -57,8 +65,8 @@ export function useAudioPlayer(
   }, [repeat]);
 
   useEffect(() => {
-    verseTimestampsRef.current = verseTimestamps;
-  }, [verseTimestamps]);
+    verseTimestampsRef.current = adjustedTimestamps;
+  }, [adjustedTimestamps]);
 
   // Initialize audio element only when audioUrl changes
   useEffect(() => {

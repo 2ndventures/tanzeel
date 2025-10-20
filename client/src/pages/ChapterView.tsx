@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Bookmark, MoreVertical, ChevronRight, Check } from "lucide-react";
+import { ArrowLeft, Bookmark, MoreVertical, ChevronRight, Check, Bug, Plus, Minus, RotateCcw } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
+import AudioDebugPanel from "@/components/AudioDebugPanel";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 import { getChapterAudioUrl, fetchVerseTimestamps, getVerseTimestamps, VerseTimestamp } from "@/lib/verseTimestamps";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
+import { getReciterOffset, setReciterOffset, resetReciterOffset } from "@/lib/timingCalibration";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,11 +70,22 @@ export default function ChapterView({
   // Fetch reciter-specific timestamps
   const [verseTimestamps, setVerseTimestamps] = useState<VerseTimestamp[]>(() => getVerseTimestamps(chapterId));
   const [isLoadingTimestamps, setIsLoadingTimestamps] = useState(false);
+  
+  // Timing calibration and debug
+  const [timingOffsetMs, setTimingOffsetMs] = useState<number>(() => getReciterOffset(reciter));
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
 
   // Fetch timestamps when reciter or chapter changes
   useEffect(() => {
     const loadTimestamps = async () => {
       const reciterInfo = getReciterById(reciter);
+      
+      // Load timing offset for this reciter
+      const offset = getReciterOffset(reciter);
+      setTimingOffsetMs(offset);
+      if (offset !== 0) {
+        console.log(`⚙️ Loaded timing offset: ${offset}ms for ${reciterInfo?.name}`);
+      }
       
       // If reciter has MP3Quran ID, fetch accurate timestamps
       if (reciterInfo?.mp3QuranId) {
@@ -155,7 +168,8 @@ export default function ChapterView({
         console.log('🎵 Auto-playing next surah after completion of chapter', chapterId);
         goToNextSurah();
       }
-    }
+    },
+    timingOffsetMs
   );
 
 
@@ -233,6 +247,18 @@ export default function ChapterView({
     if (prevChapterId >= 1) {
       onNavigate('chapter', prevChapterId);
     }
+  };
+
+  // Timing calibration functions
+  const adjustTimingOffset = (deltaMs: number) => {
+    const newOffset = timingOffsetMs + deltaMs;
+    setTimingOffsetMs(newOffset);
+    setReciterOffset(reciter, newOffset);
+  };
+
+  const resetTimingOffset = () => {
+    setTimingOffsetMs(0);
+    resetReciterOffset(reciter);
   };
 
   return (
@@ -379,6 +405,68 @@ export default function ChapterView({
                   data-testid="switch-autoplay"
                 />
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => setShowDebugPanel(!showDebugPanel)}
+                data-testid="menu-item-debug"
+              >
+                <span>Debug Mode</span>
+                <Bug className={`w-4 h-4 ${showDebugPanel ? 'text-primary' : ''}`} />
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger data-testid="menu-item-timing-calibration">
+                  <span>Timing Calibration</span>
+                  <span className="ml-auto text-xs text-muted-foreground font-mono">
+                    {timingOffsetMs > 0 ? '+' : ''}{timingOffsetMs}ms
+                  </span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuLabel>Adjust Sync Timing</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => adjustTimingOffset(-100)}
+                    className="flex items-center gap-2 cursor-pointer"
+                    data-testid="timing-adjust-minus-100"
+                  >
+                    <Minus className="w-4 h-4" />
+                    <span>Earlier (-100ms)</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => adjustTimingOffset(-50)}
+                    className="flex items-center gap-2 cursor-pointer"
+                    data-testid="timing-adjust-minus-50"
+                  >
+                    <Minus className="w-4 h-4" />
+                    <span>Earlier (-50ms)</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => adjustTimingOffset(50)}
+                    className="flex items-center gap-2 cursor-pointer"
+                    data-testid="timing-adjust-plus-50"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Later (+50ms)</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => adjustTimingOffset(100)}
+                    className="flex items-center gap-2 cursor-pointer"
+                    data-testid="timing-adjust-plus-100"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Later (+100ms)</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={resetTimingOffset}
+                    className="flex items-center gap-2 cursor-pointer"
+                    data-testid="timing-reset"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    <span>Reset to 0ms</span>
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -441,6 +529,17 @@ export default function ChapterView({
         onNext={goToNextSurah}
         onRepeatChange={onRepeatChange}
       />
+      
+      {showDebugPanel && (
+        <AudioDebugPanel
+          currentTime={currentTime}
+          currentVerse={currentVerse}
+          isInVerseRange={isInVerseRange}
+          verseTimestamps={verseTimestamps}
+          offsetMs={timingOffsetMs}
+          onClose={() => setShowDebugPanel(false)}
+        />
+      )}
     </div>
   );
 }
