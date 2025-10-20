@@ -57,13 +57,10 @@ export function useAudioPlayer(
     }
 
     const audioUrl = getAudioUrl(verseNum);
-    console.log(`🎵 Loading verse ${verseNum}: ${audioUrl}`);
-
-    // Clean up existing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-    }
+    console.log(`🎵 Loading verse ${verseNum}`);
+    console.log(`📍 Audio URL: ${audioUrl}`);
+    console.log(`📍 URL type: ${typeof audioUrl}`);
+    console.log(`📍 URL length: ${audioUrl?.length}`);
 
     setState(prev => ({
       ...prev,
@@ -73,13 +70,14 @@ export function useAudioPlayer(
     }));
 
     // Create new audio element
-    const audio = new Audio(audioUrl);
+    const audio = new Audio();
     audio.preload = 'auto';
     audio.playbackRate = speedRef.current;
-    audioRef.current = audio;
-    currentVerseRef.current = verseNum;
-
+    
+    // Set up event listeners BEFORE setting src
     const handleCanPlayThrough = () => {
+      console.log(`✓ Verse ${verseNum} ready to play`);
+      console.log(`📍 Audio element src after loading: ${audio.src}`);
       setState(prev => ({ ...prev, isLoading: false }));
       
       if (autoPlay && isPlayingRef.current) {
@@ -95,15 +93,12 @@ export function useAudioPlayer(
       console.log(`✓ Verse ${verseNum} finished`);
       
       if (repeatRef.current) {
-        // Repeat current verse
         audio.currentTime = 0;
         audio.play();
       } else if (verseNum < totalVerses) {
-        // Auto-play next verse
         onVerseChangeRef.current?.(verseNum + 1);
         loadVerse(verseNum + 1, isPlayingRef.current);
       } else {
-        // Last verse finished
         console.log('📖 Chapter finished');
         setState(prev => ({ ...prev, isPlaying: false }));
         isPlayingRef.current = false;
@@ -120,10 +115,10 @@ export function useAudioPlayer(
       console.error('Error message:', errorDetails?.message);
       console.error('Network state:', audio.networkState);
       console.error('Ready state:', audio.readyState);
+      console.error('Audio src:', audio.src);
       
       let errorMessage = `Failed to load verse ${verseNum}`;
       if (errorDetails) {
-        // MediaError codes: 1=ABORTED, 2=NETWORK, 3=DECODE, 4=SRC_NOT_SUPPORTED
         switch (errorDetails.code) {
           case 1:
             errorMessage = 'Audio loading aborted';
@@ -148,10 +143,29 @@ export function useAudioPlayer(
       }));
       isPlayingRef.current = false;
     };
-
+    
     audio.addEventListener('canplaythrough', handleCanPlayThrough);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
+    
+    // Clean up old audio
+    if (audioRef.current) {
+      console.log('📍 Cleaning up old audio element');
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
+    
+    // Set src and start loading
+    console.log('📍 About to set audio.src to:', audioUrl);
+    audio.src = audioUrl;
+    console.log('📍 After setting src, audio.src is:', audio.src);
+    console.log('📍 Calling audio.load()');
+    audio.load();
+    console.log('📍 After audio.load(), audio.src is:', audio.src);
+    console.log('📍 Audio element:', audio);
+    
+    audioRef.current = audio;
+    currentVerseRef.current = verseNum;
 
     return () => {
       audio.removeEventListener('canplaythrough', handleCanPlayThrough);
