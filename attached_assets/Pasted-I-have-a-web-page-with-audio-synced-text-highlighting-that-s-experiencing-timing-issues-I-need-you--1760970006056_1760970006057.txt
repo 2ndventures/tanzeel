@@ -1,0 +1,75 @@
+I have a web page with audio-synced text highlighting that's experiencing timing issues. I need you to create a robust synchronization system that handles multiple reciters with different pacing.
+
+CURRENT SETUP:
+- Pages with text already created
+- Basic audio sync implemented but timing is off
+- Multiple audio reciters available (each has different timing)
+
+REQUIREMENTS:
+
+1. TIMING DATA STRUCTURE:
+Create a timing system where each reciter has their own timestamp file:
+```
+{
+  "reciter_id": "husary",
+  "words": [
+    {"id": 1, "start_ms": 0, "end_ms": 450},
+    {"id": 2, "start_ms": 450, "end_ms": 1200},
+    // etc
+  ]
+}
+```
+
+2. SYNCHRONIZATION ENGINE:
+- Use `audio.ontimeupdate` event (fires frequently during playback)
+- Convert audio.currentTime to milliseconds for precision
+- Implement binary search or efficient lookup to find current word
+- Add a small offset buffer (50-100ms) to account for highlight delay perception
+- Clear previous highlights before applying new ones
+
+3. RECITER SWITCHING:
+- When user switches reciters, load the corresponding timing file
+- Reset and resync the audio player
+- Maintain the current verse/position
+
+4. TIMING CALIBRATION SYSTEM:
+Since timing is off, add a manual calibration feature:
+- Allow me to adjust global offset (+/- milliseconds)
+- Add per-word adjustment capability for fine-tuning
+- Save adjustments to localStorage
+- Include keyboard shortcuts (arrow keys) for quick offset testing during playback
+
+5. DEBUG MODE:
+Add a debug panel (toggle on/off) showing:
+- Current audio time (ms)
+- Current word being highlighted
+- Expected vs actual timing
+- Visual timeline of word boundaries
+- Console logs for timing mismatches
+
+6. PERFORMANCE OPTIMIZATION:
+- Preload timing data
+- Debounce/throttle highlight updates if needed
+- Use CSS classes for highlighting (not inline styles)
+- Implement efficient DOM queries (cache word elements)
+
+7. EDGE CASE HANDLING:
+- Handle audio seeking/scrubbing
+- Deal with paused state
+- Handle end of audio
+- Manage network delays on audio loading
+- Auto-scroll to keep highlighted word visible
+
+8. FALLBACK STRATEGY:
+If precise word timing isn't available:
+- Fall back to verse-level highlighting
+- Provide smooth transitions
+- Indicate when using fallback mode
+
+DELIVER:
+- Clean, commented JavaScript code
+- Explanation of the sync algorithm
+- Instructions for generating/adjusting timing data
+- Testing guide to verify sync accuracy
+
+Focus on making the timing system reliable and easy to calibrate. The most important aspect is smooth, accurate highlighting that adapts to different reciter speeds.
