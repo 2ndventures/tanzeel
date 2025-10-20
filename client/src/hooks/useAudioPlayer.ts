@@ -6,6 +6,8 @@ interface AudioPlayerState {
   isLoading: boolean;
   error: string | null;
   currentVerse: number;
+  currentTime: number;
+  duration: number;
 }
 
 /**
@@ -21,6 +23,7 @@ export function useAudioPlayer(
   onEnded?: () => void
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const preloadRef = useRef<HTMLAudioElement | null>(null);
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
@@ -32,6 +35,8 @@ export function useAudioPlayer(
     isLoading: true,
     error: null,
     currentVerse: initialVerse,
+    currentTime: 0,
+    duration: 0,
   });
 
   // Update refs when props change
@@ -77,6 +82,21 @@ export function useAudioPlayer(
     console.log(`📍 Audio URL: ${audioUrl}`);
 
     // Event handlers
+    const handleLoadedMetadata = () => {
+      setState(prev => ({ 
+        ...prev, 
+        duration: audio.duration || 0,
+        currentTime: 0
+      }));
+    };
+
+    const handleTimeUpdate = () => {
+      setState(prev => ({ 
+        ...prev, 
+        currentTime: audio.currentTime 
+      }));
+    };
+
     const handleCanPlay = () => {
       console.log(`✓ Verse ${verseNum} loaded and ready`);
       setState(prev => ({ ...prev, isLoading: false }));
@@ -96,6 +116,27 @@ export function useAudioPlayer(
     const handlePlay = () => {
       console.log(`▶️ Playing verse ${verseNum}`);
       setState(prev => ({ ...prev, isPlaying: true }));
+      
+      // Preload next verse for seamless playback
+      if (verseNum < totalVerses && !repeatRef.current) {
+        const nextVerseNum = verseNum + 1;
+        const nextUrl = getAudioUrl(nextVerseNum);
+        
+        // Clean up old preload
+        if (preloadRef.current) {
+          preloadRef.current.pause();
+          preloadRef.current.src = '';
+        }
+        
+        // Create new preload audio
+        const preloadAudio = new Audio();
+        preloadAudio.src = nextUrl;
+        preloadAudio.playbackRate = speedRef.current;
+        preloadAudio.load();
+        preloadRef.current = preloadAudio;
+        
+        console.log(`⏩ Preloading verse ${nextVerseNum} for seamless playback`);
+      }
     };
 
     const handlePause = () => {
@@ -112,6 +153,7 @@ export function useAudioPlayer(
         audio.play();
       } else if (verseNum < totalVerses) {
         // Move to next verse
+        // Preloaded audio will be in browser cache for instant loading
         const nextVerse = verseNum + 1;
         onVerseChangeRef.current?.(nextVerse);
         loadVerse(nextVerse, true);
@@ -141,6 +183,8 @@ export function useAudioPlayer(
     };
 
     // Attach event listeners
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
@@ -157,6 +201,8 @@ export function useAudioPlayer(
 
     // Cleanup function
     return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
@@ -220,8 +266,19 @@ export function useAudioPlayer(
     if (audioRef.current) {
       audioRef.current.playbackRate = newSpeed;
     }
+    if (preloadRef.current) {
+      preloadRef.current.playbackRate = newSpeed;
+    }
     setState(prev => ({ ...prev, speed: newSpeed }));
     console.log(`⚡ Speed: ${newSpeed}x`);
+  }, []);
+
+  // Seek within current verse
+  const seek = useCallback((time: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setState(prev => ({ ...prev, currentTime: time }));
+    }
   }, []);
 
   // Cleanup on unmount
@@ -231,12 +288,17 @@ export function useAudioPlayer(
         audioRef.current.pause();
         audioRef.current.src = '';
       }
+      if (preloadRef.current) {
+        preloadRef.current.pause();
+        preloadRef.current.src = '';
+      }
     };
   }, []);
 
   return {
     ...state,
     togglePlayPause,
+    seek,
     seekToVerse,
     nextVerse,
     prevVerse,

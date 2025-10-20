@@ -46,21 +46,38 @@ The application uses **individual MP3 files per verse** from EveryAyah.com, prov
 1. Load first verse MP3 and display "Loading..." state
 2. When audio is ready (`canplay` event), enable play button
 3. User clicks play → verse 1 audio plays, verse 1 card highlights
-4. When verse 1 ends (`ended` event) → automatically load and play verse 2
-5. Repeat until all verses in chapter are complete
+4. Next verse is preloaded in background (populates browser cache)
+5. When verse 1 ends (`ended` event) → load and play verse 2 from cache (seamless)
+6. Repeat until all verses in chapter are complete
+
+**Seamless Playback**:
+- When a verse starts playing, the next verse is preloaded to populate browser cache
+- Verse transitions load from cache instantly for near-gapless playback
+- No complex audio element swapping - relies on browser caching for performance
+- All event handlers properly scoped to prevent closure issues
+
+**Progress Tracking**:
+- Real-time progress bar showing current time and duration
+- `timeupdate` event updates current playback position
+- `loadedmetadata` event sets audio duration
+- Seekable progress bar allows jumping to any position within the current verse
+- Progress resets to 0:00 when transitioning to a new verse
 
 **State Management** (`useAudioPlayer` hook):
 - Uses `useRef` for speed to prevent dependency array issues
 - `useCallback` for stable function references to prevent infinite loops
-- Fresh `HTMLAudioElement` created for each verse
+- Fresh `HTMLAudioElement` created for each verse with proper event handler scoping
 - Cleanup avoids setting `src = ''` to prevent "Empty src" errors
+- Separate preload Audio element for cache population
 
 **Key Functions**:
 - `loadVerse(verseNum, autoPlay)`: Loads specific verse, optionally starts playback
 - `togglePlayPause()`: Play/pause current verse
+- `seek(time)`: Seek to specific time within current verse
 - `nextVerse()`: Skip to next verse
 - `prevVerse()`: Go to previous verse
 - `seekToVerse(verseNum)`: Jump to specific verse
+- `setSpeed(speed)`: Change playback speed (0.5x to 2.0x)
 
 ### Reciter System
 

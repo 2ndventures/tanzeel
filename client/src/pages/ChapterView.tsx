@@ -95,7 +95,10 @@ export default function ChapterView({
     speed,
     currentVerse,
     isLoading,
+    currentTime,
+    duration,
     togglePlayPause,
+    seek,
     setSpeed,
     seekToVerse,
     nextVerse: audioNextVerse,
@@ -377,11 +380,18 @@ export default function ChapterView({
       </main>
 
       <AudioPlayer
+        currentTime={currentTime}
+        duration={duration}
         isPlaying={isPlaying}
+        speed={speed}
+        isLoading={isLoading}
+        repeat={repeat}
         onPlayPause={togglePlayPause}
+        onSeek={seek}
+        onSpeedChange={setSpeed}
         onPrevious={audioPrevVerse}
         onNext={audioNextVerse}
-        isLoading={isLoading}
+        onRepeatChange={onRepeatChange}
       />
     </div>
   );
