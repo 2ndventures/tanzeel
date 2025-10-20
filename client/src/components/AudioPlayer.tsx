@@ -1,12 +1,6 @@
 import { Play, Pause, SkipBack, SkipForward, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface AudioPlayerProps {
   currentTime?: number;
@@ -39,10 +33,17 @@ export default function AudioPlayer({
 }: AudioPlayerProps) {
   // Speed options from 0.5 to 2.0 in 0.25 increments
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+  
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const cycleSpeed = () => {
+    const currentIndex = speedOptions.indexOf(speed);
+    const nextIndex = (currentIndex + 1) % speedOptions.length;
+    onSpeedChange?.(speedOptions[nextIndex]);
   };
 
   return (
@@ -67,33 +68,17 @@ export default function AudioPlayer({
         
         <div className="grid grid-cols-3 items-center">
         <div className="flex justify-start">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="default"
-                className="text-base font-medium min-w-16 h-11"
-                data-testid="button-speed"
-              >
-                {speed.toFixed(2)}x
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-32">
-              {speedOptions.map((speedOption) => (
-                <DropdownMenuItem
-                  key={speedOption}
-                  className="cursor-pointer justify-center"
-                  onSelect={() => {
-                    console.log('Speed option selected:', speedOption);
-                    onSpeedChange?.(speedOption);
-                  }}
-                  data-testid={`speed-option-${speedOption}`}
-                >
-                  {speedOption.toFixed(2)}x
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            variant="ghost"
+            size="default"
+            className="text-base font-medium min-w-16 h-11"
+            onClick={cycleSpeed}
+            aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
+            title="Click to cycle playback speed"
+            data-testid="button-speed"
+          >
+            {speed.toFixed(2)}x
+          </Button>
         </div>
         
         <div className="flex items-center justify-center gap-3">
