@@ -112,11 +112,37 @@ export function useAudioPlayer(
     };
 
     const handleError = (e: Event) => {
-      console.error('Audio loading error for verse', verseNum, ':', e);
+      const audio = e.target as HTMLAudioElement;
+      const errorDetails = audio.error;
+      console.error('Audio loading error for verse', verseNum);
       console.error('Failed audio URL:', audioUrl);
+      console.error('Error code:', errorDetails?.code);
+      console.error('Error message:', errorDetails?.message);
+      console.error('Network state:', audio.networkState);
+      console.error('Ready state:', audio.readyState);
+      
+      let errorMessage = `Failed to load verse ${verseNum}`;
+      if (errorDetails) {
+        // MediaError codes: 1=ABORTED, 2=NETWORK, 3=DECODE, 4=SRC_NOT_SUPPORTED
+        switch (errorDetails.code) {
+          case 1:
+            errorMessage = 'Audio loading aborted';
+            break;
+          case 2:
+            errorMessage = 'Network error loading audio';
+            break;
+          case 3:
+            errorMessage = 'Audio decoding error';
+            break;
+          case 4:
+            errorMessage = 'Audio format not supported';
+            break;
+        }
+      }
+      
       setState(prev => ({
         ...prev,
-        error: `Failed to load verse ${verseNum}`,
+        error: errorMessage,
         isLoading: false,
         isPlaying: false,
       }));
