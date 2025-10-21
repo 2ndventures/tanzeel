@@ -3,7 +3,7 @@ import { ArrowLeft, Bookmark, MoreVertical, ChevronRight, Check } from "lucide-r
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
-import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import {
@@ -63,16 +63,19 @@ export default function ChapterView({
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
   
-  // Get reciter info for EveryAyah folder
-  const reciterInfo = getReciterById(reciter);
-  const everyAyahFolder = reciterInfo?.everyAyahFolder || 'Alafasy_128kbps';
-  
-  // Generate audio URL for a specific verse (using backend proxy)
-  const getAudioUrl = useCallback((verseNum: number) => {
-    const surahPadded = String(chapterId).padStart(3, '0');
-    const ayahPadded = String(verseNum).padStart(3, '0');
-    return `/api/verse-audio/${everyAyahFolder}/${surahPadded}/${ayahPadded}`;
-  }, [chapterId, everyAyahFolder]);
+  // Map our reciter IDs to Quran.com reciter IDs
+  // https://api.qurancdn.com/api/qdc/audio/reciters
+  const reciterToQuranComId: { [key: string]: number } = {
+    'alafasy': 7,           // Mishary Rashid Alafasy
+    'abdul_basit': 1,       // Abdul Basit Abdul Samad (Murattal)
+    'abdul_basit_mujawwad': 2, // Abdul Basit (Mujawwad)
+    'sudais': 12,           // Abdurrahmaan As-Sudais
+    'ash_shaatree': 5,      // Abu Bakr Ash-Shaatree
+    'hudhaify': 3,          // Ali Al-Hudhaify
+    'hani_rifai': 9,        // Hani Rifai
+    'akram_alalaqimy': 11,  // Akram Al-Alaqimy
+  };
+  const quranComReciterId = reciterToQuranComId[reciter] || 7;
   
   // Initialize bookmark state from localStorage
   const [bookmarkedVerse, setBookmarkedVerse] = useState<number | null>(
@@ -90,10 +93,12 @@ export default function ChapterView({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [chapterId]);
   
+  // Use word-timing audio with continuous playback
   const {
     isPlaying,
     speed,
-    currentVerse,
+    currentVerseKey,
+    currentWordIndex,
     isLoading,
     currentTime,
     duration,
@@ -101,18 +106,18 @@ export default function ChapterView({
     seek,
     setSpeed,
     seekToVerse,
-    nextVerse: audioNextVerse,
-    prevVerse: audioPrevVerse,
-  } = useAudioPlayer(
-    getAudioUrl,
-    verses.length,
-    1, // Start at verse 1
+  } = useWordTimingAudio(
+    chapterId,
+    quranComReciterId,
     repeat,
-    (verse) => {
+    (verseKey) => {
       if (autoScroll) {
+        // Parse verse key (e.g., "1:2" -> verse 2)
+        const verseNumber = parseInt(verseKey.split(':')[1]);
+        
         // Use requestAnimationFrame to ensure DOM is ready
         requestAnimationFrame(() => {
-          const verseElement = document.querySelector(`[data-testid="card-verse-${verse}"]`);
+          const verseElement = document.querySelector(`[data-testid="card-verse-${verseNumber}"]`);
           
           if (verseElement) {
             // Calculate offset from top of viewport
@@ -121,7 +126,7 @@ export default function ChapterView({
             const headerHeight = 60;
             const offset = rect.top - headerHeight;
             
-            console.log('📜 Auto-scroll verse', verse, 'offset:', offset);
+            console.log('📜 Auto-scroll verse', verseNumber, 'offset:', offset);
             
             // Scroll window to bring verse to top (below header)
             window.scrollBy({ top: offset, behavior: 'smooth' });
@@ -137,6 +142,32 @@ export default function ChapterView({
       }
     }
   );
+  
+  // Extract current verse number from verse key
+  const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;
+  
+  // Helper functions for next/previous verse navigation
+  const audioNextVerse = useCallback(() => {
+    if (currentVerse < verses.length) {
+      const nextVerseKey = `${chapterId}:${currentVerse + 1}`;
+      seekToVerse(nextVerseKey);
+    }
+  }, [currentVerse, verses.length, chapterId, seekToVerse]);
+  
+  const audioPrevVerse = useCallback(() => {
+    if (currentVerse > 1) {
+      const prevVerseKey = `${chapterId}:${currentVerse - 1}`;
+      seekToVerse(prevVerseKey);
+    }
+  }, [currentVerse, chapterId, seekToVerse]);
+  
+  // Auto-play next surah when current one ends
+  const goToNextSurah = useCallback(() => {
+    const nextChapterId = chapterId + 1;
+    if (nextChapterId <= 114) {
+      onNavigate('chapter', nextChapterId);
+    }
+  }, [chapterId, onNavigate]);
 
   // Update speed when settings change (map string to numeric value)
   useEffect(() => {
@@ -182,7 +213,8 @@ export default function ChapterView({
     } 
     // If there's a saved bookmark for a different verse, seek to it
     else if (bookmarkedVerse && bookmarkedVerse !== currentVerse) {
-      seekToVerse(bookmarkedVerse);
+      const verseKey = `${chapterId}:${bookmarkedVerse}`;
+      seekToVerse(verseKey);
     } 
     // Otherwise, bookmark the current verse
     else {
@@ -191,27 +223,21 @@ export default function ChapterView({
     }
   };
 
-  const handleVerseClick = (verseNumber: number) => {
+  const handleVerseClick = useCallback((verseNumber: number) => {
     // Seek to the clicked verse and start playback
-    seekToVerse(verseNumber);
+    const verseKey = `${chapterId}:${verseNumber}`;
+    seekToVerse(verseKey);
     if (!isPlaying) {
       togglePlayPause();
     }
-  };
+  }, [chapterId, seekToVerse, isPlaying, togglePlayPause]);
 
-  const goToNextSurah = () => {
-    const nextChapterId = chapterId + 1;
-    if (nextChapterId <= 114) {
-      onNavigate('chapter', nextChapterId);
-    }
-  };
-
-  const goToPreviousSurah = () => {
+  const goToPreviousSurah = useCallback(() => {
     const prevChapterId = chapterId - 1;
     if (prevChapterId >= 1) {
       onNavigate('chapter', prevChapterId);
     }
-  };
+  }, [chapterId, onNavigate]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
@@ -353,6 +379,7 @@ export default function ChapterView({
                 isPlaying={isPlaying}
                 isCurrentVerse={isCurrentVerse}
                 isInVerseRange={isCurrentVerse}
+                currentWordIndex={isCurrentVerse ? currentWordIndex : null}
                 onClick={() => handleVerseClick(verseNumber)}
               />
             );

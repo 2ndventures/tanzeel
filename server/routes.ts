@@ -145,6 +145,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Timing data proxy for Quran.com word-level synchronization
+  app.get("/api/audio-timing/:reciterId/:chapter", async (req, res) => {
+    try {
+      const { reciterId, chapter } = req.params;
+      
+      // Fetch timing data from Quran.com API
+      const timingUrl = `https://api.qurancdn.com/api/qdc/audio/reciters/${reciterId}/audio_files?chapter=${chapter}&segments=true`;
+      console.log(`📡 Fetching timing data: ${timingUrl}`);
+      
+      const response = await fetch(timingUrl);
+      
+      if (!response.ok) {
+        console.error(`❌ Timing data not found: ${timingUrl}`);
+        return res.status(404).json({ error: "Timing data not found" });
+      }
+      
+      const data = await response.json();
+      console.log(`✓ Loaded timing data for chapter ${chapter}`);
+      
+      // Set caching headers for better performance
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
+      res.setHeader('Content-Type', 'application/json');
+      
+      res.json(data);
+    } catch (error) {
+      console.error('❌ Timing data proxy error:', error);
+      res.status(500).json({ error: "Failed to fetch timing data" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

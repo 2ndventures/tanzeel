@@ -1,0 +1,341 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+
+export interface WordSegment {
+  timestamp_from: number;
+  timestamp_to: number;
+  segments: [number, number, number][]; // Array of [wordIndex, startMs, endMs]
+  verse_key: string;
+}
+
+export interface AudioFile {
+  id: number;
+  chapter_id: number;
+  file_size: number;
+  format: string;
+  audio_url: string;
+  verse_timings: WordSegment[];
+}
+
+export interface TimingData {
+  audio_files: AudioFile[];
+}
+
+interface WordTimingAudioState {
+  isPlaying: boolean;
+  speed: number;
+  isLoading: boolean;
+  error: string | null;
+  currentTime: number;
+  duration: number;
+  currentVerseKey: string | null;
+  currentWordIndex: number | null;
+}
+
+export function useWordTimingAudio(
+  chapterId: number,
+  reciterId: number = 7,
+  repeat: boolean = false,
+  onVerseChange?: (verseKey: string) => void,
+  onEnded?: () => void
+) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const repeatRef = useRef(repeat);
+  const onVerseChangeRef = useRef(onVerseChange);
+  const onEndedRef = useRef(onEnded);
+  const speedRef = useRef(1.0);
+  const timingDataRef = useRef<AudioFile | null>(null);
+
+  const [state, setState] = useState<WordTimingAudioState>({
+    isPlaying: false,
+    speed: 1.0,
+    isLoading: true,
+    error: null,
+    currentTime: 0,
+    duration: 0,
+    currentVerseKey: null,
+    currentWordIndex: null,
+  });
+
+  // Update refs when props change
+  useEffect(() => {
+    repeatRef.current = repeat;
+  }, [repeat]);
+
+  useEffect(() => {
+    onVerseChangeRef.current = onVerseChange;
+  }, [onVerseChange]);
+
+  useEffect(() => {
+    onEndedRef.current = onEnded;
+  }, [onEnded]);
+
+  // Find current verse and word based on playback time
+  const findCurrentSegment = useCallback((currentTime: number) => {
+    if (!timingDataRef.current) return { verseKey: null, wordIndex: null };
+
+    const timings = timingDataRef.current.verse_timings;
+    const currentTimeMs = currentTime * 1000; // Convert to milliseconds
+    
+    for (const timing of timings) {
+      if (currentTimeMs >= timing.timestamp_from && currentTimeMs <= timing.timestamp_to) {
+        const verseSegments = timing.segments;
+        
+        // Segments are arrays: [wordIndex, startMs, endMs]
+        // Handle empty segments array (no word-level timing available)
+        if (verseSegments.length === 0) {
+          return { verseKey: timing.verse_key, wordIndex: null };
+        }
+        
+        for (let i = 0; i < verseSegments.length; i++) {
+          const segment = verseSegments[i];
+          // segment is [wordIndex, startMs, endMs]
+          // wordIndex is 0-based in the API, matching our array indices
+          const wordIndex = segment[0];  // canonical word index from API
+          const wordStart = segment[1];  // start timestamp in ms
+          const wordEnd = segment[2];    // end timestamp in ms
+          
+          if (currentTimeMs >= wordStart && currentTimeMs <= wordEnd) {
+            return { verseKey: timing.verse_key, wordIndex };
+          }
+        }
+        
+        // If we're in the verse but not on a specific word, use the last word's canonical index
+        const lastSegment = verseSegments[verseSegments.length - 1];
+        return { 
+          verseKey: timing.verse_key, 
+          wordIndex: lastSegment ? lastSegment[0] : null 
+        };
+      }
+    }
+
+    return { verseKey: null, wordIndex: null };
+  }, []);
+
+  // Load timing data and audio
+  const loadAudio = useCallback(async () => {
+    try {
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+      // Fetch timing data from our backend proxy
+      console.log(`📡 Fetching timing data for chapter ${chapterId}, reciter ${reciterId}`);
+      const timingResponse = await fetch(`/api/audio-timing/${reciterId}/${chapterId}`);
+      
+      if (!timingResponse.ok) {
+        throw new Error('Failed to fetch timing data');
+      }
+
+      const timingData: TimingData = await timingResponse.json();
+      
+      // API returns audio_files array, we need the first entry
+      if (!timingData.audio_files || timingData.audio_files.length === 0) {
+        throw new Error('No audio files found in timing data');
+      }
+      
+      const audioFile = timingData.audio_files[0];
+      timingDataRef.current = audioFile;
+      
+      console.log(`✓ Loaded timing data with ${audioFile.verse_timings.length} verses`);
+
+      // Create audio element with Quran.com audio URL
+      // Handle both audio_url directly on audioFile or nested in audio_file object
+      const audio = new Audio();
+      const audioUrl = audioFile.audio_url || (audioFile as any).audio_file?.audio_url;
+      
+      if (!audioUrl) {
+        throw new Error('No audio URL found in timing data');
+      }
+      
+      console.log(`📍 Audio URL: ${audioUrl}`);
+
+      // Event handlers
+      const handleLoadedMetadata = () => {
+        setState(prev => ({ 
+          ...prev, 
+          duration: audio.duration || 0,
+          currentTime: 0
+        }));
+      };
+
+      const handleTimeUpdate = () => {
+        const currentTime = audio.currentTime;
+        const { verseKey, wordIndex } = findCurrentSegment(currentTime);
+        
+        setState(prev => {
+          // Only trigger onVerseChange if verse actually changed
+          if (verseKey && verseKey !== prev.currentVerseKey) {
+            onVerseChangeRef.current?.(verseKey);
+          }
+          
+          return {
+            ...prev,
+            currentTime,
+            currentVerseKey: verseKey,
+            currentWordIndex: wordIndex,
+          };
+        });
+      };
+
+      const handleCanPlay = () => {
+        console.log(`✓ Chapter ${chapterId} loaded and ready`);
+        setState(prev => ({ ...prev, isLoading: false }));
+      };
+
+      const handlePlay = () => {
+        console.log(`▶️ Playing chapter ${chapterId}`);
+        setState(prev => ({ ...prev, isPlaying: true }));
+      };
+
+      const handlePause = () => {
+        console.log(`⏸️ Paused chapter ${chapterId}`);
+        setState(prev => ({ ...prev, isPlaying: false }));
+      };
+
+      const handleEnded = () => {
+        console.log(`✓ Chapter ${chapterId} finished`);
+        
+        if (repeatRef.current) {
+          audio.currentTime = 0;
+          audio.play();
+        } else {
+          setState(prev => ({ ...prev, isPlaying: false }));
+          onEndedRef.current?.();
+        }
+      };
+
+      const handleError = (e: Event) => {
+        const target = e.target as HTMLAudioElement;
+        const error = target.error;
+        
+        console.error('❌ Audio error for chapter', chapterId);
+        console.error('Error code:', error?.code);
+        console.error('Error message:', error?.message);
+        
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          isPlaying: false,
+          error: `Failed to load chapter ${chapterId}`,
+        }));
+      };
+
+      // Attach event listeners
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.addEventListener('timeupdate', handleTimeUpdate);
+      audio.addEventListener('canplay', handleCanPlay);
+      audio.addEventListener('play', handlePlay);
+      audio.addEventListener('pause', handlePause);
+      audio.addEventListener('ended', handleEnded);
+      audio.addEventListener('error', handleError);
+
+      // Set source and load
+      audio.src = audioUrl;
+      audio.playbackRate = speedRef.current;
+      audio.load();
+
+      // Store reference
+      audioRef.current = audio;
+
+      // Cleanup function
+      return () => {
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        audio.removeEventListener('timeupdate', handleTimeUpdate);
+        audio.removeEventListener('canplay', handleCanPlay);
+        audio.removeEventListener('play', handlePlay);
+        audio.removeEventListener('pause', handlePause);
+        audio.removeEventListener('ended', handleEnded);
+        audio.removeEventListener('error', handleError);
+        audio.pause();
+        audio.src = '';
+      };
+    } catch (error) {
+      console.error('❌ Failed to load audio:', error);
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: 'Failed to load audio',
+      }));
+    }
+  }, [chapterId, reciterId, findCurrentSegment]);
+
+  // Initialize audio on mount
+  useEffect(() => {
+    const cleanup = loadAudio();
+    return () => {
+      cleanup?.then(cleanupFn => cleanupFn?.());
+    };
+  }, [loadAudio]);
+
+  // Toggle play/pause
+  const togglePlayPause = useCallback(() => {
+    if (!audioRef.current) {
+      console.warn('No audio element');
+      return;
+    }
+
+    if (state.isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(err => {
+        console.error('Playback failed:', err);
+        setState(prev => ({ ...prev, error: 'Playback failed' }));
+      });
+    }
+  }, [state.isPlaying]);
+
+  // Seek to specific time
+  const seek = useCallback((time: number) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
+      setState(prev => ({ ...prev, currentTime: time }));
+    }
+  }, []);
+
+  // Seek to specific verse
+  const seekToVerse = useCallback((verseKey: string) => {
+    if (!timingDataRef.current) return;
+
+    const verseTiming = timingDataRef.current.verse_timings.find(
+      t => t.verse_key === verseKey
+    );
+
+    if (verseTiming && audioRef.current) {
+      const seekTime = verseTiming.timestamp_from / 1000;
+      audioRef.current.currentTime = seekTime;
+      setState(prev => ({ ...prev, currentTime: seekTime }));
+    }
+  }, []);
+
+  // Set playback speed
+  const setSpeed = useCallback((newSpeed: number) => {
+    speedRef.current = newSpeed;
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed;
+    }
+    setState(prev => ({ ...prev, speed: newSpeed }));
+    console.log(`⚡ Speed: ${newSpeed}x`);
+  }, []);
+
+  // Get timing data (returns the audio file with verse timings)
+  const getTimingData = useCallback((): AudioFile | null => {
+    return timingDataRef.current;
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+    };
+  }, []);
+
+  return {
+    ...state,
+    togglePlayPause,
+    seek,
+    seekToVerse,
+    setSpeed,
+    getTimingData,
+  };
+}

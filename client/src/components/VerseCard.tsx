@@ -11,6 +11,7 @@ interface VerseCardProps {
   isPlaying?: boolean;
   isCurrentVerse?: boolean;
   isInVerseRange?: boolean;
+  currentWordIndex?: number | null;
   onClick?: () => void;
 }
 
@@ -25,21 +26,25 @@ export default function VerseCard({
   isPlaying = false,
   isCurrentVerse = false,
   isInVerseRange = false,
+  currentWordIndex = null,
   onClick,
 }: VerseCardProps) {
   // Calculate if this verse should be highlighted
   const shouldHighlight = isPlaying && isCurrentVerse && isInVerseRange;
   
-  //Use state to ensure re-renders
+  // Use state to ensure re-renders
   const [highlighted, setHighlighted] = useState(shouldHighlight);
   
   // Update highlighted state when shouldHighlight changes
   useEffect(() => {
     setHighlighted(shouldHighlight);
     if (shouldHighlight) {
-      console.log(`📍 Highlighting verse ${verseNumber}: isPlaying=${isPlaying}, isCurrentVerse=${isCurrentVerse}, isInVerseRange=${isInVerseRange}`);
+      console.log(`📍 Highlighting verse ${verseNumber}: isPlaying=${isPlaying}, isCurrentVerse=${isCurrentVerse}, isInVerseRange=${isInVerseRange}, wordIndex=${currentWordIndex}`);
     }
-  }, [shouldHighlight, isPlaying, isCurrentVerse, isInVerseRange, verseNumber]);
+  }, [shouldHighlight, isPlaying, isCurrentVerse, isInVerseRange, verseNumber, currentWordIndex]);
+  
+  // Split Arabic text into words for word-level highlighting
+  const words = arabicText.split(' ');
   
   // Use inline styles + data attribute for highlighting to bypass className issues
   const highlightStyles: React.CSSProperties = highlighted ? {
@@ -75,7 +80,29 @@ export default function VerseCard({
           dir="rtl"
           data-testid={`text-arabic-${verseNumber}`}
         >
-          {arabicText}
+          {words.map((word, index) => {
+            // Only highlight if currentWordIndex is valid and within bounds
+            const isCurrentWord = highlighted && 
+              currentWordIndex !== null && 
+              currentWordIndex === index &&
+              currentWordIndex < words.length;
+            return (
+              <span
+                key={`word-${chapterId}-${verseNumber}-${index}`}
+                id={`word-${chapterId}-${verseNumber}-${index}`}
+                className={`transition-all duration-200 ${
+                  isCurrentWord ? 'text-primary font-bold' : ''
+                }`}
+                style={isCurrentWord ? {
+                  backgroundColor: 'rgba(77, 124, 254, 0.2)',
+                  padding: '0 4px',
+                  borderRadius: '4px',
+                } : {}}
+              >
+                {word}{index < words.length - 1 ? ' ' : ''}
+              </span>
+            );
+          })}
         </p>
         {showTransliteration && transliteration && (
           <p 
