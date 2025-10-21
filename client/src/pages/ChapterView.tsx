@@ -233,7 +233,7 @@ export default function ChapterView({
                 {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
               </h2>
             </div>
-            {chapterId !== 9 && (
+            {chapterId > 1 && chapterId !== 9 && chapterId <= 114 && (
               <p className="text-base font-arabic text-foreground mt-1" data-testid="text-bismillah">
                 بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
               </p>
