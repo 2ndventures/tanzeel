@@ -81,53 +81,27 @@ export default function Settings({
             <div className="space-y-1 divide-y divide-border">
               <SettingItem
                 label="Theme"
-                sublabel="Dark"
+                sublabel={darkMode ? "Dark" : "Light"}
                 type="toggle"
                 value={darkMode}
                 onToggle={onDarkModeChange}
                 testId="toggle-theme"
               />
               <SettingItem
-                label="Font"
-                sublabel="System"
-                type="select"
-                value={font}
-                options={[
-                  { value: "System", label: "System" },
-                  { value: "Amiri", label: "Amiri" },
-                  { value: "Traditional", label: "Traditional" },
-                ]}
-                onSelect={onFontChange}
-                testId="select-font"
-              />
-              <SettingItem
-                label="Transliteration"
-                sublabel="Off"
-                type="toggle"
-                value={transliteration}
-                onToggle={onTransliterationChange}
-                testId="toggle-transliteration"
-              />
-              <SettingItem
                 label="Translation"
-                sublabel="On"
+                sublabel={showTranslation ? "On" : "Off"}
                 type="toggle"
                 value={showTranslation}
                 onToggle={onShowTranslationChange}
                 testId="toggle-translation"
               />
               <SettingItem
-                label="Language"
-                sublabel="English"
-                type="select"
-                value={translation}
-                options={[
-                  { value: "English", label: "English" },
-                  { value: "Urdu", label: "Urdu" },
-                  { value: "French", label: "French" },
-                ]}
-                onSelect={onTranslationChange}
-                testId="select-language"
+                label="Transliteration"
+                sublabel={transliteration ? "On" : "Off"}
+                type="toggle"
+                value={transliteration}
+                onToggle={onTransliterationChange}
+                testId="toggle-transliteration"
               />
             </div>
           </div>
@@ -146,40 +120,40 @@ export default function Settings({
               />
               <SettingItem
                 label="Speed"
-                sublabel="Normal"
+                sublabel={speed}
                 type="select"
                 value={speed}
                 options={[
+                  { value: "Slow", label: "Slow" },
                   { value: "Normal", label: "Normal" },
                   { value: "Fast", label: "Fast" },
-                  { value: "Slow", label: "Slow" },
                 ]}
                 onSelect={onSpeedChange}
                 testId="select-speed"
               />
               <SettingItem
                 label="Auto-scroll"
-                sublabel="Off"
+                sublabel={autoScroll ? "On" : "Off"}
                 type="toggle"
                 value={autoScroll}
                 onToggle={onAutoScrollChange}
                 testId="toggle-autoscroll"
               />
               <SettingItem
-                label="Repeat"
-                sublabel="Off"
-                type="toggle"
-                value={repeat}
-                onToggle={onRepeatChange}
-                testId="toggle-repeat"
-              />
-              <SettingItem
-                label="Autoplay"
+                label="Autoplay next surah"
                 sublabel={autoplay ? "On" : "Off"}
                 type="toggle"
                 value={autoplay}
                 onToggle={onAutoplayChange}
                 testId="toggle-autoplay"
+              />
+              <SettingItem
+                label="Repeat"
+                sublabel={repeat ? "On" : "Off"}
+                type="toggle"
+                value={repeat}
+                onToggle={onRepeatChange}
+                testId="toggle-repeat"
               />
             </div>
           </div>

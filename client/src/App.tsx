@@ -15,10 +15,25 @@ function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
-  const [darkMode, setDarkMode] = useState(true);
-  const [transliteration, setTransliteration] = useState(false);
-  const [showTranslation, setShowTranslation] = useState(true);
+  
+  // Initialize all settings from localStorage with defaults
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : true;
+  });
+  
+  const [transliteration, setTransliteration] = useState(() => {
+    const saved = localStorage.getItem('transliteration');
+    return saved ? JSON.parse(saved) : false;
+  });
+  
+  const [showTranslation, setShowTranslation] = useState(() => {
+    const saved = localStorage.getItem('showTranslation');
+    return saved ? JSON.parse(saved) : true;
+  });
+  
   const [font, setFont] = useState("System");
+  
   const [reciter, setReciter] = useState(() => {
     const saved = localStorage.getItem('reciter');
     if (saved) {
@@ -45,13 +60,27 @@ function App() {
     }
     return DEFAULT_RECITER;
   });
-  const [speed, setSpeed] = useState("Normal");
-  const [autoScroll, setAutoScroll] = useState(true);
-  const [repeat, setRepeat] = useState(false);
+  
+  const [speed, setSpeed] = useState(() => {
+    const saved = localStorage.getItem('speed');
+    return saved || "Normal";
+  });
+  
+  const [autoScroll, setAutoScroll] = useState(() => {
+    const saved = localStorage.getItem('autoScroll');
+    return saved ? JSON.parse(saved) : true;
+  });
+  
+  const [repeat, setRepeat] = useState(() => {
+    const saved = localStorage.getItem('repeat');
+    return saved ? JSON.parse(saved) : false;
+  });
+  
   const [autoplay, setAutoplay] = useState(() => {
     const saved = localStorage.getItem('autoplay');
     return saved ? JSON.parse(saved) : false;
   });
+  
   const [translation, setTranslation] = useState("English");
 
   useEffect(() => {
@@ -60,7 +89,28 @@ function App() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem('transliteration', JSON.stringify(transliteration));
+  }, [transliteration]);
+
+  useEffect(() => {
+    localStorage.setItem('showTranslation', JSON.stringify(showTranslation));
+  }, [showTranslation]);
+
+  useEffect(() => {
+    localStorage.setItem('speed', speed);
+  }, [speed]);
+
+  useEffect(() => {
+    localStorage.setItem('autoScroll', JSON.stringify(autoScroll));
+  }, [autoScroll]);
+
+  useEffect(() => {
+    localStorage.setItem('repeat', JSON.stringify(repeat));
+  }, [repeat]);
 
   useEffect(() => {
     localStorage.setItem('autoplay', JSON.stringify(autoplay));
