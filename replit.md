@@ -1,6 +1,13 @@
 # Overview
 
-This mobile-first Quran Reading application enables users to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. It features a modern, dark-themed interface built with React, TypeScript, and shadcn/ui. Key capabilities include chapter browsing, verse-by-verse reading with synchronized audio (karaoke-style highlighting), customizable display settings, and bookmarking. The primary focus is on delivering an optimized mobile experience.
+This mobile-first Quran Reading application enables users to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. It features a modern, dark-themed interface built with React, TypeScript, and shadcn/ui. Key capabilities include chapter browsing, continuous chapter audio playback with word-level synchronized highlighting (karaoke-style), and customizable display settings. The primary focus is on delivering an optimized mobile experience.
+
+# Recent Changes
+
+**October 22, 2025:**
+- Fixed word highlighting off-by-one error by converting Quran.com API's 1-based word indices to 0-based array indices
+- Removed bookmark feature from ChapterView per user request - users no longer save/restore reading positions
+- Migrated from verse-by-verse audio to continuous chapter playback with word-level synchronization using Quran.com timing API
 
 # User Preferences
 
@@ -30,54 +37,51 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 ## Audio Playback System
 
-A custom `useAudioPlayer` hook manages audio state, playback controls, and verse progression. The system uses a **verse-by-verse architecture** where each verse is loaded and played individually, eliminating synchronization issues entirely.
+The application uses a **continuous chapter audio architecture** powered by the `useWordTimingAudio` hook, providing seamless playback with word-level synchronized highlighting (karaoke-style) using Quran.com's timing API.
 
-### Verse-by-Verse Audio Architecture
+### Continuous Chapter Audio Architecture
 
-The application uses **individual MP3 files per verse** from EveryAyah.com, providing perfect synchronization between audio and text:
+The system loads a single audio file per chapter with word-level timing data from Quran.com, enabling precise word-by-word highlighting without gaps between verses:
 
-**Audio Source**: EveryAyah.com CDN via backend proxy `/api/verse-audio/{reciter}/{surah}/{ayah}`
-- Each verse is a separate MP3 file (typically 100-300KB)
-- Individual files load quickly (~1-2 seconds)
-- No timestamp synchronization needed - audio and text are naturally synchronized
-- Backend proxy prevents CORS issues and adds caching headers
+**Audio Source**: Quran.com CDN via backend proxy `/api/audio-timing/{reciterId}/{chapter}`
+- Single continuous MP3 file per chapter (typically 5-20MB depending on reciter)
+- Word-level timing data from Quran.com API includes segments: `[wordIndex, startMs, endMs]`
+- Backend proxy prevents CORS issues and normalizes API responses
+- Audio URL can be nested at `audio_files[0].audio_url` or `audio_files[0].audio_file.audio_url`
 
 **Playback Flow**:
-1. Load first verse MP3 and display "Loading..." state
-2. When audio is ready (`canplay` event), enable play button
-3. User clicks play → verse 1 audio plays, verse 1 card highlights
-4. Next verse is preloaded in background (populates browser cache)
-5. When verse 1 ends (`ended` event) → load and play verse 2 from cache (seamless)
-6. Repeat until all verses in chapter are complete
+1. Fetch timing data and continuous audio URL from backend proxy
+2. Load chapter audio file and display "Loading..." state
+3. When audio is ready (`canplay` event), enable play button
+4. User clicks play → continuous audio plays, words/verses highlight in sync
+5. `timeupdate` event tracks playback position and updates current word/verse
+6. Playback continues seamlessly through all verses until chapter ends
 
-**Seamless Playback**:
-- When a verse starts playing, the next verse is preloaded to populate browser cache
-- Verse transitions load from cache instantly for near-gapless playback
-- No complex audio element swapping - relies on browser caching for performance
-- All event handlers properly scoped to prevent closure issues
+**Word-Level Synchronization**:
+- Each verse has an array of word segments with timestamps
+- `findCurrentSegment()` matches current playback time to active word
+- Word indices from API are 1-based, converted to 0-based for array access
+- Handles empty segments gracefully (returns null wordIndex)
+- Verse-level highlighting always works; word highlighting may have minor edge cases with special punctuation
 
 **Progress Tracking**:
-- Real-time progress bar showing current time and duration
-- `timeupdate` event updates current playback position
-- `loadedmetadata` event sets audio duration
-- Seekable progress bar allows jumping to any position within the current verse
-- Progress resets to 0:00 when transitioning to a new verse
+- Real-time progress bar showing current time and total chapter duration
+- Seekable progress bar allows jumping to any position in the chapter
+- Current verse and word tracked based on playback position
+- Auto-scroll keeps current verse visible (60px offset for sticky header)
 
-**State Management** (`useAudioPlayer` hook):
-- Uses `useRef` for speed to prevent dependency array issues
+**State Management** (`useWordTimingAudio` hook):
+- Uses `useRef` for audio element and timing data to prevent dependency issues
 - `useCallback` for stable function references to prevent infinite loops
-- Fresh `HTMLAudioElement` created for each verse with proper event handler scoping
-- Cleanup avoids setting `src = ''` to prevent "Empty src" errors
-- Separate preload Audio element for cache population
+- Single `HTMLAudioElement` instance for entire chapter
+- Handles both direct and nested audio URL structures from API
 
 **Key Functions**:
-- `loadVerse(verseNum, autoPlay)`: Loads specific verse, optionally starts playback
-- `togglePlayPause()`: Play/pause current verse
-- `seek(time)`: Seek to specific time within current verse
-- `nextVerse()`: Skip to next verse
-- `prevVerse()`: Go to previous verse
-- `seekToVerse(verseNum)`: Jump to specific verse
+- `togglePlayPause()`: Play/pause chapter audio
+- `seek(time)`: Seek to specific time within chapter
+- `seekToVerse(verseKey)`: Jump to specific verse (e.g., "1:5")
 - `setSpeed(speed)`: Change playback speed (0.5x to 2.0x)
+- `getTimingData()`: Access verse timings and word segments
 
 ### Reciter System
 
@@ -103,30 +107,42 @@ Selected reciter persists in localStorage. Users can select reciters from:
 1. **ChapterView menu**: Three-dot menu → Reciter submenu with checkmarks
 2. **Settings page**: Audio section → Reciter dropdown
 
-**Audio URL Format**: `https://www.everyayah.com/data/{reciter_folder}/{surah_padded}{ayah_padded}.mp3`
-- Example: `https://www.everyayah.com/data/Alafasy_128kbps/001001.mp3` (Surah 1, Verse 1)
-- Proxied through backend to prevent CORS: `/api/verse-audio/Alafasy_128kbps/001/001`
+**Reciter ID Mapping**: Internal reciter IDs are mapped to Quran.com reciter IDs for timing API:
+- `alafasy` → 7 (Mishary Rashid Alafasy)
+- `abdul_basit` → 1 (Abdul Basit Murattal)
+- `hudhaify` → 3 (Ali Al-Hudhaify)
+- `hani_rifai` → 9 (Hani Rifai)
+- And more in `ChapterView.tsx`
 
-### Verse Highlighting System
+### Word & Verse Highlighting System
 
-Verse highlighting is automatically synchronized with audio playback since each verse is a separate audio file:
+Word and verse highlighting is automatically synchronized with continuous audio playback using timing data from Quran.com:
 
-**Visual Indicators**:
-- Blue left border (4px solid #4d7cfe)
+**Verse Visual Indicators**:
+- Blue left border (4px solid #4d7cfe) on currently playing verse
 - Light blue background (rgba(77, 124, 254, 0.1))
 - Primary text color for verse number and Arabic text
+
+**Word Visual Indicators**:
+- Individual Arabic words rendered as separate `<span>` elements
+- Currently playing word: bold text with light blue background and padding
+- Word indices converted from API's 1-based to 0-based for array access
+- Bounds checking prevents highlighting of out-of-range indices
 
 **Accessibility Attributes** (`VerseCard.tsx`):
 - `data-playing="true"` on currently playing verse
 - `aria-current="true"` for screen readers
 - `role="article"` for semantic structure
 - `data-testid="card-verse-{number}"` for testing
+- Each word has unique `id="word-{chapter}-{verse}-{index}"` for targeting
 
 **Auto-Scroll**: When enabled, automatically scrolls to bring playing verse to top of viewport (below 60px header)
 
+**Known Limitations**: Word highlighting uses simple space-splitting which may occasionally misalign with Quran.com's canonical tokenization in verses with special Arabic punctuation or pause marks. Verse-level highlighting always works correctly.
+
 ## Data Management
 
-All Quran data (114 chapters, 6,236 verses, Arabic text, English translations, transliterations) is stored statically in `client/src/lib/quranData.ts`, sourced originally from Al-Quran Cloud API. Client-side persistence in local storage manages user preferences (theme, reciter, settings), bookmarks, and reading progress. A bookmark system allows saving and retrieving bookmarked verses.
+All Quran data (114 chapters, 6,236 verses, Arabic text, English translations, transliterations) is stored statically in `client/src/lib/quranData.ts`, sourced originally from Al-Quran Cloud API. Client-side persistence in local storage manages user preferences (theme, reciter, speed, auto-scroll, repeat, autoplay settings). Word-level timing data is fetched dynamically from Quran.com API per chapter as needed.
 
 # External Dependencies
 
@@ -178,5 +194,5 @@ All Quran data (114 chapters, 6,236 verses, Arabic text, English translations, t
 
 ## External APIs & Data Sources
 
-- **EveryAyah.com CDN**: Provides individual verse-by-verse Quran recitation audio via `/api/verse-audio/{reciter}/{surah}/{ayah}` backend proxy. Each verse is a separate MP3 file for perfect synchronization.
+- **Quran.com Audio API**: Provides continuous chapter audio files with word-level timing data via `/api/audio-timing/{reciterId}/{chapter}` backend proxy. Each chapter is a single MP3 file with precise word timestamps for synchronized highlighting.
 - **Al-Quran Cloud API**: Used to pre-fetch static Quran text data (Arabic, Sahih International English translation, `en.transliteration` transliteration).
