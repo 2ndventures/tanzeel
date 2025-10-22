@@ -89,10 +89,10 @@ export function useWordTimingAudio(
         for (let i = 0; i < verseSegments.length; i++) {
           const segment = verseSegments[i];
           // segment is [wordIndex, startMs, endMs]
-          // wordIndex is 0-based in the API, matching our array indices
-          const wordIndex = segment[0];  // canonical word index from API
-          const wordStart = segment[1];  // start timestamp in ms
-          const wordEnd = segment[2];    // end timestamp in ms
+          // API uses 1-based indexing, convert to 0-based for array access
+          const wordIndex = segment[0] - 1;  // Convert 1-based to 0-based
+          const wordStart = segment[1];      // start timestamp in ms
+          const wordEnd = segment[2];        // end timestamp in ms
           
           if (currentTimeMs >= wordStart && currentTimeMs <= wordEnd) {
             return { verseKey: timing.verse_key, wordIndex };
@@ -103,7 +103,7 @@ export function useWordTimingAudio(
         const lastSegment = verseSegments[verseSegments.length - 1];
         return { 
           verseKey: timing.verse_key, 
-          wordIndex: lastSegment ? lastSegment[0] : null 
+          wordIndex: lastSegment ? lastSegment[0] - 1 : null  // Convert 1-based to 0-based
         };
       }
     }
