@@ -87,11 +87,11 @@ export default function VerseCard({
   
   const getLineSpacing = (spacing: string) => {
     switch(spacing) {
-      case "Compact": return "leading-normal";
-      case "Normal": return "leading-relaxed";
-      case "Relaxed": return "leading-loose";
+      case "Compact": return "leading-relaxed";
+      case "Normal": return "leading-loose";
+      case "Relaxed": return "leading-[2.25]";
       case "Loose": return "leading-[2.5]";
-      default: return "leading-relaxed";
+      default: return "leading-loose";
     }
   };
   
@@ -111,7 +111,7 @@ export default function VerseCard({
       role="article"
       onClick={onClick}
     >
-      <div className={`space-y-3 ${getLineSpacing(lineSpacing)}`}>
+      <div className={`space-y-5 ${getLineSpacing(lineSpacing)}`}>
         {showVerseNumbers && (
           <div className="flex items-start gap-2">
             <span 
