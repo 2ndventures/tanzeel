@@ -37,6 +37,11 @@ interface ChapterViewProps {
   onTransliterationChange: (enabled: boolean) => void;
   onShowTranslationChange: (enabled: boolean) => void;
   onReciterChange: (reciter: string) => void;
+  arabicFontSize: string;
+  translationFontSize: string;
+  transliterationFontSize: string;
+  lineSpacing: string;
+  showVerseNumbers: boolean;
 }
 
 export default function ChapterView({ 
@@ -57,7 +62,12 @@ export default function ChapterView({
   onDarkModeChange,
   onTransliterationChange,
   onShowTranslationChange,
-  onReciterChange
+  onReciterChange,
+  arabicFontSize,
+  translationFontSize,
+  transliterationFontSize,
+  lineSpacing,
+  showVerseNumbers
 }: ChapterViewProps) {
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
@@ -322,6 +332,11 @@ export default function ChapterView({
                 isInVerseRange={isCurrentVerse}
                 currentWordIndex={isCurrentVerse ? currentWordIndex : null}
                 onClick={() => handleVerseClick(verseNumber)}
+                arabicFontSize={arabicFontSize}
+                translationFontSize={translationFontSize}
+                transliterationFontSize={transliterationFontSize}
+                lineSpacing={lineSpacing}
+                showVerseNumbers={showVerseNumbers}
               />
             );
           })}

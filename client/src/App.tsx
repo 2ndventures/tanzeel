@@ -83,6 +83,32 @@ function App() {
   
   const [translation, setTranslation] = useState("English");
 
+  // Text display settings
+  const [arabicFontSize, setArabicFontSize] = useState(() => {
+    const saved = localStorage.getItem('arabicFontSize');
+    return saved || "Large";
+  });
+
+  const [translationFontSize, setTranslationFontSize] = useState(() => {
+    const saved = localStorage.getItem('translationFontSize');
+    return saved || "Medium";
+  });
+
+  const [transliterationFontSize, setTransliterationFontSize] = useState(() => {
+    const saved = localStorage.getItem('transliterationFontSize');
+    return saved || "Small";
+  });
+
+  const [lineSpacing, setLineSpacing] = useState(() => {
+    const saved = localStorage.getItem('lineSpacing');
+    return saved || "Normal";
+  });
+
+  const [showVerseNumbers, setShowVerseNumbers] = useState(() => {
+    const saved = localStorage.getItem('showVerseNumbers');
+    return saved ? JSON.parse(saved) : true;
+  });
+
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -119,6 +145,26 @@ function App() {
   useEffect(() => {
     localStorage.setItem('reciter', reciter);
   }, [reciter]);
+
+  useEffect(() => {
+    localStorage.setItem('arabicFontSize', arabicFontSize);
+  }, [arabicFontSize]);
+
+  useEffect(() => {
+    localStorage.setItem('translationFontSize', translationFontSize);
+  }, [translationFontSize]);
+
+  useEffect(() => {
+    localStorage.setItem('transliterationFontSize', transliterationFontSize);
+  }, [transliterationFontSize]);
+
+  useEffect(() => {
+    localStorage.setItem('lineSpacing', lineSpacing);
+  }, [lineSpacing]);
+
+  useEffect(() => {
+    localStorage.setItem('showVerseNumbers', JSON.stringify(showVerseNumbers));
+  }, [showVerseNumbers]);
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => {
     setCurrentPage(page as Page);
@@ -167,6 +213,11 @@ function App() {
               onTransliterationChange={setTransliteration}
               onShowTranslationChange={setShowTranslation}
               onReciterChange={setReciter}
+              arabicFontSize={arabicFontSize}
+              translationFontSize={translationFontSize}
+              transliterationFontSize={transliterationFontSize}
+              lineSpacing={lineSpacing}
+              showVerseNumbers={showVerseNumbers}
             />
           )}
           {currentPage === "settings" && (
@@ -196,6 +247,16 @@ function App() {
               onAutoplayChange={setAutoplay}
               translation={translation}
               onTranslationChange={setTranslation}
+              arabicFontSize={arabicFontSize}
+              onArabicFontSizeChange={setArabicFontSize}
+              translationFontSize={translationFontSize}
+              onTranslationFontSizeChange={setTranslationFontSize}
+              transliterationFontSize={transliterationFontSize}
+              onTransliterationFontSizeChange={setTransliterationFontSize}
+              lineSpacing={lineSpacing}
+              onLineSpacingChange={setLineSpacing}
+              showVerseNumbers={showVerseNumbers}
+              onShowVerseNumbersChange={setShowVerseNumbers}
             />
           )}
         </div>

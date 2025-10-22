@@ -27,6 +27,16 @@ interface SettingsProps {
   onAutoplayChange: (value: boolean) => void;
   translation: string;
   onTranslationChange: (value: string) => void;
+  arabicFontSize: string;
+  onArabicFontSizeChange: (value: string) => void;
+  translationFontSize: string;
+  onTranslationFontSizeChange: (value: string) => void;
+  transliterationFontSize: string;
+  onTransliterationFontSizeChange: (value: string) => void;
+  lineSpacing: string;
+  onLineSpacingChange: (value: string) => void;
+  showVerseNumbers: boolean;
+  onShowVerseNumbersChange: (value: boolean) => void;
 }
 
 export default function Settings({
@@ -52,6 +62,16 @@ export default function Settings({
   onAutoplayChange,
   translation,
   onTranslationChange,
+  arabicFontSize,
+  onArabicFontSizeChange,
+  translationFontSize,
+  onTranslationFontSizeChange,
+  transliterationFontSize,
+  onTransliterationFontSizeChange,
+  lineSpacing,
+  onLineSpacingChange,
+  showVerseNumbers,
+  onShowVerseNumbersChange,
 }: SettingsProps) {
   const allReciters = getAllReciters();
   const reciterOptions = allReciters.map(r => ({
@@ -102,6 +122,74 @@ export default function Settings({
                 value={transliteration}
                 onToggle={onTransliterationChange}
                 testId="toggle-transliteration"
+              />
+              <SettingItem
+                label="Verse numbers"
+                sublabel={showVerseNumbers ? "On" : "Off"}
+                type="toggle"
+                value={showVerseNumbers}
+                onToggle={onShowVerseNumbersChange}
+                testId="toggle-verse-numbers"
+              />
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-3">Text Size</h2>
+            <div className="space-y-1 divide-y divide-border">
+              <SettingItem
+                label="Arabic text"
+                sublabel={arabicFontSize}
+                type="select"
+                value={arabicFontSize}
+                options={[
+                  { value: "Small", label: "Small" },
+                  { value: "Medium", label: "Medium" },
+                  { value: "Large", label: "Large" },
+                  { value: "Extra Large", label: "Extra Large" },
+                ]}
+                onSelect={onArabicFontSizeChange}
+                testId="select-arabic-font-size"
+              />
+              <SettingItem
+                label="Translation text"
+                sublabel={translationFontSize}
+                type="select"
+                value={translationFontSize}
+                options={[
+                  { value: "Small", label: "Small" },
+                  { value: "Medium", label: "Medium" },
+                  { value: "Large", label: "Large" },
+                ]}
+                onSelect={onTranslationFontSizeChange}
+                testId="select-translation-font-size"
+              />
+              <SettingItem
+                label="Transliteration text"
+                sublabel={transliterationFontSize}
+                type="select"
+                value={transliterationFontSize}
+                options={[
+                  { value: "Small", label: "Small" },
+                  { value: "Medium", label: "Medium" },
+                  { value: "Large", label: "Large" },
+                ]}
+                onSelect={onTransliterationFontSizeChange}
+                testId="select-transliteration-font-size"
+              />
+              <SettingItem
+                label="Line spacing"
+                sublabel={lineSpacing}
+                type="select"
+                value={lineSpacing}
+                options={[
+                  { value: "Compact", label: "Compact" },
+                  { value: "Normal", label: "Normal" },
+                  { value: "Relaxed", label: "Relaxed" },
+                  { value: "Loose", label: "Loose" },
+                ]}
+                onSelect={onLineSpacingChange}
+                testId="select-line-spacing"
               />
             </div>
           </div>

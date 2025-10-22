@@ -13,6 +13,11 @@ interface VerseCardProps {
   isInVerseRange?: boolean;
   currentWordIndex?: number | null;
   onClick?: () => void;
+  arabicFontSize?: string;
+  translationFontSize?: string;
+  transliterationFontSize?: string;
+  lineSpacing?: string;
+  showVerseNumbers?: boolean;
 }
 
 export default function VerseCard({
@@ -28,6 +33,11 @@ export default function VerseCard({
   isInVerseRange = false,
   currentWordIndex = null,
   onClick,
+  arabicFontSize = "Large",
+  translationFontSize = "Medium",
+  transliterationFontSize = "Small",
+  lineSpacing = "Normal",
+  showVerseNumbers = true,
 }: VerseCardProps) {
   // Calculate if this verse should be highlighted
   const shouldHighlight = isPlaying && isCurrentVerse && isInVerseRange;
@@ -46,6 +56,45 @@ export default function VerseCard({
   // Split Arabic text into words for word-level highlighting
   const words = arabicText.split(' ');
   
+  // Font size mappings
+  const getArabicFontSize = (size: string) => {
+    switch(size) {
+      case "Small": return "text-xl md:text-2xl";
+      case "Medium": return "text-2xl md:text-3xl";
+      case "Large": return "text-3xl md:text-4xl";
+      case "Extra Large": return "text-4xl md:text-5xl";
+      default: return "text-3xl md:text-4xl";
+    }
+  };
+  
+  const getTranslationFontSize = (size: string) => {
+    switch(size) {
+      case "Small": return "text-sm";
+      case "Medium": return "text-base";
+      case "Large": return "text-lg";
+      default: return "text-base";
+    }
+  };
+  
+  const getTransliterationFontSize = (size: string) => {
+    switch(size) {
+      case "Small": return "text-xs";
+      case "Medium": return "text-sm";
+      case "Large": return "text-base";
+      default: return "text-sm";
+    }
+  };
+  
+  const getLineSpacing = (spacing: string) => {
+    switch(spacing) {
+      case "Compact": return "leading-normal";
+      case "Normal": return "leading-relaxed";
+      case "Relaxed": return "leading-loose";
+      case "Loose": return "leading-[2.5]";
+      default: return "leading-relaxed";
+    }
+  };
+  
   // Use inline styles + data attribute for highlighting to bypass className issues
   const highlightStyles: React.CSSProperties = highlighted ? {
     backgroundColor: 'rgba(77, 124, 254, 0.1)', // #4d7cfe with 10% opacity
@@ -62,19 +111,21 @@ export default function VerseCard({
       role="article"
       onClick={onClick}
     >
-      <div className="space-y-3">
-        <div className="flex items-start gap-2">
-          <span 
-            className={`font-semibold text-sm flex-shrink-0 transition-colors ${
-              highlighted ? 'text-primary' : 'text-primary'
-            }`} 
-            data-testid={`text-verse-number-${verseNumber}`}
-          >
-            {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
-          </span>
-        </div>
+      <div className={`space-y-3 ${getLineSpacing(lineSpacing)}`}>
+        {showVerseNumbers && (
+          <div className="flex items-start gap-2">
+            <span 
+              className={`font-semibold text-sm flex-shrink-0 transition-colors ${
+                highlighted ? 'text-primary' : 'text-primary'
+              }`} 
+              data-testid={`text-verse-number-${verseNumber}`}
+            >
+              {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
+            </span>
+          </div>
+        )}
         <p 
-          className={`text-2xl md:text-3xl leading-loose font-arabic text-right transition-colors ${
+          className={`${getArabicFontSize(arabicFontSize)} font-arabic text-right transition-colors ${
             highlighted ? 'text-primary' : 'text-foreground'
           }`}
           dir="rtl"
@@ -106,7 +157,7 @@ export default function VerseCard({
         </p>
         {showTransliteration && transliteration && (
           <p 
-            className={`text-sm italic transition-colors ${
+            className={`${getTransliterationFontSize(transliterationFontSize)} italic transition-colors ${
               highlighted ? 'text-primary/80' : 'text-muted-foreground'
             }`} 
             data-testid={`text-transliteration-${verseNumber}`}
@@ -116,7 +167,7 @@ export default function VerseCard({
         )}
         {showTranslation && (
           <p 
-            className={`text-base transition-colors ${
+            className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
               highlighted ? 'text-foreground' : 'text-foreground'
             }`} 
             data-testid={`text-translation-${verseNumber}`}
