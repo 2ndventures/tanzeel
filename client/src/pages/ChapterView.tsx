@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, Bookmark, MoreVertical, ChevronRight, Check } from "lucide-react";
+import { useEffect, useRef, useCallback } from "react";
+import { ArrowLeft, MoreVertical, ChevronRight, Check } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
-import { getChapterBookmark, isBookmarked, saveBookmark, removeBookmark } from "@/lib/bookmarks";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import {
   DropdownMenu,
@@ -76,17 +75,6 @@ export default function ChapterView({
     'akram_alalaqimy': 11,  // Akram Al-Alaqimy
   };
   const quranComReciterId = reciterToQuranComId[reciter] || 7;
-  
-  // Initialize bookmark state from localStorage
-  const [bookmarkedVerse, setBookmarkedVerse] = useState<number | null>(
-    () => getChapterBookmark(chapterId)
-  );
-
-  // Update bookmark when chapter changes
-  useEffect(() => {
-    const saved = getChapterBookmark(chapterId);
-    setBookmarkedVerse(saved);
-  }, [chapterId]);
 
   // Scroll to top when chapter changes
   useEffect(() => {
@@ -200,29 +188,6 @@ export default function ChapterView({
     }
   }, [autoplay, isPlaying, isLoading, chapterId, togglePlayPause]);
 
-  // Show bookmark as filled if there's any bookmark for this chapter
-  const hasChapterBookmark = bookmarkedVerse !== null;
-
-  const toggleBookmark = () => {
-    const currentIsBookmarked = isBookmarked(chapterId, currentVerse);
-    
-    // If current verse is bookmarked, remove it
-    if (currentIsBookmarked) {
-      removeBookmark(chapterId, currentVerse);
-      setBookmarkedVerse(null);
-    } 
-    // If there's a saved bookmark for a different verse, seek to it
-    else if (bookmarkedVerse && bookmarkedVerse !== currentVerse) {
-      const verseKey = `${chapterId}:${bookmarkedVerse}`;
-      seekToVerse(verseKey);
-    } 
-    // Otherwise, bookmark the current verse
-    else {
-      saveBookmark(chapterId, currentVerse);
-      setBookmarkedVerse(currentVerse);
-    }
-  };
-
   const handleVerseClick = useCallback((verseNumber: number) => {
     // Seek to the clicked verse and start playback
     const verseKey = `${chapterId}:${verseNumber}`;
@@ -276,15 +241,6 @@ export default function ChapterView({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
-                onClick={toggleBookmark}
-                data-testid="menu-item-bookmark"
-              >
-                <span>Bookmark</span>
-                <Bookmark className={`w-4 h-4 ${hasChapterBookmark ? 'fill-primary text-primary' : ''}`} />
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger data-testid="menu-item-reciter">
