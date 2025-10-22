@@ -134,22 +134,7 @@ export default function ChapterView({
   // Extract current verse number from verse key
   const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;
   
-  // Helper functions for next/previous verse navigation
-  const audioNextVerse = useCallback(() => {
-    if (currentVerse < verses.length) {
-      const nextVerseKey = `${chapterId}:${currentVerse + 1}`;
-      seekToVerse(nextVerseKey);
-    }
-  }, [currentVerse, verses.length, chapterId, seekToVerse]);
-  
-  const audioPrevVerse = useCallback(() => {
-    if (currentVerse > 1) {
-      const prevVerseKey = `${chapterId}:${currentVerse - 1}`;
-      seekToVerse(prevVerseKey);
-    }
-  }, [currentVerse, chapterId, seekToVerse]);
-  
-  // Auto-play next surah when current one ends
+  // Navigation functions for next/previous surah
   const goToNextSurah = useCallback(() => {
     const nextChapterId = chapterId + 1;
     if (nextChapterId <= 114) {
@@ -372,8 +357,8 @@ export default function ChapterView({
         onPlayPause={togglePlayPause}
         onSeek={seek}
         onSpeedChange={setSpeed}
-        onPrevious={audioPrevVerse}
-        onNext={audioNextVerse}
+        onPrevious={goToPreviousSurah}
+        onNext={goToNextSurah}
         onRepeatChange={onRepeatChange}
       />
     </div>
