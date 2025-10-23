@@ -1,29 +1,46 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// Helper functions for per-chapter speed persistence
-const CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
+// Helper functions for global speed persistence
+const GLOBAL_SPEED_KEY = 'quran-playback-speed';
+const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
 
-function getChapterSpeed(chapterId: number): number | null {
+// Migrate from old per-chapter speeds to global speed (one-time cleanup)
+function migrateOldSpeedData(): void {
   try {
-    const saved = localStorage.getItem(CHAPTER_SPEEDS_KEY);
-    if (saved) {
-      const speeds = JSON.parse(saved) as Record<string, number>;
-      return speeds[chapterId.toString()] ?? null;
+    const oldData = localStorage.getItem(OLD_CHAPTER_SPEEDS_KEY);
+    if (oldData) {
+      console.log('⚙️ Migrating old per-chapter speeds to global speed');
+      localStorage.removeItem(OLD_CHAPTER_SPEEDS_KEY);
     }
   } catch (error) {
-    console.error('Failed to load chapter speed:', error);
+    console.error('Failed to migrate old speed data:', error);
+  }
+}
+
+function getGlobalSpeed(): number | null {
+  try {
+    // One-time migration
+    migrateOldSpeedData();
+    
+    const saved = localStorage.getItem(GLOBAL_SPEED_KEY);
+    if (saved) {
+      const parsed = parseFloat(saved);
+      // Validate that the parsed value is a finite number
+      if (Number.isFinite(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load global speed:', error);
   }
   return null;
 }
 
-function setChapterSpeed(chapterId: number, speed: number): void {
+function setGlobalSpeed(speed: number): void {
   try {
-    const saved = localStorage.getItem(CHAPTER_SPEEDS_KEY);
-    const speeds = saved ? JSON.parse(saved) : {};
-    speeds[chapterId.toString()] = speed;
-    localStorage.setItem(CHAPTER_SPEEDS_KEY, JSON.stringify(speeds));
+    localStorage.setItem(GLOBAL_SPEED_KEY, speed.toString());
   } catch (error) {
-    console.error('Failed to save chapter speed:', error);
+    console.error('Failed to save global speed:', error);
   }
 }
 
@@ -67,8 +84,8 @@ export function useWordTimingAudio(
   initialSpeed: number = 1.0,
   autoplay: boolean = false
 ) {
-  // Load saved speed for this chapter, or use Settings default
-  const savedSpeed = getChapterSpeed(chapterId);
+  // Load saved global speed, or use Settings default
+  const savedSpeed = getGlobalSpeed();
   const effectiveSpeed = savedSpeed ?? initialSpeed;
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -107,9 +124,9 @@ export function useWordTimingAudio(
     autoplayRef.current = autoplay;
   }, [autoplay]);
 
-  // Load saved speed for this chapter when chapterId changes
+  // Load saved global speed when chapterId changes
   useEffect(() => {
-    const savedSpeed = getChapterSpeed(chapterId);
+    const savedSpeed = getGlobalSpeed();
     const newSpeed = savedSpeed ?? initialSpeed;
     
     speedRef.current = newSpeed;
@@ -117,7 +134,7 @@ export function useWordTimingAudio(
       audioRef.current.playbackRate = newSpeed;
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
-    console.log(`⚡ Chapter ${chapterId} speed: ${newSpeed}x ${savedSpeed ? '(saved)' : '(default)'}`);
+    console.log(`⚡ Speed: ${newSpeed}x ${savedSpeed ? '(saved)' : '(default)'}`);
   }, [chapterId, initialSpeed]);
 
   // Find current verse and word based on playback time
@@ -364,16 +381,16 @@ export function useWordTimingAudio(
     }
   }, []);
 
-  // Set playback speed and save to localStorage for this chapter
+  // Set playback speed and save globally to localStorage
   const setSpeed = useCallback((newSpeed: number) => {
     speedRef.current = newSpeed;
     if (audioRef.current) {
       audioRef.current.playbackRate = newSpeed;
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
-    setChapterSpeed(chapterId, newSpeed); // Save to localStorage
-    console.log(`⚡ Speed for chapter ${chapterId}: ${newSpeed}x`);
-  }, [chapterId]);
+    setGlobalSpeed(newSpeed); // Save globally to localStorage
+    console.log(`⚡ Speed: ${newSpeed}x`);
+  }, []);
 
   // Get timing data (returns the audio file with verse timings)
   const getTimingData = useCallback((): AudioFile | null => {
