@@ -106,6 +106,7 @@ export default function Settings({
                 value={darkMode}
                 onToggle={onDarkModeChange}
                 testId="toggle-theme"
+                isThemeToggle={true}
               />
               <SettingItem
                 label="Translation"
