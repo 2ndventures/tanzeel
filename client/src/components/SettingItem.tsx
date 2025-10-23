@@ -59,7 +59,7 @@ export default function SettingItem({
       {type === "select" && options && (
         <Select value={value as string} onValueChange={onSelect}>
           <SelectTrigger className="w-32" data-testid={testId}>
-            <span>Choose</span>
+            <SelectValue placeholder="Choose" />
           </SelectTrigger>
           <SelectContent>
             {options.map((option) => (
