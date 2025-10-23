@@ -47,6 +47,7 @@ export function useWordTimingAudio(
   const speedRef = useRef(initialSpeed);
   const autoplayRef = useRef(autoplay);
   const timingDataRef = useRef<AudioFile | null>(null);
+  const lastInitialSpeed = useRef(initialSpeed); // Track the last initialSpeed value from Settings
 
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
@@ -76,17 +77,21 @@ export function useWordTimingAudio(
     autoplayRef.current = autoplay;
   }, [autoplay]);
 
-  // Update speed when initialSpeed prop changes
+  // Update speed when Settings speed changes, but preserve manual speed changes during chapter navigation
   useEffect(() => {
-    // Update ref first (before loadAudio potentially runs)
-    speedRef.current = initialSpeed;
-    
-    // Then update the audio element if it exists
-    if (audioRef.current) {
-      audioRef.current.playbackRate = initialSpeed;
+    // Only apply initialSpeed if it has actually changed (Settings update)
+    // If initialSpeed is the same, keep the current speedRef (which may have been manually changed)
+    if (lastInitialSpeed.current !== initialSpeed) {
+      lastInitialSpeed.current = initialSpeed;
+      speedRef.current = initialSpeed;
+      
+      // Update the audio element if it exists
+      if (audioRef.current) {
+        audioRef.current.playbackRate = initialSpeed;
+      }
+      setState(prev => ({ ...prev, speed: initialSpeed }));
+      console.log(`⚡ Settings speed changed to: ${initialSpeed}x`);
     }
-    setState(prev => ({ ...prev, speed: initialSpeed }));
-    console.log(`⚡ Speed updated to: ${initialSpeed}x`);
   }, [initialSpeed]);
 
   // Find current verse and word based on playback time
