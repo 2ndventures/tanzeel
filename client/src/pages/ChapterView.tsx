@@ -1,22 +1,13 @@
-import { useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, MoreVertical, Check, Sun, Moon } from "lucide-react";
+import { useEffect, useRef, useCallback, useState } from "react";
+import { ArrowLeft, MoreVertical, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -81,6 +72,10 @@ export default function ChapterView({
 }: ChapterViewProps) {
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
+  
+  // State for managing menu navigation
+  const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing'>('main');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Map our reciter IDs to Quran.com reciter IDs
   // https://api.qurancdn.com/api/qdc/audio/reciters
@@ -215,193 +210,246 @@ export default function ChapterView({
               </p>
             )}
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
+            <SheetTrigger asChild>
               <button 
                 className="p-2 hover-elevate active-elevate-2 rounded-md" 
                 data-testid="button-menu"
               >
                 <MoreVertical className="w-6 h-6 text-foreground" />
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="text-base">Options</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger data-testid="menu-item-display" className="text-base">
-                  <span>Display</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuLabel className="text-base">Display Options</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    className="flex items-center justify-between cursor-pointer text-base"
-                    onSelect={(e) => e.preventDefault()}
-                    onClick={() => onShowVerseNumbersChange?.(!showVerseNumbers)}
-                    data-testid="menu-item-verse-numbers"
-                  >
-                    <span>Verse numbers</span>
-                    <Switch 
-                      checked={showVerseNumbers} 
-                      onCheckedChange={onShowVerseNumbersChange}
-                      onClick={(e) => e.stopPropagation()}
-                      data-testid="switch-verse-numbers"
-                    />
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-base">
-                      <span>Arabic text</span>
-                      <span className="ml-auto text-sm text-muted-foreground">{arabicFontSize}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {["Small", "Medium", "Large", "Extra Large"].map((size) => (
-                        <DropdownMenuItem
-                          key={size}
-                          onClick={() => onArabicFontSizeChange?.(size)}
-                          className="flex items-center justify-between cursor-pointer text-base"
-                        >
-                          <span>{size}</span>
-                          {arabicFontSize === size && <Check className="w-4 h-4 ml-2 text-primary" />}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-base">
-                      <span>Translation text</span>
-                      <span className="ml-auto text-sm text-muted-foreground">{translationFontSize}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {["Small", "Medium", "Large"].map((size) => (
-                        <DropdownMenuItem
-                          key={size}
-                          onClick={() => onTranslationFontSizeChange?.(size)}
-                          className="flex items-center justify-between cursor-pointer text-base"
-                        >
-                          <span>{size}</span>
-                          {translationFontSize === size && <Check className="w-4 h-4 ml-2 text-primary" />}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-base">
-                      <span>Transliteration text</span>
-                      <span className="ml-auto text-sm text-muted-foreground">{transliterationFontSize}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {["Small", "Medium", "Large"].map((size) => (
-                        <DropdownMenuItem
-                          key={size}
-                          onClick={() => onTransliterationFontSizeChange?.(size)}
-                          className="flex items-center justify-between cursor-pointer text-base"
-                        >
-                          <span>{size}</span>
-                          {transliterationFontSize === size && <Check className="w-4 h-4 ml-2 text-primary" />}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger className="text-base">
-                      <span>Line spacing</span>
-                      <span className="ml-auto text-sm text-muted-foreground">{lineSpacing}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
-                        <DropdownMenuItem
-                          key={spacing}
-                          onClick={() => onLineSpacingChange?.(spacing)}
-                          className="flex items-center justify-between cursor-pointer text-base"
-                        >
-                          <span>{spacing}</span>
-                          {lineSpacing === spacing && <Check className="w-4 h-4 ml-2 text-primary" />}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger data-testid="menu-item-reciter" className="text-base">
-                  <span>Reciter</span>
-                  <span className="ml-auto text-sm text-muted-foreground">
-                    {getReciterById(reciter)?.name || 'Mishary Alafasy'}
-                  </span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
-                  <DropdownMenuLabel className="text-base">Select Reciter</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {getFeaturedReciters().map((r) => (
-                    <DropdownMenuItem
-                      key={r.id}
-                      onClick={() => onReciterChange(r.id)}
-                      className="flex items-center justify-between cursor-pointer"
-                      data-testid={`reciter-option-${r.id}`}
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-[85vh]">
+              <SheetHeader className="mb-4">
+                {menuView !== 'main' && (
+                  <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={() => setMenuView('main')}>
+                    <ChevronLeft className="w-6 h-6" />
+                  </Button>
+                )}
+                <SheetTitle className="text-xl">
+                  {menuView === 'main' && 'Options'}
+                  {menuView === 'display' && 'Display Options'}
+                  {menuView === 'reciter' && 'Select Reciter'}
+                  {menuView === 'arabic' && 'Arabic Text Size'}
+                  {menuView === 'translation' && 'Translation Text Size'}
+                  {menuView === 'transliteration' && 'Transliteration Text Size'}
+                  {menuView === 'spacing' && 'Line Spacing'}
+                </SheetTitle>
+              </SheetHeader>
+
+              <div className="overflow-y-auto h-[calc(85vh-80px)]">
+                {menuView === 'main' && (
+                  <div className="space-y-1">
+                    <button
+                      onClick={() => setMenuView('display')}
+                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md text-lg"
+                      data-testid="menu-item-display"
                     >
-                      <div className="flex flex-col">
-                        <span className="text-base">{r.name}</span>
-                        <span className="text-sm text-muted-foreground">{r.arabicName}</span>
+                      <span>Display</span>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                    </button>
+                    
+                    <button
+                      onClick={() => setMenuView('reciter')}
+                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                      data-testid="menu-item-reciter"
+                    >
+                      <span className="text-lg">Reciter</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                       </div>
-                      {reciter === r.id && <Check className="w-4 h-4 ml-2 text-primary" />}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer text-base"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onDarkModeChange?.(!darkMode)}
-                data-testid="menu-item-theme"
-              >
-                <span>Theme</span>
-                <div className="relative">
-                  <Switch 
-                    checked={darkMode} 
-                    onCheckedChange={onDarkModeChange}
-                    onClick={(e) => e.stopPropagation()}
-                    data-testid="switch-theme"
-                    className="relative"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-                    <Sun className="w-3.5 h-3.5 text-yellow-500" />
-                    <Moon className="w-3.5 h-3.5 text-blue-400" />
+                    </button>
+
+                    <div className="flex items-center justify-between p-4" data-testid="menu-item-theme">
+                      <span className="text-lg">Theme</span>
+                      <div className="relative">
+                        <Switch 
+                          checked={darkMode} 
+                          onCheckedChange={onDarkModeChange}
+                          data-testid="switch-theme"
+                          className="relative"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
+                          <Sun className="w-3.5 h-3.5 text-yellow-500" />
+                          <Moon className="w-3.5 h-3.5 text-blue-400" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4" data-testid="menu-item-transliteration">
+                      <span className="text-lg">Transliteration</span>
+                      <Switch 
+                        checked={showTransliteration} 
+                        onCheckedChange={onTransliterationChange}
+                        data-testid="switch-transliteration"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between p-4" data-testid="menu-item-translation">
+                      <span className="text-lg">Translation</span>
+                      <Switch 
+                        checked={showTranslation} 
+                        onCheckedChange={onShowTranslationChange}
+                        data-testid="switch-translation"
+                      />
+                    </div>
                   </div>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer text-base"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onTransliterationChange?.(!showTransliteration)}
-                data-testid="menu-item-transliteration"
-              >
-                <span>Transliteration</span>
-                <Switch 
-                  checked={showTransliteration} 
-                  onCheckedChange={onTransliterationChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-transliteration"
-                />
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer text-base"
-                onSelect={(e) => e.preventDefault()}
-                onClick={() => onShowTranslationChange?.(!showTranslation)}
-                data-testid="menu-item-translation"
-              >
-                <span>Translation</span>
-                <Switch 
-                  checked={showTranslation} 
-                  onCheckedChange={onShowTranslationChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-translation"
-                />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                )}
+
+                {menuView === 'display' && (
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between p-4" data-testid="menu-item-verse-numbers">
+                      <span className="text-lg">Verse numbers</span>
+                      <Switch 
+                        checked={showVerseNumbers} 
+                        onCheckedChange={onShowVerseNumbersChange}
+                        data-testid="switch-verse-numbers"
+                      />
+                    </div>
+
+                    <button
+                      onClick={() => setMenuView('arabic')}
+                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                    >
+                      <span className="text-lg">Arabic text</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{arabicFontSize}</span>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setMenuView('translation')}
+                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                    >
+                      <span className="text-lg">Translation text</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{translationFontSize}</span>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setMenuView('transliteration')}
+                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                    >
+                      <span className="text-lg">Transliteration text</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{transliterationFontSize}</span>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => setMenuView('spacing')}
+                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                    >
+                      <span className="text-lg">Line spacing</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{lineSpacing}</span>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </button>
+                  </div>
+                )}
+
+                {menuView === 'reciter' && (
+                  <div className="space-y-1">
+                    {getFeaturedReciters().map((r) => (
+                      <button
+                        key={r.id}
+                        onClick={() => {
+                          onReciterChange(r.id);
+                          setMenuView('main');
+                        }}
+                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                        data-testid={`reciter-option-${r.id}`}
+                      >
+                        <div className="flex flex-col items-start">
+                          <span className="text-lg">{r.name}</span>
+                          <span className="text-sm text-muted-foreground">{r.arabicName}</span>
+                        </div>
+                        {reciter === r.id && <Check className="w-5 h-5 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {menuView === 'arabic' && (
+                  <div className="space-y-1">
+                    {["Small", "Medium", "Large", "Extra Large"].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => {
+                          onArabicFontSizeChange?.(size);
+                          setMenuView('display');
+                        }}
+                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                      >
+                        <span className="text-lg">{size}</span>
+                        {arabicFontSize === size && <Check className="w-5 h-5 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {menuView === 'translation' && (
+                  <div className="space-y-1">
+                    {["Small", "Medium", "Large"].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => {
+                          onTranslationFontSizeChange?.(size);
+                          setMenuView('display');
+                        }}
+                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                      >
+                        <span className="text-lg">{size}</span>
+                        {translationFontSize === size && <Check className="w-5 h-5 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {menuView === 'transliteration' && (
+                  <div className="space-y-1">
+                    {["Small", "Medium", "Large"].map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => {
+                          onTransliterationFontSizeChange?.(size);
+                          setMenuView('display');
+                        }}
+                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                      >
+                        <span className="text-lg">{size}</span>
+                        {transliterationFontSize === size && <Check className="w-5 h-5 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {menuView === 'spacing' && (
+                  <div className="space-y-1">
+                    {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
+                      <button
+                        key={spacing}
+                        onClick={() => {
+                          onLineSpacingChange?.(spacing);
+                          setMenuView('display');
+                        }}
+                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                      >
+                        <span className="text-lg">{spacing}</span>
+                        {lineSpacing === spacing && <Check className="w-5 h-5 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
