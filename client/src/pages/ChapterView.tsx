@@ -188,6 +188,9 @@ export default function ChapterView({
             <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
           <div className="flex flex-col items-center flex-1 mx-2">
+            <p className="text-sm text-muted-foreground mb-1" data-testid="text-surah-number">
+              Surah {chapterId}
+            </p>
             <div className="flex items-center gap-3">
               <h1 className="text-lg font-semibold text-foreground" data-testid="text-chapter-title-english">
                 {chapterInfo?.englishName || 'Al-Fatihah'}
