@@ -124,18 +124,18 @@ export function useWordTimingAudio(
     autoplayRef.current = autoplay;
   }, [autoplay]);
 
-  // Load saved global speed when chapterId changes
-  useEffect(() => {
+  // Sync speedRef with saved global speed before loadAudio runs
+  // This ensures the audio element gets the correct speed when created
+  const syncSpeed = useCallback(() => {
     const savedSpeed = getGlobalSpeed();
     const newSpeed = savedSpeed ?? initialSpeed;
     
     speedRef.current = newSpeed;
-    if (audioRef.current) {
-      audioRef.current.playbackRate = newSpeed;
-    }
     setState(prev => ({ ...prev, speed: newSpeed }));
     console.log(`⚡ Speed: ${newSpeed}x ${savedSpeed ? '(saved)' : '(default)'}`);
-  }, [chapterId, initialSpeed]);
+    
+    return newSpeed;
+  }, [initialSpeed]);
 
   // Find current verse and word based on playback time
   const findCurrentSegment = useCallback((currentTime: number) => {
@@ -183,6 +183,9 @@ export function useWordTimingAudio(
   const loadAudio = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+      // Sync speed before creating audio element
+      syncSpeed();
 
       // Fetch timing data from our backend proxy
       console.log(`📡 Fetching timing data for chapter ${chapterId}, reciter ${reciterId}`);
@@ -331,7 +334,7 @@ export function useWordTimingAudio(
         error: 'Failed to load audio',
       }));
     }
-  }, [chapterId, reciterId, findCurrentSegment]);
+  }, [chapterId, reciterId, findCurrentSegment, syncSpeed]);
 
   // Initialize audio on mount
   useEffect(() => {
