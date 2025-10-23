@@ -214,18 +214,18 @@ export default function ChapterView({
                 <MoreVertical className="w-6 h-6 text-foreground" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Options</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel className="text-base">Options</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
-                <DropdownMenuSubTrigger data-testid="menu-item-reciter">
+                <DropdownMenuSubTrigger data-testid="menu-item-reciter" className="text-base">
                   <span>Reciter</span>
-                  <span className="ml-auto text-xs text-muted-foreground">
+                  <span className="ml-auto text-sm text-muted-foreground">
                     {getReciterById(reciter)?.name || 'Mishary Alafasy'}
                   </span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
-                  <DropdownMenuLabel>Select Reciter</DropdownMenuLabel>
+                  <DropdownMenuLabel className="text-base">Select Reciter</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {getFeaturedReciters().map((r) => (
                     <DropdownMenuItem
@@ -235,8 +235,8 @@ export default function ChapterView({
                       data-testid={`reciter-option-${r.id}`}
                     >
                       <div className="flex flex-col">
-                        <span className="text-sm">{r.name}</span>
-                        <span className="text-xs text-muted-foreground">{r.arabicName}</span>
+                        <span className="text-base">{r.name}</span>
+                        <span className="text-sm text-muted-foreground">{r.arabicName}</span>
                       </div>
                       {reciter === r.id && <Check className="w-4 h-4 ml-2 text-primary" />}
                     </DropdownMenuItem>
@@ -245,7 +245,7 @@ export default function ChapterView({
               </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
+                className="flex items-center justify-between cursor-pointer text-base"
                 onSelect={(e) => e.preventDefault()}
                 onClick={() => onDarkModeChange?.(!darkMode)}
                 data-testid="menu-item-theme"
@@ -266,7 +266,7 @@ export default function ChapterView({
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
+                className="flex items-center justify-between cursor-pointer text-base"
                 onSelect={(e) => e.preventDefault()}
                 onClick={() => onTransliterationChange?.(!showTransliteration)}
                 data-testid="menu-item-transliteration"
@@ -280,7 +280,7 @@ export default function ChapterView({
                 />
               </DropdownMenuItem>
               <DropdownMenuItem 
-                className="flex items-center justify-between cursor-pointer"
+                className="flex items-center justify-between cursor-pointer text-base"
                 onSelect={(e) => e.preventDefault()}
                 onClick={() => onShowTranslationChange?.(!showTranslation)}
                 data-testid="menu-item-translation"
