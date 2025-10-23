@@ -248,6 +248,11 @@ export function useWordTimingAudio(
 
       const handleCanPlay = () => {
         console.log(`✓ Chapter ${chapterId} loaded and ready`);
+        
+        // Set playback rate after audio is ready (some browsers reset it during load())
+        audio.playbackRate = speedRef.current;
+        console.log(`🎵 Applied playback rate: ${speedRef.current}x`);
+        
         setState(prev => ({ ...prev, isLoading: false }));
         
         // Auto-start playback if autoplay is enabled
