@@ -1,4 +1,4 @@
-import { Play, Pause, SkipBack, SkipForward, Repeat } from "lucide-react";
+import { CirclePlay, CirclePause, CircleChevronLeft, CircleChevronRight, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
@@ -48,22 +48,24 @@ export default function AudioPlayer({
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-10" data-testid="audio-player-wrapper">
-      <div className="bg-card border-t border-border px-4 py-4 space-y-4" data-testid="audio-player-content">
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground w-12" data-testid="text-current-time">
-            {formatTime(currentTime)}
-          </span>
+      <div className="bg-card border-t border-border px-4 py-6 space-y-5" data-testid="audio-player-content">
+        <div className="space-y-2">
           <Slider
             value={[currentTime]}
             max={duration}
             step={1}
             onValueChange={(value) => onSeek?.(value[0])}
-            className="flex-1"
+            className="w-full"
             data-testid="slider-audio-progress"
           />
-          <span className="text-sm text-muted-foreground w-12 text-right" data-testid="text-duration">
-            {formatTime(duration)}
-          </span>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground" data-testid="text-current-time">
+              {formatTime(currentTime)}
+            </span>
+            <span className="text-sm text-muted-foreground" data-testid="text-duration">
+              {formatTime(duration)}
+            </span>
+          </div>
         </div>
         
         <div className="grid grid-cols-3 items-center">
@@ -86,26 +88,26 @@ export default function AudioPlayer({
               variant="ghost"
               size="icon"
               onClick={onPrevious}
-              className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
+              className="w-11 h-11 flex-shrink-0 aspect-square"
               data-testid="button-previous"
             >
-              <SkipBack className="w-6 h-6" />
+              <CircleChevronLeft className="w-8 h-8" />
             </Button>
             
             <Button
               variant="default"
               size="icon"
-              className="w-16 h-16 rounded-full flex-shrink-0 aspect-square"
+              className="w-16 h-16 flex-shrink-0 aspect-square"
               onClick={onPlayPause}
               disabled={isLoading}
               data-testid="button-play-pause"
             >
               {isLoading ? (
-                <div className="w-7 h-7 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                <div className="w-9 h-9 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-7 h-7" />
+                <CirclePause className="w-9 h-9" />
               ) : (
-                <Play className="w-7 h-7 ml-0.5" />
+                <CirclePlay className="w-9 h-9" />
               )}
             </Button>
             
@@ -113,10 +115,10 @@ export default function AudioPlayer({
               variant="ghost"
               size="icon"
               onClick={onNext}
-              className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
+              className="w-11 h-11 flex-shrink-0 aspect-square"
               data-testid="button-next"
             >
-              <SkipForward className="w-6 h-6" />
+              <CircleChevronRight className="w-8 h-8" />
             </Button>
           </div>
           
