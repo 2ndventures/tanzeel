@@ -5,7 +5,7 @@ This mobile-first Quran Reading application enables users to read, listen to, an
 # Recent Changes
 
 **October 23, 2025:**
-- Implemented per-chapter speed persistence: each surah independently remembers its own playback speed setting in localStorage
+- Implemented global speed persistence: playback speed now carries over across all chapters (setting 2x on Surah 1 keeps 2x for Surah 2, etc.)
 
 **October 22, 2025:**
 - Fixed word highlighting off-by-one error by converting Quran.com API's 1-based word indices to 0-based array indices
@@ -86,13 +86,14 @@ The system loads a single audio file per chapter with word-level timing data fro
 - `setSpeed(speed)`: Change playback speed (0.5x to 2.0x)
 - `getTimingData()`: Access verse timings and word segments
 
-**Per-Chapter Speed Persistence**:
-- Each chapter independently remembers its own playback speed setting
-- Speed preferences are stored in localStorage under key `quran-chapter-speeds` as a JSON object mapping chapter IDs to speed values
-- When navigating to a chapter, the hook loads its saved speed (or falls back to Settings default if none exists)
-- When user changes speed via AudioPlayer controls, the new speed is saved for that specific chapter
-- Example: Setting Chapter 1 to 1.5x and Chapter 2 to 0.75x - each will maintain its speed when you return to it
-- Settings speed serves as the default for chapters that haven't been customized yet
+**Global Speed Persistence**:
+- Playback speed carries over across all chapters globally
+- Speed preference is stored in localStorage under key `quran-playback-speed` as a single numeric value
+- When user changes speed via AudioPlayer controls, the new speed is saved globally
+- When navigating to any chapter, the hook loads the saved global speed (or falls back to Settings default if none exists)
+- Example: Setting speed to 2x on Chapter 1 maintains 2x when navigating to Chapter 2, Chapter 3, etc.
+- The speed persists across sessions until manually changed again
+- One-time migration automatically cleans up old per-chapter speed data from localStorage
 
 ### Reciter System
 
