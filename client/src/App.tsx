@@ -218,6 +218,11 @@ function App() {
               transliterationFontSize={transliterationFontSize}
               lineSpacing={lineSpacing}
               showVerseNumbers={showVerseNumbers}
+              onArabicFontSizeChange={setArabicFontSize}
+              onTranslationFontSizeChange={setTranslationFontSize}
+              onTransliterationFontSizeChange={setTransliterationFontSize}
+              onLineSpacingChange={setLineSpacing}
+              onShowVerseNumbersChange={setShowVerseNumbers}
             />
           )}
           {currentPage === "settings" && (

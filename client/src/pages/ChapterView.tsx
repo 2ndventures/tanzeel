@@ -42,6 +42,11 @@ interface ChapterViewProps {
   transliterationFontSize: string;
   lineSpacing: string;
   showVerseNumbers: boolean;
+  onArabicFontSizeChange?: (size: string) => void;
+  onTranslationFontSizeChange?: (size: string) => void;
+  onTransliterationFontSizeChange?: (size: string) => void;
+  onLineSpacingChange?: (spacing: string) => void;
+  onShowVerseNumbersChange?: (enabled: boolean) => void;
 }
 
 export default function ChapterView({ 
@@ -67,7 +72,12 @@ export default function ChapterView({
   translationFontSize,
   transliterationFontSize,
   lineSpacing,
-  showVerseNumbers
+  showVerseNumbers,
+  onArabicFontSizeChange,
+  onTranslationFontSizeChange,
+  onTransliterationFontSizeChange,
+  onLineSpacingChange,
+  onShowVerseNumbersChange
 }: ChapterViewProps) {
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
@@ -216,6 +226,103 @@ export default function ChapterView({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="text-base">Options</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger data-testid="menu-item-display" className="text-base">
+                  <span>Display</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuLabel className="text-base">Display Options</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="flex items-center justify-between cursor-pointer text-base"
+                    onSelect={(e) => e.preventDefault()}
+                    onClick={() => onShowVerseNumbersChange?.(!showVerseNumbers)}
+                    data-testid="menu-item-verse-numbers"
+                  >
+                    <span>Verse numbers</span>
+                    <Switch 
+                      checked={showVerseNumbers} 
+                      onCheckedChange={onShowVerseNumbersChange}
+                      onClick={(e) => e.stopPropagation()}
+                      data-testid="switch-verse-numbers"
+                    />
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="text-base">
+                      <span>Arabic text</span>
+                      <span className="ml-auto text-sm text-muted-foreground">{arabicFontSize}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {["Small", "Medium", "Large", "Extra Large"].map((size) => (
+                        <DropdownMenuItem
+                          key={size}
+                          onClick={() => onArabicFontSizeChange?.(size)}
+                          className="flex items-center justify-between cursor-pointer text-base"
+                        >
+                          <span>{size}</span>
+                          {arabicFontSize === size && <Check className="w-4 h-4 ml-2 text-primary" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="text-base">
+                      <span>Translation text</span>
+                      <span className="ml-auto text-sm text-muted-foreground">{translationFontSize}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {["Small", "Medium", "Large"].map((size) => (
+                        <DropdownMenuItem
+                          key={size}
+                          onClick={() => onTranslationFontSizeChange?.(size)}
+                          className="flex items-center justify-between cursor-pointer text-base"
+                        >
+                          <span>{size}</span>
+                          {translationFontSize === size && <Check className="w-4 h-4 ml-2 text-primary" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="text-base">
+                      <span>Transliteration text</span>
+                      <span className="ml-auto text-sm text-muted-foreground">{transliterationFontSize}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {["Small", "Medium", "Large"].map((size) => (
+                        <DropdownMenuItem
+                          key={size}
+                          onClick={() => onTransliterationFontSizeChange?.(size)}
+                          className="flex items-center justify-between cursor-pointer text-base"
+                        >
+                          <span>{size}</span>
+                          {transliterationFontSize === size && <Check className="w-4 h-4 ml-2 text-primary" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="text-base">
+                      <span>Line spacing</span>
+                      <span className="ml-auto text-sm text-muted-foreground">{lineSpacing}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
+                        <DropdownMenuItem
+                          key={spacing}
+                          onClick={() => onLineSpacingChange?.(spacing)}
+                          className="flex items-center justify-between cursor-pointer text-base"
+                        >
+                          <span>{spacing}</span>
+                          {lineSpacing === spacing && <Check className="w-4 h-4 ml-2 text-primary" />}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger data-testid="menu-item-reciter" className="text-base">
