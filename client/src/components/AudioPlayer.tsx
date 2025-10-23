@@ -67,72 +67,72 @@ export default function AudioPlayer({
         </div>
         
         <div className="grid grid-cols-3 items-center">
-        <div className="flex justify-start">
-          <Button
-            variant="ghost"
-            size="default"
-            className="text-base font-medium min-w-16 h-11"
-            onClick={cycleSpeed}
-            aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
-            title="Click to cycle playback speed"
-            data-testid="button-speed"
-          >
-            {speed.toFixed(2)}x
-          </Button>
-        </div>
-        
-        <div className="flex items-center justify-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onPrevious}
-            className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
-            data-testid="button-previous"
-          >
-            <SkipBack className="w-6 h-6" />
-          </Button>
+          <div className="flex justify-start">
+            <Button
+              variant="ghost"
+              size="default"
+              className="text-base font-medium min-w-16 h-11"
+              onClick={cycleSpeed}
+              aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
+              title="Click to cycle playback speed"
+              data-testid="button-speed"
+            >
+              {speed.toFixed(2)}x
+            </Button>
+          </div>
           
-          <Button
-            variant="default"
-            size="icon"
-            className="w-16 h-16 rounded-full flex-shrink-0 aspect-square"
-            onClick={onPlayPause}
-            disabled={isLoading}
-            data-testid="button-play-pause"
-          >
-            {isLoading ? (
-              <div className="w-7 h-7 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-            ) : isPlaying ? (
-              <Pause className="w-7 h-7" />
-            ) : (
-              <Play className="w-7 h-7 ml-0.5" />
-            )}
-          </Button>
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onPrevious}
+              className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
+              data-testid="button-previous"
+            >
+              <SkipBack className="w-6 h-6" />
+            </Button>
+            
+            <Button
+              variant="default"
+              size="icon"
+              className="w-16 h-16 rounded-full flex-shrink-0 aspect-square"
+              onClick={onPlayPause}
+              disabled={isLoading}
+              data-testid="button-play-pause"
+            >
+              {isLoading ? (
+                <div className="w-7 h-7 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+              ) : isPlaying ? (
+                <Pause className="w-7 h-7" />
+              ) : (
+                <Play className="w-7 h-7 ml-0.5" />
+              )}
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onNext}
+              className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
+              data-testid="button-next"
+            >
+              <SkipForward className="w-6 h-6" />
+            </Button>
+          </div>
           
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNext}
-            className="rounded-full w-11 h-11 flex-shrink-0 aspect-square"
-            data-testid="button-next"
-          >
-            <SkipForward className="w-6 h-6" />
-          </Button>
-        </div>
-        
-        <div className="flex justify-end">
-          <Button
-            variant="ghost"
-            size="icon"
-            className={`w-11 h-11 flex-shrink-0 aspect-square ${repeat ? 'text-primary' : ''}`}
-            onClick={() => onRepeatChange?.(!repeat)}
-            data-testid="button-repeat"
-          >
-            <Repeat className="w-6 h-6" />
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`w-11 h-11 flex-shrink-0 aspect-square ${repeat ? 'text-primary' : ''}`}
+              onClick={() => onRepeatChange?.(!repeat)}
+              data-testid="button-repeat"
+            >
+              <Repeat className="w-6 h-6" />
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

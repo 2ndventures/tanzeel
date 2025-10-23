@@ -22,9 +22,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
     <div className="min-h-screen bg-background pb-20">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between p-4">
-          <button className="p-2 hover-elevate active-elevate-2 rounded-md" data-testid="button-menu">
-            <Menu className="w-6 h-6 text-foreground" />
-          </button>
+          <div className="w-10"></div>
           <h1 className="text-xl font-semibold text-foreground" data-testid="text-title">Surah/Juz</h1>
           <button 
             className="p-2 hover-elevate active-elevate-2 rounded-md" 
