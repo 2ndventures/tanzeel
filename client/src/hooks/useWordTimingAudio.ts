@@ -1,5 +1,32 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
+// Helper functions for per-chapter speed persistence
+const CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
+
+function getChapterSpeed(chapterId: number): number | null {
+  try {
+    const saved = localStorage.getItem(CHAPTER_SPEEDS_KEY);
+    if (saved) {
+      const speeds = JSON.parse(saved) as Record<string, number>;
+      return speeds[chapterId.toString()] ?? null;
+    }
+  } catch (error) {
+    console.error('Failed to load chapter speed:', error);
+  }
+  return null;
+}
+
+function setChapterSpeed(chapterId: number, speed: number): void {
+  try {
+    const saved = localStorage.getItem(CHAPTER_SPEEDS_KEY);
+    const speeds = saved ? JSON.parse(saved) : {};
+    speeds[chapterId.toString()] = speed;
+    localStorage.setItem(CHAPTER_SPEEDS_KEY, JSON.stringify(speeds));
+  } catch (error) {
+    console.error('Failed to save chapter speed:', error);
+  }
+}
+
 export interface WordSegment {
   timestamp_from: number;
   timestamp_to: number;
@@ -40,18 +67,21 @@ export function useWordTimingAudio(
   initialSpeed: number = 1.0,
   autoplay: boolean = false
 ) {
+  // Load saved speed for this chapter, or use Settings default
+  const savedSpeed = getChapterSpeed(chapterId);
+  const effectiveSpeed = savedSpeed ?? initialSpeed;
+  
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
-  const speedRef = useRef(initialSpeed);
+  const speedRef = useRef(effectiveSpeed);
   const autoplayRef = useRef(autoplay);
   const timingDataRef = useRef<AudioFile | null>(null);
-  const lastInitialSpeed = useRef(initialSpeed); // Track the last initialSpeed value from Settings
 
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
-    speed: initialSpeed,
+    speed: effectiveSpeed,
     isLoading: true,
     error: null,
     currentTime: 0,
@@ -77,22 +107,18 @@ export function useWordTimingAudio(
     autoplayRef.current = autoplay;
   }, [autoplay]);
 
-  // Update speed when Settings speed changes, but preserve manual speed changes during chapter navigation
+  // Load saved speed for this chapter when chapterId changes
   useEffect(() => {
-    // Only apply initialSpeed if it has actually changed (Settings update)
-    // If initialSpeed is the same, keep the current speedRef (which may have been manually changed)
-    if (lastInitialSpeed.current !== initialSpeed) {
-      lastInitialSpeed.current = initialSpeed;
-      speedRef.current = initialSpeed;
-      
-      // Update the audio element if it exists
-      if (audioRef.current) {
-        audioRef.current.playbackRate = initialSpeed;
-      }
-      setState(prev => ({ ...prev, speed: initialSpeed }));
-      console.log(`⚡ Settings speed changed to: ${initialSpeed}x`);
+    const savedSpeed = getChapterSpeed(chapterId);
+    const newSpeed = savedSpeed ?? initialSpeed;
+    
+    speedRef.current = newSpeed;
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed;
     }
-  }, [initialSpeed]);
+    setState(prev => ({ ...prev, speed: newSpeed }));
+    console.log(`⚡ Chapter ${chapterId} speed: ${newSpeed}x ${savedSpeed ? '(saved)' : '(default)'}`);
+  }, [chapterId, initialSpeed]);
 
   // Find current verse and word based on playback time
   const findCurrentSegment = useCallback((currentTime: number) => {
@@ -338,15 +364,16 @@ export function useWordTimingAudio(
     }
   }, []);
 
-  // Set playback speed
+  // Set playback speed and save to localStorage for this chapter
   const setSpeed = useCallback((newSpeed: number) => {
     speedRef.current = newSpeed;
     if (audioRef.current) {
       audioRef.current.playbackRate = newSpeed;
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
-    console.log(`⚡ Speed: ${newSpeed}x`);
-  }, []);
+    setChapterSpeed(chapterId, newSpeed); // Save to localStorage
+    console.log(`⚡ Speed for chapter ${chapterId}: ${newSpeed}x`);
+  }, [chapterId]);
 
   // Get timing data (returns the audio file with verse timings)
   const getTimingData = useCallback((): AudioFile | null => {
