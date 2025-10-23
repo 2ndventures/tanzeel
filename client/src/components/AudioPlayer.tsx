@@ -88,26 +88,26 @@ export default function AudioPlayer({
               variant="ghost"
               size="icon"
               onClick={onPrevious}
-              className="w-11 h-11 flex-shrink-0 aspect-square"
+              className="w-14 h-14 flex-shrink-0 aspect-square"
               data-testid="button-previous"
             >
-              <SkipBack className="w-9 h-9 fill-current" />
+              <SkipBack className="w-11 h-11 fill-current" />
             </Button>
             
             <Button
               variant="default"
               size="icon"
-              className="w-16 h-16 flex-shrink-0 aspect-square"
+              className="w-16 h-16 rounded-full flex-shrink-0 aspect-square"
               onClick={onPlayPause}
               disabled={isLoading}
               data-testid="button-play-pause"
             >
               {isLoading ? (
-                <div className="w-10 h-10 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-10 h-10 fill-current" />
+                <Pause className="w-12 h-12 fill-current" />
               ) : (
-                <Play className="w-10 h-10 fill-current" />
+                <Play className="w-12 h-12 fill-current" />
               )}
             </Button>
             
@@ -115,10 +115,10 @@ export default function AudioPlayer({
               variant="ghost"
               size="icon"
               onClick={onNext}
-              className="w-11 h-11 flex-shrink-0 aspect-square"
+              className="w-14 h-14 flex-shrink-0 aspect-square"
               data-testid="button-next"
             >
-              <SkipForward className="w-9 h-9 fill-current" />
+              <SkipForward className="w-11 h-11 fill-current" />
             </Button>
           </div>
           
