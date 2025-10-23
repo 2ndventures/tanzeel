@@ -78,14 +78,15 @@ export function useWordTimingAudio(
 
   // Update speed when initialSpeed prop changes
   useEffect(() => {
-    if (speedRef.current !== initialSpeed) {
-      speedRef.current = initialSpeed;
-      if (audioRef.current) {
-        audioRef.current.playbackRate = initialSpeed;
-      }
-      setState(prev => ({ ...prev, speed: initialSpeed }));
-      console.log(`⚡ Speed updated to: ${initialSpeed}x`);
+    // Update ref first (before loadAudio potentially runs)
+    speedRef.current = initialSpeed;
+    
+    // Then update the audio element if it exists
+    if (audioRef.current) {
+      audioRef.current.playbackRate = initialSpeed;
     }
+    setState(prev => ({ ...prev, speed: initialSpeed }));
+    console.log(`⚡ Speed updated to: ${initialSpeed}x`);
   }, [initialSpeed]);
 
   // Find current verse and word based on playback time
