@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, MoreVertical, Check } from "lucide-react";
+import { ArrowLeft, MoreVertical, Check, Sun, Moon } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
@@ -248,12 +248,19 @@ export default function ChapterView({
                 data-testid="menu-item-theme"
               >
                 <span>Theme</span>
-                <Switch 
-                  checked={darkMode} 
-                  onCheckedChange={onDarkModeChange}
-                  onClick={(e) => e.stopPropagation()}
-                  data-testid="switch-theme"
-                />
+                <div className="relative">
+                  <Switch 
+                    checked={darkMode} 
+                    onCheckedChange={onDarkModeChange}
+                    onClick={(e) => e.stopPropagation()}
+                    data-testid="switch-theme"
+                    className="relative"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
+                    <Sun className="w-3.5 h-3.5 text-yellow-500" />
+                    <Moon className="w-3.5 h-3.5 text-blue-400" />
+                  </div>
+                </div>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 className="flex items-center justify-between cursor-pointer"
