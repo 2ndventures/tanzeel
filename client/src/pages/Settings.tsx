@@ -140,7 +140,6 @@ export default function Settings({
             <div className="space-y-1 divide-y divide-border">
               <SettingItem
                 label="Arabic text"
-                sublabel={arabicFontSize}
                 type="select"
                 value={arabicFontSize}
                 options={[
@@ -154,7 +153,6 @@ export default function Settings({
               />
               <SettingItem
                 label="Translation text"
-                sublabel={translationFontSize}
                 type="select"
                 value={translationFontSize}
                 options={[
@@ -167,7 +165,6 @@ export default function Settings({
               />
               <SettingItem
                 label="Transliteration text"
-                sublabel={transliterationFontSize}
                 type="select"
                 value={transliterationFontSize}
                 options={[
@@ -180,7 +177,6 @@ export default function Settings({
               />
               <SettingItem
                 label="Line spacing"
-                sublabel={lineSpacing}
                 type="select"
                 value={lineSpacing}
                 options={[
@@ -200,7 +196,6 @@ export default function Settings({
             <div className="space-y-1 divide-y divide-border">
               <SettingItem
                 label="Reciter"
-                sublabel={getReciterDisplayName(reciter)}
                 type="select"
                 value={reciter}
                 options={reciterOptions}
@@ -209,7 +204,6 @@ export default function Settings({
               />
               <SettingItem
                 label="Speed"
-                sublabel={speed}
                 type="select"
                 value={speed}
                 options={[
