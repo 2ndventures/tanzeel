@@ -91,7 +91,7 @@ export default function AudioPlayer({
               className="w-11 h-11 flex-shrink-0 aspect-square"
               data-testid="button-previous"
             >
-              <SkipBack className="w-7 h-7 fill-current" />
+              <SkipBack className="w-9 h-9 fill-current" />
             </Button>
             
             <Button
@@ -103,11 +103,11 @@ export default function AudioPlayer({
               data-testid="button-play-pause"
             >
               {isLoading ? (
-                <div className="w-9 h-9 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                <div className="w-10 h-10 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-8 h-8 fill-current" />
+                <Pause className="w-10 h-10 fill-current" />
               ) : (
-                <Play className="w-8 h-8 fill-current" />
+                <Play className="w-10 h-10 fill-current" />
               )}
             </Button>
             
@@ -118,7 +118,7 @@ export default function AudioPlayer({
               className="w-11 h-11 flex-shrink-0 aspect-square"
               data-testid="button-next"
             >
-              <SkipForward className="w-7 h-7 fill-current" />
+              <SkipForward className="w-9 h-9 fill-current" />
             </Button>
           </div>
           
