@@ -4,6 +4,9 @@ This mobile-first Quran Reading application enables users to read, listen to, an
 
 # Recent Changes
 
+**October 23, 2025:**
+- Implemented per-chapter speed persistence: each surah independently remembers its own playback speed setting in localStorage
+
 **October 22, 2025:**
 - Fixed word highlighting off-by-one error by converting Quran.com API's 1-based word indices to 0-based array indices
 - Removed bookmark feature from ChapterView per user request - users no longer save/restore reading positions
@@ -82,6 +85,14 @@ The system loads a single audio file per chapter with word-level timing data fro
 - `seekToVerse(verseKey)`: Jump to specific verse (e.g., "1:5")
 - `setSpeed(speed)`: Change playback speed (0.5x to 2.0x)
 - `getTimingData()`: Access verse timings and word segments
+
+**Per-Chapter Speed Persistence**:
+- Each chapter independently remembers its own playback speed setting
+- Speed preferences are stored in localStorage under key `quran-chapter-speeds` as a JSON object mapping chapter IDs to speed values
+- When navigating to a chapter, the hook loads its saved speed (or falls back to Settings default if none exists)
+- When user changes speed via AudioPlayer controls, the new speed is saved for that specific chapter
+- Example: Setting Chapter 1 to 1.5x and Chapter 2 to 0.75x - each will maintain its speed when you return to it
+- Settings speed serves as the default for chapters that haven't been customized yet
 
 ### Reciter System
 
