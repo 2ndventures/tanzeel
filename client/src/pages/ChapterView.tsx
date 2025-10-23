@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, MoreVertical, ChevronRight, Check } from "lucide-react";
+import { ArrowLeft, MoreVertical, Check } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
@@ -91,6 +91,14 @@ export default function ChapterView({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [chapterId]);
   
+  // Map speed setting to numeric value
+  const speedMap: { [key: string]: number } = {
+    'Slow': 0.75,
+    'Normal': 1.0,
+    'Fast': 1.25,
+  };
+  const numericSpeed = speedMap[initialSpeed] || 1.0;
+
   // Use word-timing audio with continuous playback
   const {
     isPlaying,
@@ -133,12 +141,11 @@ export default function ChapterView({
       }
     },
     () => {
-      // Auto-play next surah when current one ends (if autoplay is enabled and not repeating)
-      if (autoplay && !repeat) {
-        console.log('🎵 Auto-playing next surah after completion of chapter', chapterId);
-        goToNextSurah();
-      }
-    }
+      // Navigate to next surah when current one ends (will auto-play if autoplay is enabled)
+      console.log('✓ Chapter ended, navigating to next surah');
+      goToNextSurah();
+    },
+    numericSpeed
   );
   
   // Extract current verse number from verse key
@@ -151,20 +158,6 @@ export default function ChapterView({
       onNavigate('chapter', nextChapterId);
     }
   }, [chapterId, onNavigate]);
-
-  // Update speed when settings change (map string to numeric value)
-  useEffect(() => {
-    const speedMap: { [key: string]: number } = {
-      'Slow': 0.75,
-      'Normal': 1.0,
-      'Fast': 1.25,
-    };
-    const mappedSpeed = speedMap[initialSpeed];
-    if (mappedSpeed) {
-      console.log('Setting speed from settings:', mappedSpeed);
-      setSpeed(mappedSpeed);
-    }
-  }, [initialSpeed, setSpeed]);
 
   // Track if autoplay has been triggered for this chapter
   const autoplayTriggeredRef = useRef(false);
@@ -340,25 +333,6 @@ export default function ChapterView({
               />
             );
           })}
-        </div>
-
-        <div className="max-w-2xl mx-auto mt-6 pb-6 flex justify-between items-center">
-          <button 
-            className="px-4 py-2 text-sm text-primary hover-elevate active-elevate-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={goToPreviousSurah}
-            disabled={chapterId === 1}
-            data-testid="button-previous-chapter"
-          >
-            ← Previous Surah
-          </button>
-          <button 
-            className="px-4 py-2 text-sm text-primary hover-elevate active-elevate-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={goToNextSurah}
-            disabled={chapterId === 114}
-            data-testid="button-next-chapter"
-          >
-            Next Surah <ChevronRight className="w-4 h-4 inline ml-1" />
-          </button>
         </div>
       </main>
 

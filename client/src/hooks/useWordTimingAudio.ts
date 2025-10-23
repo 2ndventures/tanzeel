@@ -36,18 +36,19 @@ export function useWordTimingAudio(
   reciterId: number = 7,
   repeat: boolean = false,
   onVerseChange?: (verseKey: string) => void,
-  onEnded?: () => void
+  onEnded?: () => void,
+  initialSpeed: number = 1.0
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
-  const speedRef = useRef(1.0);
+  const speedRef = useRef(initialSpeed);
   const timingDataRef = useRef<AudioFile | null>(null);
 
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
-    speed: 1.0,
+    speed: initialSpeed,
     isLoading: true,
     error: null,
     currentTime: 0,
@@ -68,6 +69,18 @@ export function useWordTimingAudio(
   useEffect(() => {
     onEndedRef.current = onEnded;
   }, [onEnded]);
+
+  // Update speed when initialSpeed prop changes
+  useEffect(() => {
+    if (speedRef.current !== initialSpeed) {
+      speedRef.current = initialSpeed;
+      if (audioRef.current) {
+        audioRef.current.playbackRate = initialSpeed;
+      }
+      setState(prev => ({ ...prev, speed: initialSpeed }));
+      console.log(`⚡ Speed updated to: ${initialSpeed}x`);
+    }
+  }, [initialSpeed]);
 
   // Find current verse and word based on playback time
   const findCurrentSegment = useCallback((currentTime: number) => {
