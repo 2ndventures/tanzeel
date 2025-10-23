@@ -37,13 +37,15 @@ export function useWordTimingAudio(
   repeat: boolean = false,
   onVerseChange?: (verseKey: string) => void,
   onEnded?: () => void,
-  initialSpeed: number = 1.0
+  initialSpeed: number = 1.0,
+  autoplay: boolean = false
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
   const speedRef = useRef(initialSpeed);
+  const autoplayRef = useRef(autoplay);
   const timingDataRef = useRef<AudioFile | null>(null);
 
   const [state, setState] = useState<WordTimingAudioState>({
@@ -69,6 +71,10 @@ export function useWordTimingAudio(
   useEffect(() => {
     onEndedRef.current = onEnded;
   }, [onEnded]);
+
+  useEffect(() => {
+    autoplayRef.current = autoplay;
+  }, [autoplay]);
 
   // Update speed when initialSpeed prop changes
   useEffect(() => {
@@ -191,6 +197,14 @@ export function useWordTimingAudio(
       const handleCanPlay = () => {
         console.log(`✓ Chapter ${chapterId} loaded and ready`);
         setState(prev => ({ ...prev, isLoading: false }));
+        
+        // Auto-start playback if autoplay is enabled
+        if (autoplayRef.current) {
+          console.log(`🎵 Auto-starting playback for chapter ${chapterId}`);
+          audio.play().catch(err => {
+            console.error('Playback failed:', err);
+          });
+        }
       };
 
       const handlePlay = () => {

@@ -141,11 +141,12 @@ export default function ChapterView({
       }
     },
     () => {
-      // Navigate to next surah when current one ends (will auto-play if autoplay is enabled)
+      // Navigate to next surah when current one ends (autoplay will be handled by hook)
       console.log('✓ Chapter ended, navigating to next surah');
       goToNextSurah();
     },
-    numericSpeed
+    numericSpeed,
+    autoplay
   );
   
   // Extract current verse number from verse key
@@ -158,23 +159,6 @@ export default function ChapterView({
       onNavigate('chapter', nextChapterId);
     }
   }, [chapterId, onNavigate]);
-
-  // Track if autoplay has been triggered for this chapter
-  const autoplayTriggeredRef = useRef(false);
-
-  // Reset autoplay trigger when chapter changes
-  useEffect(() => {
-    autoplayTriggeredRef.current = false;
-  }, [chapterId]);
-
-  // Autoplay effect - starts playback when chapter loads if autoplay is enabled
-  useEffect(() => {
-    if (autoplay && !isPlaying && !isLoading && !autoplayTriggeredRef.current) {
-      console.log('🎵 Autoplay triggered for chapter', chapterId);
-      autoplayTriggeredRef.current = true;
-      togglePlayPause();
-    }
-  }, [autoplay, isPlaying, isLoading, chapterId, togglePlayPause]);
 
   const handleVerseClick = useCallback((verseNumber: number) => {
     // Seek to the clicked verse and start playback
