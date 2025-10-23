@@ -1,4 +1,4 @@
-import { CirclePlay, CirclePause, CircleChevronLeft, CircleChevronRight, Repeat } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
@@ -91,7 +91,7 @@ export default function AudioPlayer({
               className="w-11 h-11 flex-shrink-0 aspect-square"
               data-testid="button-previous"
             >
-              <CircleChevronLeft className="w-8 h-8" />
+              <SkipBack className="w-7 h-7 fill-current" />
             </Button>
             
             <Button
@@ -105,9 +105,9 @@ export default function AudioPlayer({
               {isLoading ? (
                 <div className="w-9 h-9 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <CirclePause className="w-9 h-9" />
+                <Pause className="w-8 h-8 fill-current" />
               ) : (
-                <CirclePlay className="w-9 h-9" />
+                <Play className="w-8 h-8 fill-current" />
               )}
             </Button>
             
@@ -118,7 +118,7 @@ export default function AudioPlayer({
               className="w-11 h-11 flex-shrink-0 aspect-square"
               data-testid="button-next"
             >
-              <CircleChevronRight className="w-8 h-8" />
+              <SkipForward className="w-7 h-7 fill-current" />
             </Button>
           </div>
           
