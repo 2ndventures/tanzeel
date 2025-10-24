@@ -184,7 +184,7 @@ export default function ChapterView({
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center justify-between p-4 pb-2">
+        <div className="flex items-center justify-between px-4 py-5">
           <button 
             className="p-2 hover-elevate active-elevate-2 rounded-md"
             onClick={onBack}
@@ -192,8 +192,8 @@ export default function ChapterView({
           >
             <ArrowLeft className="w-6 h-6 text-foreground" />
           </button>
-          <div className="flex flex-col items-center flex-1 mx-2">
-            <p className="text-sm text-muted-foreground mb-1" data-testid="text-surah-number">
+          <div className="flex flex-col items-center flex-1 mx-2 gap-1">
+            <p className="text-sm text-muted-foreground" data-testid="text-surah-number">
               Surah {chapterId}
             </p>
             <div className="flex items-center gap-3">
