@@ -184,7 +184,7 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-48">
+    <div className="min-h-screen bg-background flex flex-col">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 py-5">
           <button 
@@ -455,8 +455,8 @@ export default function ChapterView({
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto px-4 pt-14">
-        <div className="max-w-2xl mx-auto space-y-6">
+      <main className="flex-1 overflow-auto px-4">
+        <div className="max-w-2xl mx-auto space-y-6 py-[50vh]">
           {verses.map((verse, index) => {
             const verseNumber = index + 1;
             const isCurrentVerse = currentVerse === verseNumber;
