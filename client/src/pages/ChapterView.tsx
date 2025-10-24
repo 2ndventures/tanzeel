@@ -455,8 +455,8 @@ export default function ChapterView({
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto px-4">
-        <div className="max-w-2xl mx-auto space-y-6 py-[50vh]">
+      <main className="flex-1 overflow-auto px-4 pt-14">
+        <div className="max-w-2xl mx-auto space-y-6 pb-[50vh]">
           {verses.map((verse, index) => {
             const verseNumber = index + 1;
             const isCurrentVerse = currentVerse === verseNumber;
