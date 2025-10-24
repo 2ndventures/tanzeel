@@ -21,16 +21,16 @@ export default function ChapterCard({
 }: ChapterCardProps) {
   return (
     <Card
-      className="flex items-center gap-4 p-4 hover-elevate active-elevate-2 cursor-pointer"
+      className="flex items-center gap-4 p-5 hover-elevate active-elevate-2 cursor-pointer shadow-sm hover-lift transition-smooth animate-fade-in-up"
       onClick={onClick}
       data-testid={`card-chapter-${number}`}
     >
-      <div className="flex-shrink-0 w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" data-testid={`text-chapter-number-${number}`}>
-        <span className="text-sm font-semibold text-primary">{number}</span>
+      <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm" data-testid={`text-chapter-number-${number}`}>
+        <span className="text-lg font-bold text-primary">{number}</span>
       </div>
-      <div className="flex-1 flex flex-col items-center">
-        <div className="flex items-center gap-4 mb-1">
-          <h3 className="font-semibold text-foreground" data-testid={`text-chapter-name-${number}`}>
+      <div className="flex-1 flex flex-col gap-1">
+        <div className="flex items-baseline gap-3">
+          <h3 className="font-semibold text-lg text-foreground" data-testid={`text-chapter-name-${number}`}>
             {englishName}
           </h3>
           <p className="font-arabic text-xl text-foreground">
@@ -38,10 +38,10 @@ export default function ChapterCard({
           </p>
         </div>
         <p className="text-sm text-muted-foreground">
-          {verseCount} verses
+          {verseCount} verses · {revelationType}
         </p>
       </div>
-      <div className="text-muted-foreground flex-shrink-0">
+      <div className="text-muted-foreground flex-shrink-0 transition-transform group-hover:translate-x-1">
         <ChevronRight className="w-5 h-5" />
       </div>
     </Card>
