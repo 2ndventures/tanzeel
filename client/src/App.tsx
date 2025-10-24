@@ -183,87 +183,89 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen">
-          {currentPage === "home" && (
-            <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
-          )}
-          {currentPage === "surah-juz" && (
-            <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} />
-          )}
-          {currentPage === "chapter" && (
-            <ChapterView
-              chapterId={selectedChapter}
-              onBack={() => {
-                setCurrentPage("surah-juz");
-                setActiveTab("surah");
-              }}
-              showTransliteration={transliteration}
-              showTranslation={showTranslation}
-              onNavigate={handleNavigate}
-              reciter={reciter}
-              speed={speed}
-              autoScroll={autoScroll}
-              repeat={repeat}
-              autoplay={autoplay}
-              darkMode={darkMode}
-              onAutoScrollChange={setAutoScroll}
-              onRepeatChange={setRepeat}
-              onAutoplayChange={setAutoplay}
-              onDarkModeChange={setDarkMode}
-              onTransliterationChange={setTransliteration}
-              onShowTranslationChange={setShowTranslation}
-              onReciterChange={setReciter}
-              arabicFontSize={arabicFontSize}
-              translationFontSize={translationFontSize}
-              transliterationFontSize={transliterationFontSize}
-              lineSpacing={lineSpacing}
-              showVerseNumbers={showVerseNumbers}
-              onArabicFontSizeChange={setArabicFontSize}
-              onTranslationFontSizeChange={setTranslationFontSize}
-              onTransliterationFontSizeChange={setTransliterationFontSize}
-              onLineSpacingChange={setLineSpacing}
-              onShowVerseNumbersChange={setShowVerseNumbers}
-            />
-          )}
-          {currentPage === "settings" && (
-            <Settings
-              onBack={() => {
-                setCurrentPage("surah-juz");
-                setActiveTab("surah");
-              }}
-              onNavigate={handleNavigate}
-              darkMode={darkMode}
-              onDarkModeChange={setDarkMode}
-              transliteration={transliteration}
-              onTransliterationChange={setTransliteration}
-              showTranslation={showTranslation}
-              onShowTranslationChange={setShowTranslation}
-              font={font}
-              onFontChange={setFont}
-              reciter={reciter}
-              onReciterChange={setReciter}
-              speed={speed}
-              onSpeedChange={setSpeed}
-              autoScroll={autoScroll}
-              onAutoScrollChange={setAutoScroll}
-              repeat={repeat}
-              onRepeatChange={setRepeat}
-              autoplay={autoplay}
-              onAutoplayChange={setAutoplay}
-              translation={translation}
-              onTranslationChange={setTranslation}
-              arabicFontSize={arabicFontSize}
-              onArabicFontSizeChange={setArabicFontSize}
-              translationFontSize={translationFontSize}
-              onTranslationFontSizeChange={setTranslationFontSize}
-              transliterationFontSize={transliterationFontSize}
-              onTransliterationFontSizeChange={setTransliterationFontSize}
-              lineSpacing={lineSpacing}
-              onLineSpacingChange={setLineSpacing}
-              showVerseNumbers={showVerseNumbers}
-              onShowVerseNumbersChange={setShowVerseNumbers}
-            />
-          )}
+        <div className="min-h-screen transition-smooth">
+          <div key={currentPage} className="animate-fade-in">
+            {currentPage === "home" && (
+              <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
+            )}
+            {currentPage === "surah-juz" && (
+              <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} />
+            )}
+            {currentPage === "chapter" && (
+              <ChapterView
+                chapterId={selectedChapter}
+                onBack={() => {
+                  setCurrentPage("surah-juz");
+                  setActiveTab("surah");
+                }}
+                showTransliteration={transliteration}
+                showTranslation={showTranslation}
+                onNavigate={handleNavigate}
+                reciter={reciter}
+                speed={speed}
+                autoScroll={autoScroll}
+                repeat={repeat}
+                autoplay={autoplay}
+                darkMode={darkMode}
+                onAutoScrollChange={setAutoScroll}
+                onRepeatChange={setRepeat}
+                onAutoplayChange={setAutoplay}
+                onDarkModeChange={setDarkMode}
+                onTransliterationChange={setTransliteration}
+                onShowTranslationChange={setShowTranslation}
+                onReciterChange={setReciter}
+                arabicFontSize={arabicFontSize}
+                translationFontSize={translationFontSize}
+                transliterationFontSize={transliterationFontSize}
+                lineSpacing={lineSpacing}
+                showVerseNumbers={showVerseNumbers}
+                onArabicFontSizeChange={setArabicFontSize}
+                onTranslationFontSizeChange={setTranslationFontSize}
+                onTransliterationFontSizeChange={setTransliterationFontSize}
+                onLineSpacingChange={setLineSpacing}
+                onShowVerseNumbersChange={setShowVerseNumbers}
+              />
+            )}
+            {currentPage === "settings" && (
+              <Settings
+                onBack={() => {
+                  setCurrentPage("surah-juz");
+                  setActiveTab("surah");
+                }}
+                onNavigate={handleNavigate}
+                darkMode={darkMode}
+                onDarkModeChange={setDarkMode}
+                transliteration={transliteration}
+                onTransliterationChange={setTransliteration}
+                showTranslation={showTranslation}
+                onShowTranslationChange={setShowTranslation}
+                font={font}
+                onFontChange={setFont}
+                reciter={reciter}
+                onReciterChange={setReciter}
+                speed={speed}
+                onSpeedChange={setSpeed}
+                autoScroll={autoScroll}
+                onAutoScrollChange={setAutoScroll}
+                repeat={repeat}
+                onRepeatChange={setRepeat}
+                autoplay={autoplay}
+                onAutoplayChange={setAutoplay}
+                translation={translation}
+                onTranslationChange={setTranslation}
+                arabicFontSize={arabicFontSize}
+                onArabicFontSizeChange={setArabicFontSize}
+                translationFontSize={translationFontSize}
+                onTranslationFontSizeChange={setTranslationFontSize}
+                transliterationFontSize={transliterationFontSize}
+                onTransliterationFontSizeChange={setTransliterationFontSize}
+                lineSpacing={lineSpacing}
+                onLineSpacingChange={setLineSpacing}
+                showVerseNumbers={showVerseNumbers}
+                onShowVerseNumbersChange={setShowVerseNumbers}
+              />
+            )}
+          </div>
         </div>
         <Toaster />
       </TooltipProvider>
