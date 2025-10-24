@@ -131,15 +131,17 @@ export default function ChapterView({
           const verseElement = document.querySelector(`[data-testid="card-verse-${verseNumber}"]`);
           
           if (verseElement) {
-            // Calculate offset from top of viewport
+            // Calculate offset to center verse vertically in viewport
             const rect = verseElement.getBoundingClientRect();
-            // Account for the sticky header (120px) to position verse at top below header
-            const headerHeight = 120;
-            const offset = rect.top - headerHeight;
+            const viewportHeight = window.innerHeight;
+            const verseHeight = rect.height;
+            
+            // Center the verse: viewport center - verse center
+            const offset = rect.top - (viewportHeight / 2) + (verseHeight / 2);
             
             console.log('📜 Auto-scroll verse', verseNumber, 'offset:', offset);
             
-            // Scroll window to bring verse to top (below header)
+            // Scroll window to center verse in viewport
             window.scrollBy({ top: offset, behavior: 'smooth' });
           }
         });
