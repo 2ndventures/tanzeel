@@ -9,6 +9,7 @@ interface ChapterCardProps {
   verseCount: number;
   revelationType: string;
   onClick?: () => void;
+  style?: React.CSSProperties;
 }
 
 export default function ChapterCard({
@@ -18,11 +19,13 @@ export default function ChapterCard({
   verseCount,
   revelationType,
   onClick,
+  style,
 }: ChapterCardProps) {
   return (
     <Card
       className="flex items-center gap-4 p-5 hover-elevate active-elevate-2 cursor-pointer shadow-sm hover-lift transition-smooth animate-fade-in-up"
       onClick={onClick}
+      style={style}
       data-testid={`card-chapter-${number}`}
     >
       <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm" data-testid={`text-chapter-number-${number}`}>
