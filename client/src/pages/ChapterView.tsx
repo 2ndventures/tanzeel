@@ -133,8 +133,8 @@ export default function ChapterView({
           if (verseElement) {
             // Calculate offset from top of viewport
             const rect = verseElement.getBoundingClientRect();
-            // Account for the sticky header (60px) to position verse at top below header
-            const headerHeight = 60;
+            // Account for the sticky header (95px) to position verse at top below header
+            const headerHeight = 95;
             const offset = rect.top - headerHeight;
             
             console.log('📜 Auto-scroll verse', verseNumber, 'offset:', offset);
