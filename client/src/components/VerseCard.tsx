@@ -103,7 +103,7 @@ export default function VerseCard({
   
   return (
     <div 
-      className="space-y-4 p-4 transition-all duration-300 cursor-pointer hover-elevate"
+      className="space-y-4 p-5 rounded-2xl transition-all duration-300 cursor-pointer hover-elevate shadow-sm hover-lift"
       style={highlightStyles}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
@@ -111,12 +111,12 @@ export default function VerseCard({
       role="article"
       onClick={onClick}
     >
-      <div className={`space-y-5 ${getLineSpacing(lineSpacing)}`}>
+      <div className={`space-y-6 ${getLineSpacing(lineSpacing)}`}>
         {showVerseNumbers && (
           <div className="flex items-start gap-2">
             <span 
-              className={`font-semibold text-sm flex-shrink-0 transition-colors ${
-                highlighted ? 'text-primary' : 'text-primary'
+              className={`font-bold text-sm flex-shrink-0 transition-colors px-3 py-1 rounded-full ${
+                highlighted ? 'bg-primary/20 text-primary' : 'bg-primary/10 text-primary'
               }`} 
               data-testid={`text-verse-number-${verseNumber}`}
             >
