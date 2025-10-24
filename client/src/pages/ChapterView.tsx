@@ -182,7 +182,7 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col pb-24">
+    <div className="min-h-screen bg-background flex flex-col pb-40">
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 py-5">
           <button 
