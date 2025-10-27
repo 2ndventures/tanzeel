@@ -1,0 +1,516 @@
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+
+- shadcn project structure  
+
+- Tailwind CSS
+
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine yourself the ideal path for components and styles. 
+
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+
+Copy-paste this component to /components/ui folder:
+
+```tsx
+
+Quran App Home Screen
+
+import { Icon } from "@iconify/react";
+
+export function QuranAppHomeScreen() {
+
+  return (
+<div className="w-full max-w-md mx-auto bg-background min-h-screen">
+<div className="flex items-center justify-between px-6 pt-4 pb-2">
+<span className="text-sm font-medium text-foreground">9:41</span>
+<div className="flex items-center gap-1">
+<Icon icon="solar:signal-bold" className="size-4 text-foreground" />
+<Icon icon="solar:wi-fi-bold" className="size-4 text-foreground" />
+<Icon icon="solar:battery-charge-bold" className="size-4 text-foreground" />
+</div>
+</div>
+<div className="relative px-6 pt-8 pb-6 overflow-hidden">
+<div className="absolute -top-20 -right-20 size-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl" />
+<div className="relative">
+<h1 className="font-heading text-4xl font-bold tracking-tight text-foreground mb-2">
+
+            As-Salamu
+<br />
+
+            Alaykum
+</h1>
+<p className="text-muted-foreground text-sm">Continue your spiritual journey</p>
+</div>
+</div>
+<div className="px-6 mb-8">
+<div className="bg-gradient-to-br from-primary to-primary/90 rounded-3xl p-6 shadow-xl shadow-primary/20">
+<div className="flex items-center justify-between mb-4">
+<div className="flex items-center gap-3">
+<div className="size-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+<Icon icon="solar:book-bold" className="size-6 text-white" />
+</div>
+<div>
+<p className="text-white/80 text-xs font-medium">Reading Progress</p>
+<h3 className="text-white text-2xl font-bold">Juz 12</h3>
+</div>
+</div>
+<div className="text-right">
+<p className="text-white text-3xl font-bold">47%</p>
+<p className="text-white/80 text-xs">Completed</p>
+</div>
+</div>
+<div className="h-2 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+<div className="h-full w-[47%] bg-gradient-to-r from-white to-accent rounded-full" />
+</div>
+<div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-white/20">
+<div className="text-center">
+<p className="text-white text-xl font-bold">24</p>
+<p className="text-white/70 text-xs mt-1">Days Streak</p>
+</div>
+<div className="text-center">
+<p className="text-white text-xl font-bold">156</p>
+<p className="text-white/70 text-xs mt-1">Pages Read</p>
+</div>
+<div className="text-center">
+<p className="text-white text-xl font-bold">3.2h</p>
+<p className="text-white/70 text-xs mt-1">This Week</p>
+</div>
+</div>
+</div>
+</div>
+<div className="px-6 mb-8">
+<div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+<div className="flex-shrink-0 bg-card rounded-full px-6 py-3 shadow-lg flex items-center gap-3 border border-border">
+<div className="size-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+<Icon icon="solar:play-circle-bold" className="size-5 text-white" />
+</div>
+<span className="text-sm font-semibold text-foreground whitespace-nowrap">
+
+              Continue Reading
+</span>
+</div>
+<div className="flex-shrink-0 bg-card rounded-full px-6 py-3 shadow-lg flex items-center gap-3 border border-border">
+<div className="size-10 rounded-full bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center">
+<Icon icon="solar:bookmark-bold" className="size-5 text-white" />
+</div>
+<span className="text-sm font-semibold text-foreground whitespace-nowrap">
+
+              Bookmarks
+</span>
+</div>
+<div className="flex-shrink-0 bg-card rounded-full px-6 py-3 shadow-lg flex items-center gap-3 border border-border">
+<div className="size-10 rounded-full bg-gradient-to-br from-chart-3 to-chart-3/80 flex items-center justify-center">
+<Icon icon="solar:star-bold" className="size-5 text-white" />
+</div>
+<span className="text-sm font-semibold text-foreground whitespace-nowrap">
+
+              Favorites
+</span>
+</div>
+</div>
+</div>
+<div className="px-6 mb-6">
+<div className="flex items-center justify-between mb-4">
+<h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+
+            Explore Surahs
+</h2>
+<button className="text-primary text-sm font-semibold flex items-center gap-1">
+
+            View All
+<Icon icon="solar:alt-arrow-right-bold" className="size-4" />
+</button>
+</div>
+<div className="space-y-3">
+<div className="bg-gradient-to-br from-card to-secondary/30 rounded-3xl p-5 shadow-lg border border-border relative overflow-hidden">
+<div className="absolute -right-10 -bottom-10 size-32 bg-primary/10 rounded-full blur-2xl" />
+<div className="relative flex items-start justify-between">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-2">
+<div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+<span className="text-primary text-sm font-bold">1</span>
+</div>
+<span className="text-xs text-muted-foreground font-medium">
+
+                    7 Verses · Makkah
+</span>
+</div>
+<h3 className="text-xl font-bold text-foreground mb-1">Al-Fatihah</h3>
+<p className="text-2xl font-arabic text-primary mb-3">الفاتحة</p>
+<p className="text-xs text-muted-foreground">The Opening</p>
+</div>
+<div className="flex flex-col items-end gap-2">
+<div className="size-10 rounded-full bg-accent/10 flex items-center justify-center">
+<Icon icon="solar:play-bold" className="size-5 text-accent" />
+</div>
+<div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+<Icon icon="solar:bookmark-bold" className="size-5 text-primary" />
+</div>
+</div>
+</div>
+</div>
+<div className="bg-card rounded-3xl p-5 shadow-lg border border-border">
+<div className="flex items-start justify-between">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-2">
+<div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+<span className="text-primary text-sm font-bold">2</span>
+</div>
+<span className="text-xs text-muted-foreground font-medium">
+
+                    286 Verses · Madinah
+</span>
+</div>
+<h3 className="text-xl font-bold text-foreground mb-1">Al-Baqarah</h3>
+<p className="text-2xl font-arabic text-primary mb-3">البقرة</p>
+<p className="text-xs text-muted-foreground">The Cow</p>
+</div>
+<div className="flex flex-col items-end gap-2">
+<div className="size-10 rounded-full bg-secondary flex items-center justify-center">
+<Icon icon="solar:play-bold" className="size-5 text-muted-foreground" />
+</div>
+</div>
+</div>
+</div>
+<div className="bg-card rounded-3xl p-5 shadow-lg border border-border">
+<div className="flex items-start justify-between">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-2">
+<div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+<span className="text-primary text-sm font-bold">3</span>
+</div>
+<span className="text-xs text-muted-foreground font-medium">
+
+                    200 Verses · Madinah
+</span>
+</div>
+<h3 className="text-xl font-bold text-foreground mb-1">Ali 'Imran</h3>
+<p className="text-2xl font-arabic text-primary mb-3">آل عمران</p>
+<p className="text-xs text-muted-foreground">Family of Imran</p>
+</div>
+<div className="flex flex-col items-end gap-2">
+<div className="size-10 rounded-full bg-secondary flex items-center justify-center">
+<Icon icon="solar:play-bold" className="size-5 text-muted-foreground" />
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div className="px-6 mb-24">
+<div className="bg-gradient-to-br from-accent to-accent/90 rounded-3xl p-6 shadow-xl shadow-accent/20 relative overflow-hidden">
+<div className="absolute -left-10 -top-10 size-40 bg-white/10 rounded-full blur-3xl" />
+<div className="relative">
+<div className="flex items-center gap-2 mb-3">
+<Icon icon="solar:star-bold" className="size-5 text-white" />
+<span className="text-white/90 text-xs font-semibold uppercase tracking-wider">
+
+                Verse of the Day
+</span>
+</div>
+<p className="text-white text-lg leading-relaxed mb-4 font-arabic">
+
+              وَمَا خَلَقْتُ الْجِنَّ وَالْإِنسَ إِلَّا لِيَعْبُدُونِ
+</p>
+<p className="text-white/90 text-sm mb-2">
+
+              "And I did not create the jinn and mankind except to worship Me."
+</p>
+<p className="text-white/70 text-xs">Surah Adh-Dhariyat (51:56)</p>
+</div>
+</div>
+</div>
+<div className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-6">
+<div className="bg-card/95 backdrop-blur-xl rounded-full shadow-2xl border border-border px-8 py-4 flex items-center gap-8">
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-lg shadow-primary/20">
+<Icon icon="solar:home-2-bold" className="size-6 text-white" />
+</div>
+<span className="text-xs font-semibold text-primary">Home</span>
+</button>
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-secondary/50 flex items-center justify-center">
+<Icon icon="solar:book-2-bold" className="size-6 text-muted-foreground" />
+</div>
+<span className="text-xs font-medium text-muted-foreground">Read</span>
+</button>
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-secondary/50 flex items-center justify-center">
+<Icon icon="solar:headphones-bold" className="size-6 text-muted-foreground" />
+</div>
+<span className="text-xs font-medium text-muted-foreground">Listen</span>
+</button>
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-secondary/50 flex items-center justify-center">
+<Icon icon="solar:user-circle-bold" className="size-6 text-muted-foreground" />
+</div>
+<span className="text-xs font-medium text-muted-foreground">Profile</span>
+</button>
+</div>
+</div>
+</div>
+
+  );
+
+}
+
+```
+
+Implementation Guidelines
+
+ 1. Analyze the component structure and identify all required dependencies (imported components are shadcn/ui, therefore you should install them if not present)
+
+ 2. Make sure to ask the user, if not specified, whether and where they want to use it in their existing codebase yet
+
+ 3. Create and adapt the business logic of the component to the user's codebase context
+
+Steps to integrate
+
+ 0. Copy paste all the code above in the correct directories
+
+ 1. Install external dependencies
+ 
+import { Icon } from "@iconify/react";
+
+export function QuranAppHomeScreen() {
+
+  return (
+<div className="w-full max-w-md mx-auto bg-background min-h-screen">
+<div className="flex items-center justify-between px-6 pt-4 pb-2">
+<span className="text-sm font-medium text-foreground">9:41</span>
+<div className="flex items-center gap-1">
+<Icon icon="solar:signal-bold" className="size-4 text-foreground" />
+<Icon icon="solar:wi-fi-bold" className="size-4 text-foreground" />
+<Icon icon="solar:battery-charge-bold" className="size-4 text-foreground" />
+</div>
+</div>
+<div className="relative px-6 pt-8 pb-6 overflow-hidden">
+<div className="absolute -top-20 -right-20 size-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl" />
+<div className="relative">
+<h1 className="font-heading text-4xl font-bold tracking-tight text-foreground mb-2">
+
+            As-Salamu
+<br />
+
+            Alaykum
+</h1>
+<p className="text-muted-foreground text-sm">Continue your spiritual journey</p>
+</div>
+</div>
+<div className="px-6 mb-8">
+<div className="bg-gradient-to-br from-primary to-primary/90 rounded-3xl p-6 shadow-xl shadow-primary/20">
+<div className="flex items-center justify-between mb-4">
+<div className="flex items-center gap-3">
+<div className="size-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+<Icon icon="solar:book-bold" className="size-6 text-white" />
+</div>
+<div>
+<p className="text-white/80 text-xs font-medium">Reading Progress</p>
+<h3 className="text-white text-2xl font-bold">Juz 12</h3>
+</div>
+</div>
+<div className="text-right">
+<p className="text-white text-3xl font-bold">47%</p>
+<p className="text-white/80 text-xs">Completed</p>
+</div>
+</div>
+<div className="h-2 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+<div className="h-full w-[47%] bg-gradient-to-r from-white to-accent rounded-full" />
+</div>
+<div className="grid grid-cols-3 gap-3 mt-6 pt-6 border-t border-white/20">
+<div className="text-center">
+<p className="text-white text-xl font-bold">24</p>
+<p className="text-white/70 text-xs mt-1">Days Streak</p>
+</div>
+<div className="text-center">
+<p className="text-white text-xl font-bold">156</p>
+<p className="text-white/70 text-xs mt-1">Pages Read</p>
+</div>
+<div className="text-center">
+<p className="text-white text-xl font-bold">3.2h</p>
+<p className="text-white/70 text-xs mt-1">This Week</p>
+</div>
+</div>
+</div>
+</div>
+<div className="px-6 mb-8">
+<div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+<div className="flex-shrink-0 bg-card rounded-full px-6 py-3 shadow-lg flex items-center gap-3 border border-border">
+<div className="size-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+<Icon icon="solar:play-circle-bold" className="size-5 text-white" />
+</div>
+<span className="text-sm font-semibold text-foreground whitespace-nowrap">
+
+              Continue Reading
+</span>
+</div>
+<div className="flex-shrink-0 bg-card rounded-full px-6 py-3 shadow-lg flex items-center gap-3 border border-border">
+<div className="size-10 rounded-full bg-gradient-to-br from-accent to-accent/80 flex items-center justify-center">
+<Icon icon="solar:bookmark-bold" className="size-5 text-white" />
+</div>
+<span className="text-sm font-semibold text-foreground whitespace-nowrap">
+
+              Bookmarks
+</span>
+</div>
+<div className="flex-shrink-0 bg-card rounded-full px-6 py-3 shadow-lg flex items-center gap-3 border border-border">
+<div className="size-10 rounded-full bg-gradient-to-br from-chart-3 to-chart-3/80 flex items-center justify-center">
+<Icon icon="solar:star-bold" className="size-5 text-white" />
+</div>
+<span className="text-sm font-semibold text-foreground whitespace-nowrap">
+
+              Favorites
+</span>
+</div>
+</div>
+</div>
+<div className="px-6 mb-6">
+<div className="flex items-center justify-between mb-4">
+<h2 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+
+            Explore Surahs
+</h2>
+<button className="text-primary text-sm font-semibold flex items-center gap-1">
+
+            View All
+<Icon icon="solar:alt-arrow-right-bold" className="size-4" />
+</button>
+</div>
+<div className="space-y-3">
+<div className="bg-gradient-to-br from-card to-secondary/30 rounded-3xl p-5 shadow-lg border border-border relative overflow-hidden">
+<div className="absolute -right-10 -bottom-10 size-32 bg-primary/10 rounded-full blur-2xl" />
+<div className="relative flex items-start justify-between">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-2">
+<div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+<span className="text-primary text-sm font-bold">1</span>
+</div>
+<span className="text-xs text-muted-foreground font-medium">
+
+                    7 Verses · Makkah
+</span>
+</div>
+<h3 className="text-xl font-bold text-foreground mb-1">Al-Fatihah</h3>
+<p className="text-2xl font-arabic text-primary mb-3">الفاتحة</p>
+<p className="text-xs text-muted-foreground">The Opening</p>
+</div>
+<div className="flex flex-col items-end gap-2">
+<div className="size-10 rounded-full bg-accent/10 flex items-center justify-center">
+<Icon icon="solar:play-bold" className="size-5 text-accent" />
+</div>
+<div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+<Icon icon="solar:bookmark-bold" className="size-5 text-primary" />
+</div>
+</div>
+</div>
+</div>
+<div className="bg-card rounded-3xl p-5 shadow-lg border border-border">
+<div className="flex items-start justify-between">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-2">
+<div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+<span className="text-primary text-sm font-bold">2</span>
+</div>
+<span className="text-xs text-muted-foreground font-medium">
+
+                    286 Verses · Madinah
+</span>
+</div>
+<h3 className="text-xl font-bold text-foreground mb-1">Al-Baqarah</h3>
+<p className="text-2xl font-arabic text-primary mb-3">البقرة</p>
+<p className="text-xs text-muted-foreground">The Cow</p>
+</div>
+<div className="flex flex-col items-end gap-2">
+<div className="size-10 rounded-full bg-secondary flex items-center justify-center">
+<Icon icon="solar:play-bold" className="size-5 text-muted-foreground" />
+</div>
+</div>
+</div>
+</div>
+<div className="bg-card rounded-3xl p-5 shadow-lg border border-border">
+<div className="flex items-start justify-between">
+<div className="flex-1">
+<div className="flex items-center gap-2 mb-2">
+<div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center">
+<span className="text-primary text-sm font-bold">3</span>
+</div>
+<span className="text-xs text-muted-foreground font-medium">
+
+                    200 Verses · Madinah
+</span>
+</div>
+<h3 className="text-xl font-bold text-foreground mb-1">Ali 'Imran</h3>
+<p className="text-2xl font-arabic text-primary mb-3">آل عمران</p>
+<p className="text-xs text-muted-foreground">Family of Imran</p>
+</div>
+<div className="flex flex-col items-end gap-2">
+<div className="size-10 rounded-full bg-secondary flex items-center justify-center">
+<Icon icon="solar:play-bold" className="size-5 text-muted-foreground" />
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div className="px-6 mb-24">
+<div className="bg-gradient-to-br from-accent to-accent/90 rounded-3xl p-6 shadow-xl shadow-accent/20 relative overflow-hidden">
+<div className="absolute -left-10 -top-10 size-40 bg-white/10 rounded-full blur-3xl" />
+<div className="relative">
+<div className="flex items-center gap-2 mb-3">
+<Icon icon="solar:star-bold" className="size-5 text-white" />
+<span className="text-white/90 text-xs font-semibold uppercase tracking-wider">
+
+                Verse of the Day
+</span>
+</div>
+<p className="text-white text-lg leading-relaxed mb-4 font-arabic">
+
+              وَمَا خَلَقْتُ الْجِنَّ وَالْإِنسَ إِلَّا لِيَعْبُدُونِ
+</p>
+<p className="text-white/90 text-sm mb-2">
+
+              "And I did not create the jinn and mankind except to worship Me."
+</p>
+<p className="text-white/70 text-xs">Surah Adh-Dhariyat (51:56)</p>
+</div>
+</div>
+</div>
+<div className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-6">
+<div className="bg-card/95 backdrop-blur-xl rounded-full shadow-2xl border border-border px-8 py-4 flex items-center gap-8">
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-lg shadow-primary/20">
+<Icon icon="solar:home-2-bold" className="size-6 text-white" />
+</div>
+<span className="text-xs font-semibold text-primary">Home</span>
+</button>
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-secondary/50 flex items-center justify-center">
+<Icon icon="solar:book-2-bold" className="size-6 text-muted-foreground" />
+</div>
+<span className="text-xs font-medium text-muted-foreground">Read</span>
+</button>
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-secondary/50 flex items-center justify-center">
+<Icon icon="solar:headphones-bold" className="size-6 text-muted-foreground" />
+</div>
+<span className="text-xs font-medium text-muted-foreground">Listen</span>
+</button>
+<button className="flex flex-col items-center gap-1">
+<div className="size-12 rounded-2xl bg-secondary/50 flex items-center justify-center">
+<Icon icon="solar:user-circle-bold" className="size-6 text-muted-foreground" />
+</div>
+<span className="text-xs font-medium text-muted-foreground">Profile</span>
+</button>
+</div>
+</div>
+</div>
+
+  );
+
+}
+ 
