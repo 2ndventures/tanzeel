@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { Icon } from "@iconify/react";
 import SettingItem from "@/components/SettingItem";
 import BottomNav from "@/components/BottomNav";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -81,24 +81,24 @@ export default function Settings({
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <header className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center gap-4 p-4">
+      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-lg border-b border-border shadow-sm">
+        <div className="flex items-center gap-4 p-5">
           <button 
-            className="p-2 hover-elevate active-elevate-2 rounded-md"
+            className="p-2 hover-elevate active-elevate-2 rounded-xl"
             onClick={onBack}
             data-testid="button-back"
           >
-            <ArrowLeft className="w-6 h-6 text-foreground" />
+            <Icon icon="solar:alt-arrow-left-bold" className="w-6 h-6 text-foreground" />
           </button>
-          <h1 className="text-xl font-semibold text-foreground" data-testid="text-title">Settings</h1>
+          <h1 className="text-2xl font-semibold text-foreground tracking-tight" data-testid="text-title">Settings</h1>
         </div>
       </header>
 
       <ScrollArea className="h-[calc(100vh-140px)]">
-        <div className="p-4 space-y-6">
+        <div className="p-5 space-y-6">
           <div>
-            <h2 className="text-lg font-semibold text-foreground mb-3">Display</h2>
-            <div className="space-y-1 divide-y divide-border">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Display</h2>
+            <div className="bg-card rounded-3xl shadow-lg border border-border overflow-hidden divide-y divide-border">
               <SettingItem
                 label="Theme"
                 sublabel={darkMode ? "Dark" : "Light"}
@@ -136,8 +136,8 @@ export default function Settings({
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-foreground mb-3">Text Size</h2>
-            <div className="space-y-1 divide-y divide-border">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Text Size</h2>
+            <div className="bg-card rounded-3xl shadow-lg border border-border overflow-hidden divide-y divide-border">
               <SettingItem
                 label="Arabic text"
                 type="select"
@@ -192,8 +192,8 @@ export default function Settings({
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-foreground mb-3">Audio</h2>
-            <div className="space-y-1 divide-y divide-border">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Audio</h2>
+            <div className="bg-card rounded-3xl shadow-lg border border-border overflow-hidden divide-y divide-border">
               <SettingItem
                 label="Reciter"
                 type="select"

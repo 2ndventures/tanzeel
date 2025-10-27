@@ -1,4 +1,4 @@
-import { Play, Pause, SkipBack, SkipForward, Repeat } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
@@ -31,7 +31,6 @@ export default function AudioPlayer({
   onNext,
   onRepeatChange,
 }: AudioPlayerProps) {
-  // Speed options from 0.5 to 2.0 in 0.25 increments
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
   
   const formatTime = (seconds: number) => {
@@ -48,7 +47,7 @@ export default function AudioPlayer({
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-10" data-testid="audio-player-wrapper">
-      <div className="bg-card border-t border-border px-4 py-6 space-y-5" data-testid="audio-player-content">
+      <div className="bg-card/95 backdrop-blur-xl border-t border-border px-6 py-6 space-y-5 shadow-2xl" data-testid="audio-player-content">
         <div className="space-y-2">
           <Slider
             value={[currentTime]}
@@ -59,21 +58,21 @@ export default function AudioPlayer({
             data-testid="slider-audio-progress"
           />
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground" data-testid="text-current-time">
+            <span className="text-sm font-medium text-muted-foreground" data-testid="text-current-time">
               {formatTime(currentTime)}
             </span>
-            <span className="text-sm text-muted-foreground" data-testid="text-duration">
+            <span className="text-sm font-medium text-muted-foreground" data-testid="text-duration">
               {formatTime(duration)}
             </span>
           </div>
         </div>
         
         <div className="grid grid-cols-3 items-center">
-          <div className="flex justify-start">
+          <div className="flex justify-start gap-2">
             <Button
               variant="ghost"
               size="default"
-              className="text-base font-medium min-w-16 h-11"
+              className="text-base font-semibold min-w-16 h-11 rounded-2xl"
               onClick={cycleSpeed}
               aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
               title="Click to cycle playback speed"
@@ -84,54 +83,48 @@ export default function AudioPlayer({
           </div>
           
           <div className="flex items-center justify-center gap-3">
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={onPrevious}
-              className="w-14 h-14 flex-shrink-0 aspect-square"
+              className="size-12 rounded-full bg-secondary/50 flex items-center justify-center hover-elevate active-elevate-2"
               data-testid="button-previous"
             >
-              <SkipBack className="w-11 h-11 fill-current" />
-            </Button>
+              <Icon icon="solar:skip-previous-bold" className="size-6 text-foreground" />
+            </button>
             
-            <Button
-              variant="default"
-              size="icon"
-              className="w-16 h-16 rounded-full flex-shrink-0 aspect-square"
+            <button
+              className="size-16 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-xl shadow-primary/20 hover-elevate active-elevate-2 disabled:opacity-50"
               onClick={onPlayPause}
               disabled={isLoading}
               data-testid="button-play-pause"
             >
               {isLoading ? (
-                <div className="w-12 h-12 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                <div className="size-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Pause className="w-12 h-12 fill-current" />
+                <Icon icon="solar:pause-bold" className="size-8 text-white" />
               ) : (
-                <Play className="w-12 h-12 fill-current" />
+                <Icon icon="solar:play-bold" className="size-8 text-white ml-1" />
               )}
-            </Button>
+            </button>
             
-            <Button
-              variant="ghost"
-              size="icon"
+            <button
               onClick={onNext}
-              className="w-14 h-14 flex-shrink-0 aspect-square"
+              className="size-12 rounded-full bg-secondary/50 flex items-center justify-center hover-elevate active-elevate-2"
               data-testid="button-next"
             >
-              <SkipForward className="w-11 h-11 fill-current" />
-            </Button>
+              <Icon icon="solar:skip-next-bold" className="size-6 text-foreground" />
+            </button>
           </div>
           
           <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`w-11 h-11 flex-shrink-0 aspect-square ${repeat ? 'text-primary' : ''}`}
+            <button
+              className={`size-11 rounded-full flex items-center justify-center hover-elevate active-elevate-2 ${
+                repeat ? 'bg-primary/10 text-primary' : 'bg-secondary/50 text-muted-foreground'
+              }`}
               onClick={() => onRepeatChange?.(!repeat)}
               data-testid="button-repeat"
             >
-              <Repeat className="w-6 h-6" />
-            </Button>
+              <Icon icon="solar:repeat-bold" className="size-6" />
+            </button>
           </div>
         </div>
       </div>
