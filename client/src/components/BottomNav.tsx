@@ -1,4 +1,4 @@
-import { Home, Book, Settings } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
@@ -8,32 +8,44 @@ interface BottomNavProps {
 
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs = [
-    { id: "home" as const, icon: Home, label: "Home" },
-    { id: "surah" as const, icon: Book, label: "Surah/Juz" },
-    { id: "settings" as const, icon: Settings, label: "Settings" },
+    { id: "home" as const, icon: "solar:home-2-bold", label: "Home" },
+    { id: "surah" as const, icon: "solar:book-2-bold", label: "Read" },
+    { id: "settings" as const, icon: "solar:settings-bold", label: "Settings" },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border shadow-lg">
-      <div className="flex items-center justify-around gap-2 max-w-md mx-auto px-4 py-3">
+    <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-6 pointer-events-none">
+      <div className="bg-card/95 backdrop-blur-xl rounded-full shadow-2xl border border-border px-8 py-4 flex items-center gap-8 pointer-events-auto">
         {tabs.map((tab) => {
-          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           
           return (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={cn(
-                "flex flex-col items-center justify-center py-3 px-4 gap-1.5 flex-1 rounded-2xl transition-smooth",
-                isActive 
-                  ? "bg-primary/10 text-primary" 
-                  : "text-muted-foreground hover-elevate active-elevate-2"
-              )}
+              className="flex flex-col items-center gap-1"
               data-testid={`button-nav-${tab.id}`}
             >
-              <Icon className={cn("w-5 h-5 transition-transform", isActive && "scale-110")} />
-              <span className="text-xs font-semibold">{tab.label}</span>
+              <div className={cn(
+                "size-12 rounded-2xl flex items-center justify-center transition-all",
+                isActive 
+                  ? "bg-gradient-to-br from-primary to-primary/90 shadow-lg shadow-primary/20" 
+                  : "bg-secondary/50 hover-elevate active-elevate-2"
+              )}>
+                <Icon 
+                  icon={tab.icon} 
+                  className={cn(
+                    "size-6 transition-colors",
+                    isActive ? "text-white" : "text-muted-foreground"
+                  )} 
+                />
+              </div>
+              <span className={cn(
+                "text-xs font-medium transition-colors",
+                isActive ? "text-primary font-semibold" : "text-muted-foreground"
+              )}>
+                {tab.label}
+              </span>
             </button>
           );
         })}

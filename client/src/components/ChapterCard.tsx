@@ -1,4 +1,4 @@
-import { ChevronRight } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { Card } from "@/components/ui/card";
 import { getDisplayArabicName } from "@/lib/quranData";
 
@@ -10,6 +10,7 @@ interface ChapterCardProps {
   revelationType: string;
   onClick?: () => void;
   style?: React.CSSProperties;
+  isFirst?: boolean;
 }
 
 export default function ChapterCard({
@@ -20,32 +21,44 @@ export default function ChapterCard({
   revelationType,
   onClick,
   style,
+  isFirst = false,
 }: ChapterCardProps) {
   return (
     <Card
-      className="flex items-center gap-4 p-5 hover-elevate active-elevate-2 cursor-pointer shadow-sm hover-lift transition-smooth animate-fade-in-up"
+      className={`relative overflow-hidden p-5 hover-elevate active-elevate-2 cursor-pointer shadow-lg border border-border hover-lift transition-smooth animate-fade-in-up rounded-3xl ${
+        isFirst ? "bg-gradient-to-br from-card to-secondary/30" : "bg-card"
+      }`}
       onClick={onClick}
       style={style}
       data-testid={`card-chapter-${number}`}
     >
-      <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm" data-testid={`text-chapter-number-${number}`}>
-        <span className="text-lg font-bold text-primary">{number}</span>
-      </div>
-      <div className="flex-1 flex flex-col gap-1">
-        <div className="flex items-baseline gap-3">
-          <h3 className="font-semibold text-lg text-foreground" data-testid={`text-chapter-name-${number}`}>
+      {isFirst && (
+        <div className="absolute -right-10 -bottom-10 size-32 bg-primary/10 rounded-full blur-2xl" />
+      )}
+      
+      <div className="relative flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="size-8 rounded-xl bg-primary/10 flex items-center justify-center" data-testid={`text-chapter-number-${number}`}>
+              <span className="text-primary text-sm font-bold">{number}</span>
+            </div>
+            <span className="text-xs text-muted-foreground font-medium">
+              {verseCount} Verses · {revelationType}
+            </span>
+          </div>
+          <h3 className="text-xl font-bold text-foreground mb-1" data-testid={`text-chapter-name-${number}`}>
             {englishName}
           </h3>
-          <p className="font-arabic text-xl text-foreground">
+          <p className="text-2xl font-arabic text-primary mb-1">
             {getDisplayArabicName(arabicName)}
           </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {verseCount} verses · {revelationType}
-        </p>
-      </div>
-      <div className="text-muted-foreground flex-shrink-0 transition-transform group-hover:translate-x-1">
-        <ChevronRight className="w-5 h-5" />
+        
+        <div className="flex flex-col items-end gap-2 ml-4">
+          <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Icon icon="solar:play-bold" className="size-5 text-primary" />
+          </div>
+        </div>
       </div>
     </Card>
   );
