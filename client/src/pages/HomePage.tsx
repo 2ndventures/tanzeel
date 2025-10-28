@@ -1,6 +1,8 @@
 import { Icon } from "@iconify/react";
+import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { chapters } from "@/lib/quranData";
+import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
 
 interface HomePageProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
@@ -13,6 +15,19 @@ const featuredSurahs = [
 ];
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
+  const [stats, setStats] = useState(() => getReadingStats());
+
+  useEffect(() => {
+    // Refresh stats when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        setStats(getReadingStats());
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pb-24 animate-fade-in relative">
       <div className="absolute -top-20 -right-20 size-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl" />
@@ -40,6 +55,24 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           >
             Start Reading
           </button>
+        </div>
+
+        {/* Reading Stats */}
+        <div className="px-5 mt-4 max-w-md w-full mx-auto">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-card rounded-2xl p-3 text-center shadow-lg" data-testid="stat-day-streak">
+              <div className="text-2xl font-bold text-foreground mb-1">{stats.dayStreak}</div>
+              <div className="text-[10px] text-muted-foreground">Day Streak</div>
+            </div>
+            <div className="bg-card rounded-2xl p-3 text-center shadow-lg" data-testid="stat-verses-read">
+              <div className="text-2xl font-bold text-foreground mb-1">{stats.versesRead}</div>
+              <div className="text-[10px] text-muted-foreground">Verses Read</div>
+            </div>
+            <div className="bg-card rounded-2xl p-3 text-center shadow-lg" data-testid="stat-weekly-time">
+              <div className="text-2xl font-bold text-foreground mb-1">{formatReadingTime(stats.weeklyMinutes)}</div>
+              <div className="text-[10px] text-muted-foreground">This Week</div>
+            </div>
+          </div>
         </div>
 
         <div className="px-5 mt-4 max-w-md w-full mx-auto">

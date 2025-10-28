@@ -8,6 +8,7 @@ import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -104,6 +105,10 @@ export default function ChapterView({
   };
   const numericSpeed = speedMap[initialSpeed] || 1.0;
 
+  // Track completed verses
+  const completedVersesRef = useRef(new Set<string>());
+  const lastTimeRef = useRef(0);
+
   // Use word-timing audio with continuous playback
   const {
     isPlaying,
@@ -122,6 +127,12 @@ export default function ChapterView({
     quranComReciterId,
     repeat,
     (verseKey) => {
+      // Track verse completion for stats
+      if (!completedVersesRef.current.has(verseKey)) {
+        completedVersesRef.current.add(verseKey);
+        incrementVersesRead(1);
+      }
+
       if (autoScroll) {
         // Parse verse key (e.g., "1:2" -> verse 2)
         const verseNumber = parseInt(verseKey.split(':')[1]);
@@ -156,6 +167,22 @@ export default function ChapterView({
     autoplay
   );
   
+  // Track reading time
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        // Track 1 second of reading time
+        addReadingTime(1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying]);
+
+  // Reset completed verses when chapter changes
+  useEffect(() => {
+    completedVersesRef.current.clear();
+  }, [chapterId]);
+
   // Extract current verse number from verse key
   const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;
   
