@@ -14,7 +14,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-4 pointer-events-none" style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pb-6 px-4 pointer-events-none" style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
       <div className="bg-card/95 backdrop-blur-xl rounded-full shadow-2xl border border-border px-6 py-3 flex items-center gap-6 pointer-events-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
