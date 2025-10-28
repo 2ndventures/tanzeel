@@ -24,7 +24,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   
   const filteredChapters = chapters.filter((chapter) =>
     chapter.arabicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chapter.englishName.toLowerCase().includes(searchQuery.toLowerCase())
+    chapter.englishName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    chapter.id.toString().includes(searchQuery)
   );
 
   return (
