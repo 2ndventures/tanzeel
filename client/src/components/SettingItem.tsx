@@ -25,40 +25,56 @@ export default function SettingItem({
   testId,
   isThemeToggle = false,
 }: SettingItemProps) {
+  if (type === "toggle") {
+    return (
+      <button
+        onClick={() => onToggle?.(!value)}
+        className="flex items-center justify-between py-4 px-4 min-h-[60px] w-full text-left hover-elevate active-elevate-2 transition-smooth"
+      >
+        <div className="flex-1 pr-4">
+          <p className="text-base font-medium text-foreground" data-testid={testId ? `${testId}-label` : undefined}>
+            {label}
+          </p>
+          {sublabel && (
+            <p className="text-sm text-muted-foreground mt-1">{sublabel}</p>
+          )}
+        </div>
+        {isThemeToggle ? (
+          <div className="relative pointer-events-none">
+            <Switch
+              checked={value as boolean}
+              data-testid={testId}
+              className="relative"
+            />
+            <div className="absolute inset-0 flex items-center justify-between px-1">
+              <Sun className="w-3.5 h-3.5 text-yellow-500" />
+              <Moon className="w-3.5 h-3.5 text-blue-400" />
+            </div>
+          </div>
+        ) : (
+          <Switch
+            checked={value as boolean}
+            data-testid={testId}
+            className="pointer-events-none"
+          />
+        )}
+      </button>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-between py-3">
-      <div className="flex-1">
-        <p className="text-sm font-medium text-foreground" data-testid={testId ? `${testId}-label` : undefined}>
+    <div className="flex items-center justify-between py-4 px-4 min-h-[60px]">
+      <div className="flex-1 pr-4">
+        <p className="text-base font-medium text-foreground" data-testid={testId ? `${testId}-label` : undefined}>
           {label}
         </p>
         {sublabel && (
-          <p className="text-xs text-muted-foreground mt-0.5">{sublabel}</p>
+          <p className="text-sm text-muted-foreground mt-1">{sublabel}</p>
         )}
       </div>
-      {type === "toggle" && isThemeToggle && (
-        <div className="relative">
-          <Switch
-            checked={value as boolean}
-            onCheckedChange={onToggle}
-            data-testid={testId}
-            className="relative"
-          />
-          <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-            <Sun className="w-3.5 h-3.5 text-yellow-500" />
-            <Moon className="w-3.5 h-3.5 text-blue-400" />
-          </div>
-        </div>
-      )}
-      {type === "toggle" && !isThemeToggle && (
-        <Switch
-          checked={value as boolean}
-          onCheckedChange={onToggle}
-          data-testid={testId}
-        />
-      )}
       {type === "select" && options && (
         <Select value={value as string} onValueChange={onSelect}>
-          <SelectTrigger className="w-32" data-testid={testId}>
+          <SelectTrigger className="min-w-[120px] min-h-[48px] w-auto" data-testid={testId}>
             <SelectValue placeholder="Choose" />
           </SelectTrigger>
           <SelectContent>

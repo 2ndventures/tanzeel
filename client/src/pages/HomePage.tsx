@@ -8,7 +8,7 @@ interface HomePageProps {
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
   return (
-    <div className="min-h-screen bg-background pb-20 flex flex-col items-center justify-center animate-fade-in relative overflow-hidden">
+    <div className="min-h-screen bg-background pb-32 flex flex-col items-center justify-center animate-fade-in relative overflow-hidden">
       <div className="absolute -top-20 -right-20 size-64 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl" />
       <div className="absolute -bottom-20 -left-20 size-64 bg-gradient-to-br from-accent/20 to-primary/20 rounded-full blur-3xl" />
       
@@ -28,7 +28,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
         <button
           onClick={() => onNavigate("surah-juz", undefined, "surah")}
-          className="mt-8 px-10 py-4 bg-gradient-to-br from-primary to-primary/90 text-white rounded-3xl hover-elevate active-elevate-2 font-semibold text-lg shadow-xl shadow-primary/20 hover-lift transition-smooth"
+          className="mt-8 px-10 py-4 min-h-[56px] bg-gradient-to-br from-primary to-primary/90 text-white rounded-3xl hover-elevate active-elevate-2 font-semibold text-lg shadow-xl shadow-primary/20 hover-lift transition-smooth"
           data-testid="button-start-reading"
         >
           Start Reading

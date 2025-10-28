@@ -80,11 +80,11 @@ export default function Settings({
   }));
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-32">
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-lg border-b border-border shadow-sm">
         <div className="flex items-center gap-4 p-5">
           <button 
-            className="p-2 hover-elevate active-elevate-2 rounded-xl"
+            className="min-h-[48px] min-w-[48px] p-2 hover-elevate active-elevate-2 rounded-xl"
             onClick={onBack}
             data-testid="button-back"
           >

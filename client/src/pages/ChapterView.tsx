@@ -188,7 +188,7 @@ export default function ChapterView({
       <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 py-5">
           <button 
-            className="p-2 hover-elevate active-elevate-2 rounded-md"
+            className="min-h-[48px] min-w-[48px] p-2 hover-elevate active-elevate-2 rounded-md"
             onClick={onBack}
             data-testid="button-back"
           >
@@ -215,7 +215,7 @@ export default function ChapterView({
           <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
             <SheetTrigger asChild>
               <button 
-                className="p-2 hover-elevate active-elevate-2 rounded-md" 
+                className="min-h-[48px] min-w-[48px] p-2 hover-elevate active-elevate-2 rounded-md" 
                 data-testid="button-menu"
               >
                 <MoreVertical className="w-6 h-6 text-foreground" />
@@ -224,7 +224,7 @@ export default function ChapterView({
             <SheetContent side="bottom" className="h-[85vh]">
               <SheetHeader className="mb-4">
                 {menuView !== 'main' && (
-                  <Button variant="ghost" size="icon" className="absolute left-4 top-4" onClick={() => setMenuView('main')}>
+                  <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px]" onClick={() => setMenuView('main')}>
                     <ChevronLeft className="w-6 h-6" />
                   </Button>
                 )}
@@ -244,7 +244,7 @@ export default function ChapterView({
                   <div className="space-y-1">
                     <button
                       onClick={() => setMenuView('display')}
-                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md text-lg"
+                      className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md text-lg"
                       data-testid="menu-item-display"
                     >
                       <span>Display</span>
@@ -253,7 +253,7 @@ export default function ChapterView({
                     
                     <button
                       onClick={() => setMenuView('reciter')}
-                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
+                      className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
                       data-testid="menu-item-reciter"
                     >
                       <span className="text-lg">Reciter</span>
@@ -263,7 +263,7 @@ export default function ChapterView({
                       </div>
                     </button>
 
-                    <div className="flex items-center justify-between p-4" data-testid="menu-item-theme">
+                    <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-theme">
                       <span className="text-lg">Theme</span>
                       <div className="relative">
                         <Switch 

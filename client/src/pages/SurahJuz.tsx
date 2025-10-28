@@ -28,13 +28,13 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   );
 
   return (
-    <div className="min-h-screen bg-background pb-20 animate-fade-in">
+    <div className="min-h-screen bg-background pb-32 animate-fade-in">
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-lg border-b border-border shadow-sm">
         <div className="flex items-center justify-between p-5">
           <div className="w-10"></div>
           <h1 className="text-2xl font-semibold text-foreground tracking-tight" data-testid="text-title">Explore Surahs</h1>
           <button 
-            className="p-2.5 hover-elevate active-elevate-2 rounded-xl transition-smooth" 
+            className="min-h-[48px] min-w-[48px] p-2.5 hover-elevate active-elevate-2 rounded-xl transition-smooth" 
             data-testid="button-settings"
             onClick={() => onNavigate("settings", undefined, "settings")}
           >

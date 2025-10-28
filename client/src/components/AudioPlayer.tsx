@@ -46,8 +46,8 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-10" data-testid="audio-player-wrapper">
-      <div className="bg-card/95 backdrop-blur-xl border-t border-border px-6 py-6 space-y-5 shadow-2xl" data-testid="audio-player-content">
+    <div className="fixed inset-x-0 bottom-0 z-10" data-testid="audio-player-wrapper" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="bg-card/95 backdrop-blur-xl border-t border-border px-4 py-5 pb-6 space-y-4 shadow-2xl" data-testid="audio-player-content">
         <div className="space-y-2">
           <Slider
             value={[currentTime]}
@@ -67,32 +67,28 @@ export default function AudioPlayer({
           </div>
         </div>
         
-        <div className="grid grid-cols-3 items-center">
-          <div className="flex justify-start gap-2">
-            <Button
-              variant="ghost"
-              size="default"
-              className="text-base font-semibold min-w-16 h-11 rounded-2xl"
-              onClick={cycleSpeed}
-              aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
-              title="Click to cycle playback speed"
-              data-testid="button-speed"
-            >
-              {speed.toFixed(2)}x
-            </Button>
-          </div>
+        <div className="flex items-center justify-between gap-2">
+          <button
+            onClick={cycleSpeed}
+            className="min-h-[48px] min-w-[60px] px-3 rounded-2xl bg-secondary/50 hover-elevate active-elevate-2 flex items-center justify-center"
+            aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
+            title="Click to cycle playback speed"
+            data-testid="button-speed"
+          >
+            <span className="text-base font-semibold text-foreground">{speed.toFixed(2)}x</span>
+          </button>
           
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={onPrevious}
-              className="size-12 rounded-full bg-secondary/50 flex items-center justify-center hover-elevate active-elevate-2"
+              className="min-h-[48px] min-w-[48px] size-12 rounded-full bg-secondary/50 flex items-center justify-center hover-elevate active-elevate-2"
               data-testid="button-previous"
             >
               <Icon icon="solar:skip-previous-bold" className="size-6 text-foreground" />
             </button>
             
             <button
-              className="size-16 rounded-full bg-primary flex items-center justify-center shadow-lg hover-elevate active-elevate-2 disabled:opacity-50"
+              className="min-h-[64px] min-w-[64px] size-16 rounded-full bg-primary flex items-center justify-center shadow-lg hover-elevate active-elevate-2 disabled:opacity-50"
               onClick={onPlayPause}
               disabled={isLoading}
               data-testid="button-play-pause"
@@ -108,24 +104,22 @@ export default function AudioPlayer({
             
             <button
               onClick={onNext}
-              className="size-12 rounded-full bg-secondary/50 flex items-center justify-center hover-elevate active-elevate-2"
+              className="min-h-[48px] min-w-[48px] size-12 rounded-full bg-secondary/50 flex items-center justify-center hover-elevate active-elevate-2"
               data-testid="button-next"
             >
               <Icon icon="solar:skip-next-bold" className="size-6 text-foreground" />
             </button>
           </div>
           
-          <div className="flex justify-end">
-            <button
-              className={`size-11 rounded-full flex items-center justify-center hover-elevate active-elevate-2 ${
-                repeat ? 'bg-primary/10 text-primary' : 'bg-secondary/50 text-muted-foreground'
-              }`}
-              onClick={() => onRepeatChange?.(!repeat)}
-              data-testid="button-repeat"
-            >
-              <Icon icon="solar:repeat-bold" className="size-6" />
-            </button>
-          </div>
+          <button
+            className={`min-h-[48px] min-w-[48px] size-12 rounded-full flex items-center justify-center hover-elevate active-elevate-2 ${
+              repeat ? 'bg-primary/10 text-primary' : 'bg-secondary/50 text-muted-foreground'
+            }`}
+            onClick={() => onRepeatChange?.(!repeat)}
+            data-testid="button-repeat"
+          >
+            <Icon icon="solar:repeat-bold" className="size-6" />
+          </button>
         </div>
       </div>
     </div>

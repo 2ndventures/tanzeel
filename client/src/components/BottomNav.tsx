@@ -14,8 +14,8 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-6 pointer-events-none">
-      <div className="bg-card/95 backdrop-blur-xl rounded-full shadow-2xl border border-border px-8 py-4 flex items-center gap-8 pointer-events-auto">
+    <div className="fixed bottom-0 left-0 right-0 flex justify-center pb-6 px-4 pointer-events-none" style={{ paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
+      <div className="bg-card/95 backdrop-blur-xl rounded-full shadow-2xl border border-border px-6 py-3 flex items-center gap-6 pointer-events-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           
@@ -27,7 +27,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               data-testid={`button-nav-${tab.id}`}
             >
               <div className={cn(
-                "size-12 rounded-2xl flex items-center justify-center transition-all",
+                "min-h-[48px] min-w-[48px] size-12 rounded-2xl flex items-center justify-center transition-all",
                 isActive 
                   ? "bg-gradient-to-br from-primary to-primary/90 shadow-lg shadow-primary/20" 
                   : "bg-secondary/50 hover-elevate active-elevate-2"
