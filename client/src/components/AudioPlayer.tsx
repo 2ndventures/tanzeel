@@ -92,7 +92,7 @@ export default function AudioPlayer({
             </button>
             
             <button
-              className="size-16 rounded-full bg-gradient-to-br from-primary to-primary/90 flex items-center justify-center shadow-xl shadow-primary/20 hover-elevate active-elevate-2 disabled:opacity-50"
+              className="size-16 rounded-full bg-primary flex items-center justify-center shadow-lg hover-elevate active-elevate-2 disabled:opacity-50"
               onClick={onPlayPause}
               disabled={isLoading}
               data-testid="button-play-pause"
@@ -100,9 +100,9 @@ export default function AudioPlayer({
               {isLoading ? (
                 <div className="size-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : isPlaying ? (
-                <Icon icon="solar:pause-bold" className="size-8 text-white" />
+                <Icon icon="solar:pause-bold" className="size-7 text-white" />
               ) : (
-                <Icon icon="solar:play-bold" className="size-8 text-white ml-1" />
+                <Icon icon="solar:play-bold" className="size-7 text-white ml-0.5" />
               )}
             </button>
             
