@@ -253,7 +253,7 @@ export function useWordTimingAudio(
         audio.playbackRate = speedRef.current;
         console.log(`🎵 Applied playback rate: ${speedRef.current}x`);
         
-        setState(prev => ({ ...prev, isLoading: false }));
+        setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
         
         // Auto-start playback if autoplay is enabled
         if (autoplayRef.current) {
