@@ -150,8 +150,6 @@ export default function VerseCard({
                     backgroundColor: 'rgba(59, 130, 246, 0.25)',
                     padding: '2px 8px',
                     borderRadius: '8px',
-                    textShadow: '0 0 8px rgba(59, 130, 246, 0.6), 0 2px 6px rgba(0,0,0,0.3)',
-                    boxShadow: '0 0 12px rgba(59, 130, 246, 0.4)',
                   } : {}}
                 >
                   {word}{index < words.length - 1 ? ' ' : ''}
