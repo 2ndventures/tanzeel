@@ -75,36 +75,36 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   });
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 pb-24">
-      {/* Rich layered gradients for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-slate-900/50 to-black/70" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
+      {/* Rich layered gradients for depth - adapts to theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10" />
       {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
       {/* Header */}
       <div className="relative px-8 pt-8 pb-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="font-heading text-5xl font-black tracking-tighter text-white" style={{textShadow: '0 4px 16px rgba(0,0,0,0.6)'}}>
+          <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
             Surahs
           </h1>
           <button 
-            className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate" 
+            className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-border shadow-md hover-elevate" 
             data-testid="button-search"
           >
-            <Icon icon="solar:magnifer-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
+            <Icon icon="solar:magnifer-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
           </button>
         </div>
         
         {/* Search Bar - Glass */}
-        <div className="relative mb-6 overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
+        <div className="relative mb-6 overflow-hidden rounded-3xl p-[1px] shadow-lg">
+          <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
           <div className="relative">
             <Input
               type="search"
               placeholder="Search by name or number..."
-              className="h-14 bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-white placeholder:text-gray-500 px-6"
+              className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="input-search"
@@ -113,15 +113,15 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
         </div>
 
         {/* Mode Toggle - Glass */}
-        <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
-          <div className="relative flex gap-2 p-1 bg-slate-900/60 backdrop-blur-xl rounded-3xl">
+        <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
+          <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
+          <div className="relative flex gap-2 p-1 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl">
             <button
               onClick={() => setMode("surah")}
               className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
                 mode === "surah"
-                  ? "bg-primary text-black shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
-                  : "text-gray-400"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground"
               }`}
               data-testid="button-mode-surah"
             >
@@ -131,8 +131,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               onClick={() => setMode("juz")}
               className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
                 mode === "juz"
-                  ? "bg-primary text-black shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
-                  : "text-gray-400"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground"
               }`}
               data-testid="button-mode-juz"
             >
@@ -171,7 +171,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           ))
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-400 text-lg">No chapters found</p>
+            <p className="text-muted-foreground text-lg">No chapters found</p>
           </div>
         )}
       </div>

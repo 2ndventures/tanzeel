@@ -14,7 +14,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-[0_-8px_32px_rgba(0,0,0,0.6)]">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-border bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl">
       <div className="flex items-center justify-around px-8 py-5">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -30,13 +30,13 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 icon={tab.icon} 
                 className={cn(
                   "size-7 transition-all",
-                  isActive ? "text-primary" : "text-gray-400"
+                  isActive ? "text-primary" : "text-muted-foreground"
                 )} 
-                style={isActive ? {filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'} : undefined}
+                style={isActive ? {filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'} : undefined}
               />
               <span className={cn(
                 "text-xs font-medium transition-colors",
-                isActive ? "text-primary font-semibold" : "text-gray-400"
+                isActive ? "text-primary font-semibold" : "text-muted-foreground"
               )}>
                 {tab.label}
               </span>

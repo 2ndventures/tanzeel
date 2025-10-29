@@ -94,7 +94,7 @@ export default function VerseCard({
   return (
     <div 
       className={`relative group overflow-hidden rounded-3xl p-[1px] shadow-lg cursor-pointer hover-elevate transition-all duration-300 ${
-        highlighted ? 'shadow-[0_16px_48px_rgba(59,130,246,0.4)] ring-2 ring-primary/50' : 'shadow-[0_8px_24px_rgba(0,0,0,0.5)]'
+        highlighted ? 'shadow-[0_16px_48px_rgba(59,130,246,0.4)] ring-2 ring-primary/50' : ''
       }`}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
@@ -104,12 +104,12 @@ export default function VerseCard({
     >
       {/* Gradient border */}
       <div className={`absolute inset-0 rounded-3xl transition-all ${
-        highlighted ? 'bg-gradient-to-br from-primary/50 via-primary/20 to-transparent' : 'bg-gradient-to-br from-white/10 to-transparent'
+        highlighted ? 'bg-gradient-to-br from-primary/50 via-primary/20 to-transparent' : 'bg-gradient-to-br from-border to-transparent'
       }`} />
       
       {/* Inner glass panel */}
       <div className={`relative overflow-visible rounded-3xl p-6 backdrop-blur-xl transition-all ${
-        highlighted ? 'bg-primary/10 border-l-4 border-primary' : 'bg-slate-900/70'
+        highlighted ? 'bg-primary/10 border-l-4 border-primary' : 'bg-card/80 dark:bg-slate-900/70'
       }`}>
         <div className={`space-y-6 ${getLineSpacing(lineSpacing)}`}>
           {showVerseNumbers && (
@@ -117,10 +117,9 @@ export default function VerseCard({
               <span 
                 className={`font-bold text-sm flex-shrink-0 transition-all px-4 py-2 rounded-full shadow-inner ring-1 ${
                   highlighted 
-                    ? 'bg-primary/25 text-primary ring-primary/30 shadow-[0_4px_12px_rgba(0,0,0,0.6)]' 
-                    : 'bg-slate-800/60 text-gray-400 ring-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.5)]'
+                    ? 'bg-primary/25 text-primary ring-primary/30 shadow-md' 
+                    : 'bg-muted/60 dark:bg-slate-800/60 text-muted-foreground ring-border shadow-sm'
                 }`}
-                style={highlighted ? {textShadow: '0 2px 4px rgba(0,0,0,0.5)'} : {}}
                 data-testid={`text-verse-number-${verseNumber}`}
               >
                 {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
@@ -129,9 +128,8 @@ export default function VerseCard({
           )}
           <p 
             className={`${getArabicFontSize(arabicFontSize)} font-arabic text-right transition-colors ${
-              highlighted ? 'text-white' : 'text-white'
+              highlighted ? 'text-foreground' : 'text-foreground'
             }`}
-            style={{textShadow: '0 2px 8px rgba(0,0,0,0.4)'}}
             dir="rtl"
             data-testid={`text-arabic-${verseNumber}`}
           >
@@ -152,7 +150,7 @@ export default function VerseCard({
                     backgroundColor: 'rgba(59, 130, 246, 0.25)',
                     padding: '2px 8px',
                     borderRadius: '8px',
-                    textShadow: '0 0 8px rgba(59, 130, 246, 0.6), 0 2px 6px rgba(0,0,0,0.5)',
+                    textShadow: '0 0 8px rgba(59, 130, 246, 0.6), 0 2px 6px rgba(0,0,0,0.3)',
                     boxShadow: '0 0 12px rgba(59, 130, 246, 0.4)',
                   } : {}}
                 >
@@ -164,7 +162,7 @@ export default function VerseCard({
           {showTransliteration && transliteration && (
             <p 
               className={`${getTransliterationFontSize(transliterationFontSize)} italic transition-colors ${
-                highlighted ? 'text-gray-300' : 'text-gray-400'
+                highlighted ? 'text-foreground/80' : 'text-muted-foreground'
               }`} 
               data-testid={`text-transliteration-${verseNumber}`}
             >
@@ -174,7 +172,7 @@ export default function VerseCard({
           {showTranslation && (
             <p 
               className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
-                highlighted ? 'text-white' : 'text-gray-300'
+                highlighted ? 'text-foreground' : 'text-foreground/90'
               }`} 
               data-testid={`text-translation-${verseNumber}`}
             >

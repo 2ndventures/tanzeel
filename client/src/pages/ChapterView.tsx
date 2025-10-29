@@ -225,35 +225,35 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex flex-col">
-      {/* Rich layered gradients for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-slate-900/50 to-black/70" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background flex flex-col">
+      {/* Rich layered gradients for depth - adapts to theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10" />
       {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
       {/* Header - Glass Treatment */}
       <header className="sticky top-0 z-10 mt-4">
         <div className="relative overflow-hidden">
           {/* Glass background */}
-          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5" />
+          <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
           
-          <div className="relative flex items-center justify-between px-6 py-6 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+          <div className="relative flex items-center justify-between px-6 py-6 shadow-xl">
             <button 
-              className="flex size-12 items-center justify-center rounded-full bg-slate-800/60 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate ring-1 ring-white/10"
+              className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate ring-1 ring-border"
               onClick={onBack}
               data-testid="button-back"
             >
-              <ArrowLeft className="w-5 h-5 text-white" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
+              <ArrowLeft className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
             </button>
             
             <div className="flex flex-col items-center flex-1 mx-4">
-              <h1 className="text-2xl font-bold text-white mb-1" style={{textShadow: '0 4px 12px rgba(0,0,0,0.5)'}} data-testid="text-chapter-title-english">
+              <h1 className="text-2xl font-bold text-foreground mb-1" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-chapter-title-english">
                 {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
               </h1>
-              <p className="text-sm text-gray-400" data-testid="text-surah-number">
+              <p className="text-sm text-muted-foreground" data-testid="text-surah-number">
                 {chapterInfo?.revelationType || 'The Opening'}
               </p>
             </div>
@@ -261,10 +261,10 @@ export default function ChapterView({
             <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
               <SheetTrigger asChild>
                 <button 
-                  className="flex size-12 items-center justify-center rounded-full bg-slate-800/60 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate ring-1 ring-white/10" 
+                  className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate ring-1 ring-border" 
                   data-testid="button-menu"
                 >
-                  <MoreVertical className="w-5 h-5 text-white" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
+                  <MoreVertical className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </button>
               </SheetTrigger>
             <SheetContent side="bottom" className="h-[85vh]">
