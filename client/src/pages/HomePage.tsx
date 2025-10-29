@@ -23,17 +23,21 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background to-card">
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50" />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950">
+      {/* Rich layered gradients for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-slate-900/50 to-black/70" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+      {/* Vignette effect */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
       
       {/* Status Bar */}
       <div className="relative flex items-center justify-between px-8 py-4">
-        <span className="text-sm font-semibold text-foreground">9:41</span>
+        <span className="text-sm font-semibold text-white">9:41</span>
         <div className="flex items-center gap-1">
-          <Icon icon="solar:signal-bold" className="size-4 text-foreground" />
-          <Icon icon="solar:wifi-router-bold" className="size-4 text-foreground" />
-          <Icon icon="solar:battery-charge-bold" className="size-4 text-foreground" />
+          <Icon icon="solar:signal-bold" className="size-4 text-white" />
+          <Icon icon="solar:wifi-router-bold" className="size-4 text-white" />
+          <Icon icon="solar:battery-charge-bold" className="size-4 text-white" />
         </div>
       </div>
 
@@ -42,12 +46,12 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         {/* Profile Section */}
         <div className="flex items-center justify-between py-6">
           <div>
-            <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
-            <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
+            <p className="text-sm text-gray-400">As-salamu alaykum</p>
+            <h2 className="font-heading text-4xl font-black tracking-tighter text-white" style={{textShadow: '0 0 20px rgba(255,214,10,0.3)'}}>
               Ahmad
             </h2>
           </div>
-          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_rgba(255,214,10,0.3)]">
+          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-[0_0_40px_rgba(255,214,10,0.6)] ring-2 ring-primary/50 ring-offset-2 ring-offset-primary/10">
             <img
               alt="Profile"
               src="https://randomuser.me/api/portraits/men/32.jpg"
@@ -56,66 +60,80 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </div>
         </div>
 
-        {/* Continue Reading Card */}
-        <div className="mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl" />
-          <div className="relative mb-6 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-foreground/70">Continue Reading</p>
-              <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground">
-                Surah Al-Baqarah
-              </h3>
-              <p className="mt-2 text-sm text-foreground/60">Ayah 156 of 286</p>
+        {/* Continue Reading Card - Multi-layer glass */}
+        <div className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-2xl shadow-[0_0_50px_rgba(255,214,10,0.4)]">
+          {/* Gradient border */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-amber-500/30 to-primary/40 rounded-3xl" />
+          {/* Inner glass panel */}
+          <div className="relative overflow-hidden rounded-3xl bg-slate-900/60 p-8 backdrop-blur-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-amber-500/10 rounded-3xl" />
+            <div className="relative mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Continue Reading</p>
+                <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-white" style={{textShadow: '0 0 15px rgba(255,214,10,0.4)'}}>
+                  Surah Al-Baqarah
+                </h3>
+                <p className="mt-2 text-sm text-gray-500">Ayah 156 of 286</p>
+              </div>
+              <Icon icon="solar:book-2-bold" className="size-14 text-white/10" />
             </div>
-            <Icon icon="solar:book-2-bold" className="size-14 text-foreground/20" />
-          </div>
-          <div className="mb-4 h-3 overflow-hidden rounded-full bg-foreground/10">
-            <div
-              style={{ width: "54%" }}
-              className="h-full rounded-full bg-gradient-to-r from-primary to-secondary shadow-inner"
-            />
-          </div>
-          <div className="flex items-center justify-between text-xs text-foreground/60">
-            <span>54% Complete</span>
-            <span>130 Ayahs left</span>
+            <div className="mb-4 h-3 overflow-hidden rounded-full bg-black/40 shadow-inner ring-1 ring-white/5">
+              <div
+                style={{ width: "54%" }}
+                className="h-full rounded-full bg-gradient-to-r from-primary via-amber-500 to-primary shadow-[0_0_15px_rgba(255,214,10,0.6)]"
+              />
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-400">
+              <span>54% Complete</span>
+              <span>130 Ayahs left</span>
+            </div>
           </div>
         </div>
 
         {/* Quick Access */}
         <div className="mb-6">
-          <h3 className="mb-6 text-sm font-bold tracking-wider text-muted-foreground uppercase">
+          <h3 className="mb-6 text-sm font-bold tracking-wider text-gray-400 uppercase" style={{textShadow: '0 0 10px rgba(255,214,10,0.15)'}}>
             QUICK ACCESS
           </h3>
           <div className="grid grid-cols-3 gap-6">
             <div 
-              className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 hover-elevate cursor-pointer"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_0_20px_rgba(255,214,10,0.2)] hover-elevate cursor-pointer group"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               data-testid="button-bookmarks"
             >
-              <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-inner">
-                <Icon icon="solar:bookmark-bold" className="size-7 text-primary" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl" />
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-slate-900/70 p-6 backdrop-blur-xl">
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-[0_0_20px_rgba(255,214,10,0.4)] shadow-inner ring-1 ring-primary/30">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 0 8px rgba(255,214,10,0.6))'}} />
+                </div>
+                <span className="text-xs font-semibold text-white">Bookmarks</span>
               </div>
-              <span className="text-xs font-semibold text-foreground">Bookmarks</span>
             </div>
             <div 
-              className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 hover-elevate cursor-pointer"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_0_20px_rgba(255,165,0,0.2)] hover-elevate cursor-pointer group"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               data-testid="button-favorites"
             >
-              <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-secondary/20 shadow-inner">
-                <Icon icon="solar:star-bold" className="size-7 text-secondary" />
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-transparent rounded-3xl" />
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-slate-900/70 p-6 backdrop-blur-xl">
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 shadow-[0_0_20px_rgba(255,165,0,0.4)] shadow-inner ring-1 ring-amber-500/30">
+                  <Icon icon="solar:star-bold" className="size-7 text-amber-500" style={{filter: 'drop-shadow(0 0 8px rgba(255,165,0,0.6))'}} />
+                </div>
+                <span className="text-xs font-semibold text-white">Favorites</span>
               </div>
-              <span className="text-xs font-semibold text-foreground">Favorites</span>
             </div>
             <div 
-              className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 hover-elevate cursor-pointer"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_0_20px_rgba(255,214,10,0.2)] hover-elevate cursor-pointer group"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               data-testid="button-history"
             >
-              <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-accent/20 shadow-inner">
-                <Icon icon="solar:history-bold" className="size-7 text-accent" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl" />
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-slate-900/70 p-6 backdrop-blur-xl">
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-[0_0_20px_rgba(255,214,10,0.4)] shadow-inner ring-1 ring-primary/30">
+                  <Icon icon="solar:history-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 0 8px rgba(255,214,10,0.6))'}} />
+                </div>
+                <span className="text-xs font-semibold text-white">History</span>
               </div>
-              <span className="text-xs font-semibold text-foreground">History</span>
             </div>
           </div>
         </div>
@@ -123,34 +141,39 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         {/* Today's Reading */}
         <div>
           <div className="mb-6 flex items-center justify-between">
-            <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
+            <h3 className="text-sm font-bold tracking-wider text-gray-400 uppercase" style={{textShadow: '0 0 10px rgba(255,214,10,0.15)'}}>
               TODAY'S READING
             </h3>
-            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" />
+            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" style={{filter: 'drop-shadow(0 0 8px rgba(255,214,10,0.6))'}} />
           </div>
           <div 
-            className="rounded-3xl border border-border/50 bg-card/80 p-6 shadow-lg backdrop-blur-sm hover-elevate cursor-pointer"
+            className="relative group overflow-hidden rounded-3xl p-[1px] shadow-2xl shadow-[0_0_40px_rgba(255,214,10,0.3)] hover-elevate cursor-pointer"
             onClick={() => onNavigate("chapter", 55)}
             data-testid="card-todays-reading"
           >
-            <div className="mb-4 flex items-start justify-between">
-              <div>
-                <h4 className="font-heading text-2xl font-bold tracking-tighter text-foreground">
-                  Surah Ar-Rahman
-                </h4>
-                <p className="mt-2 text-sm text-muted-foreground">The Most Merciful • 78 Ayahs</p>
+            {/* Gradient border */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-transparent to-amber-500/30 rounded-3xl" />
+            {/* Inner glass panel */}
+            <div className="relative overflow-hidden rounded-3xl bg-slate-900/70 p-6 backdrop-blur-2xl">
+              <div className="mb-4 flex items-start justify-between">
+                <div>
+                  <h4 className="font-heading text-2xl font-bold tracking-tighter text-white" style={{textShadow: '0 0 15px rgba(255,214,10,0.4)'}}>
+                    Surah Ar-Rahman
+                  </h4>
+                  <p className="mt-2 text-sm text-gray-400">The Most Merciful • 78 Ayahs</p>
+                </div>
+                <div className="rounded-2xl bg-primary/25 px-4 py-2 shadow-[0_0_20px_rgba(255,214,10,0.5)] shadow-inner ring-1 ring-primary/40">
+                  <span className="text-sm font-bold text-primary" style={{textShadow: '0 0 10px rgba(255,214,10,0.6)'}}>55</span>
+                </div>
               </div>
-              <div className="rounded-2xl bg-primary/20 px-4 py-2 shadow-inner">
-                <span className="text-sm font-bold text-primary">55</span>
+              <div className="rounded-2xl bg-black/40 p-6 border border-white/5 ring-1 ring-white/5">
+                <p className="text-center font-arabic text-3xl leading-relaxed text-white" style={{textShadow: '0 0 10px rgba(255,214,10,0.2)'}}>
+                  فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
+                </p>
+                <p className="mt-4 text-center text-sm italic text-gray-400">
+                  Then which of the favors of your Lord will you deny?
+                </p>
               </div>
-            </div>
-            <div className="rounded-2xl bg-muted/10 p-6 border border-border/30">
-              <p className="text-center font-arabic text-3xl leading-relaxed text-foreground">
-                فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
-              </p>
-              <p className="mt-4 text-center text-sm italic text-muted-foreground">
-                Then which of the favors of your Lord will you deny?
-              </p>
             </div>
           </div>
         </div>
