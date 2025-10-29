@@ -406,13 +406,14 @@ export function useWordTimingAudio(
       const seekTime = verseTiming.timestamp_from / 1000;
       audioRef.current.currentTime = seekTime;
       
-      // Immediately update the highlighting state for the seeked verse
-      const { verseKey: currentVerseKey, wordIndex } = findCurrentSegment(seekTime);
-      setState(prev => ({ 
-        ...prev, 
+      // Immediately update state to reflect the new position
+      // This ensures UI updates even in iframe contexts where timeupdate may be delayed
+      const { verseKey: newVerseKey, wordIndex: newWordIndex } = findCurrentSegment(seekTime);
+      setState(prev => ({
+        ...prev,
         currentTime: seekTime,
-        currentVerseKey,
-        currentWordIndex: wordIndex,
+        currentVerseKey: newVerseKey,
+        currentWordIndex: newWordIndex,
       }));
     }
   }, [findCurrentSegment]);
