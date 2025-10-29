@@ -1,6 +1,6 @@
 # Overview
 
-This mobile-first Quran Reading application allows users to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. It features a modern, dark-themed interface built with React, TypeScript, and shadcn/ui. The application focuses on delivering an optimized mobile experience with capabilities such as chapter browsing, continuous chapter audio playback with word-level synchronized highlighting (karaoke-style), and customizable display settings. The business vision is to provide a premium, aesthetically pleasing, and highly functional digital Quran experience.
+This mobile-first Quran Reading application allows users to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. It features a modern interface built with React, TypeScript, and shadcn/ui, offering both light and dark theme variants with a premium glassmorphism aesthetic. The application focuses on delivering an optimized mobile experience with capabilities such as chapter browsing, continuous chapter audio playback with word-level synchronized highlighting (karaoke-style), and customizable display settings. The business vision is to provide a premium, aesthetically pleasing, and highly functional digital Quran experience.
 
 # User Preferences
 
@@ -10,7 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 
-The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. The UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a dark-themed, mobile-first design with a premium dark glassmorphism aesthetic. State management utilizes React Hooks for local state and React Query for server state. Client-side navigation uses a page state system with HomePage, SurahJuz, and Settings screens. The application features a consistent premium dark glassmorphism design system across all UI elements, including pages, components, modals, dropdowns, and sheets, with elegant dark gray shadows and dark gradient backgrounds. All page headers (Surahs, Settings) use consistent large, bold typography (text-5xl font-black) with non-sticky layouts and circular action buttons for optimal visual harmony.
+The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. The UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a mobile-first design with a premium glassmorphism aesthetic that adapts to both light and dark themes. State management utilizes React Hooks for local state and React Query for server state. Client-side navigation uses a page state system with HomePage, SurahJuz, and Settings screens. The application features a consistent premium glassmorphism design system across all UI elements, including pages, components, modals, dropdowns, and sheets, with elegant shadows and gradient backgrounds that automatically adapt to the selected theme. All page headers (Surahs, Settings) use consistent large, bold typography (text-5xl font-black) with non-sticky layouts and circular action buttons for optimal visual harmony.
+
+### Theme System (Updated October 29, 2025)
+
+The application implements a comprehensive light and dark theme system using CSS variables in `client/src/index.css`:
+- **Light Mode**: Soft backgrounds (slate-50), dark text (slate-950), subtle shadows and borders
+- **Dark Mode**: Deep backgrounds (slate-950), light text, stronger shadows with indigo/amber accents
+- **Theme Toggle**: Available in Settings page, persists in localStorage via App.tsx
+- **Components**: All pages and UI components use semantic theme tokens (bg-background, bg-card, text-foreground, text-muted-foreground, border) for automatic theme adaptation
+- **Glassmorphism**: Multi-layer glass effects adapt to each theme while maintaining premium aesthetic
+- **Visual Consistency**: Background gradients, card styling, text colors, borders, and shadows all respond seamlessly to theme changes
 
 ## Backend Architecture
 
