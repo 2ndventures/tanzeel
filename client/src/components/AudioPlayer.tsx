@@ -102,9 +102,9 @@ export default function AudioPlayer({
                 {isLoading ? (
                   <div className="size-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : isPlaying ? (
-                  <Icon icon="solar:pause-bold" className="size-7 text-black" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
+                  <Icon icon="solar:pause-bold" className="size-7 text-white" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
                 ) : (
-                  <Icon icon="solar:play-bold" className="size-7 text-black ml-0.5" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
+                  <Icon icon="solar:play-bold" className="size-7 text-white ml-0.5" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
                 )}
               </button>
               
