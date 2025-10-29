@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react";
 import SettingItem from "@/components/SettingItem";
 import BottomNav from "@/components/BottomNav";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { getAllReciters, getReciterDisplayName } from "@/lib/reciters";
 
 interface SettingsProps {
@@ -85,27 +84,23 @@ export default function Settings({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Glass header with premium treatment */}
-      <header className="sticky top-0 z-10 backdrop-blur-xl bg-slate-900/80 border-b border-white/5 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5" />
-          <div className="relative flex items-center gap-4 p-5">
-            <button 
-              className="min-h-[48px] min-w-[48px] size-12 p-2 hover-elevate active-elevate-2 rounded-full bg-slate-800/60 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.6)] ring-1 ring-white/10"
-              onClick={onBack}
-              data-testid="button-back"
-            >
-              <Icon icon="solar:alt-arrow-left-bold" className="w-6 h-6 text-white" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
-            </button>
-            <h1 className="text-2xl font-bold text-white tracking-tight" data-testid="text-title" style={{textShadow: '0 4px 12px rgba(0,0,0,0.5)'}}>
-              Settings
-            </h1>
-          </div>
+      {/* Header */}
+      <div className="relative px-8 pt-8 pb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="font-heading text-5xl font-black tracking-tighter text-white" style={{textShadow: '0 4px 16px rgba(0,0,0,0.6)'}} data-testid="text-title">
+            Settings
+          </h1>
+          <button 
+            className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate"
+            onClick={onBack}
+            data-testid="button-back"
+          >
+            <Icon icon="solar:alt-arrow-left-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
+          </button>
         </div>
-      </header>
+      </div>
 
-      <ScrollArea className="h-[calc(100vh-140px)]">
-        <div className="p-6 space-y-8">
+      <div className="relative px-8 space-y-8 pb-24">
           {/* Display Section */}
           <div>
             <h2 className="text-lg font-semibold text-white mb-4" style={{textShadow: '0 2px 8px rgba(0,0,0,0.4)'}}>Display</h2>
@@ -259,8 +254,7 @@ export default function Settings({
               </div>
             </div>
           </div>
-        </div>
-      </ScrollArea>
+      </div>
 
       <BottomNav
         activeTab="settings"
