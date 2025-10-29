@@ -30,19 +30,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
-      
-      {/* Status Bar */}
-      <div className="relative flex items-center justify-between px-8 py-4">
-        <span className="text-sm font-semibold text-white">9:41</span>
-        <div className="flex items-center gap-1">
-          <Icon icon="solar:signal-bold" className="size-4 text-white" />
-          <Icon icon="solar:wifi-router-bold" className="size-4 text-white" />
-          <Icon icon="solar:battery-charge-bold" className="size-4 text-white" />
-        </div>
-      </div>
 
       {/* Main Content */}
-      <div className="relative px-8 pb-24">
+      <div className="relative px-8 pb-24 pt-8">
         {/* Profile Section */}
         <div className="flex items-center justify-between py-6">
           <div>

@@ -232,19 +232,9 @@ export default function ChapterView({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
-      
-      {/* Status Bar */}
-      <div className="relative flex items-center justify-between px-8 py-4 z-20">
-        <span className="text-sm font-semibold text-white">9:41</span>
-        <div className="flex items-center gap-2">
-          <Icon icon="solar:wi-fi-bold" className="size-4 text-white" />
-          <Icon icon="solar:signal-bold" className="size-4 text-white" />
-          <Icon icon="solar:battery-charge-bold" className="size-5 text-white" />
-        </div>
-      </div>
 
       {/* Header - Glass Treatment */}
-      <header className="sticky top-0 z-10">
+      <header className="sticky top-0 z-10 mt-4">
         <div className="relative overflow-hidden">
           {/* Glass background */}
           <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-xl" />

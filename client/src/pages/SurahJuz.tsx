@@ -82,19 +82,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
-      
-      {/* Status Bar */}
-      <div className="relative flex items-center justify-between px-8 py-4">
-        <span className="text-sm font-semibold text-white">9:41</span>
-        <div className="flex items-center gap-2">
-          <Icon icon="solar:wi-fi-bold" className="size-4 text-white" />
-          <Icon icon="solar:signal-bold" className="size-4 text-white" />
-          <Icon icon="solar:battery-charge-bold" className="size-5 text-white" />
-        </div>
-      </div>
 
       {/* Header */}
-      <div className="relative px-8 pt-4 pb-6">
+      <div className="relative px-8 pt-8 pb-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-heading text-5xl font-black tracking-tighter text-white" style={{textShadow: '0 4px 16px rgba(0,0,0,0.6)'}}>
             Surahs
