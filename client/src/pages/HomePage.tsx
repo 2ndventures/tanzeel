@@ -47,11 +47,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <div className="flex items-center justify-between py-6">
           <div>
             <p className="text-sm text-gray-400">As-salamu alaykum</p>
-            <h2 className="font-heading text-4xl font-black tracking-tighter text-white" style={{textShadow: '0 0 20px rgba(255,214,10,0.3)'}}>
+            <h2 className="font-heading text-4xl font-black tracking-tighter text-white" style={{textShadow: '0 4px 12px rgba(0,0,0,0.5)'}}>
               Ahmad
             </h2>
           </div>
-          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-[0_0_40px_rgba(255,214,10,0.6)] ring-2 ring-primary/50 ring-offset-2 ring-offset-primary/10">
+          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-[0_8px_32px_rgba(0,0,0,0.6)] ring-2 ring-white/10">
             <img
               alt="Profile"
               src="https://randomuser.me/api/portraits/men/32.jpg"
@@ -61,16 +61,16 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
 
         {/* Continue Reading Card - Multi-layer glass */}
-        <div className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-2xl shadow-[0_0_50px_rgba(255,214,10,0.4)]">
+        <div className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-2xl shadow-[0_12px_48px_rgba(0,0,0,0.7)]">
           {/* Gradient border */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-amber-500/30 to-primary/40 rounded-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-white/10 rounded-3xl" />
           {/* Inner glass panel */}
           <div className="relative overflow-hidden rounded-3xl bg-slate-900/60 p-8 backdrop-blur-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-amber-500/10 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-3xl" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Continue Reading</p>
-                <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-white" style={{textShadow: '0 0 15px rgba(255,214,10,0.4)'}}>
+                <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-white" style={{textShadow: '0 4px 12px rgba(0,0,0,0.5)'}}>
                   Surah Al-Baqarah
                 </h3>
                 <p className="mt-2 text-sm text-gray-500">Ayah 156 of 286</p>
@@ -80,7 +80,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             <div className="mb-4 h-3 overflow-hidden rounded-full bg-black/40 shadow-inner ring-1 ring-white/5">
               <div
                 style={{ width: "54%" }}
-                className="h-full rounded-full bg-gradient-to-r from-primary via-amber-500 to-primary shadow-[0_0_15px_rgba(255,214,10,0.6)]"
+                className="h-full rounded-full bg-gradient-to-r from-primary via-amber-500 to-primary shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
               />
             </div>
             <div className="flex items-center justify-between text-xs text-gray-400">
@@ -92,45 +92,45 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
         {/* Quick Access */}
         <div className="mb-6">
-          <h3 className="mb-6 text-sm font-bold tracking-wider text-gray-400 uppercase" style={{textShadow: '0 0 10px rgba(255,214,10,0.15)'}}>
+          <h3 className="mb-6 text-sm font-bold tracking-wider text-gray-400 uppercase" style={{textShadow: '0 2px 8px rgba(0,0,0,0.4)'}}>
             QUICK ACCESS
           </h3>
           <div className="grid grid-cols-3 gap-6">
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_0_20px_rgba(255,214,10,0.2)] hover-elevate cursor-pointer group"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover-elevate cursor-pointer group"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               data-testid="button-bookmarks"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
               <div className="relative flex flex-col items-center justify-center rounded-3xl bg-slate-900/70 p-6 backdrop-blur-xl">
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-[0_0_20px_rgba(255,214,10,0.4)] shadow-inner ring-1 ring-primary/30">
-                  <Icon icon="solar:bookmark-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 0 8px rgba(255,214,10,0.6))'}} />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-[0_4px_16px_rgba(0,0,0,0.6)] shadow-inner ring-1 ring-white/10">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
                 </div>
                 <span className="text-xs font-semibold text-white">Bookmarks</span>
               </div>
             </div>
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_0_20px_rgba(255,165,0,0.2)] hover-elevate cursor-pointer group"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover-elevate cursor-pointer group"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               data-testid="button-favorites"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-transparent rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
               <div className="relative flex flex-col items-center justify-center rounded-3xl bg-slate-900/70 p-6 backdrop-blur-xl">
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 shadow-[0_0_20px_rgba(255,165,0,0.4)] shadow-inner ring-1 ring-amber-500/30">
-                  <Icon icon="solar:star-bold" className="size-7 text-amber-500" style={{filter: 'drop-shadow(0 0 8px rgba(255,165,0,0.6))'}} />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 shadow-[0_4px_16px_rgba(0,0,0,0.6)] shadow-inner ring-1 ring-white/10">
+                  <Icon icon="solar:star-bold" className="size-7 text-amber-500" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
                 </div>
                 <span className="text-xs font-semibold text-white">Favorites</span>
               </div>
             </div>
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_0_20px_rgba(255,214,10,0.2)] hover-elevate cursor-pointer group"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] hover-elevate cursor-pointer group"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               data-testid="button-history"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-transparent rounded-3xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
               <div className="relative flex flex-col items-center justify-center rounded-3xl bg-slate-900/70 p-6 backdrop-blur-xl">
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-[0_0_20px_rgba(255,214,10,0.4)] shadow-inner ring-1 ring-primary/30">
-                  <Icon icon="solar:history-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 0 8px rgba(255,214,10,0.6))'}} />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-[0_4px_16px_rgba(0,0,0,0.6)] shadow-inner ring-1 ring-white/10">
+                  <Icon icon="solar:history-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
                 </div>
                 <span className="text-xs font-semibold text-white">History</span>
               </div>
@@ -141,33 +141,33 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         {/* Today's Reading */}
         <div>
           <div className="mb-6 flex items-center justify-between">
-            <h3 className="text-sm font-bold tracking-wider text-gray-400 uppercase" style={{textShadow: '0 0 10px rgba(255,214,10,0.15)'}}>
+            <h3 className="text-sm font-bold tracking-wider text-gray-400 uppercase" style={{textShadow: '0 2px 8px rgba(0,0,0,0.4)'}}>
               TODAY'S READING
             </h3>
-            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" style={{filter: 'drop-shadow(0 0 8px rgba(255,214,10,0.6))'}} />
+            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
           </div>
           <div 
-            className="relative group overflow-hidden rounded-3xl p-[1px] shadow-2xl shadow-[0_0_40px_rgba(255,214,10,0.3)] hover-elevate cursor-pointer"
+            className="relative group overflow-hidden rounded-3xl p-[1px] shadow-2xl shadow-[0_12px_48px_rgba(0,0,0,0.7)] hover-elevate cursor-pointer"
             onClick={() => onNavigate("chapter", 55)}
             data-testid="card-todays-reading"
           >
             {/* Gradient border */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-transparent to-amber-500/30 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-white/5 to-white/10 rounded-3xl" />
             {/* Inner glass panel */}
             <div className="relative overflow-hidden rounded-3xl bg-slate-900/70 p-6 backdrop-blur-2xl">
               <div className="mb-4 flex items-start justify-between">
                 <div>
-                  <h4 className="font-heading text-2xl font-bold tracking-tighter text-white" style={{textShadow: '0 0 15px rgba(255,214,10,0.4)'}}>
+                  <h4 className="font-heading text-2xl font-bold tracking-tighter text-white" style={{textShadow: '0 4px 12px rgba(0,0,0,0.5)'}}>
                     Surah Ar-Rahman
                   </h4>
                   <p className="mt-2 text-sm text-gray-400">The Most Merciful • 78 Ayahs</p>
                 </div>
-                <div className="rounded-2xl bg-primary/25 px-4 py-2 shadow-[0_0_20px_rgba(255,214,10,0.5)] shadow-inner ring-1 ring-primary/40">
-                  <span className="text-sm font-bold text-primary" style={{textShadow: '0 0 10px rgba(255,214,10,0.6)'}}>55</span>
+                <div className="rounded-2xl bg-primary/25 px-4 py-2 shadow-[0_4px_16px_rgba(0,0,0,0.6)] shadow-inner ring-1 ring-white/10">
+                  <span className="text-sm font-bold text-primary" style={{textShadow: '0 2px 6px rgba(0,0,0,0.5)'}}>55</span>
                 </div>
               </div>
               <div className="rounded-2xl bg-black/40 p-6 border border-white/5 ring-1 ring-white/5">
-                <p className="text-center font-arabic text-3xl leading-relaxed text-white" style={{textShadow: '0 0 10px rgba(255,214,10,0.2)'}}>
+                <p className="text-center font-arabic text-3xl leading-relaxed text-white" style={{textShadow: '0 2px 8px rgba(0,0,0,0.4)'}}>
                   فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
                 </p>
                 <p className="mt-4 text-center text-sm italic text-gray-400">

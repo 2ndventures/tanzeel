@@ -14,6 +14,7 @@ interface SurahJuzProps {
 export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [mode, setMode] = useState<"surah" | "juz">("surah");
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,36 +30,85 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   );
 
   return (
-    <div className="min-h-screen bg-background pb-32 animate-fade-in">
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-lg border-b border-border shadow-sm">
-        <div className="flex items-center justify-between p-5">
-          <div className="w-10"></div>
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight" data-testid="text-title">Explore Surahs</h1>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 pb-24">
+      {/* Rich layered gradients for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-slate-900/50 to-black/70" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+      {/* Vignette effect */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+      
+      {/* Status Bar */}
+      <div className="relative flex items-center justify-between px-8 py-4">
+        <span className="text-sm font-semibold text-white">9:41</span>
+        <div className="flex items-center gap-2">
+          <Icon icon="solar:wi-fi-bold" className="size-4 text-white" />
+          <Icon icon="solar:signal-bold" className="size-4 text-white" />
+          <Icon icon="solar:battery-charge-bold" className="size-5 text-white" />
+        </div>
+      </div>
+
+      {/* Header */}
+      <div className="relative px-8 pt-4 pb-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="font-heading text-5xl font-black tracking-tighter text-white" style={{textShadow: '0 4px 16px rgba(0,0,0,0.6)'}}>
+            Surahs
+          </h1>
           <button 
-            className="min-h-[48px] min-w-[48px] p-2.5 hover-elevate active-elevate-2 rounded-xl transition-smooth" 
-            data-testid="button-settings"
-            onClick={() => onNavigate("settings", undefined, "settings")}
+            className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate" 
+            data-testid="button-search"
           >
-            <Icon icon="solar:settings-bold" className="w-6 h-6 text-foreground" />
+            <Icon icon="solar:magnifer-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
           </button>
         </div>
         
-        <div className="px-5 pb-5">
+        {/* Search Bar - Glass */}
+        <div className="relative mb-6 overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
           <div className="relative">
-            <Icon icon="solar:magnifer-bold" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search chapters..."
-              className="pl-12 h-12 bg-card/50 border-border rounded-3xl shadow-sm transition-smooth focus:shadow-md"
+              placeholder="Search by name or number..."
+              className="h-14 bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-white placeholder:text-gray-500 px-6"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="input-search"
             />
           </div>
         </div>
-      </header>
 
-      <div className="p-5 space-y-3">
+        {/* Mode Toggle - Glass */}
+        <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl" />
+          <div className="relative flex gap-2 p-1 bg-slate-900/60 backdrop-blur-xl rounded-3xl">
+            <button
+              onClick={() => setMode("surah")}
+              className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
+                mode === "surah"
+                  ? "bg-primary text-black shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+                  : "text-gray-400"
+              }`}
+              data-testid="button-mode-surah"
+            >
+              All Surahs
+            </button>
+            <button
+              onClick={() => setMode("juz")}
+              className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
+                mode === "juz"
+                  ? "bg-primary text-black shadow-[0_4px_16px_rgba(0,0,0,0.6)]"
+                  : "text-gray-400"
+              }`}
+              data-testid="button-mode-juz"
+            >
+              Juz
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Chapter List */}
+      <div className="relative px-8 space-y-3">
         {isLoading ? (
           Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="flex items-center gap-4 p-5">
@@ -86,7 +136,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           ))
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">No chapters found</p>
+            <p className="text-gray-400 text-lg">No chapters found</p>
           </div>
         )}
       </div>
