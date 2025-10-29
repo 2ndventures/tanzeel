@@ -1,23 +1,13 @@
-import { Search, Play } from "lucide-react";
+import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { chapters } from "@/lib/quranData";
 import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 
 interface HomePageProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
   activeTab?: "home" | "surah" | "settings";
 }
-
-const featuredSurahs = [
-  { id: 1, meaning: "The Opening" },
-  { id: 2, meaning: "The Cow" },
-  { id: 3, meaning: "Family of Imran" },
-];
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
   const [stats, setStats] = useState(() => getReadingStats());
@@ -33,175 +23,140 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   }, []);
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="max-w-md w-full mx-auto px-5 pt-6 pb-4">
-        {/* Header with greeting and search */}
-        <div className="flex items-start justify-between mb-6">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background to-card">
+      {/* Subtle gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50" />
+      
+      {/* Status Bar */}
+      <div className="relative flex items-center justify-between px-8 py-4">
+        <span className="text-sm font-semibold text-foreground">9:41</span>
+        <div className="flex items-center gap-1">
+          <Icon icon="solar:signal-bold" className="size-4 text-foreground" />
+          <Icon icon="solar:wifi-router-bold" className="size-4 text-foreground" />
+          <Icon icon="solar:battery-charge-bold" className="size-4 text-foreground" />
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="relative px-8 pb-24">
+        {/* Profile Section */}
+        <div className="flex items-center justify-between py-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-1" data-testid="text-greeting">
-              As-Salamu<br />Alaykum
-            </h1>
-            <p className="text-sm text-muted-foreground" data-testid="text-subtitle">
-              Continue your spiritual journey
-            </p>
-          </div>
-          <Button 
-            size="icon" 
-            variant="ghost" 
-            className="mt-1"
-            data-testid="button-search"
-            onClick={() => onNavigate("surah-juz", undefined, "surah")}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-        </div>
-
-        {/* Reading Progress Card */}
-        <Card className="p-5 mb-4" data-testid="card-reading-progress">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-foreground rounded" />
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground mb-0.5" data-testid="text-progress-label">
-                  Reading Progress
-                </p>
-                <p className="text-base font-semibold text-foreground" data-testid="text-current-juz">
-                  Juz 12
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-foreground" data-testid="text-progress-percentage">
-                47%
-              </p>
-              <p className="text-xs text-muted-foreground" data-testid="text-completed-label">
-                Completed
-              </p>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mb-5">
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-primary rounded-full transition-all duration-300"
-                style={{ width: '47%' }}
-                data-testid="progress-bar"
-              />
-            </div>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center" data-testid="stat-day-streak">
-              <p className="text-2xl font-bold text-foreground mb-1">{stats.dayStreak}</p>
-              <p className="text-xs text-muted-foreground">Days Streak</p>
-            </div>
-            <div className="text-center" data-testid="stat-pages-read">
-              <p className="text-2xl font-bold text-foreground mb-1">{stats.versesRead}</p>
-              <p className="text-xs text-muted-foreground">Pages Read</p>
-            </div>
-            <div className="text-center" data-testid="stat-weekly-time">
-              <p className="text-2xl font-bold text-foreground mb-1">{formatReadingTime(stats.weeklyMinutes)}</p>
-              <p className="text-xs text-muted-foreground">This Week</p>
-            </div>
-          </div>
-        </Card>
-
-        {/* Continue Reading Button */}
-        <div className="mb-6">
-          <Button 
-            className="gap-2 h-12 rounded-full px-6" 
-            data-testid="button-continue-reading"
-            onClick={() => onNavigate("chapter", 12)}
-          >
-            <Play className="h-4 w-4 fill-current" />
-            Continue Reading
-          </Button>
-        </div>
-
-        {/* Explore Surahs Section */}
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-foreground" data-testid="text-explore-surahs">
-              Explore Surahs
+            <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
+            <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
+              Ahmad
             </h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-primary font-medium gap-1 h-auto px-2 py-1"
-              data-testid="button-view-all"
-              onClick={() => onNavigate("surah-juz", undefined, "surah")}
-            >
-              View All
-              <span className="text-lg">›</span>
-            </Button>
           </div>
+          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_rgba(255,214,10,0.3)]">
+            <img
+              alt="Profile"
+              src="https://randomuser.me/api/portraits/men/32.jpg"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
 
-          {/* Surah List */}
-          <div className="space-y-3">
-            {featuredSurahs.map((featured) => {
-              const chapter = chapters.find(ch => ch.id === featured.id);
-              if (!chapter) return null;
+        {/* Continue Reading Card */}
+        <div className="mb-6 overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl" />
+          <div className="relative mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-foreground/70">Continue Reading</p>
+              <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground">
+                Surah Al-Baqarah
+              </h3>
+              <p className="mt-2 text-sm text-foreground/60">Ayah 156 of 286</p>
+            </div>
+            <Icon icon="solar:book-2-bold" className="size-14 text-foreground/20" />
+          </div>
+          <div className="mb-4 h-3 overflow-hidden rounded-full bg-foreground/10">
+            <div
+              style={{ width: "54%" }}
+              className="h-full rounded-full bg-gradient-to-r from-primary to-secondary shadow-inner"
+            />
+          </div>
+          <div className="flex items-center justify-between text-xs text-foreground/60">
+            <span>54% Complete</span>
+            <span>130 Ayahs left</span>
+          </div>
+        </div>
 
-              return (
-                <Card
-                  key={chapter.id}
-                  className="p-4 hover-elevate active-elevate-2 cursor-pointer transition-smooth"
-                  data-testid={`card-surah-${chapter.id}`}
-                  onClick={() => onNavigate("chapter", chapter.id)}
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Number Badge */}
-                    <Badge 
-                      variant="secondary" 
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-base font-semibold p-0"
-                      data-testid={`badge-surah-number-${chapter.id}`}
-                    >
-                      {chapter.id}
-                    </Badge>
+        {/* Quick Access */}
+        <div className="mb-6">
+          <h3 className="mb-6 text-sm font-bold tracking-wider text-muted-foreground uppercase">
+            QUICK ACCESS
+          </h3>
+          <div className="grid grid-cols-3 gap-6">
+            <div 
+              className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 hover-elevate cursor-pointer"
+              onClick={() => onNavigate("surah-juz", undefined, "surah")}
+              data-testid="button-bookmarks"
+            >
+              <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-inner">
+                <Icon icon="solar:bookmark-bold" className="size-7 text-primary" />
+              </div>
+              <span className="text-xs font-semibold text-foreground">Bookmarks</span>
+            </div>
+            <div 
+              className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 hover-elevate cursor-pointer"
+              onClick={() => onNavigate("surah-juz", undefined, "surah")}
+              data-testid="button-favorites"
+            >
+              <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-secondary/20 shadow-inner">
+                <Icon icon="solar:star-bold" className="size-7 text-secondary" />
+              </div>
+              <span className="text-xs font-semibold text-foreground">Favorites</span>
+            </div>
+            <div 
+              className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 hover-elevate cursor-pointer"
+              onClick={() => onNavigate("surah-juz", undefined, "surah")}
+              data-testid="button-history"
+            >
+              <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-accent/20 shadow-inner">
+                <Icon icon="solar:history-bold" className="size-7 text-accent" />
+              </div>
+              <span className="text-xs font-semibold text-foreground">History</span>
+            </div>
+          </div>
+        </div>
 
-                    {/* Surah Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-muted-foreground mb-1" data-testid={`text-surah-meta-${chapter.id}`}>
-                        {chapter.verseCount} Verses · {chapter.revelationType === "Meccan" ? "Makkah" : "Madinah"}
-                      </p>
-                      <h3 className="text-base font-semibold text-foreground mb-0.5" data-testid={`text-surah-name-${chapter.id}`}>
-                        {chapter.englishName}
-                      </h3>
-                      <p className="text-xl font-arabic text-foreground mb-1" data-testid={`text-surah-arabic-${chapter.id}`}>
-                        {chapter.arabicName.replace('سُورَةُ ', '')}
-                      </p>
-                      <p className="text-xs text-muted-foreground" data-testid={`text-surah-meaning-${chapter.id}`}>
-                        {featured.meaning}
-                      </p>
-                    </div>
-
-                    {/* Play Icon */}
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="rounded-full shrink-0"
-                      data-testid={`button-play-surah-${chapter.id}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onNavigate("chapter", chapter.id);
-                      }}
-                    >
-                      <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                        <Play className="h-4 w-4 fill-current" />
-                      </div>
-                    </Button>
-                  </div>
-                </Card>
-              );
-            })}
+        {/* Today's Reading */}
+        <div>
+          <div className="mb-6 flex items-center justify-between">
+            <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
+              TODAY'S READING
+            </h3>
+            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" />
+          </div>
+          <div 
+            className="rounded-3xl border border-border/50 bg-card/80 p-6 shadow-lg backdrop-blur-sm hover-elevate cursor-pointer"
+            onClick={() => onNavigate("chapter", 55)}
+            data-testid="card-todays-reading"
+          >
+            <div className="mb-4 flex items-start justify-between">
+              <div>
+                <h4 className="font-heading text-2xl font-bold tracking-tighter text-foreground">
+                  Surah Ar-Rahman
+                </h4>
+                <p className="mt-2 text-sm text-muted-foreground">The Most Merciful • 78 Ayahs</p>
+              </div>
+              <div className="rounded-2xl bg-primary/20 px-4 py-2 shadow-inner">
+                <span className="text-sm font-bold text-primary">55</span>
+              </div>
+            </div>
+            <div className="rounded-2xl bg-muted/10 p-6 border border-border/30">
+              <p className="text-center font-arabic text-3xl leading-relaxed text-foreground">
+                فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
+              </p>
+              <p className="mt-4 text-center text-sm italic text-muted-foreground">
+                Then which of the favors of your Lord will you deny?
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
+      {/* Bottom Navigation */}
       <BottomNav
         activeTab={activeTab}
         onTabChange={(tab) => {
