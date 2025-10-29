@@ -95,16 +95,11 @@ export default function VerseCard({
     }
   };
   
-  // Use inline styles + data attribute for highlighting to bypass className issues
-  const highlightStyles: React.CSSProperties = highlighted ? {
-    backgroundColor: 'rgba(77, 124, 254, 0.1)', // #4d7cfe with 10% opacity
-    borderLeft: '4px solid #4d7cfe', // primary color
-  } : {};
-  
   return (
     <div 
-      className="space-y-4 p-5 rounded-2xl transition-all duration-300 cursor-pointer hover-elevate shadow-sm hover-lift"
-      style={highlightStyles}
+      className={`space-y-4 p-5 rounded-2xl transition-all duration-300 cursor-pointer hover-elevate shadow-sm hover-lift ${
+        highlighted ? 'verse-highlighted' : ''
+      }`}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
       aria-current={highlighted ? 'true' : 'false'}

@@ -354,6 +354,21 @@
     inset: -1px;
   }
 
+  /* Verse highlighting that works with the elevate system */
+  .verse-highlighted {
+    background-color: hsl(var(--primary) / 0.08) !important;
+    border-left: 4px solid hsl(var(--primary)) !important;
+  }
+
+  /* Override the ::after element background when highlighted */
+  .verse-highlighted.hover-elevate::after {
+    background-color: hsl(var(--primary) / 0.08) !important;
+  }
+
+  .verse-highlighted.hover-elevate:hover::after {
+    background-color: hsl(var(--primary) / 0.12) !important;
+  }
+
   /* Modern animation utilities */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-in-out;
