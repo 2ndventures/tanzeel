@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface VerseCardProps {
   chapterId: number;
@@ -39,19 +39,15 @@ export default function VerseCard({
   lineSpacing = "Normal",
   showVerseNumbers = true,
 }: VerseCardProps) {
-  // Calculate if this verse should be highlighted
-  const shouldHighlight = isPlaying && isCurrentVerse && isInVerseRange;
+  // Calculate if this verse should be highlighted - use directly without state
+  const highlighted = isPlaying && isCurrentVerse && isInVerseRange;
   
-  // Use state to ensure re-renders
-  const [highlighted, setHighlighted] = useState(shouldHighlight);
-  
-  // Update highlighted state when shouldHighlight changes
+  // Debug logging
   useEffect(() => {
-    setHighlighted(shouldHighlight);
-    if (shouldHighlight) {
-      console.log(`📍 Highlighting verse ${verseNumber}: isPlaying=${isPlaying}, isCurrentVerse=${isCurrentVerse}, isInVerseRange=${isInVerseRange}, wordIndex=${currentWordIndex}`);
+    if (highlighted) {
+      console.log(`✅ VERSE ${verseNumber} IS HIGHLIGHTED - isPlaying=${isPlaying}, isCurrentVerse=${isCurrentVerse}, wordIndex=${currentWordIndex}`);
     }
-  }, [shouldHighlight, isPlaying, isCurrentVerse, isInVerseRange, verseNumber, currentWordIndex]);
+  }, [highlighted, verseNumber, isPlaying, isCurrentVerse, currentWordIndex]);
   
   // Split Arabic text into words for word-level highlighting
   const words = arabicText.split(' ');

@@ -195,13 +195,22 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   const handleVerseClick = useCallback((verseNumber: number) => {
-    // Seek to the clicked verse and start playback
     const verseKey = `${chapterId}:${verseNumber}`;
-    seekToVerse(verseKey);
-    if (!isPlaying) {
+    const clickedCurrentVerse = currentVerse === verseNumber;
+    
+    console.log(`🖱️ Verse ${verseNumber} clicked - currentVerse: ${currentVerse}, isPlaying: ${isPlaying}, clickedCurrent: ${clickedCurrentVerse}`);
+    
+    if (clickedCurrentVerse && isPlaying) {
+      // Clicking the currently playing verse pauses it
       togglePlayPause();
+    } else {
+      // Clicking a different verse seeks to it and starts playback
+      seekToVerse(verseKey);
+      if (!isPlaying) {
+        togglePlayPause();
+      }
     }
-  }, [chapterId, seekToVerse, isPlaying, togglePlayPause]);
+  }, [chapterId, currentVerse, seekToVerse, isPlaying, togglePlayPause]);
 
   const goToPreviousSurah = useCallback(() => {
     const prevChapterId = chapterId - 1;
