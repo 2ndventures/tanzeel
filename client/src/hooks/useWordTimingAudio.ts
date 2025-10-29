@@ -349,6 +349,23 @@ export function useWordTimingAudio(
     };
   }, [loadAudio]);
 
+  // Dedicated pause function
+  const pauseAudio = useCallback(() => {
+    if (audioRef.current && state.isPlaying) {
+      audioRef.current.pause();
+    }
+  }, [state.isPlaying]);
+
+  // Dedicated play function
+  const playAudio = useCallback(() => {
+    if (audioRef.current && !state.isPlaying) {
+      audioRef.current.play().catch(err => {
+        console.error('Playback failed:', err);
+        setState(prev => ({ ...prev, error: 'Playback failed' }));
+      });
+    }
+  }, [state.isPlaying]);
+
   // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (!audioRef.current) {
@@ -426,6 +443,8 @@ export function useWordTimingAudio(
   return {
     ...state,
     togglePlayPause,
+    pauseAudio,
+    playAudio,
     seek,
     seekToVerse,
     setSpeed,

@@ -356,6 +356,8 @@
 
   /* Verse highlighting that works with the elevate system */
   .verse-highlighted {
+    position: relative !important;
+    overflow: visible !important;
     background-color: hsl(var(--primary) / 0.08) !important;
     border-left: 4px solid hsl(var(--primary)) !important;
   }

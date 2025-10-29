@@ -119,6 +119,8 @@ export default function ChapterView({
     currentTime,
     duration,
     togglePlayPause,
+    pauseAudio,
+    playAudio,
     seek,
     setSpeed,
     seekToVerse,
@@ -202,15 +204,17 @@ export default function ChapterView({
     
     if (clickedCurrentVerse && isPlaying) {
       // Clicking the currently playing verse pauses it
-      togglePlayPause();
+      console.log('⏸️ Pausing current verse');
+      pauseAudio();
     } else {
       // Clicking a different verse seeks to it and starts playback
       seekToVerse(verseKey);
       if (!isPlaying) {
-        togglePlayPause();
+        console.log('▶️ Starting playback');
+        playAudio();
       }
     }
-  }, [chapterId, currentVerse, seekToVerse, isPlaying, togglePlayPause]);
+  }, [chapterId, currentVerse, seekToVerse, isPlaying, pauseAudio, playAudio]);
 
   const goToPreviousSurah = useCallback(() => {
     const prevChapterId = chapterId - 1;
