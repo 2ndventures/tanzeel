@@ -342,7 +342,7 @@ export function useWordTimingAudio(
         error: 'Failed to load audio',
       }));
     }
-  }, [chapterId, reciterId, findCurrentSegment, syncSpeed]);
+  }, [chapterId, reciterId, syncSpeed]);
 
   // Initialize audio on mount
   useEffect(() => {
