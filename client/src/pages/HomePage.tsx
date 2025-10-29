@@ -56,27 +56,27 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </Button>
         </div>
 
-        {/* Reading Progress Card - Dark */}
-        <Card className="bg-card-foreground dark:bg-card-foreground text-background dark:text-background p-5 mb-4" data-testid="card-reading-progress">
+        {/* Reading Progress Card */}
+        <Card className="p-5 mb-4" data-testid="card-reading-progress">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-background/20 dark:bg-background/20 rounded-lg flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-background dark:border-background rounded" />
+              <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-foreground rounded" />
               </div>
               <div>
-                <p className="text-xs text-background/70 dark:text-background/70 mb-0.5" data-testid="text-progress-label">
+                <p className="text-xs text-muted-foreground mb-0.5" data-testid="text-progress-label">
                   Reading Progress
                 </p>
-                <p className="text-base font-semibold" data-testid="text-current-juz">
+                <p className="text-base font-semibold text-foreground" data-testid="text-current-juz">
                   Juz 12
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold" data-testid="text-progress-percentage">
+              <p className="text-2xl font-bold text-foreground" data-testid="text-progress-percentage">
                 47%
               </p>
-              <p className="text-xs text-background/70 dark:text-background/70" data-testid="text-completed-label">
+              <p className="text-xs text-muted-foreground" data-testid="text-completed-label">
                 Completed
               </p>
             </div>
@@ -84,9 +84,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
           {/* Progress Bar */}
           <div className="mb-5">
-            <div className="h-1.5 bg-background/20 dark:bg-background/20 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div 
-                className="h-full bg-background dark:bg-background rounded-full transition-all duration-300"
+                className="h-full bg-primary rounded-full transition-all duration-300"
                 style={{ width: '47%' }}
                 data-testid="progress-bar"
               />
@@ -96,16 +96,16 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center" data-testid="stat-day-streak">
-              <p className="text-2xl font-bold mb-1">{stats.dayStreak}</p>
-              <p className="text-xs text-background/70 dark:text-background/70">Days Streak</p>
+              <p className="text-2xl font-bold text-foreground mb-1">{stats.dayStreak}</p>
+              <p className="text-xs text-muted-foreground">Days Streak</p>
             </div>
             <div className="text-center" data-testid="stat-pages-read">
-              <p className="text-2xl font-bold mb-1">{stats.versesRead}</p>
-              <p className="text-xs text-background/70 dark:text-background/70">Pages Read</p>
+              <p className="text-2xl font-bold text-foreground mb-1">{stats.versesRead}</p>
+              <p className="text-xs text-muted-foreground">Pages Read</p>
             </div>
             <div className="text-center" data-testid="stat-weekly-time">
-              <p className="text-2xl font-bold mb-1">{formatReadingTime(stats.weeklyMinutes)}</p>
-              <p className="text-xs text-background/70 dark:text-background/70">This Week</p>
+              <p className="text-2xl font-bold text-foreground mb-1">{formatReadingTime(stats.weeklyMinutes)}</p>
+              <p className="text-xs text-muted-foreground">This Week</p>
             </div>
           </div>
         </Card>
