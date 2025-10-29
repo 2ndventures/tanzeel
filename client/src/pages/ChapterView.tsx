@@ -212,7 +212,7 @@ export default function ChapterView({
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-10 bg-background border-b border-border shadow-sm">
+      <header className="sticky top-0 z-10 bg-background border-b border-border">
         <div className="flex items-center justify-between px-4 py-5">
           <button 
             className="min-h-[48px] min-w-[48px] p-2 hover-elevate active-elevate-2 rounded-md"
@@ -234,11 +234,9 @@ export default function ChapterView({
               </h2>
             </div>
             {chapterId > 1 && chapterId !== 9 && chapterId <= 114 && (
-              <div className="mt-2 px-4 py-2 bg-muted/30 rounded-full" data-testid="text-bismillah-container">
-                <p className="text-base font-arabic text-foreground" data-testid="text-bismillah">
-                  بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
-                </p>
-              </div>
+              <p className="text-base font-arabic text-foreground mt-1" data-testid="text-bismillah">
+                بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+              </p>
             )}
           </div>
           <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>

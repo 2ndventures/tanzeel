@@ -103,7 +103,7 @@ export default function VerseCard({
   
   return (
     <div 
-      className="space-y-4 p-5 bg-card rounded-2xl transition-all duration-300 cursor-pointer hover-elevate shadow-sm hover-lift border border-border"
+      className="space-y-4 p-5 rounded-2xl transition-all duration-300 cursor-pointer hover-elevate shadow-sm hover-lift"
       style={highlightStyles}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
