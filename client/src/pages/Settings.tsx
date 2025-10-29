@@ -86,18 +86,9 @@ export default function Settings({
 
       {/* Header */}
       <div className="relative px-8 pt-8 pb-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="font-heading text-5xl font-black tracking-tighter text-white" style={{textShadow: '0 4px 16px rgba(0,0,0,0.6)'}} data-testid="text-title">
-            Settings
-          </h1>
-          <button 
-            className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate"
-            onClick={onBack}
-            data-testid="button-back"
-          >
-            <Icon icon="solar:alt-arrow-left-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
-          </button>
-        </div>
+        <h1 className="font-heading text-5xl font-black tracking-tighter text-white mb-6" style={{textShadow: '0 4px 16px rgba(0,0,0,0.6)'}} data-testid="text-title">
+          Settings
+        </h1>
       </div>
 
       <div className="relative px-8 space-y-8 pb-24">
