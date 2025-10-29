@@ -385,9 +385,17 @@ export function useWordTimingAudio(
     if (verseTiming && audioRef.current) {
       const seekTime = verseTiming.timestamp_from / 1000;
       audioRef.current.currentTime = seekTime;
-      setState(prev => ({ ...prev, currentTime: seekTime }));
+      
+      // Immediately update the highlighting state for the seeked verse
+      const { verseKey: currentVerseKey, wordIndex } = findCurrentSegment(seekTime);
+      setState(prev => ({ 
+        ...prev, 
+        currentTime: seekTime,
+        currentVerseKey,
+        currentWordIndex: wordIndex,
+      }));
     }
-  }, []);
+  }, [findCurrentSegment]);
 
   // Set playback speed and save globally to localStorage
   const setSpeed = useCallback((newSpeed: number) => {
