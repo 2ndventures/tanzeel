@@ -17,8 +17,6 @@ interface SettingsProps {
   onFontChange: (value: string) => void;
   reciter: string;
   onReciterChange: (value: string) => void;
-  speed: string;
-  onSpeedChange: (value: string) => void;
   autoScroll: boolean;
   onAutoScrollChange: (value: boolean) => void;
   repeat: boolean;
@@ -52,8 +50,6 @@ export default function Settings({
   onFontChange,
   reciter,
   onReciterChange,
-  speed,
-  onSpeedChange,
   autoScroll,
   onAutoScrollChange,
   repeat,
@@ -235,18 +231,6 @@ export default function Settings({
                   options={reciterOptions}
                   onSelect={onReciterChange}
                   testId="select-reciter"
-                />
-                <SettingItem
-                  label="Speed"
-                  type="select"
-                  value={speed}
-                  options={[
-                    { value: "Slow", label: "Slow" },
-                    { value: "Normal", label: "Normal" },
-                    { value: "Fast", label: "Fast" },
-                  ]}
-                  onSelect={onSpeedChange}
-                  testId="select-speed"
                 />
                 <SettingItem
                   label="Auto-scroll"

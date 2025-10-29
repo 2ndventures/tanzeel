@@ -243,8 +243,6 @@ function App() {
                 onFontChange={setFont}
                 reciter={reciter}
                 onReciterChange={setReciter}
-                speed={speed}
-                onSpeedChange={setSpeed}
                 autoScroll={autoScroll}
                 onAutoScrollChange={setAutoScroll}
                 repeat={repeat}
