@@ -100,7 +100,7 @@ export default function Settings({
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
               
               {/* Inner glass panel */}
-              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-card/80 dark:bg-slate-900/70 divide-y divide-border">
+              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70 divide-y divide-border">
                 <SettingItem
                   label="Theme"
                   sublabel={darkMode ? "Dark" : "Light"}
@@ -146,7 +146,7 @@ export default function Settings({
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
               
               {/* Inner glass panel */}
-              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-card/80 dark:bg-slate-900/70 divide-y divide-border">
+              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70 divide-y divide-border">
                 <SettingItem
                   label="Arabic text"
                   type="select"
@@ -209,7 +209,7 @@ export default function Settings({
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
               
               {/* Inner glass panel */}
-              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-card/80 dark:bg-slate-900/70 divide-y divide-border">
+              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70 divide-y divide-border">
                 <SettingItem
                   label="Reciter"
                   type="select"
