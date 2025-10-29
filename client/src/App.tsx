@@ -78,7 +78,7 @@ function App() {
   
   const [autoplay, setAutoplay] = useState(() => {
     const saved = localStorage.getItem('autoplay');
-    return saved ? JSON.parse(saved) : false;
+    return saved ? JSON.parse(saved) : true;
   });
   
   const [translation, setTranslation] = useState("English");
