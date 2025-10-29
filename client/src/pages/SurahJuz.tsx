@@ -23,11 +23,56 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
     return () => clearTimeout(timer);
   }, []);
   
-  const filteredChapters = chapters.filter((chapter) =>
-    chapter.arabicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chapter.englishName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chapter.id.toString().includes(searchQuery)
-  );
+  // Normalize search text for better matching
+  const normalizeSearch = (text: string): string => {
+    return text
+      .toLowerCase()
+      .trim()
+      // Remove common prefixes
+      .replace(/^(al-|ar-|as-|an-|at-|az-)/i, '')
+      // Normalize double vowels to single (aa->a, ee->e, etc.)
+      .replace(/aa/g, 'a')
+      .replace(/ee/g, 'e')
+      .replace(/ii/g, 'i')
+      .replace(/oo/g, 'o')
+      .replace(/uu/g, 'u')
+      // Remove hyphens and apostrophes
+      .replace(/[-']/g, '');
+  };
+
+  const filteredChapters = chapters.filter((chapter) => {
+    const query = searchQuery.toLowerCase().trim();
+    const englishName = chapter.englishName.toLowerCase();
+    const arabicName = chapter.arabicName.toLowerCase();
+    
+    // Direct match
+    if (englishName.includes(query) || arabicName.includes(query) || chapter.id.toString().includes(query)) {
+      return true;
+    }
+    
+    // Normalized match for transliteration variations
+    const normalizedQuery = normalizeSearch(query);
+    const normalizedEnglish = normalizeSearch(englishName);
+    
+    if (normalizedEnglish.includes(normalizedQuery)) {
+      return true;
+    }
+    
+    // Also try with/without 'h' at the end
+    if (normalizedQuery.endsWith('h')) {
+      const withoutH = normalizedQuery.slice(0, -1);
+      if (normalizedEnglish.includes(withoutH)) {
+        return true;
+      }
+    } else {
+      const withH = normalizedQuery + 'h';
+      if (normalizedEnglish.includes(withH)) {
+        return true;
+      }
+    }
+    
+    return false;
+  });
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 pb-24">
