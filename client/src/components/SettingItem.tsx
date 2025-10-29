@@ -29,14 +29,14 @@ export default function SettingItem({
     return (
       <button
         onClick={() => onToggle?.(!value)}
-        className="flex items-center justify-between py-4 px-4 min-h-[60px] w-full text-left hover-elevate active-elevate-2 transition-smooth"
+        className="flex items-center justify-between py-4 px-5 min-h-[60px] w-full text-left hover-elevate active-elevate-2 transition-smooth"
       >
         <div className="flex-1 pr-4">
-          <p className="text-base font-medium text-foreground" data-testid={testId ? `${testId}-label` : undefined}>
+          <p className="text-base font-medium text-white" data-testid={testId ? `${testId}-label` : undefined} style={{textShadow: '0 2px 6px rgba(0,0,0,0.4)'}}>
             {label}
           </p>
           {sublabel && (
-            <p className="text-sm text-muted-foreground mt-1">{sublabel}</p>
+            <p className="text-sm text-gray-400 mt-1">{sublabel}</p>
           )}
         </div>
         {isThemeToggle ? (
@@ -63,13 +63,13 @@ export default function SettingItem({
   }
 
   return (
-    <div className="flex items-center justify-between py-4 px-4 min-h-[60px]">
+    <div className="flex items-center justify-between py-4 px-5 min-h-[60px]">
       <div className="flex-1 pr-4">
-        <p className="text-base font-medium text-foreground" data-testid={testId ? `${testId}-label` : undefined}>
+        <p className="text-base font-medium text-white" data-testid={testId ? `${testId}-label` : undefined} style={{textShadow: '0 2px 6px rgba(0,0,0,0.4)'}}>
           {label}
         </p>
         {sublabel && (
-          <p className="text-sm text-muted-foreground mt-1">{sublabel}</p>
+          <p className="text-sm text-gray-400 mt-1">{sublabel}</p>
         )}
       </div>
       {type === "select" && options && (
