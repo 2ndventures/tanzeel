@@ -111,9 +111,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </Card>
 
         {/* Continue Reading Button */}
-        <div className="flex gap-3 mb-6">
+        <div className="mb-6">
           <Button 
-            className="flex-1 gap-2 h-12" 
+            className="gap-2 h-12 rounded-full px-6" 
             data-testid="button-continue-reading"
             onClick={() => onNavigate("chapter", 12)}
           >
