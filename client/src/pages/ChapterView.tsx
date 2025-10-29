@@ -268,60 +268,93 @@ export default function ChapterView({
 
               <div className="overflow-y-auto h-[calc(85vh-80px)]">
                 {menuView === 'main' && (
-                  <div className="space-y-1">
-                    <button
-                      onClick={() => setMenuView('display')}
-                      className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md text-lg"
-                      data-testid="menu-item-display"
-                    >
-                      <span>Display</span>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </button>
-                    
-                    <button
-                      onClick={() => setMenuView('reciter')}
-                      className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
-                      data-testid="menu-item-reciter"
-                    >
-                      <span className="text-lg">Reciter</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    </button>
+                  <div className="space-y-6">
+                    {/* Audio Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
+                        Audio
+                      </h3>
+                      <div className="space-y-1">
+                        <button
+                          onClick={() => setMenuView('reciter')}
+                          className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
+                          data-testid="menu-item-reciter"
+                        >
+                          <span className="text-lg">Reciter</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        </button>
 
-                    <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-theme">
-                      <span className="text-lg">Theme</span>
-                      <div className="relative">
-                        <Switch 
-                          checked={darkMode} 
-                          onCheckedChange={onDarkModeChange}
-                          data-testid="switch-theme"
-                          className="relative"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-                          <Sun className="w-3.5 h-3.5 text-yellow-500" />
-                          <Moon className="w-3.5 h-3.5 text-blue-400" />
+                        <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-autoplay">
+                          <span className="text-lg">Autoplay next surah</span>
+                          <Switch 
+                            checked={autoplay} 
+                            onCheckedChange={onAutoplayChange}
+                            data-testid="switch-autoplay"
+                          />
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4" data-testid="menu-item-transliteration">
-                      <span className="text-lg">Transliteration</span>
-                      <Switch 
-                        checked={showTransliteration} 
-                        onCheckedChange={onTransliterationChange}
-                        data-testid="switch-transliteration"
-                      />
+                    {/* Display Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-display">
+                        Display
+                      </h3>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-theme">
+                          <span className="text-lg">Theme</span>
+                          <div className="relative">
+                            <Switch 
+                              checked={darkMode} 
+                              onCheckedChange={onDarkModeChange}
+                              data-testid="switch-theme"
+                              className="relative"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
+                              <Sun className="w-3.5 h-3.5 text-yellow-500" />
+                              <Moon className="w-3.5 h-3.5 text-blue-400" />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4" data-testid="menu-item-transliteration">
+                          <span className="text-lg">Transliteration</span>
+                          <Switch 
+                            checked={showTransliteration} 
+                            onCheckedChange={onTransliterationChange}
+                            data-testid="switch-transliteration"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4" data-testid="menu-item-translation">
+                          <span className="text-lg">Translation</span>
+                          <Switch 
+                            checked={showTranslation} 
+                            onCheckedChange={onShowTranslationChange}
+                            data-testid="switch-translation"
+                          />
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4" data-testid="menu-item-translation">
-                      <span className="text-lg">Translation</span>
-                      <Switch 
-                        checked={showTranslation} 
-                        onCheckedChange={onShowTranslationChange}
-                        data-testid="switch-translation"
-                      />
+                    {/* Text Appearance Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-text-appearance">
+                        Text Appearance
+                      </h3>
+                      <div className="space-y-1">
+                        <button
+                          onClick={() => setMenuView('display')}
+                          className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
+                          data-testid="menu-item-display"
+                        >
+                          <span className="text-lg">Text size & spacing</span>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
