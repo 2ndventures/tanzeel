@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { Icon } from "@iconify/react";
 import { ArrowLeft, MoreVertical, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -224,43 +225,58 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-10 bg-background border-b border-border">
-        <div className="flex items-center justify-between px-4 py-5">
-          <button 
-            className="min-h-[48px] min-w-[48px] p-2 hover-elevate active-elevate-2 rounded-md"
-            onClick={onBack}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-6 h-6 text-foreground" />
-          </button>
-          <div className="flex flex-col items-center flex-1 mx-2 gap-1">
-            <p className="text-sm text-muted-foreground" data-testid="text-surah-number">
-              Surah {chapterId}
-            </p>
-            <div className="flex items-center gap-3">
-              <h1 className="text-lg font-semibold text-foreground" data-testid="text-chapter-title-english">
-                {chapterInfo?.englishName || 'Al-Fatihah'}
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950 flex flex-col">
+      {/* Rich layered gradients for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 via-slate-900/50 to-black/70" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+      {/* Vignette effect */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+      
+      {/* Status Bar */}
+      <div className="relative flex items-center justify-between px-8 py-4 z-20">
+        <span className="text-sm font-semibold text-white">9:41</span>
+        <div className="flex items-center gap-2">
+          <Icon icon="solar:wi-fi-bold" className="size-4 text-white" />
+          <Icon icon="solar:signal-bold" className="size-4 text-white" />
+          <Icon icon="solar:battery-charge-bold" className="size-5 text-white" />
+        </div>
+      </div>
+
+      {/* Header - Glass Treatment */}
+      <header className="sticky top-0 z-10">
+        <div className="relative overflow-hidden">
+          {/* Glass background */}
+          <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5" />
+          
+          <div className="relative flex items-center justify-between px-6 py-6 shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+            <button 
+              className="flex size-12 items-center justify-center rounded-full bg-slate-800/60 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate ring-1 ring-white/10"
+              onClick={onBack}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-5 h-5 text-white" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
+            </button>
+            
+            <div className="flex flex-col items-center flex-1 mx-4">
+              <h1 className="text-2xl font-bold text-white mb-1" style={{textShadow: '0 4px 12px rgba(0,0,0,0.5)'}} data-testid="text-chapter-title-english">
+                {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
               </h1>
-              <h2 className="text-xl font-semibold text-foreground font-arabic" data-testid="text-chapter-title-arabic">
-                {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
-              </h2>
-            </div>
-            {chapterId > 1 && chapterId !== 9 && chapterId <= 114 && (
-              <p className="text-base font-arabic text-foreground mt-1" data-testid="text-bismillah">
-                بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+              <p className="text-sm text-gray-400" data-testid="text-surah-number">
+                {chapterInfo?.revelationType || 'The Opening'}
               </p>
-            )}
-          </div>
-          <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
-            <SheetTrigger asChild>
-              <button 
-                className="min-h-[48px] min-w-[48px] p-2 hover-elevate active-elevate-2 rounded-md" 
-                data-testid="button-menu"
-              >
-                <MoreVertical className="w-6 h-6 text-foreground" />
-              </button>
-            </SheetTrigger>
+            </div>
+            
+            <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
+              <SheetTrigger asChild>
+                <button 
+                  className="flex size-12 items-center justify-center rounded-full bg-slate-800/60 backdrop-blur-xl shadow-[0_4px_16px_rgba(0,0,0,0.6)] hover-elevate ring-1 ring-white/10" 
+                  data-testid="button-menu"
+                >
+                  <MoreVertical className="w-5 h-5 text-white" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'}} />
+                </button>
+              </SheetTrigger>
             <SheetContent side="bottom" className="h-[85vh]">
               <SheetHeader className="mb-4">
                 {menuView !== 'main' && (
@@ -525,11 +541,12 @@ export default function ChapterView({
               </div>
             </SheetContent>
           </Sheet>
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 overflow-auto px-4 pt-14">
-        <div className="max-w-2xl mx-auto space-y-6 pb-[50vh]">
+      <main className="relative flex-1 overflow-auto px-6 pt-6">
+        <div className="max-w-2xl mx-auto space-y-4 pb-[50vh]">
           {verses.map((verse, index) => {
             const verseNumber = index + 1;
             const isCurrentVerse = currentVerse === verseNumber;
