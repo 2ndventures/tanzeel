@@ -253,14 +253,17 @@ export function useWordTimingAudio(
         audio.playbackRate = speedRef.current;
         console.log(`🎵 Applied playback rate: ${speedRef.current}x`);
         
-        setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
-        
         // Auto-start playback if autoplay is enabled
         if (autoplayRef.current) {
-          console.log(`🎵 Auto-starting playback for chapter ${chapterId}`);
+          console.log(`🎵 AUTO-STARTING playback for chapter ${chapterId} (autoplay=${autoplayRef.current})`);
+          setState(prev => ({ ...prev, isLoading: false }));
           audio.play().catch(err => {
-            console.error('Playback failed:', err);
+            console.error('❌ Autoplay failed:', err);
+            setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
           });
+        } else {
+          console.log(`⏹️ Not autoplaying chapter ${chapterId} (autoplay=${autoplayRef.current})`);
+          setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
         }
       };
 
