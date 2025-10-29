@@ -5,17 +5,27 @@ This mobile-first Quran Reading application enables users to read, listen to, an
 # Recent Changes
 
 **October 29, 2025:**
-- Completed premium dark aesthetic redesign for ChapterView (playback screen) to match HomePage and SurahJuz pages
-- Added mobile status bar to ChapterView header with time and system icons
-- Redesigned ChapterView header with glass treatment: circular glass back/menu buttons, large centered title with dark shadows
-- Updated VerseCard component with multi-layer glass panels, gradient borders (from-white/10 to-transparent), and dark shadows
-- Redesigned AudioPlayer with glass background (bg-slate-900/90 backdrop-blur-2xl), gradient top line, and deep shadows
-- Replaced all golden yellow glows with elegant dark gray shadows throughout ChapterView for refined aesthetic
-- All glass buttons now use bg-slate-800/60 with ring-1 ring-white/10 and shadow-[0_4px_16px_rgba(0,0,0,0.6)]
-- Applied consistent dark gradient backgrounds (from-slate-950 via-indigo-950) with layered radial gradients across ChapterView
-- Enhanced text readability with white colors and dark text shadows (textShadow: '0 2px 8px rgba(0,0,0,0.4)')
-- Verse number badges now have glass treatment with rings and shadows matching overall design
-- Audio player buttons feature icons with drop-shadow filters for depth
+- Completed premium dark aesthetic redesign across ALL pages (HomePage, SurahJuz, ChapterView, Settings)
+- **ChapterView (Playback Screen):**
+  - Added mobile status bar with time and system icons
+  - Glass header with circular back/menu buttons and centered title with dark shadows
+  - Updated VerseCard with multi-layer glass panels and gradient borders
+  - Redesigned AudioPlayer with glass background, gradient top line, and deep shadows
+  - Changed play/pause icons from black to white for better contrast
+- **Settings Page:**
+  - Applied same multi-layer dark gradient background as other pages
+  - Glass header with circular back button and bold white title
+  - Three settings sections (Display, Text Size, Audio) with glass card treatment
+  - Each card uses p-[1px] gradient border technique with from-white/10 to-transparent
+  - Inner glass panels: bg-slate-900/70 with backdrop-blur-xl
+  - White text labels with dark shadows for readability
+  - Fixed back button navigation to return to Home (not Surah/Juz)
+- **Global Design System:**
+  - Replaced all golden yellow glows with elegant dark gray shadows for refined aesthetic
+  - All glass buttons use bg-slate-800/60 with ring-1 ring-white/10 and shadow-[0_4px_16px_rgba(0,0,0,0.6)]
+  - Consistent dark gradient backgrounds (from-slate-950 via-indigo-950) with layered radial gradients
+  - Enhanced text readability with white colors and dark text shadows (textShadow: '0 2px 8px rgba(0,0,0,0.4)')
+  - Icons feature drop-shadow filters for depth (drop-shadow(0 2px 4px rgba(0,0,0,0.5)))
 
 **October 23, 2025:**
 - Implemented global speed persistence: playback speed now carries over across all chapters (setting 2x on Surah 1 keeps 2x for Surah 2, etc.)
