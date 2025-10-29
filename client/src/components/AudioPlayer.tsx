@@ -47,7 +47,7 @@ export default function AudioPlayer({
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-10" data-testid="audio-player-wrapper" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="bg-card/95 backdrop-blur-xl border-t border-border px-4 py-5 pb-6 space-y-4 shadow-2xl" data-testid="audio-player-content">
+      <div className="bg-card border-t border-border px-4 py-5 pb-6 space-y-4 shadow-lg" data-testid="audio-player-content">
         <div className="space-y-2">
           <Slider
             value={[currentTime]}
