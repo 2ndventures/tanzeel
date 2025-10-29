@@ -7,7 +7,6 @@ This mobile-first Quran Reading application enables users to read, listen to, an
 **October 29, 2025:**
 - Completed premium dark aesthetic redesign across ALL pages (HomePage, SurahJuz, ChapterView, Settings)
 - **ChapterView (Playback Screen):**
-  - Added mobile status bar with time and system icons
   - Glass header with circular back/menu buttons and centered title with dark shadows
   - Updated VerseCard with multi-layer glass panels and gradient borders
   - Redesigned AudioPlayer with glass background, gradient top line, and deep shadows
@@ -20,6 +19,11 @@ This mobile-first Quran Reading application enables users to read, listen to, an
   - Inner glass panels: bg-slate-900/70 with backdrop-blur-xl
   - White text labels with dark shadows for readability
   - Fixed back button navigation to return to Home (not Surah/Juz)
+- **Removed Status Bar Elements:**
+  - Removed fake mobile status bars (time/battery/signal icons) from all pages (HomePage, SurahJuz, ChapterView)
+  - Status bars were not representative of actual mobile device appearance
+  - Adjusted top margins for clean, proper spacing: HomePage (pt-8), SurahJuz (pt-8), ChapterView (mt-4)
+  - All pages now have consistent, clean headers without status bar mockups
 - **Global Design System:**
   - Replaced all golden yellow glows with elegant dark gray shadows for refined aesthetic
   - All glass buttons use bg-slate-800/60 with ring-1 ring-white/10 and shadow-[0_4px_16px_rgba(0,0,0,0.6)]
