@@ -144,13 +144,8 @@ export default function VerseCard({
                   key={`word-${chapterId}-${verseNumber}-${index}`}
                   id={`word-${chapterId}-${verseNumber}-${index}`}
                   className={`transition-all duration-200 ${
-                    isCurrentWord ? 'text-primary font-bold inline-block' : ''
+                    isCurrentWord ? 'text-primary font-bold' : ''
                   }`}
-                  style={isCurrentWord ? {
-                    backgroundColor: 'rgba(59, 130, 246, 0.25)',
-                    padding: '2px 8px',
-                    borderRadius: '8px',
-                  } : {}}
                 >
                   {word}{index < words.length - 1 ? ' ' : ''}
                 </span>
