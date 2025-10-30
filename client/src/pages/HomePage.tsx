@@ -129,7 +129,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
 
         {/* Today's Reading */}
-        <div>
+        <div className="pb-6">
           <div className="mb-6 flex items-center justify-between">
             <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
               TODAY'S READING
