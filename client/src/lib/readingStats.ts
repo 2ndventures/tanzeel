@@ -1,4 +1,5 @@
 // Reading statistics tracking for Quran app
+import { chapters } from './quranData';
 
 interface ReadingStats {
   dayStreak: number;
@@ -6,6 +7,8 @@ interface ReadingStats {
   versesRead: number;
   weeklyMinutes: number;
   weekStart: string; // ISO date string for start of current week
+  lastReadChapter: number; // Last chapter read (1-114)
+  lastReadVerse: number; // Last verse read in that chapter
 }
 
 const STATS_KEY = 'quran-reading-stats';
@@ -18,6 +21,8 @@ function getDefaultStats(): ReadingStats {
     versesRead: 0,
     weeklyMinutes: 0,
     weekStart: getWeekStart(now).toISOString(),
+    lastReadChapter: 1, // Default to Al-Fatiha
+    lastReadVerse: 0, // Verse 0 means not started yet (0% progress)
   };
 }
 
@@ -49,6 +54,57 @@ export function getReadingStats(): ReadingStats {
     const now = new Date();
     const weekStart = getWeekStart(now);
     let needsSave = false;
+    
+    // Type coercion: Ensure chapter and verse are numbers (handles string storage from legacy data)
+    if (stats.lastReadChapter !== undefined) {
+      const numChapter = Number(stats.lastReadChapter);
+      if (!isNaN(numChapter) && numChapter !== stats.lastReadChapter) {
+        stats.lastReadChapter = numChapter;
+        needsSave = true;
+      }
+    }
+    if (stats.lastReadVerse !== undefined) {
+      const numVerse = Number(stats.lastReadVerse);
+      if (!isNaN(numVerse) && numVerse !== stats.lastReadVerse) {
+        stats.lastReadVerse = numVerse;
+        needsSave = true;
+      }
+    }
+    
+    // Backfill missing fields for legacy data
+    if (stats.lastReadChapter === undefined || stats.lastReadVerse === undefined || 
+        isNaN(stats.lastReadChapter) || isNaN(stats.lastReadVerse)) {
+      // For legacy users, preserve their position by defaulting to chapter 1, verse 0
+      // They can navigate to where they want to continue
+      stats.lastReadChapter = 1; // Default to Al-Fatiha
+      stats.lastReadVerse = 0; // Verse 0 = not started/unknown position
+      needsSave = true;
+    }
+    
+    // Clamp chapter to valid range (1-114)
+    if (stats.lastReadChapter < 1 || stats.lastReadChapter > 114) {
+      stats.lastReadChapter = 1;
+      stats.lastReadVerse = 0;
+      needsSave = true;
+    }
+    
+    // Clamp verse to valid range for the selected chapter
+    const currentChapter = chapters.find(ch => ch.id === stats.lastReadChapter);
+    if (currentChapter) {
+      if (stats.lastReadVerse > currentChapter.verseCount) {
+        stats.lastReadVerse = currentChapter.verseCount; // Completed chapter
+        needsSave = true;
+      }
+      if (stats.lastReadVerse < 0) {
+        stats.lastReadVerse = 0;
+        needsSave = true;
+      }
+    } else {
+      // Chapter lookup failed (shouldn't happen after clamping, but be safe)
+      stats.lastReadChapter = 1;
+      stats.lastReadVerse = 0;
+      needsSave = true;
+    }
     
     // Reset weekly stats if new week
     if (new Date(stats.weekStart) < weekStart) {
@@ -108,9 +164,22 @@ export function updateDayStreak(): void {
   }
 }
 
-export function incrementVersesRead(count: number = 1): void {
+export function incrementVersesRead(count: number = 1, verseKey?: string): void {
   const stats = getReadingStats();
   stats.versesRead += count;
+  
+  // Update last read position if verse key is provided
+  if (verseKey) {
+    const [chapterStr, verseStr] = verseKey.split(':');
+    const chapter = parseInt(chapterStr);
+    const verse = parseInt(verseStr);
+    
+    if (!isNaN(chapter) && !isNaN(verse)) {
+      stats.lastReadChapter = chapter;
+      stats.lastReadVerse = verse;
+    }
+  }
+  
   saveReadingStats(stats);
   updateDayStreak();
 }

@@ -22,6 +22,16 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  // Get current chapter data from stats
+  const currentChapter = chapters.find(ch => ch.id === stats.lastReadChapter) || chapters[0];
+  
+  // Calculate progress with guards against undefined/NaN and clamp to 0-100
+  const rawProgress = stats.lastReadVerse && currentChapter.verseCount > 0 
+    ? (stats.lastReadVerse / currentChapter.verseCount) * 100 
+    : 0;
+  const progress = Math.max(0, Math.min(100, Math.round(rawProgress)));
+  const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
       {/* Rich layered gradients for depth - adapts to theme */}
@@ -51,7 +61,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
 
         {/* Continue Reading Card - Multi-layer glass */}
-        <div className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl">
+        <div 
+          className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate cursor-pointer"
+          onClick={() => onNavigate("chapter", stats.lastReadChapter)}
+          data-testid="card-continue-reading"
+        >
           {/* Gradient border */}
           <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
           {/* Inner glass panel */}
@@ -59,23 +73,25 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-3xl" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Continue Reading</p>
+                <p className="text-sm text-muted-foreground">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
                 <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
-                  Surah Al-Baqarah
+                  Surah {currentChapter.englishName}
                 </h3>
-                <p className="mt-2 text-sm text-muted-foreground">Ayah 156 of 286</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {stats.lastReadVerse > 0 ? `Ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}` : `${currentChapter.verseCount} Ayahs`}
+                </p>
               </div>
               <Icon icon="solar:book-2-bold" className="size-14 text-foreground/10" />
             </div>
             <div className="mb-4 h-3 overflow-hidden rounded-full bg-muted/50 shadow-inner ring-1 ring-border">
               <div
-                style={{ width: "54%" }}
+                style={{ width: `${progress}%` }}
                 className="h-full rounded-full bg-gradient-to-r from-primary via-amber-500 to-primary shadow-md"
               />
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>54% Complete</span>
-              <span>130 Ayahs left</span>
+              <span>{progress}% Complete</span>
+              <span>{stats.lastReadVerse > 0 ? `${versesLeft} Ayahs left` : `Ready to start`}</span>
             </div>
           </div>
         </div>

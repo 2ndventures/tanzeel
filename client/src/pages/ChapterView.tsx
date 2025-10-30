@@ -133,7 +133,7 @@ export default function ChapterView({
       // Track verse completion for stats
       if (!completedVersesRef.current.has(verseKey)) {
         completedVersesRef.current.add(verseKey);
-        incrementVersesRead(1);
+        incrementVersesRead(1, verseKey);
       }
 
       if (autoScroll) {
