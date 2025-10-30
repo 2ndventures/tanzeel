@@ -37695,7 +37695,7 @@ export const chapter94Verses: Verse[] = [
 export const chapter95Verses: Verse[] = [
   {
     "number": 1,
-    "arabicText": "بِّسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ وَٱلتِّينِ وَٱلزَّيْتُونِ",
+    "arabicText": "وَٱلتِّينِ وَٱلزَّيْتُونِ",
     "transliteration": "Wat teeni waz zaitoon",
     "translation": "By the fig and the olive"
   },
@@ -37863,7 +37863,7 @@ export const chapter96Verses: Verse[] = [
 export const chapter97Verses: Verse[] = [
   {
     "number": 1,
-    "arabicText": "بِّسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ إِنَّآ أَنزَلْنَٰهُ فِى لَيْلَةِ ٱلْقَدْرِ",
+    "arabicText": "إِنَّآ أَنزَلْنَٰهُ فِى لَيْلَةِ ٱلْقَدْرِ",
     "transliteration": "Innaa anzalnaahu fee lailatil qadr",
     "translation": "Indeed, We sent the Qur'an down during the Night of Decree."
   },
