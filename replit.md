@@ -12,6 +12,14 @@ Preferred communication style: Simple, everyday language.
 
 The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. The UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a mobile-first design with a premium glassmorphism aesthetic that adapts to both light and dark themes. State management utilizes React Hooks for local state and React Query for server state. Client-side navigation uses a page state system with HomePage, SurahJuz, and Settings screens. The application features a consistent premium glassmorphism design system across all UI elements, including pages, components, modals, dropdowns, and sheets, with elegant shadows and gradient backgrounds that automatically adapt to the selected theme. All page headers (Surahs, Settings) use consistent large, bold typography (text-5xl font-black) with non-sticky layouts and circular action buttons for optimal visual harmony.
 
+### Mobile-First Responsive Design (Updated October 30, 2025)
+
+All UI components use viewport-relative units for mobile responsiveness:
+- **Dropdowns**: Select dropdowns use `max-h-[60vh]` to ensure proper scrolling on all mobile screen sizes
+- **Modals**: Constrained to viewport height with proper scrolling
+- **Spacing**: Percentage-based and viewport-relative units rather than fixed pixels
+- **Touch targets**: Minimum 48px for accessibility on touch devices
+
 ### Theme System (Updated October 29, 2025)
 
 The application implements a comprehensive light and dark theme system using CSS variables in `client/src/index.css`:
