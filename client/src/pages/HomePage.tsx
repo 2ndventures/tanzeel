@@ -96,7 +96,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-md shadow-inner ring-1 ring-border">
                   <Icon icon="solar:bookmark-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </div>
-                <span className="text-xs font-semibold text-foreground">Bookmarks</span>
+                <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
             </div>
             <div 
