@@ -267,7 +267,7 @@ export default function ChapterView({
                   <MoreVertical className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[calc(85vh-180px)]">
+            <SheetContent side="bottom" className="h-[85vh]">
               <SheetHeader className="mb-4">
                 {menuView !== 'main' && (
                   <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px]" onClick={() => setMenuView('main')}>
@@ -285,9 +285,9 @@ export default function ChapterView({
                 </SheetTitle>
               </SheetHeader>
 
-              <div className="overflow-y-auto h-[calc(85vh-260px)]">
+              <div className="overflow-y-auto h-[calc(85vh-80px)]">
                 {menuView === 'main' && (
-                  <div className="space-y-6 pb-20">
+                  <div className="space-y-6">
                     {/* Audio Section */}
                     <div>
                       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
@@ -379,7 +379,7 @@ export default function ChapterView({
                 )}
 
                 {menuView === 'display' && (
-                  <div className="space-y-1 pb-20">
+                  <div className="space-y-1">
                     <div className="flex items-center justify-between p-4" data-testid="menu-item-verse-numbers">
                       <span className="text-lg">Verse numbers</span>
                       <Switch 
@@ -436,7 +436,7 @@ export default function ChapterView({
                 )}
 
                 {menuView === 'reciter' && (
-                  <div className="space-y-1 pb-20">
+                  <div className="space-y-1">
                     {getFeaturedReciters().map((r) => (
                       <button
                         key={r.id}
@@ -458,7 +458,7 @@ export default function ChapterView({
                 )}
 
                 {menuView === 'arabic' && (
-                  <div className="space-y-1 pb-20">
+                  <div className="space-y-1">
                     {["Small", "Medium", "Large", "Extra Large"].map((size) => (
                       <button
                         key={size}
@@ -476,7 +476,7 @@ export default function ChapterView({
                 )}
 
                 {menuView === 'translation' && (
-                  <div className="space-y-1 pb-20">
+                  <div className="space-y-1">
                     {["Small", "Medium", "Large"].map((size) => (
                       <button
                         key={size}
@@ -494,7 +494,7 @@ export default function ChapterView({
                 )}
 
                 {menuView === 'transliteration' && (
-                  <div className="space-y-1 pb-20">
+                  <div className="space-y-1">
                     {["Small", "Medium", "Large"].map((size) => (
                       <button
                         key={size}
@@ -512,7 +512,7 @@ export default function ChapterView({
                 )}
 
                 {menuView === 'spacing' && (
-                  <div className="space-y-1 pb-20">
+                  <div className="space-y-1">
                     {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
                       <button
                         key={spacing}
