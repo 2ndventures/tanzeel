@@ -46,7 +46,7 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20" data-testid="audio-player-wrapper" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed inset-x-0 bottom-0 z-[100]" data-testid="audio-player-wrapper" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* Glass background with gradient borders */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-card/90 dark:bg-slate-900/90 backdrop-blur-2xl" />
