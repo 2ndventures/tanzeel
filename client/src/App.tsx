@@ -166,6 +166,11 @@ function App() {
     localStorage.setItem('showVerseNumbers', JSON.stringify(showVerseNumbers));
   }, [showVerseNumbers]);
 
+  // Scroll to top whenever the page changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
+
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => {
     setCurrentPage(page as Page);
     if (tab) {
