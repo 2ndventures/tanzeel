@@ -285,7 +285,7 @@ export default function ChapterView({
                 </SheetTitle>
               </SheetHeader>
 
-              <div className="overflow-y-auto h-[calc(85vh-80px)] pb-8">
+              <div className="overflow-y-auto h-[calc(85vh-80px)] pb-16">
                 {menuView === 'main' && (
                   <div className="space-y-6">
                     {/* Audio Section */}
