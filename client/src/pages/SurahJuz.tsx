@@ -89,12 +89,13 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
             Surahs
           </h1>
-          <button 
-            className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-border shadow-md hover-elevate" 
-            data-testid="button-search"
-          >
-            <Icon icon="solar:magnifier-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
-          </button>
+          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border" data-testid="avatar-profile">
+            <img
+              alt="Profile"
+              src="https://randomuser.me/api/portraits/men/32.jpg"
+              className="h-full w-full object-cover"
+            />
+          </div>
         </div>
         
         {/* Search Bar - Glass */}
