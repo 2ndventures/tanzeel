@@ -45,9 +45,6 @@ export default function VerseCard({
   // Split Arabic text into words for word-level highlighting
   const words = arabicText.split(' ');
   
-  // Split transliteration into words for word-level highlighting
-  const transliterationWords = transliteration ? transliteration.split(' ') : [];
-  
   // Font size mappings
   const getArabicFontSize = (size: string) => {
     switch(size) {
@@ -155,23 +152,7 @@ export default function VerseCard({
               }`} 
               data-testid={`text-transliteration-${verseNumber}`}
             >
-              {transliterationWords.map((word, index) => {
-                // Only highlight if currentWordIndex is valid and within bounds
-                const isCurrentWord = highlighted && 
-                  currentWordIndex !== null && 
-                  currentWordIndex === index &&
-                  currentWordIndex < transliterationWords.length;
-                return (
-                  <span
-                    key={`transliteration-${chapterId}-${verseNumber}-${index}`}
-                    className={`transition-all duration-200 ${
-                      isCurrentWord ? 'text-primary font-bold' : ''
-                    }`}
-                  >
-                    {word}{index < transliterationWords.length - 1 ? ' ' : ''}
-                  </span>
-                );
-              })}
+              {transliteration}
             </p>
           )}
           {showTranslation && (
