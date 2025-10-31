@@ -130,15 +130,15 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             </div>
             <div 
               className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate cursor-pointer group"
-              onClick={() => onNavigate("surah-juz", undefined, "surah")}
-              data-testid="button-history"
+              onClick={() => onNavigate("settings", undefined, "settings")}
+              data-testid="button-settings"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
               <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-xl">
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-md shadow-inner ring-1 ring-border">
-                  <Icon icon="solar:history-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <Icon icon="solar:settings-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </div>
-                <span className="text-xs font-semibold text-foreground">History</span>
+                <span className="text-xs font-semibold text-foreground">Settings</span>
               </div>
             </div>
           </div>
