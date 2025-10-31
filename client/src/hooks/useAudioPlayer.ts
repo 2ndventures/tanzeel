@@ -55,11 +55,8 @@ export function useAudioPlayer(
   // Load a specific verse
   const loadVerse = useCallback((verseNum: number, shouldPlay: boolean = false) => {
     if (verseNum < 1 || verseNum > totalVerses) {
-      console.warn(`Verse ${verseNum} out of range (1-${totalVerses})`);
       return;
     }
-
-    console.log(`🎵 Loading verse ${verseNum}/${totalVerses}`);
 
     // Clean up previous audio
     if (audioRef.current) {
@@ -78,8 +75,6 @@ export function useAudioPlayer(
     // Create new audio element
     const audio = new Audio();
     const audioUrl = getAudioUrl(verseNum);
-    
-    console.log(`📍 Audio URL: ${audioUrl}`);
 
     // Event handlers
     const handleLoadedMetadata = () => {
@@ -98,7 +93,6 @@ export function useAudioPlayer(
     };
 
     const handleCanPlay = () => {
-      console.log(`✓ Verse ${verseNum} loaded and ready`);
       setState(prev => ({ ...prev, isLoading: false }));
       
       if (shouldPlay) {
@@ -114,7 +108,6 @@ export function useAudioPlayer(
     };
 
     const handlePlay = () => {
-      console.log(`▶️ Playing verse ${verseNum}`);
       setState(prev => ({ ...prev, isPlaying: true }));
       
       // Preload next verse for seamless playback
@@ -134,19 +127,14 @@ export function useAudioPlayer(
         preloadAudio.playbackRate = speedRef.current;
         preloadAudio.load();
         preloadRef.current = preloadAudio;
-        
-        console.log(`⏩ Preloading verse ${nextVerseNum} for seamless playback`);
       }
     };
 
     const handlePause = () => {
-      console.log(`⏸️ Paused verse ${verseNum}`);
       setState(prev => ({ ...prev, isPlaying: false }));
     };
 
     const handleEnded = () => {
-      console.log(`✓ Verse ${verseNum} finished`);
-      
       if (repeatRef.current) {
         // Repeat current verse
         audio.currentTime = 0;
@@ -159,7 +147,6 @@ export function useAudioPlayer(
         loadVerse(nextVerse, true);
       } else {
         // Chapter finished
-        console.log('📖 Chapter complete');
         setState(prev => ({ ...prev, isPlaying: false }));
         onEndedRef.current?.();
       }

@@ -9,7 +9,6 @@ function migrateOldSpeedData(): void {
   try {
     const oldData = localStorage.getItem(OLD_CHAPTER_SPEEDS_KEY);
     if (oldData) {
-      console.log('⚙️ Migrating old per-chapter speeds to global speed');
       localStorage.removeItem(OLD_CHAPTER_SPEEDS_KEY);
     }
   } catch (error) {
@@ -132,7 +131,6 @@ export function useWordTimingAudio(
     
     speedRef.current = newSpeed;
     setState(prev => ({ ...prev, speed: newSpeed }));
-    console.log(`⚡ Speed: ${newSpeed}x ${savedSpeed ? '(saved)' : '(default)'}`);
     
     return newSpeed;
   }, [initialSpeed]);
@@ -188,7 +186,6 @@ export function useWordTimingAudio(
       syncSpeed();
 
       // Fetch timing data from our backend proxy
-      console.log(`📡 Fetching timing data for chapter ${chapterId}, reciter ${reciterId}`);
       const timingResponse = await fetch(`/api/audio-timing/${reciterId}/${chapterId}`);
       
       if (!timingResponse.ok) {
@@ -204,8 +201,6 @@ export function useWordTimingAudio(
       
       const audioFile = timingData.audio_files[0];
       timingDataRef.current = audioFile;
-      
-      console.log(`✓ Loaded timing data with ${audioFile.verse_timings.length} verses`);
 
       // Create audio element with Quran.com audio URL
       // Handle both audio_url directly on audioFile or nested in audio_file object
@@ -215,8 +210,6 @@ export function useWordTimingAudio(
       if (!audioUrl) {
         throw new Error('No audio URL found in timing data');
       }
-      
-      console.log(`📍 Audio URL: ${audioUrl}`);
 
       // Event handlers
       const handleLoadedMetadata = () => {
@@ -247,38 +240,30 @@ export function useWordTimingAudio(
       };
 
       const handleCanPlay = () => {
-        console.log(`✓ Chapter ${chapterId} loaded and ready`);
-        
         // Set playback rate after audio is ready (some browsers reset it during load())
         audio.playbackRate = speedRef.current;
-        console.log(`🎵 Applied playback rate: ${speedRef.current}x`);
         
         // Auto-start playback if autoplay is enabled
         if (autoplayRef.current) {
-          console.log(`🎵 AUTO-STARTING playback for chapter ${chapterId} (autoplay=${autoplayRef.current})`);
           setState(prev => ({ ...prev, isLoading: false }));
           audio.play().catch(err => {
             console.error('❌ Autoplay failed:', err);
             setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
           });
         } else {
-          console.log(`⏹️ Not autoplaying chapter ${chapterId} (autoplay=${autoplayRef.current})`);
           setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
         }
       };
 
       const handlePlay = () => {
-        console.log(`▶️ Playing chapter ${chapterId}`);
         setState(prev => ({ ...prev, isPlaying: true }));
       };
 
       const handlePause = () => {
-        console.log(`⏸️ Paused chapter ${chapterId}`);
         setState(prev => ({ ...prev, isPlaying: false }));
       };
 
       const handleEnded = () => {
-        console.log(`✓ Chapter ${chapterId} finished`);
         
         if (repeatRef.current) {
           audio.currentTime = 0;
@@ -426,7 +411,6 @@ export function useWordTimingAudio(
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
     setGlobalSpeed(newSpeed); // Save globally to localStorage
-    console.log(`⚡ Speed: ${newSpeed}x`);
   }, []);
 
   // Get timing data (returns the audio file with verse timings)

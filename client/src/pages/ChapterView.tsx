@@ -18,7 +18,6 @@ interface ChapterViewProps {
   showTranslation: boolean;
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
   reciter: string;
-  speed: string;
   autoScroll: boolean;
   repeat: boolean;
   autoplay: boolean;
@@ -49,7 +48,6 @@ export default function ChapterView({
   showTranslation,
   onNavigate,
   reciter,
-  speed: initialSpeed,
   autoScroll,
   repeat,
   autoplay,
@@ -97,14 +95,6 @@ export default function ChapterView({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [chapterId]);
-  
-  // Map speed setting to numeric value
-  const speedMap: { [key: string]: number } = {
-    'Slow': 0.75,
-    'Normal': 1.0,
-    'Fast': 1.25,
-  };
-  const numericSpeed = speedMap[initialSpeed] || 1.0;
 
   // Track completed verses
   const completedVersesRef = useRef(new Set<string>());
@@ -145,28 +135,34 @@ export default function ChapterView({
           const verseElement = document.querySelector(`[data-testid="card-verse-${verseNumber}"]`);
           
           if (verseElement) {
-            // Calculate offset to center verse vertically in viewport
             const rect = verseElement.getBoundingClientRect();
             const viewportHeight = window.innerHeight;
             const verseHeight = rect.height;
             
-            // Center the verse: viewport center - verse center
-            const offset = rect.top - (viewportHeight / 2) + (verseHeight / 2);
+            // Reserve space for fixed header and audio player
+            const headerHeight = 100;
+            const playerHeight = 150;
+            const availableHeight = viewportHeight - headerHeight - playerHeight;
             
-            console.log('📜 Auto-scroll verse', verseNumber, 'offset:', offset);
-            
-            // Scroll window to center verse in viewport
-            window.scrollBy({ top: offset, behavior: 'smooth' });
+            // If verse is taller than available viewport, scroll to top of verse
+            if (verseHeight > availableHeight) {
+              const offset = rect.top - headerHeight - 20;
+              window.scrollBy({ top: offset, behavior: 'smooth' });
+            } else {
+              // Otherwise, center the verse in available viewport
+              const targetPosition = headerHeight + (availableHeight / 2) - (verseHeight / 2);
+              const offset = rect.top - targetPosition;
+              window.scrollBy({ top: offset, behavior: 'smooth' });
+            }
           }
         });
       }
     },
     () => {
       // Navigate to next surah when current one ends (autoplay will be handled by hook)
-      console.log('✓ Chapter ended, navigating to next surah');
       goToNextSurah();
     },
-    numericSpeed,
+    1.0,
     autoplay
   );
   
@@ -201,17 +197,13 @@ export default function ChapterView({
     const verseKey = `${chapterId}:${verseNumber}`;
     const clickedCurrentVerse = currentVerse === verseNumber;
     
-    console.log(`🖱️ Verse ${verseNumber} clicked - currentVerse: ${currentVerse}, isPlaying: ${isPlaying}, clickedCurrent: ${clickedCurrentVerse}`);
-    
     if (clickedCurrentVerse && isPlaying) {
       // Clicking the currently playing verse pauses it
-      console.log('⏸️ Pausing current verse');
       pauseAudio();
     } else {
       // Clicking a different verse seeks to it and starts playback
       seekToVerse(verseKey);
       if (!isPlaying) {
-        console.log('▶️ Starting playback');
         playAudio();
       }
     }

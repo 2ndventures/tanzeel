@@ -3,6 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import HomePage from "@/pages/HomePage";
 import SurahJuz from "@/pages/SurahJuz";
 import ChapterView from "@/pages/ChapterView";
@@ -44,7 +45,6 @@ function App() {
       if (migratedId !== DEFAULT_RECITER || trimmedId in LEGACY_RECITER_MAP) {
         // Legacy ID found - migrate it
         localStorage.setItem('reciter', migratedId);
-        console.log(`Migrated reciter from "${trimmedId}" to "${migratedId}"`);
         return migratedId;
       }
       
@@ -54,16 +54,10 @@ function App() {
       }
       
       // If reciter ID is invalid/removed, reset to default
-      console.log(`Reciter ID "${trimmedId}" not found, resetting to default`);
       localStorage.setItem('reciter', DEFAULT_RECITER);
       return DEFAULT_RECITER;
     }
     return DEFAULT_RECITER;
-  });
-  
-  const [speed, setSpeed] = useState(() => {
-    const saved = localStorage.getItem('speed');
-    return saved || "Normal";
   });
   
   const [autoScroll, setAutoScroll] = useState(() => {
@@ -127,10 +121,6 @@ function App() {
   }, [showTranslation]);
 
   useEffect(() => {
-    localStorage.setItem('speed', speed);
-  }, [speed]);
-
-  useEffect(() => {
     localStorage.setItem('autoScroll', JSON.stringify(autoScroll));
   }, [autoScroll]);
 
@@ -186,10 +176,11 @@ function App() {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="min-h-screen transition-smooth">
-          <div key={currentPage} className="animate-fade-in">
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <div className="min-h-screen transition-smooth">
+            <div key={currentPage} className="animate-fade-in">
             {currentPage === "home" && (
               <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
             )}
@@ -207,7 +198,6 @@ function App() {
                 showTranslation={showTranslation}
                 onNavigate={handleNavigate}
                 reciter={reciter}
-                speed={speed}
                 autoScroll={autoScroll}
                 repeat={repeat}
                 autoplay={autoplay}
@@ -273,6 +263,7 @@ function App() {
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
+  </ErrorBoundary>
   );
 }
 

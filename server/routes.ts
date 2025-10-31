@@ -1,7 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Readable, pipeline } from "stream";
-import { storage } from "./storage";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Verse-by-verse audio proxy for EveryAyah.com

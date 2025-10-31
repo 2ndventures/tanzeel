@@ -42,13 +42,6 @@ export default function VerseCard({
   // Calculate if this verse should be highlighted
   const highlighted = isPlaying && isCurrentVerse && isInVerseRange;
   
-  // Debug logging
-  useEffect(() => {
-    if (highlighted) {
-      console.log(`✅ VERSE ${verseNumber} IS HIGHLIGHTED - isPlaying=${isPlaying}, isCurrentVerse=${isCurrentVerse}, wordIndex=${currentWordIndex}`);
-    }
-  }, [highlighted, verseNumber, isPlaying, isCurrentVerse, currentWordIndex]);
-  
   // Split Arabic text into words for word-level highlighting
   const words = arabicText.split(' ');
   

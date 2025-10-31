@@ -93,7 +93,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
             className="flex size-14 items-center justify-center rounded-full bg-primary/20 ring-1 ring-border shadow-md hover-elevate" 
             data-testid="button-search"
           >
-            <Icon icon="solar:magnifer-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+            <Icon icon="solar:magnifier-bold" className="size-6 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
           </button>
         </div>
         
