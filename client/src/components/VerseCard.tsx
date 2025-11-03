@@ -40,7 +40,8 @@ export default function VerseCard({
   showVerseNumbers = true,
 }: VerseCardProps) {
   // Calculate if this verse should be highlighted
-  const highlighted = isPlaying && isCurrentVerse && isInVerseRange;
+  // Keep highlighting even when paused - only need current verse/range
+  const highlighted = isCurrentVerse && isInVerseRange;
   
   // Split Arabic text into words for word-level highlighting
   const words = arabicText.split(' ');
