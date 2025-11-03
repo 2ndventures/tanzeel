@@ -64,20 +64,20 @@ export default function AudioPlayer({
           {(surahNameArabic || surahNameEnglish) && (
             <div className="flex items-center justify-start gap-3 py-1" data-testid="surah-info">
               {surahNameArabic && (
-                <span className="font-arabic text-xl text-foreground" data-testid="text-surah-arabic">
+                <span className="font-arabic text-xl font-bold text-foreground" data-testid="text-surah-arabic">
                   {surahNameArabic}
                 </span>
               )}
               {surahNumber && surahNameEnglish && (
-                <span className="text-sm text-muted-foreground">•</span>
+                <span className="text-sm font-bold text-muted-foreground">•</span>
               )}
               {surahNumber && (
-                <span className="text-sm font-semibold text-muted-foreground" data-testid="text-surah-number">
+                <span className="text-sm font-bold text-muted-foreground" data-testid="text-surah-number">
                   {surahNumber}
                 </span>
               )}
               {surahNameEnglish && (
-                <span className="text-sm font-semibold text-foreground" data-testid="text-surah-english">
+                <span className="text-sm font-bold text-foreground" data-testid="text-surah-english">
                   {surahNameEnglish}
                 </span>
               )}

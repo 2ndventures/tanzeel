@@ -280,6 +280,35 @@ export default function ChapterView({
               <div className="overflow-y-auto h-[calc(85vh-80px)] pb-16">
                 {menuView === 'main' && (
                   <div className="space-y-6">
+                    {/* Arabic Text Size Section - Prioritized at top */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-size">
+                        Arabic Text Size
+                      </h3>
+                      <div className="grid grid-cols-2 gap-2 px-2">
+                        {["Small", "Medium", "Large", "Extra Large"].map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => onArabicFontSizeChange?.(size)}
+                            className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
+                              arabicFontSize === size 
+                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
+                                : 'bg-muted/40 dark:bg-slate-800/40'
+                            }`}
+                            data-testid={`button-arabic-size-${size.toLowerCase().replace(' ', '-')}`}
+                          >
+                            <span className={`font-arabic ${
+                              size === "Small" ? "text-xl" :
+                              size === "Medium" ? "text-2xl" :
+                              size === "Large" ? "text-3xl" :
+                              "text-4xl"
+                            }`}>أ</span>
+                            <span className="text-xs font-semibold">{size}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Audio Section */}
                     <div>
                       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
@@ -351,10 +380,10 @@ export default function ChapterView({
                       </div>
                     </div>
 
-                    {/* Text Appearance Section */}
+                    {/* More Text Options Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-text-appearance">
-                        Text Appearance
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-more-text">
+                        More Text Options
                       </h3>
                       <div className="space-y-1">
                         <button
@@ -362,7 +391,7 @@ export default function ChapterView({
                           className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
                           data-testid="menu-item-display"
                         >
-                          <span className="text-lg">Text size & spacing</span>
+                          <span className="text-lg">Translation, spacing & more</span>
                           <ChevronRight className="w-5 h-5 text-muted-foreground" />
                         </button>
                       </div>
