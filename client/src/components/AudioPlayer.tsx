@@ -60,6 +60,30 @@ export default function AudioPlayer({
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
         
         <div className="relative px-6 py-6 pb-8 space-y-4 shadow-2xl" data-testid="audio-player-content">
+          {/* Surah Information - Above progress bar, side by side */}
+          {(surahNameArabic || surahNameEnglish) && (
+            <div className="flex items-center justify-center gap-3 py-1" data-testid="surah-info">
+              {surahNameArabic && (
+                <span className="font-arabic text-xl text-foreground" data-testid="text-surah-arabic">
+                  {surahNameArabic}
+                </span>
+              )}
+              {surahNumber && surahNameEnglish && (
+                <span className="text-sm text-muted-foreground">•</span>
+              )}
+              {surahNumber && (
+                <span className="text-sm font-semibold text-muted-foreground" data-testid="text-surah-number">
+                  {surahNumber}
+                </span>
+              )}
+              {surahNameEnglish && (
+                <span className="text-sm font-semibold text-foreground" data-testid="text-surah-english">
+                  {surahNameEnglish}
+                </span>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Slider
               value={[currentTime]}
@@ -78,29 +102,6 @@ export default function AudioPlayer({
               </span>
             </div>
           </div>
-
-          {/* Surah Information */}
-          {(surahNameArabic || surahNameEnglish) && (
-            <div className="text-center py-2" data-testid="surah-info">
-              {surahNameArabic && (
-                <div className="font-arabic text-xl text-foreground mb-1" data-testid="text-surah-arabic">
-                  {surahNameArabic}
-                </div>
-              )}
-              <div className="flex items-center justify-center gap-2">
-                {surahNumber && (
-                  <span className="text-sm font-semibold text-muted-foreground" data-testid="text-surah-number">
-                    {surahNumber}
-                  </span>
-                )}
-                {surahNameEnglish && (
-                  <span className="text-sm font-semibold text-foreground" data-testid="text-surah-english">
-                    {surahNameEnglish}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
           
           <div className="flex items-center justify-between gap-2">
             <button
