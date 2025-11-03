@@ -62,7 +62,7 @@ export default function AudioPlayer({
         <div className="relative px-6 py-6 pb-8 space-y-4 shadow-2xl" data-testid="audio-player-content">
           {/* Surah Information - Above progress bar, side by side */}
           {(surahNameArabic || surahNameEnglish) && (
-            <div className="flex items-center justify-center gap-3 py-1" data-testid="surah-info">
+            <div className="flex items-center justify-start gap-3 py-1" data-testid="surah-info">
               {surahNameArabic && (
                 <span className="font-arabic text-xl text-foreground" data-testid="text-surah-arabic">
                   {surahNameArabic}
