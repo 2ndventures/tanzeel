@@ -572,6 +572,9 @@ export default function ChapterView({
         onPrevious={goToPreviousSurah}
         onNext={goToNextSurah}
         onRepeatChange={onRepeatChange}
+        surahNumber={chapterId}
+        surahNameArabic={chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : undefined}
+        surahNameEnglish={chapterInfo?.englishName}
       />
     </div>
   );

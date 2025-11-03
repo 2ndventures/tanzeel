@@ -260,7 +260,12 @@ export function useWordTimingAudio(
       };
 
       const handlePause = () => {
-        setState(prev => ({ ...prev, isPlaying: false }));
+        // Keep current verse and word highlighting when paused
+        setState(prev => ({ 
+          ...prev, 
+          isPlaying: false
+          // Preserve currentVerseKey and currentWordIndex
+        }));
       };
 
       const handleEnded = () => {

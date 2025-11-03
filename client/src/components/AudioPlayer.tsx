@@ -15,6 +15,9 @@ interface AudioPlayerProps {
   onPrevious?: () => void;
   onNext?: () => void;
   onRepeatChange?: (enabled: boolean) => void;
+  surahNumber?: number;
+  surahNameArabic?: string;
+  surahNameEnglish?: string;
 }
 
 export default function AudioPlayer({
@@ -30,6 +33,9 @@ export default function AudioPlayer({
   onPrevious,
   onNext,
   onRepeatChange,
+  surahNumber,
+  surahNameArabic,
+  surahNameEnglish,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
   
@@ -72,6 +78,29 @@ export default function AudioPlayer({
               </span>
             </div>
           </div>
+
+          {/* Surah Information */}
+          {(surahNameArabic || surahNameEnglish) && (
+            <div className="text-center py-2" data-testid="surah-info">
+              {surahNameArabic && (
+                <div className="font-arabic text-xl text-foreground mb-1" data-testid="text-surah-arabic">
+                  {surahNameArabic}
+                </div>
+              )}
+              <div className="flex items-center justify-center gap-2">
+                {surahNumber && (
+                  <span className="text-sm font-semibold text-muted-foreground" data-testid="text-surah-number">
+                    {surahNumber}
+                  </span>
+                )}
+                {surahNameEnglish && (
+                  <span className="text-sm font-semibold text-foreground" data-testid="text-surah-english">
+                    {surahNameEnglish}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
           
           <div className="flex items-center justify-between gap-2">
             <button
