@@ -48,15 +48,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           <div>
             <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
             <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground" style={{textShadow: '0 4px 12px rgba(0,0,0,0.2)'}}>
-              Ahmad
+              Simple Quran
             </h2>
           </div>
-          <div className="relative size-16 overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
-            <img
-              alt="Profile"
-              src="https://randomuser.me/api/portraits/men/32.jpg"
-              className="h-full w-full object-cover"
-            />
+          <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
+            <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
           </div>
         </div>
 
