@@ -309,6 +309,62 @@ export default function ChapterView({
                       </div>
                     </div>
 
+                    {/* Translation Text Size Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-translation-size">
+                        Translation Text Size
+                      </h3>
+                      <div className="grid grid-cols-3 gap-2 px-2">
+                        {["Small", "Medium", "Large"].map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => onTranslationFontSizeChange?.(size)}
+                            className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
+                              translationFontSize === size 
+                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
+                                : 'bg-muted/40 dark:bg-slate-800/40'
+                            }`}
+                            data-testid={`button-translation-size-${size.toLowerCase()}`}
+                          >
+                            <span className={`font-semibold ${
+                              size === "Small" ? "text-sm" :
+                              size === "Medium" ? "text-base" :
+                              "text-lg"
+                            }`}>A</span>
+                            <span className="text-xs font-semibold">{size}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Transliteration Text Size Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-transliteration-size">
+                        Transliteration Text Size
+                      </h3>
+                      <div className="grid grid-cols-3 gap-2 px-2">
+                        {["Small", "Medium", "Large"].map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => onTransliterationFontSizeChange?.(size)}
+                            className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
+                              transliterationFontSize === size 
+                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
+                                : 'bg-muted/40 dark:bg-slate-800/40'
+                            }`}
+                            data-testid={`button-transliteration-size-${size.toLowerCase()}`}
+                          >
+                            <span className={`italic font-medium ${
+                              size === "Small" ? "text-xs" :
+                              size === "Medium" ? "text-sm" :
+                              "text-base"
+                            }`}>A</span>
+                            <span className="text-xs font-semibold">{size}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Audio Section */}
                     <div>
                       <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
@@ -380,10 +436,10 @@ export default function ChapterView({
                       </div>
                     </div>
 
-                    {/* More Text Options Section */}
+                    {/* More Options Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-more-text">
-                        More Text Options
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-more-options">
+                        More Options
                       </h3>
                       <div className="space-y-1">
                         <button
@@ -391,7 +447,7 @@ export default function ChapterView({
                           className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
                           data-testid="menu-item-display"
                         >
-                          <span className="text-lg">Translation, spacing & more</span>
+                          <span className="text-lg">Verse numbers & line spacing</span>
                           <ChevronRight className="w-5 h-5 text-muted-foreground" />
                         </button>
                       </div>
