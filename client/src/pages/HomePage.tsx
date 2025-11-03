@@ -148,7 +148,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <div className="pb-6">
           <div className="mb-6 flex items-center justify-between">
             <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
-              TODAY'S READING
+              SURAH OF THE DAY
             </h3>
             <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
           </div>
