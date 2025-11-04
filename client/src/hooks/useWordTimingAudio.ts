@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { API_BASE_URL } from '@/config';
 
 // Helper functions for global speed persistence
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
@@ -186,7 +187,7 @@ export function useWordTimingAudio(
       syncSpeed();
 
       // Fetch timing data from our backend proxy
-      const timingResponse = await fetch(`/api/audio-timing/${reciterId}/${chapterId}`);
+      const timingResponse = await fetch(`${API_BASE_URL}/api/audio-timing/${reciterId}/${chapterId}`);
       
       if (!timingResponse.ok) {
         throw new Error('Failed to fetch timing data');
