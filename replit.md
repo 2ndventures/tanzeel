@@ -57,3 +57,54 @@ All Quran data (chapters, verses, Arabic text, English translations, translitera
 - **External APIs & Data Sources**:
     - **Quran.com Audio API**: Provides continuous chapter audio files with word-level timing data via a backend proxy.
     - **Al-Quran Cloud API**: Used for pre-fetching static Quran text data (Arabic, Sahih International English translation, transliteration).
+
+# Mobile App Deployment (Updated November 4, 2025)
+
+## Capacitor Integration
+
+The application is configured with Capacitor to enable native iOS and Android app deployment to the App Store and Google Play Store. Capacitor wraps the existing React web application in a native container while preserving all functionality and UI.
+
+### Configuration
+
+- **App ID**: `com.simplequran.app`
+- **App Name**: Simple Quran
+- **Web Directory**: `dist/public` (Vite build output)
+- **Platforms**: iOS and Android
+
+### Project Structure
+
+```
+ios/                 # iOS (Xcode) native project
+android/             # Android (Android Studio) native project
+resources/           # Source files for app icons and splash screens
+capacitor.config.ts  # Capacitor configuration
+```
+
+### Development Workflow
+
+1. **Build the web app**: Run `vite build` to create production bundle in `dist/public`
+2. **Sync to native platforms**: Run `npx cap sync` to copy web assets and sync plugins
+3. **Open in IDE**: 
+   - iOS: `npx cap open ios` (requires macOS and Xcode)
+   - Android: `npx cap open android` (requires Android Studio)
+4. **Test on devices**: Use Xcode/Android Studio to build and run on simulators or physical devices
+5. **Build for release**: Create signed builds through Xcode/Android Studio for app store submission
+
+### App Icons and Splash Screens
+
+App branding assets are managed in the `resources/` directory. See `resources/README.md` for detailed setup instructions. The recommended approach is to:
+
+1. Place a 1024x1024px app icon as `resources/icon.png`
+2. Place a 2732x2732px splash screen as `resources/splash.png`
+3. Run `npx capacitor-assets generate` to create all required sizes
+
+### Publishing Requirements
+
+- **Apple App Store**: Requires Apple Developer account ($99/year) and macOS with Xcode
+- **Google Play Store**: Requires Google Play Developer account ($25 one-time fee) and Android Studio
+
+### Backend Considerations
+
+When deploying as a native app, ensure the backend API is accessible:
+- During development: The web app makes requests to the local Express server
+- In production: Update API endpoints to point to your deployed backend (consider using Replit Deployments or other hosting)
