@@ -44,8 +44,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { reciter, chapter } = req.params;
       
-      // Try requested reciter first
-      let audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${chapter}.mp3`;
+      // Try requested reciter first using Quranic Audio CDN
+      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${chapter}.mp3`;
       
       // Prepare fetch options with Range header if client requested it
       const fetchOptions: RequestInit = {
@@ -60,11 +60,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let response = await fetch(audioUrl, fetchOptions);
       
-      // If not found, fallback to Alafasy (most complete collection)
+      // If not found, fallback to Alafasy/Mishari (most complete collection)
       // But preserve 416 Range Not Satisfiable errors (client needs to retry)
-      if (!response.ok && response.status !== 416 && reciter !== 'ar.alafasy') {
-        console.log(`Audio not found for ${reciter}, falling back to Alafasy`);
-        audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${chapter}.mp3`;
+      if (!response.ok && response.status !== 416 && reciter !== 'mishari_al_afasy') {
+        console.log(`Audio not found for ${reciter}, falling back to Mishari Al-Afasy`);
+        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${chapter}.mp3`;
         response = await fetch(audioUrl, fetchOptions);
       }
       
@@ -162,6 +162,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const data = await response.json();
       console.log(`✓ Loaded timing data for chapter ${chapter}`);
+      
+      // CRITICAL: Rewrite audio URLs to use our proxy instead of direct Quran.com URLs
+      // This fixes CORS issues in mobile apps (iOS/Android)
+      if (data.audio_files && Array.isArray(data.audio_files)) {
+        data.audio_files = data.audio_files.map((audioFile: any) => {
+          // Extract reciter ID from the original URL
+          // URL format: https://download.quranicaudio.com/qdc/[reciter]/murattal/[chapter].mp3
+          const originalUrl = audioFile.audio_url;
+          if (originalUrl) {
+            const urlParts = originalUrl.split('/');
+            // URL structure: ["https:", "", "download.quranicaudio.com", "qdc", "reciter_name", "murattal", "chapter.mp3"]
+            const reciterFromUrl = urlParts[4]; // Extract reciter from URL (index 4)
+            
+            // Rewrite to use our backend proxy
+            // Our proxy URL: /api/audio/[reciter]/[chapter]
+            audioFile.audio_url = `/api/audio/${reciterFromUrl}/${chapter}`;
+            console.log(`🔄 Rewrote audio URL: ${originalUrl} → ${audioFile.audio_url}`);
+          }
+          return audioFile;
+        });
+      }
       
       // Set caching headers for better performance
       res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
