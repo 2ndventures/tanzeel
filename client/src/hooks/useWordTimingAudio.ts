@@ -206,10 +206,15 @@ export function useWordTimingAudio(
       // Create audio element with Quran.com audio URL
       // Handle both audio_url directly on audioFile or nested in audio_file object
       const audio = new Audio();
-      const audioUrl = audioFile.audio_url || (audioFile as any).audio_file?.audio_url;
+      let audioUrl = audioFile.audio_url || (audioFile as any).audio_file?.audio_url;
       
       if (!audioUrl) {
         throw new Error('No audio URL found in timing data');
+      }
+      
+      // CRITICAL: Prepend API_BASE_URL for relative paths (mobile apps need full URLs)
+      if (audioUrl.startsWith('/')) {
+        audioUrl = `${API_BASE_URL}${audioUrl}`;
       }
 
       // Event handlers
