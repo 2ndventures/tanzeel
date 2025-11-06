@@ -198,13 +198,19 @@ export function useWordTimingAudio(
       const timingResponse = await fetch(timingUrl);
       
       if (!timingResponse.ok) {
+        const errorText = await timingResponse.text().catch(() => 'Unable to read error');
         console.error('❌ Timing fetch failed:', timingResponse.status, timingResponse.statusText);
-        throw new Error(`Failed to fetch timing data: ${timingResponse.status}`);
+        console.error('❌ Response body:', errorText);
+        throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
       }
 
-      console.log('✅ Timing data received');
+      console.log('✅ Timing data received, status:', timingResponse.status);
       const timingData: TimingData = await timingResponse.json();
       console.log('✅ Timing data parsed, audio files:', timingData.audio_files?.length);
+      
+      if (timingData.audio_files?.[0]) {
+        console.log('✅ Audio URL from timing:', timingData.audio_files[0].audio_url);
+      }
       
       // API returns audio_files array, we need the first entry
       if (!timingData.audio_files || timingData.audio_files.length === 0) {
