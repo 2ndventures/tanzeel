@@ -109,6 +109,7 @@ export default function ChapterView({
     isLoading,
     currentTime,
     duration,
+    error,
     togglePlayPause,
     pauseAudio,
     playAudio,
@@ -165,6 +166,13 @@ export default function ChapterView({
     1.0,
     autoplay
   );
+  
+  // Show audio error as alert (for debugging mobile)
+  useEffect(() => {
+    if (error) {
+      alert(`AUDIO ERROR: ${error}\n\nChapter: ${chapterId}\nReciter ID: ${quranComReciterId}\nReciter: ${reciter}`);
+    }
+  }, [error, chapterId, quranComReciterId, reciter]);
   
   // Track reading time
   useEffect(() => {
