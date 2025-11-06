@@ -88,7 +88,11 @@ export function useWordTimingAudio(
   const savedSpeed = getGlobalSpeed();
   const effectiveSpeed = savedSpeed ?? initialSpeed;
   
+  // CRITICAL FIX: Use a ref to the DOM audio element instead of new Audio()
+  // This works in mobile WebViews (iOS/Android) unlike the headless Audio() constructor
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContainerRef = useRef<HTMLDivElement | null>(null);
+  
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
@@ -203,22 +207,40 @@ export function useWordTimingAudio(
       const audioFile = timingData.audio_files[0];
       timingDataRef.current = audioFile;
 
-      // Create audio element with Quran.com audio URL
-      // Handle both audio_url directly on audioFile or nested in audio_file object
-      const audio = new Audio();
+      // CRITICAL FIX: Create audio element in DOM instead of using new Audio()
+      // This works in mobile WebViews (iOS/Android)
+      
+      // Create container div if it doesn't exist
+      if (!audioContainerRef.current) {
+        const container = document.createElement('div');
+        container.style.display = 'none'; // Hide from UI
+        container.id = `quran-audio-player-${chapterId}`;
+        document.body.appendChild(container);
+        audioContainerRef.current = container;
+      }
+
+      // Create audio element in DOM
+      const audio = document.createElement('audio');
+      audio.preload = 'auto';
+      audio.crossOrigin = 'anonymous';
+      audioContainerRef.current.appendChild(audio);
+
       let audioUrl = audioFile.audio_url || (audioFile as any).audio_file?.audio_url;
       
       if (!audioUrl) {
         throw new Error('No audio URL found in timing data');
       }
       
-      // CRITICAL: Prepend API_BASE_URL for relative paths (mobile apps need full URLs)
+      // Prepend API_BASE_URL for relative paths (mobile apps need full URLs)
       if (audioUrl.startsWith('/')) {
         audioUrl = `${API_BASE_URL}${audioUrl}`;
       }
 
+      console.log('🎵 Loading audio from:', audioUrl);
+
       // Event handlers
       const handleLoadedMetadata = () => {
+        console.log('✅ Audio metadata loaded, duration:', audio.duration);
         setState(prev => ({ 
           ...prev, 
           duration: audio.duration || 0,
@@ -246,6 +268,7 @@ export function useWordTimingAudio(
       };
 
       const handleCanPlay = () => {
+        console.log('✅ Audio can play');
         // Set playback rate after audio is ready (some browsers reset it during load())
         audio.playbackRate = speedRef.current;
         
@@ -262,10 +285,12 @@ export function useWordTimingAudio(
       };
 
       const handlePlay = () => {
+        console.log('▶️ Audio playing');
         setState(prev => ({ ...prev, isPlaying: true }));
       };
 
       const handlePause = () => {
+        console.log('⏸️ Audio paused');
         // Keep current verse and word highlighting when paused
         setState(prev => ({ 
           ...prev, 
@@ -275,6 +300,7 @@ export function useWordTimingAudio(
       };
 
       const handleEnded = () => {
+        console.log('⏹️ Audio ended');
         
         if (repeatRef.current) {
           audio.currentTime = 0;
@@ -292,6 +318,7 @@ export function useWordTimingAudio(
         console.error('❌ Audio error for chapter', chapterId);
         console.error('Error code:', error?.code);
         console.error('Error message:', error?.message);
+        console.error('Error URL:', audioUrl);
         
         setState(prev => ({
           ...prev,
@@ -329,6 +356,7 @@ export function useWordTimingAudio(
         audio.removeEventListener('error', handleError);
         audio.pause();
         audio.src = '';
+        audio.remove();
       };
     } catch (error) {
       console.error('❌ Failed to load audio:', error);
@@ -338,7 +366,7 @@ export function useWordTimingAudio(
         error: 'Failed to load audio',
       }));
     }
-  }, [chapterId, reciterId, syncSpeed]);
+  }, [chapterId, reciterId, syncSpeed, findCurrentSegment]);
 
   // Initialize audio on mount
   useEffect(() => {
@@ -347,6 +375,21 @@ export function useWordTimingAudio(
       cleanup?.then(cleanupFn => cleanupFn?.());
     };
   }, [loadAudio]);
+
+  // Cleanup container on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current.remove();
+      }
+      if (audioContainerRef.current) {
+        audioContainerRef.current.remove();
+        audioContainerRef.current = null;
+      }
+    };
+  }, []);
 
   // Dedicated pause function
   const pauseAudio = useCallback(() => {
@@ -357,9 +400,15 @@ export function useWordTimingAudio(
 
   // Dedicated play function
   const playAudio = useCallback(() => {
-    if (audioRef.current && !state.isPlaying) {
+    if (!audioRef.current) {
+      console.warn('⚠️ No audio element - still loading');
+      return;
+    }
+    
+    if (!state.isPlaying) {
+      console.log('▶️ Attempting to play audio...');
       audioRef.current.play().catch(err => {
-        console.error('Playback failed:', err);
+        console.error('❌ Playback failed:', err);
         setState(prev => ({ ...prev, error: 'Playback failed' }));
       });
     }
@@ -368,15 +417,17 @@ export function useWordTimingAudio(
   // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (!audioRef.current) {
-      console.warn('No audio element');
+      console.warn('⚠️ No audio element - still loading');
       return;
     }
 
     if (state.isPlaying) {
+      console.log('⏸️ Pausing audio...');
       audioRef.current.pause();
     } else {
+      console.log('▶️ Playing audio...');
       audioRef.current.play().catch(err => {
-        console.error('Playback failed:', err);
+        console.error('❌ Playback failed:', err);
         setState(prev => ({ ...prev, error: 'Playback failed' }));
       });
     }
@@ -427,16 +478,6 @@ export function useWordTimingAudio(
   // Get timing data (returns the audio file with verse timings)
   const getTimingData = useCallback((): AudioFile | null => {
     return timingDataRef.current;
-  }, []);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      }
-    };
   }, []);
 
   return {
