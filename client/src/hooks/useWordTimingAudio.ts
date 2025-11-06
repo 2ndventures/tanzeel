@@ -185,19 +185,26 @@ export function useWordTimingAudio(
   // Load timing data and audio
   const loadAudio = useCallback(async () => {
     try {
+      console.log('🔄 loadAudio called for chapter', chapterId, 'with API_BASE_URL:', API_BASE_URL);
       setState(prev => ({ ...prev, isLoading: true, error: null }));
 
       // Sync speed before creating audio element
       syncSpeed();
 
       // Fetch timing data from our backend proxy
-      const timingResponse = await fetch(`${API_BASE_URL}/api/audio-timing/${reciterId}/${chapterId}`);
+      const timingUrl = `${API_BASE_URL}/api/audio-timing/${reciterId}/${chapterId}`;
+      console.log('📡 Fetching timing data from:', timingUrl);
+      
+      const timingResponse = await fetch(timingUrl);
       
       if (!timingResponse.ok) {
-        throw new Error('Failed to fetch timing data');
+        console.error('❌ Timing fetch failed:', timingResponse.status, timingResponse.statusText);
+        throw new Error(`Failed to fetch timing data: ${timingResponse.status}`);
       }
 
+      console.log('✅ Timing data received');
       const timingData: TimingData = await timingResponse.json();
+      console.log('✅ Timing data parsed, audio files:', timingData.audio_files?.length);
       
       // API returns audio_files array, we need the first entry
       if (!timingData.audio_files || timingData.audio_files.length === 0) {
@@ -360,6 +367,13 @@ export function useWordTimingAudio(
       };
     } catch (error) {
       console.error('❌ Failed to load audio:', error);
+      console.error('❌ Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        chapterId,
+        reciterId,
+        API_BASE_URL
+      });
       setState(prev => ({
         ...prev,
         isLoading: false,
