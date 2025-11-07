@@ -251,6 +251,20 @@ export function useWordTimingAudio(
 
       console.log('🎵 Loading audio from:', audioUrl);
 
+      // Add debugging event listeners first
+      audio.addEventListener('loadstart', () => console.log('🔵 Audio load started'));
+      audio.addEventListener('loadedmetadata', () => console.log('🟢 Metadata loaded'));
+      audio.addEventListener('canplay', () => console.log('✅ Audio can play'));
+      audio.addEventListener('error', (e) => {
+        console.log('❌ Audio Error Details:', {
+          errorCode: audio.error?.code,
+          errorMessage: audio.error?.message,
+          networkState: audio.networkState,
+          readyState: audio.readyState,
+          src: audio.src
+        });
+      });
+
       // Event handlers
       const handleLoadedMetadata = () => {
         console.log('✅ Audio metadata loaded, duration:', audio.duration);
