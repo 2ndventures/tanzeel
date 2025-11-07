@@ -75,7 +75,7 @@ export default function Settings({
   }));
 
   return (
-    <div className="min-h-screen pb-32 relative overflow-hidden" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="min-h-screen pb-32 relative overflow-hidden safe-area-pad">
       {/* Multi-layer gradient background - adapts to theme */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
