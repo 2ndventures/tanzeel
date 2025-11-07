@@ -44,12 +44,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { reciter, chapter } = req.params;
       
-      // Zero-pad chapter number to 3 digits (required by Quranic Audio CDN)
-      // Examples: 1 -> 001, 10 -> 010, 114 -> 114
-      const paddedChapter = chapter.padStart(3, '0');
-      
-      // Try requested reciter first using Quranic Audio CDN
-      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${paddedChapter}.mp3`;
+      // Quranic Audio CDN uses non-padded chapter numbers (1.mp3, not 001.mp3)
+      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${chapter}.mp3`;
+      console.log(`🎵 Audio proxy request: ${reciter}/${chapter}`);
+      console.log(`🌐 Fetching from CDN: ${audioUrl}`);
       
       // Prepare fetch options with Range header if client requested it
       const fetchOptions: RequestInit = {
@@ -60,15 +58,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rangeHeader = req.headers.range;
       if (rangeHeader) {
         (fetchOptions.headers as Record<string, string>)['Range'] = rangeHeader;
+        console.log(`📏 Range request: ${rangeHeader}`);
       }
       
       let response = await fetch(audioUrl, fetchOptions);
+      console.log(`📡 CDN response: ${response.status} ${response.statusText}`);
       
       // If not found, fallback to Alafasy/Mishari (most complete collection)
       // But preserve 416 Range Not Satisfiable errors (client needs to retry)
       if (!response.ok && response.status !== 416 && reciter !== 'mishari_al_afasy') {
         console.log(`Audio not found for ${reciter}, falling back to Mishari Al-Afasy`);
-        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${paddedChapter}.mp3`;
+        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${chapter}.mp3`;
         response = await fetch(audioUrl, fetchOptions);
       }
       
@@ -83,9 +83,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (!response.ok) {
-        console.error(`Audio not found: ${audioUrl}`);
+        console.error(`❌ Audio not found: ${audioUrl} (Status: ${response.status})`);
         return res.status(404).send("Audio not found");
       }
+      
+      console.log(`✅ Audio found, streaming to client...`);
       
       // Set status code (206 for partial content, 200 for full)
       res.status(response.status);
