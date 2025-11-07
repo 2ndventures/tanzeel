@@ -206,18 +206,29 @@ export function useWordTimingAudio(
 
       console.log('✅ Timing data received, status:', timingResponse.status);
       const timingData: TimingData = await timingResponse.json();
-      console.log('✅ Timing data parsed, audio files:', timingData.audio_files?.length);
-      
-      if (timingData.audio_files?.[0]) {
-        console.log('✅ Audio URL from timing:', timingData.audio_files[0].audio_url);
-      }
-      
-      // API returns audio_files array, we need the first entry
-      if (!timingData.audio_files || timingData.audio_files.length === 0) {
+      // Backend normalizes both API formats to always return audio_files array
+      // But add defensive checks in case of unexpected responses
+      if (!timingData.audio_files || !Array.isArray(timingData.audio_files) || timingData.audio_files.length === 0) {
+        console.error('❌ Invalid timing data structure:', timingData);
         throw new Error('No audio files found in timing data');
       }
       
+      console.log('✅ Timing data parsed, audio files:', timingData.audio_files.length);
+      
       const audioFile = timingData.audio_files[0];
+      
+      if (!audioFile) {
+        throw new Error('Audio file data is missing');
+      }
+      
+      console.log('✅ Audio file loaded:', {
+        id: audioFile.id,
+        chapterId: audioFile.chapter_id,
+        url: audioFile.audio_url,
+        hasTimings: !!audioFile.verse_timings,
+        timingsCount: audioFile.verse_timings?.length
+      });
+      
       timingDataRef.current = audioFile;
 
       // CRITICAL FIX: Create audio element in DOM instead of using new Audio()
