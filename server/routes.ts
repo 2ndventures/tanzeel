@@ -44,10 +44,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { reciter, chapter } = req.params;
       
-      // Quranic Audio CDN requires zero-padded chapter numbers (001.mp3, 002.mp3, etc.)
-      const paddedChapter = chapter.padStart(3, '0');
-      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${paddedChapter}.mp3`;
-      console.log(`🎵 Audio proxy request: ${reciter}/${chapter} (padded: ${paddedChapter})`);
+      // Use chapter number as-is (no zero-padding needed for Quran.com CDN)
+      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${chapter}.mp3`;
+      console.log(`🎵 Audio proxy request: ${reciter}/${chapter}`);
       console.log(`🌐 Fetching from CDN: ${audioUrl}`);
       
       // Prepare fetch options with Range header if client requested it
@@ -69,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // But preserve 416 Range Not Satisfiable errors (client needs to retry)
       if (!response.ok && response.status !== 416 && reciter !== 'mishari_al_afasy') {
         console.log(`Audio not found for ${reciter}, falling back to Mishari Al-Afasy`);
-        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${paddedChapter}.mp3`;
+        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${chapter}.mp3`;
         response = await fetch(audioUrl, fetchOptions);
       }
       
