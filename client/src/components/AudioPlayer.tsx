@@ -52,7 +52,7 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 safe-area-bottom" data-testid="audio-player-wrapper">
+    <div className="fixed inset-x-0 bottom-0 z-20" data-testid="audio-player-wrapper">
       {/* Glass background with gradient borders */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-card/90 dark:bg-slate-900/90 backdrop-blur-2xl" />
