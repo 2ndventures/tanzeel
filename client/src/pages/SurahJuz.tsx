@@ -75,7 +75,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   });
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* Rich layered gradients for depth - adapts to theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
@@ -84,7 +84,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
       {/* Header */}
-      <div className="relative px-8 pt-8 pb-6">
+      <div className="relative px-8 pt-4 pb-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
             Surahs
