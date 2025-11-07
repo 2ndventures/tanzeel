@@ -38,9 +38,11 @@ The backend is an Express.js server running on Node.js with TypeScript. It provi
 
 The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabase/serverless`). The schema is defined in `shared/schema.ts`, including a `users` table with Zod validation. Drizzle Kit handles migrations. While set up for Neon (serverless PostgreSQL), it currently uses in-memory storage.
 
-## Audio Playback System
+## Audio Playback System (Updated November 7, 2025)
 
 The application employs a continuous chapter audio architecture with word-level synchronized highlighting using `useWordTimingAudio` hook. It loads a single audio file per chapter with timing data from Quran.com, enabling seamless playback without gaps between verses. Playback speed is globally persistent, stored in `localStorage`, and applies across all chapters. The system supports 10 professional reciters from EveryAyah.com, with metadata defined in `client/src/lib/reciters.ts`. Word and verse highlighting are automatically synchronized with audio playback, featuring visual indicators and auto-scrolling to the current verse.
+
+**API Response Normalization**: The backend timing proxy (`/api/audio-timing/:reciterId/:chapter`) handles inconsistent Quran.com API responses that return either `{audio_files: [...]}` (plural array) or `{audio_file: {...}}` (singular object) depending on the chapter. The proxy normalizes both formats to always return `{audio_files: [...]}` ensuring consistent behavior across all 114 chapters.
 
 ## Data Management
 
