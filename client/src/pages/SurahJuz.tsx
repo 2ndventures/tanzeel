@@ -93,7 +93,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
       {/* Collapsible Header */}
       <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
-        <div className="px-8 pt-4 pb-4">
+        <div className="px-8 pt-4 pb-6 space-y-6">
+          {/* Title and Settings */}
           <div className="flex items-center justify-between">
             <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
               Surahs
@@ -108,17 +109,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               <Settings className="size-6" />
             </Button>
           </div>
-        </div>
-      </div>
 
-      {/* Scrollable Content */}
-      <div 
-        ref={scrollContainerRef}
-        className="relative h-screen overflow-y-auto safe-area-pad"
-        style={{ paddingTop: '140px' }}
-      >
-        {/* Search and Controls */}
-        <div className="px-8 pb-6 space-y-6">
           {/* Search Bar - Glass */}
           <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
             <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
@@ -163,6 +154,14 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div 
+        ref={scrollContainerRef}
+        className="relative h-screen overflow-y-auto safe-area-pad"
+        style={{ paddingTop: '280px' }}
+      >
 
         {/* Chapter List */}
         <div className="px-8 space-y-3 pb-8">
