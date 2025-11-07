@@ -44,8 +44,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { reciter, chapter } = req.params;
       
+      // Zero-pad chapter number to 3 digits (required by Quranic Audio CDN)
+      // Examples: 1 -> 001, 10 -> 010, 114 -> 114
+      const paddedChapter = chapter.padStart(3, '0');
+      
       // Try requested reciter first using Quranic Audio CDN
-      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${chapter}.mp3`;
+      let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${paddedChapter}.mp3`;
       
       // Prepare fetch options with Range header if client requested it
       const fetchOptions: RequestInit = {
@@ -64,7 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // But preserve 416 Range Not Satisfiable errors (client needs to retry)
       if (!response.ok && response.status !== 416 && reciter !== 'mishari_al_afasy') {
         console.log(`Audio not found for ${reciter}, falling back to Mishari Al-Afasy`);
-        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${chapter}.mp3`;
+        audioUrl = `https://download.quranicaudio.com/qdc/mishari_al_afasy/murattal/${paddedChapter}.mp3`;
         response = await fetch(audioUrl, fetchOptions);
       }
       
