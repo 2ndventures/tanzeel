@@ -169,32 +169,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = await response.json();
       console.log(`✓ Loaded timing data for chapter ${chapter}`);
       
-      // CRITICAL: Rewrite audio URLs to use our proxy instead of direct Quran.com URLs
-      // This fixes CORS issues in mobile apps (iOS/Android)
+      // CRITICAL FIX: Quran.com API returns INCONSISTENT formats:
+      // - Some chapters: {"audio_files": [...]} (plural, array)
+      // - Other chapters: {"audio_file": {...}} (singular, object)
+      // We need to normalize both formats to always return audio_files array
+      
+      let audioFiles: any[] = [];
+      
       if (data.audio_files && Array.isArray(data.audio_files)) {
-        data.audio_files = data.audio_files.map((audioFile: any) => {
-          // Extract reciter ID from the original URL
-          // URL format: https://download.quranicaudio.com/qdc/[reciter]/murattal/[chapter].mp3
-          const originalUrl = audioFile.audio_url;
-          if (originalUrl) {
-            const urlParts = originalUrl.split('/');
-            // URL structure: ["https:", "", "download.quranicaudio.com", "qdc", "reciter_name", "murattal", "chapter.mp3"]
-            const reciterFromUrl = urlParts[4]; // Extract reciter from URL (index 4)
-            
-            // Rewrite to use our backend proxy
-            // Our proxy URL: /api/audio/[reciter]/[chapter]
-            audioFile.audio_url = `/api/audio/${reciterFromUrl}/${chapter}`;
-            console.log(`🔄 Rewrote audio URL: ${originalUrl} → ${audioFile.audio_url}`);
-          }
-          return audioFile;
-        });
+        // Format 1: audio_files array (e.g., chapter 1)
+        audioFiles = data.audio_files;
+        console.log(`📦 Format: audio_files array (${audioFiles.length} files)`);
+      } else if (data.audio_file && typeof data.audio_file === 'object') {
+        // Format 2: audio_file singular object (e.g., chapter 2)
+        audioFiles = [data.audio_file];
+        console.log(`📦 Format: audio_file object (normalized to array)`);
+      } else {
+        console.error(`❌ Unexpected API response format:`, Object.keys(data));
+        return res.status(500).json({ error: "Unexpected API response format" });
       }
+      
+      // Rewrite audio URLs to use our proxy instead of direct Quran.com URLs
+      // This fixes CORS issues in mobile apps (iOS/Android)
+      audioFiles = audioFiles.map((audioFile: any) => {
+        // Extract reciter ID from the original URL
+        // URL format: https://download.quranicaudio.com/qdc/[reciter]/murattal/[chapter].mp3
+        const originalUrl = audioFile.audio_url;
+        if (originalUrl) {
+          const urlParts = originalUrl.split('/');
+          // URL structure: ["https:", "", "download.quranicaudio.com", "qdc", "reciter_name", "murattal", "chapter.mp3"]
+          const reciterFromUrl = urlParts[4]; // Extract reciter from URL (index 4)
+          
+          // Rewrite to use our backend proxy
+          // Our proxy URL: /api/audio/[reciter]/[chapter]
+          audioFile.audio_url = `/api/audio/${reciterFromUrl}/${chapter}`;
+          console.log(`🔄 Rewrote audio URL: ${originalUrl} → ${audioFile.audio_url}`);
+        }
+        return audioFile;
+      });
+      
+      // Always return normalized format with audio_files array
+      const normalizedData = {
+        audio_files: audioFiles
+      };
       
       // Set caching headers for better performance
       res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 1 day
       res.setHeader('Content-Type', 'application/json');
       
-      res.json(data);
+      res.json(normalizedData);
     } catch (error) {
       console.error('❌ Timing data proxy error:', error);
       res.status(500).json({ error: "Failed to fetch timing data" });
