@@ -173,9 +173,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // CRITICAL: Rewrite audio URLs to use our proxy instead of direct Quran.com URLs
       // This fixes CORS issues in mobile apps (iOS/Android)
       if (data.audio_files && Array.isArray(data.audio_files)) {
-        // Zero-pad chapter number for consistent URL format
-        const paddedChapter = chapter.padStart(3, '0');
-        
         data.audio_files = data.audio_files.map((audioFile: any) => {
           // Extract reciter ID from the original URL
           // URL format: https://download.quranicaudio.com/qdc/[reciter]/murattal/[chapter].mp3
@@ -185,9 +182,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // URL structure: ["https:", "", "download.quranicaudio.com", "qdc", "reciter_name", "murattal", "chapter.mp3"]
             const reciterFromUrl = urlParts[4]; // Extract reciter from URL (index 4)
             
-            // Rewrite to use our backend proxy with zero-padded chapter number
-            // Our proxy URL: /api/audio/[reciter]/[paddedChapter]
-            audioFile.audio_url = `/api/audio/${reciterFromUrl}/${paddedChapter}`;
+            // Rewrite to use our backend proxy
+            // Our proxy URL: /api/audio/[reciter]/[chapter]
+            audioFile.audio_url = `/api/audio/${reciterFromUrl}/${chapter}`;
             console.log(`🔄 Rewrote audio URL: ${originalUrl} → ${audioFile.audio_url}`);
           }
           return audioFile;

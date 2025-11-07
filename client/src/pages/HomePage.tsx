@@ -41,30 +41,20 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
-      {/* Sticky Header - background extends into safe area */}
-      <header className="sticky top-0 z-10">
-        <div className="relative overflow-hidden shadow-xl">
-          {/* Glass background - extends to very top */}
-          <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-          
-          {/* Profile Section - content has safe-area padding */}
-          <div className="relative flex items-center justify-between px-8 py-6 safe-area-top">
-            <div>
-              <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
-              <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground" style={{textShadow: '0 4px 12px rgba(0,0,0,0.2)'}}>
-                Simple Quran
-              </h2>
-            </div>
-            <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
-              <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
-            </div>
+      {/* Main Content */}
+      <div className="relative px-8 pb-24 pt-4">
+        {/* Profile Section */}
+        <div className="flex items-center justify-between py-6">
+          <div>
+            <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
+            <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground" style={{textShadow: '0 4px 12px rgba(0,0,0,0.2)'}}>
+              Simple Quran
+            </h2>
+          </div>
+          <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
+            <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="relative px-8 pb-24 pt-6">
 
         {/* Continue Reading Card - Multi-layer glass */}
         <div 

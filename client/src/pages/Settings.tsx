@@ -84,21 +84,12 @@ export default function Settings({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Sticky Header - background extends into safe area */}
-      <header className="sticky top-0 z-10">
-        <div className="relative overflow-hidden shadow-xl">
-          {/* Glass background - extends to very top */}
-          <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-          
-          {/* Content has safe-area padding */}
-          <div className="relative px-8 py-6 safe-area-top">
-            <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
-              Settings
-            </h1>
-          </div>
-        </div>
-      </header>
+      {/* Header */}
+      <div className="relative px-8 pt-4 pb-6">
+        <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground mb-6" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
+          Settings
+        </h1>
+      </div>
 
       <div className="relative px-8 space-y-8 pb-24">
           {/* Display Section */}
