@@ -23,7 +23,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className="flex flex-col items-center gap-2"
+              className="flex flex-col items-center gap-2 min-h-[56px] min-w-[56px] justify-center hover-elevate active-elevate-2 rounded-lg px-2"
               data-testid={`button-nav-${tab.id}`}
             >
               <Icon 
