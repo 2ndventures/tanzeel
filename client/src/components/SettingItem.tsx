@@ -27,10 +27,7 @@ export default function SettingItem({
 }: SettingItemProps) {
   if (type === "toggle") {
     return (
-      <button
-        onClick={() => onToggle?.(!value)}
-        className="flex items-center justify-between py-4 px-5 min-h-[60px] w-full text-left hover-elevate active-elevate-2 transition-smooth"
-      >
+      <div className="flex items-center justify-between py-4 px-5 min-h-[60px] w-full">
         <div className="flex-1 pr-4">
           <p className="text-base font-medium text-foreground" data-testid={testId ? `${testId}-label` : undefined}>
             {label}
@@ -40,25 +37,28 @@ export default function SettingItem({
           )}
         </div>
         {isThemeToggle ? (
-          <div className="relative pointer-events-none">
+          <div className="relative">
             <Switch
               checked={value as boolean}
+              onCheckedChange={onToggle}
+              aria-label={label}
               data-testid={testId}
               className="relative"
             />
-            <div className="absolute inset-0 flex items-center justify-between px-1">
-              <Sun className="w-3.5 h-3.5 text-yellow-500" />
-              <Moon className="w-3.5 h-3.5 text-blue-400" />
+            <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
+              <Sun className="w-3.5 h-3.5 text-yellow-500" aria-hidden="true" />
+              <Moon className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
             </div>
           </div>
         ) : (
           <Switch
             checked={value as boolean}
+            onCheckedChange={onToggle}
+            aria-label={label}
             data-testid={testId}
-            className="pointer-events-none"
           />
         )}
-      </button>
+      </div>
     );
   }
 

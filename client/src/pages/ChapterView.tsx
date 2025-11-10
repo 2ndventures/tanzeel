@@ -234,6 +234,11 @@ export default function ChapterView({
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
+      {/* Screen reader announcements for verse changes */}
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
+      </div>
+
       {/* Status Bar Shim */}
       <StatusBarShim />
 
@@ -246,11 +251,12 @@ export default function ChapterView({
           
           <div className="relative flex items-center justify-between px-6 py-6 shadow-xl">
             <button 
-              className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate ring-1 ring-border"
+              className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate active-elevate-2 ring-1 ring-border"
               onClick={onBack}
+              aria-label="Go back to surahs list"
               data-testid="button-back"
             >
-              <ArrowLeft className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+              <ArrowLeft className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
             </button>
             
             <div className="flex flex-col items-center flex-1 mx-4">
@@ -265,10 +271,11 @@ export default function ChapterView({
             <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
               <SheetTrigger asChild>
                 <button 
-                  className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate ring-1 ring-border" 
+                  className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate active-elevate-2 ring-1 ring-border" 
+                  aria-label="Open menu for display settings and reciter selection"
                   data-testid="button-menu"
                 >
-                  <MoreVertical className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <MoreVertical className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
                 </button>
               </SheetTrigger>
             <SheetContent side="bottom" className="h-[85vh]">
