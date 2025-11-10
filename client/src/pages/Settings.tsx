@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import SettingItem from "@/components/SettingItem";
 import BottomNav from "@/components/BottomNav";
+import { StatusBarShim } from "@/components/StatusBarShim";
 import { getAllReciters, getReciterDisplayName } from "@/lib/reciters";
 
 interface SettingsProps {
@@ -75,7 +76,7 @@ export default function Settings({
   }));
 
   return (
-    <div className="min-h-screen pb-32 relative overflow-hidden safe-area-pad">
+    <div className="min-h-screen pb-32 relative overflow-hidden">
       {/* Multi-layer gradient background - adapts to theme */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
@@ -84,8 +85,11 @@ export default function Settings({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl" />
       </div>
 
+      {/* Status Bar Shim */}
+      <StatusBarShim />
+
       {/* Header */}
-      <div className="relative px-8 pt-4 pb-6">
+      <div className="relative px-8 header-safe-padding pt-4 pb-6">
         <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground mb-6" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
           Settings
         </h1>

@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react";
 import { ArrowLeft, MoreVertical, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
+import { StatusBarShim } from "@/components/StatusBarShim";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
@@ -225,7 +226,7 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background flex flex-col safe-area-pad">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background flex flex-col">
       {/* Rich layered gradients for depth - adapts to theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
@@ -233,8 +234,11 @@ export default function ChapterView({
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
+      {/* Status Bar Shim */}
+      <StatusBarShim />
+
       {/* Header - Glass Treatment */}
-      <header className="sticky z-10 mt-2 safe-area-top">
+      <header className="sticky z-10 header-safe-padding">
         <div className="relative overflow-hidden">
           {/* Glass background */}
           <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />

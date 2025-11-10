@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
+import { StatusBarShim } from "@/components/StatusBarShim";
 import { chapters } from "@/lib/quranData";
 import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
 
@@ -33,7 +34,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background safe-area-pad">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
       {/* Rich layered gradients for depth - adapts to theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
@@ -41,8 +42,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
 
+      {/* Status Bar Shim */}
+      <StatusBarShim />
+
       {/* Main Content */}
-      <div className="relative px-8 pb-24 pt-4">
+      <div className="relative px-8 pb-24 header-safe-padding pt-4">
         {/* Profile Section */}
         <div className="flex items-center justify-between py-6">
           <div>

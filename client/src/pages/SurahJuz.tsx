@@ -159,7 +159,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       {/* Scrollable Content */}
       <div 
         ref={scrollContainerRef}
-        className="relative h-screen overflow-y-auto safe-area-pad"
+        className="relative h-screen overflow-y-auto"
         style={{ paddingTop: '280px' }}
       >
 
