@@ -4,6 +4,7 @@ import { ArrowLeft, MoreVertical, Check, Sun, Moon, ChevronRight, ChevronLeft } 
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { StatusBarShim } from "@/components/StatusBarShim";
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
@@ -74,6 +75,9 @@ export default function ChapterView({
   const chapterInfo = getChapterInfo(chapterId);
   const verses = getChapterVerses(chapterId);
   
+  // Collapsible header hook
+  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
+  
   // State for managing menu navigation
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing'>('main');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -94,7 +98,9 @@ export default function ChapterView({
 
   // Scroll to top when chapter changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
   }, [chapterId]);
 
   // Track completed verses
@@ -128,34 +134,37 @@ export default function ChapterView({
         incrementVersesRead(1, verseKey);
       }
 
-      if (autoScroll) {
+      if (autoScroll && scrollContainerRef.current) {
         // Parse verse key (e.g., "1:2" -> verse 2)
         const verseNumber = parseInt(verseKey.split(':')[1]);
         
         // Use requestAnimationFrame to ensure DOM is ready
         requestAnimationFrame(() => {
           const verseElement = document.querySelector(`[data-testid="card-verse-${verseNumber}"]`);
+          const container = scrollContainerRef.current;
           
-          if (verseElement) {
-            const rect = verseElement.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            const verseHeight = rect.height;
+          if (verseElement && container) {
+            // Get the header element to measure its actual height
+            const headerElement = document.querySelector('.header-safe-padding');
+            const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : (isCollapsed ? 70 : 120);
             
-            // Reserve space for fixed header and audio player
-            const headerHeight = 100;
-            const playerHeight = 150;
-            const availableHeight = viewportHeight - headerHeight - playerHeight;
+            // Get the verse's and container's bounding rectangles
+            const verseRect = (verseElement as HTMLElement).getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
             
-            // If verse is taller than available viewport, scroll to top of verse
-            if (verseHeight > availableHeight) {
-              const offset = rect.top - headerHeight - 20;
-              window.scrollBy({ top: offset, behavior: 'smooth' });
-            } else {
-              // Otherwise, center the verse in available viewport
-              const targetPosition = headerHeight + (availableHeight / 2) - (verseHeight / 2);
-              const offset = rect.top - targetPosition;
-              window.scrollBy({ top: offset, behavior: 'smooth' });
-            }
+            // The verse's position relative to the container's current scroll position
+            const verseRelativeTop = verseRect.top - containerRect.top + container.scrollTop;
+            
+            // We want the verse to appear below the fixed header with some breathing room
+            // The container's top edge is at y=0, but the header overlays the first headerHeight pixels
+            // So we need to scroll less to keep the verse visible below the header
+            const breathingRoom = 20;
+            const targetScroll = verseRelativeTop - headerHeight - breathingRoom;
+            
+            container.scrollTo({ 
+              top: Math.max(0, targetScroll),
+              behavior: 'smooth' 
+            });
           }
         });
       }
@@ -226,7 +235,7 @@ export default function ChapterView({
   }, [chapterId, onNavigate]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background flex flex-col">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
       {/* Rich layered gradients for depth - adapts to theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
@@ -242,8 +251,8 @@ export default function ChapterView({
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Header - Glass Treatment */}
-      <header className="sticky z-10 header-safe-padding">
+      {/* Collapsible Header */}
+      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
         <div className="relative overflow-hidden">
           {/* Glass background */}
           <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />
@@ -629,10 +638,16 @@ export default function ChapterView({
           </Sheet>
           </div>
         </div>
-      </header>
+      </div>
 
-      <main className="relative flex-1 overflow-auto px-6 pt-6">
-        <div className="max-w-2xl mx-auto space-y-4 pb-[50vh]">
+      {/* Scrollable content area - padding adjusts based on header state */}
+      <div 
+        ref={scrollContainerRef}
+        className={`relative flex-1 overflow-y-auto px-6 pb-[200px] transition-[padding] duration-300 ${
+          isCollapsed ? 'pt-[80px]' : 'pt-[140px]'
+        }`}
+      >
+        <div className="max-w-2xl mx-auto space-y-4">
           {verses.map((verse, index) => {
             const verseNumber = index + 1;
             const isCurrentVerse = currentVerse === verseNumber;
@@ -661,7 +676,7 @@ export default function ChapterView({
             );
           })}
         </div>
-      </main>
+      </div>
 
       <AudioPlayer
         currentTime={currentTime}
