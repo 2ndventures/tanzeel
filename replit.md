@@ -48,6 +48,20 @@ The application meets WCAG 2.1 accessibility standards for inclusive use:
 - **Touch Optimization**: All interactive elements meet 48px minimum touch target size
 - **No Nested Buttons**: All button nesting issues resolved for valid HTML structure
 
+### Onboarding Experience (Added November 10, 2025)
+
+The application provides a first-time user onboarding flow to introduce the app and customize reading preferences:
+- **First Launch Detection**: Checks localStorage for 'onboardingCompleted' flag to determine if onboarding should display
+- **Welcome Screen**: Introduces Simple Quran with app branding, feature highlights (translations, audio, customization), and "Get Started" button
+- **Font Customization Screen**: 
+  - Live preview of Quran verse (Al-Fatiha 1:1) with Arabic text and translation
+  - Interactive sliders for Arabic and Translation font sizes
+  - Real-time updates as users adjust sliders to preview font changes
+  - Navigation with Back and "Start Reading" buttons
+- **Design**: Full-screen overlay with premium glassmorphism aesthetic matching the app theme
+- **Integration**: Uses existing font size state setters from App.tsx, changes persist via localStorage
+- **Completion**: Saves 'onboardingCompleted' flag to localStorage, preventing re-display on subsequent launches
+
 ### Theme System (Updated October 29, 2025)
 
 The application implements a comprehensive light and dark theme system using CSS variables in `client/src/index.css`:
