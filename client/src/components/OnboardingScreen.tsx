@@ -10,6 +10,8 @@ interface OnboardingScreenProps {
   onArabicFontSizeChange: (value: string) => void;
   translationFontSize: string;
   onTranslationFontSizeChange: (value: string) => void;
+  transliterationFontSize: string;
+  onTransliterationFontSizeChange: (value: string) => void;
   darkMode: boolean;
 }
 
@@ -19,6 +21,8 @@ export default function OnboardingScreen({
   onArabicFontSizeChange,
   translationFontSize,
   onTranslationFontSizeChange,
+  transliterationFontSize,
+  onTransliterationFontSizeChange,
   darkMode,
 }: OnboardingScreenProps) {
   const [step, setStep] = useState(0);
@@ -69,6 +73,30 @@ export default function OnboardingScreen({
   };
 
   const sliderToTranslationSize = (value: number): string => {
+    if (value <= 33) return "Small";
+    if (value <= 66) return "Medium";
+    return "Large";
+  };
+
+  const getTransliterationFontSize = (size: string) => {
+    switch(size) {
+      case "Small": return "text-xs";
+      case "Medium": return "text-sm";
+      case "Large": return "text-base";
+      default: return "text-xs";
+    }
+  };
+
+  const transliterationSizeToSlider = (size: string): number => {
+    switch(size) {
+      case "Small": return 0;
+      case "Medium": return 50;
+      case "Large": return 100;
+      default: return 0;
+    }
+  };
+
+  const sliderToTransliterationSize = (value: number): string => {
     if (value <= 33) return "Small";
     if (value <= 66) return "Medium";
     return "Large";
@@ -176,6 +204,11 @@ export default function OnboardingScreen({
                     {exampleVerse.arabicText}
                   </p>
 
+                  {/* Transliteration */}
+                  <p className={`${getTransliterationFontSize(transliterationFontSize)} italic text-muted-foreground transition-all duration-300`}>
+                    {exampleVerse.transliteration}
+                  </p>
+
                   {/* Translation */}
                   <p className={`${getTranslationFontSize(translationFontSize)} text-foreground/90 transition-all duration-300`}>
                     {exampleVerse.translation}
@@ -230,6 +263,26 @@ export default function OnboardingScreen({
                   step={1}
                   className="w-full"
                   data-testid="slider-translation-font-size"
+                />
+              </div>
+
+              {/* Transliteration Font Size */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-foreground">
+                    Transliteration Text Size
+                  </label>
+                  <span className="text-xs text-muted-foreground">
+                    {transliterationFontSize}
+                  </span>
+                </div>
+                <Slider
+                  value={[transliterationSizeToSlider(transliterationFontSize)]}
+                  onValueChange={([value]) => onTransliterationFontSizeChange(sliderToTransliterationSize(value))}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                  data-testid="slider-transliteration-font-size"
                 />
               </div>
             </div>

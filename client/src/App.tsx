@@ -199,6 +199,8 @@ function App() {
               onArabicFontSizeChange={setArabicFontSize}
               translationFontSize={translationFontSize}
               onTranslationFontSizeChange={setTranslationFontSize}
+              transliterationFontSize={transliterationFontSize}
+              onTransliterationFontSizeChange={setTransliterationFontSize}
               darkMode={darkMode}
             />
           )}

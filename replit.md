@@ -54,8 +54,8 @@ The application provides a first-time user onboarding flow to introduce the app 
 - **First Launch Detection**: Checks localStorage for 'onboardingCompleted' flag to determine if onboarding should display
 - **Welcome Screen**: Introduces Simple Quran with app branding, feature highlights (translations, audio, customization), and "Get Started" button
 - **Font Customization Screen**: 
-  - Live preview of Quran verse (Al-Fatiha 1:1) with Arabic text and translation
-  - Interactive sliders for Arabic and Translation font sizes
+  - Live preview of Quran verse (Al-Fatiha 1:1) with Arabic text, transliteration, and translation
+  - Interactive sliders for Arabic, Translation, and Transliteration font sizes
   - Real-time updates as users adjust sliders to preview font changes
   - Navigation with Back and "Start Reading" buttons
 - **Design**: Full-screen overlay with premium glassmorphism aesthetic matching the app theme
