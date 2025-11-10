@@ -12,13 +12,41 @@ Preferred communication style: Simple, everyday language.
 
 The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. The UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a mobile-first design with a premium glassmorphism aesthetic that adapts to both light and dark themes. State management utilizes React Hooks for local state and React Query for server state. Client-side navigation uses a page state system with HomePage, SurahJuz, and Settings screens. The application features a consistent premium glassmorphism design system across all UI elements, including pages, components, modals, dropdowns, and sheets, with elegant shadows and gradient backgrounds that automatically adapt to the selected theme. All page headers (Surahs, Settings) use consistent large, bold typography (text-5xl font-black) with non-sticky layouts and circular action buttons for optimal visual harmony.
 
-### Mobile-First Responsive Design (Updated October 30, 2025)
+### Mobile-First Responsive Design (Updated November 10, 2025)
 
 All UI components use viewport-relative units for mobile responsiveness:
 - **Dropdowns**: Select dropdowns use `max-h-[60vh]` to ensure proper scrolling on all mobile screen sizes
 - **Modals**: Constrained to viewport height with proper scrolling
 - **Spacing**: Percentage-based and viewport-relative units rather than fixed pixels
-- **Touch targets**: Minimum 48px for accessibility on touch devices
+- **Touch targets**: Minimum 48px for accessibility on touch devices (verified across all screens)
+
+### Status Bar System (Updated November 10, 2025)
+
+The application implements Instagram-style collapsible headers with safe-area handling for native mobile deployment:
+- **StatusBarShim Component**: Fixed z-50 overlay that reserves space for device status bar
+- **Collapsible Headers**: Headers hide on scroll down, reappear on scroll up using scroll listeners
+- **Safe-Area Handling**: 
+  - Headers use `.header-safe-padding` utility class for top safe-area padding
+  - Bottom navigation and audio player use `.safe-area-bottom` for bottom safe-area padding
+  - Deprecated: `.safe-area-pad` and `.safe-area-top` classes removed
+- **Applied Across All Screens**: HomePage, SurahJuz, ChapterView, and Settings pages
+
+### Accessibility Compliance (Updated November 10, 2025)
+
+The application meets WCAG 2.1 accessibility standards for inclusive use:
+- **Semantic HTML**: All interactive elements use proper semantic markup (buttons, not divs)
+- **Keyboard Navigation**: 
+  - All interactive elements support keyboard access with `role="button"`, `tabIndex="0"`
+  - Enter/Space key handlers implemented on all custom interactive elements
+  - Focus-visible styling for visual keyboard navigation feedback
+- **Screen Reader Support**:
+  - Comprehensive ARIA labels on all interactive elements (audio controls, navigation, settings)
+  - Decorative icons marked with `aria-hidden="true"`
+  - Search field properly labeled with sr-only text and aria-label
+  - aria-live region in ChapterView announces verse changes during navigation
+  - Switch components have accessible names via aria-label
+- **Touch Optimization**: All interactive elements meet 48px minimum touch target size
+- **No Nested Buttons**: All button nesting issues resolved for valid HTML structure
 
 ### Theme System (Updated October 29, 2025)
 
