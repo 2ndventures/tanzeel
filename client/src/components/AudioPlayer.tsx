@@ -118,32 +118,35 @@ export default function AudioPlayer({
               <button
                 onClick={onPrevious}
                 className="min-h-[48px] min-w-[48px] size-12 rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl flex items-center justify-center hover-elevate active-elevate-2 shadow-md ring-1 ring-border"
+                aria-label="Previous chapter"
                 data-testid="button-previous"
               >
-                <Icon icon="solar:skip-previous-bold" className="size-6 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                <Icon icon="solar:skip-previous-bold" className="size-6 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
               </button>
               
               <button
                 className="min-h-[64px] min-w-[64px] size-16 rounded-full bg-primary flex items-center justify-center shadow-xl hover-elevate active-elevate-2 disabled:opacity-50 ring-2 ring-primary/20"
                 onClick={onPlayPause}
                 disabled={isLoading}
+                aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
                 data-testid="button-play-pause"
               >
                 {isLoading ? (
-                  <div className="size-8 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  <div className="size-8 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
                 ) : isPlaying ? (
-                  <Icon icon="solar:pause-bold" className="size-7 text-primary-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <Icon icon="solar:pause-bold" className="size-7 text-primary-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
                 ) : (
-                  <Icon icon="solar:play-bold" className="size-7 text-primary-foreground ml-0.5" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <Icon icon="solar:play-bold" className="size-7 text-primary-foreground ml-0.5" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
                 )}
               </button>
               
               <button
                 onClick={onNext}
                 className="min-h-[48px] min-w-[48px] size-12 rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl flex items-center justify-center hover-elevate active-elevate-2 shadow-md ring-1 ring-border"
+                aria-label="Next chapter"
                 data-testid="button-next"
               >
-                <Icon icon="solar:skip-next-bold" className="size-6 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                <Icon icon="solar:skip-next-bold" className="size-6 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
               </button>
             </div>
             
@@ -152,9 +155,11 @@ export default function AudioPlayer({
                 repeat ? 'bg-primary/25 text-primary ring-primary/30' : 'bg-muted/60 dark:bg-slate-800/60 text-muted-foreground ring-border'
               }`}
               onClick={() => onRepeatChange?.(!repeat)}
+              aria-label={repeat ? "Repeat enabled. Click to disable" : "Repeat disabled. Click to enable"}
+              aria-pressed={repeat}
               data-testid="button-repeat"
             >
-              <Icon icon="solar:repeat-bold" className="size-6" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+              <Icon icon="solar:repeat-bold" className="size-6" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
             </button>
           </div>
         </div>

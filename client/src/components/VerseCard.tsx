@@ -85,16 +85,26 @@ export default function VerseCard({
     }
   };
   
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.();
+    }
+  };
+
   return (
     <div 
-      className={`relative group overflow-hidden rounded-3xl p-[1px] shadow-lg cursor-pointer hover-elevate transition-all duration-300 ${
+      className={`relative group overflow-hidden rounded-3xl p-[1px] shadow-lg cursor-pointer hover-elevate active-elevate-2 transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 ${
         highlighted ? 'shadow-[0_16px_48px_rgba(59,130,246,0.4)] ring-2 ring-primary/50' : ''
       }`}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
       aria-current={highlighted ? 'true' : 'false'}
-      role="article"
+      aria-label={`Verse ${chapterId}:${verseNumber}. ${highlighted ? 'Currently playing. ' : ''}Click to ${isPlaying ? 'pause' : 'play'} this verse.`}
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
     >
       {/* Gradient border */}
       <div className={`absolute inset-0 rounded-3xl transition-all ${

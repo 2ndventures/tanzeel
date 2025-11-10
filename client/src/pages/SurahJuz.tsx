@@ -104,9 +104,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               variant="ghost" 
               onClick={() => onNavigate("settings", undefined, "settings")}
               className="size-14 rounded-full"
+              aria-label="Open settings"
               data-testid="button-settings"
             >
-              <Settings className="size-6" />
+              <Settings className="size-6" aria-hidden="true" />
             </Button>
           </div>
 
@@ -114,12 +115,15 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
             <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
             <div className="relative">
+              <label htmlFor="surah-search" className="sr-only">Search surahs by name or number</label>
               <Input
+                id="surah-search"
                 type="search"
                 placeholder="Search by name or number..."
                 className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search surahs by name or number"
                 data-testid="input-search"
               />
             </div>

@@ -62,8 +62,12 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
         {/* Continue Reading Card - Multi-layer glass */}
         <div 
-          className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate cursor-pointer"
+          className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate active-elevate-2 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
           onClick={() => onNavigate("chapter", stats.lastReadChapter)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter); }}}
+          role="button"
+          tabIndex={0}
+          aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}
           data-testid="card-continue-reading"
         >
           {/* Gradient border */}
@@ -103,8 +107,12 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </h3>
           <div className="grid grid-cols-3 gap-6">
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate cursor-pointer group"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
+              role="button"
+              tabIndex={0}
+              aria-label="Browse all surahs"
               data-testid="button-bookmarks"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
@@ -116,8 +124,12 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               </div>
             </div>
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate cursor-pointer group"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
+              role="button"
+              tabIndex={0}
+              aria-label="View favorites"
               data-testid="button-favorites"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
@@ -129,8 +141,12 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               </div>
             </div>
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate cursor-pointer group"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
               onClick={() => onNavigate("settings", undefined, "settings")}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("settings", undefined, "settings"); }}}
+              role="button"
+              tabIndex={0}
+              aria-label="Open settings"
               data-testid="button-settings"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
