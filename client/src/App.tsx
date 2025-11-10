@@ -8,6 +8,7 @@ import HomePage from "@/pages/HomePage";
 import SurahJuz from "@/pages/SurahJuz";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
+import OnboardingScreen from "@/components/OnboardingScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 
 type Page = "home" | "surah-juz" | "chapter" | "settings";
@@ -17,6 +18,12 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
   
+  // Onboarding state
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    const completed = localStorage.getItem('onboardingCompleted');
+    return !completed;
+  });
+
   // Initialize all settings from localStorage with defaults
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
@@ -175,10 +182,27 @@ function App() {
     if (chapterId) setSelectedChapter(chapterId);
   };
 
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('onboardingCompleted', 'true');
+    setShowOnboarding(false);
+  };
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          {/* Show onboarding on first launch */}
+          {showOnboarding && (
+            <OnboardingScreen
+              onComplete={handleOnboardingComplete}
+              arabicFontSize={arabicFontSize}
+              onArabicFontSizeChange={setArabicFontSize}
+              translationFontSize={translationFontSize}
+              onTranslationFontSizeChange={setTranslationFontSize}
+              darkMode={darkMode}
+            />
+          )}
+
           <div className="min-h-screen transition-smooth">
             <div key={currentPage} className="animate-fade-in">
             {currentPage === "home" && (
