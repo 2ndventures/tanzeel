@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters } from "@/lib/quranData";
 import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
 
@@ -11,6 +12,7 @@ interface HomePageProps {
 }
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
+  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
   const [stats, setStats] = useState(() => getReadingStats());
 
   useEffect(() => {
@@ -34,7 +36,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
       {/* Rich layered gradients for depth - adapts to theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
@@ -45,21 +47,31 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Main Content */}
-      <div className="relative px-8 pb-24 header-safe-padding pt-4">
-        {/* Profile Section */}
-        <div className="flex items-center justify-between py-6">
-          <div>
-            <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
-            <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground" style={{textShadow: '0 4px 12px rgba(0,0,0,0.2)'}}>
-              Simple Quran
-            </h2>
-          </div>
-          <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
-            <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
+      {/* Collapsible Header */}
+      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
+        <div className="px-8 pt-4 pb-6">
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
+              <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground" style={{textShadow: '0 4px 12px rgba(0,0,0,0.2)'}}>
+                Simple Quran
+              </h2>
+            </div>
+            <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
+              <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
+            </div>
           </div>
         </div>
+      </div>
 
+      {/* Scrollable Content */}
+      <div 
+        ref={scrollContainerRef}
+        className={`relative h-screen overflow-y-auto transition-[padding] duration-300 ${
+          isCollapsed ? 'pt-[100px]' : 'pt-[160px]'
+        }`}
+      >
+        <div className="px-8 space-y-6">
         {/* Continue Reading Card - Multi-layer glass */}
         <div 
           className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate active-elevate-2 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
@@ -198,6 +210,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
