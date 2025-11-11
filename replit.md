@@ -152,8 +152,10 @@ App branding assets are managed in the `resources/` directory. See `resources/RE
 - **Apple App Store**: Requires Apple Developer account ($99/year) and macOS with Xcode
 - **Google Play Store**: Requires Google Play Developer account ($25 one-time fee) and Android Studio
 
-### Backend Considerations
+### Backend Considerations (Updated November 11, 2025)
 
-When deploying as a native app, ensure the backend API is accessible:
-- During development: The web app makes requests to the local Express server
-- In production: Update API endpoints to point to your deployed backend (consider using Replit Deployments or other hosting)
+The app automatically detects its runtime environment and configures API calls accordingly:
+- **Web browser**: Uses relative URLs (`/api/...`) to call the local development server
+- **iOS/Android app**: Uses the production Replit URL (`https://11424-newest-version-web266.replit.app`)
+
+This configuration is managed in `client/src/config.ts` using Capacitor's `isNativePlatform()` API. The backend must be deployed and accessible at the configured URL for the mobile app to function (audio loading, timing data, etc.).
