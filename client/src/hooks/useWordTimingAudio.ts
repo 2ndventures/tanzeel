@@ -247,7 +247,7 @@ export function useWordTimingAudio(
       // Create audio element in DOM
       const audio = document.createElement('audio');
       audio.preload = 'auto';
-      audio.crossOrigin = 'anonymous';
+      // Remove crossOrigin since we're proxying through our backend - no CORS needed
       audioContainerRef.current.appendChild(audio);
 
       let audioUrl = audioFile.audio_url || (audioFile as any).audio_file?.audio_url;
