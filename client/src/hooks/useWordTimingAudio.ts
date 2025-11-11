@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { API_BASE_URL } from '@/config';
 
 // Helper functions for global speed persistence
@@ -261,19 +262,35 @@ export function useWordTimingAudio(
       }
 
       console.log('🎵 Loading audio from:', audioUrl);
+      console.log('📊 Audio URL breakdown:', {
+        API_BASE_URL,
+        originalUrl: audioFile.audio_url,
+        finalUrl: audioUrl,
+        isDev: import.meta.env.DEV,
+        isNative: Capacitor.isNativePlatform()
+      });
 
       // Add debugging event listeners first
-      audio.addEventListener('loadstart', () => console.log('🔵 Audio load started'));
+      audio.addEventListener('loadstart', () => {
+        console.log('🔵 Audio load started');
+        console.log('🔵 Network state:', audio.networkState, 'Ready state:', audio.readyState);
+      });
+      audio.addEventListener('progress', () => {
+        console.log('📥 Loading progress... network state:', audio.networkState);
+      });
       audio.addEventListener('loadedmetadata', () => console.log('🟢 Metadata loaded'));
       audio.addEventListener('canplay', () => console.log('✅ Audio can play'));
       audio.addEventListener('error', (e) => {
-        console.log('❌ Audio Error Details:', {
+        console.error('❌ Audio Error Details:', {
           errorCode: audio.error?.code,
           errorMessage: audio.error?.message,
           networkState: audio.networkState,
           readyState: audio.readyState,
-          src: audio.src
+          src: audio.src,
+          crossOrigin: audio.crossOrigin
         });
+        console.error('❌ Error codes: 1=ABORTED, 2=NETWORK, 3=DECODE, 4=SRC_NOT_SUPPORTED');
+        console.error('❌ Network states: 0=EMPTY, 1=IDLE, 2=LOADING, 3=NO_SOURCE');
       });
 
       // Event handlers
