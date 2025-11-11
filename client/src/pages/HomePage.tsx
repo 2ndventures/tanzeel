@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
-import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters } from "@/lib/quranData";
 import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
 
@@ -12,7 +11,6 @@ interface HomePageProps {
 }
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
-  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
   const [stats, setStats] = useState(() => getReadingStats());
 
   useEffect(() => {
@@ -47,8 +45,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Collapsible Header */}
-      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
         <div className="px-8 pt-4 pb-6">
           <div className="flex items-center justify-between py-2">
             <div>
@@ -65,12 +63,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       </div>
 
       {/* Scrollable Content */}
-      <div 
-        ref={scrollContainerRef}
-        className={`relative h-screen overflow-y-auto transition-[padding] duration-300 ${
-          isCollapsed ? 'pt-[100px]' : 'pt-[160px]'
-        }`}
-      >
+      <div className="relative h-screen overflow-y-auto pt-[160px]">
         <div className="px-8 space-y-6">
         {/* Continue Reading Card - Multi-layer glass */}
         <div 
