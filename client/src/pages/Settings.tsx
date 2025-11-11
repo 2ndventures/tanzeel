@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react";
 import SettingItem from "@/components/SettingItem";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
-import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { getAllReciters, getReciterDisplayName } from "@/lib/reciters";
 
 interface SettingsProps {
@@ -70,7 +69,6 @@ export default function Settings({
   showVerseNumbers,
   onShowVerseNumbersChange,
 }: SettingsProps) {
-  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
   const allReciters = getAllReciters();
   const reciterOptions = allReciters.map(r => ({
     value: r.id,
@@ -90,8 +88,8 @@ export default function Settings({
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Collapsible Header */}
-      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
         <div className="px-8 pt-4 pb-6">
           <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
             Settings
@@ -100,12 +98,7 @@ export default function Settings({
       </div>
 
       {/* Scrollable Content */}
-      <div 
-        ref={scrollContainerRef}
-        className={`relative h-screen overflow-y-auto transition-[padding] duration-300 ${
-          isCollapsed ? 'pt-[80px]' : 'pt-[140px]'
-        }`}
-      >
+      <div className="relative h-screen overflow-y-auto pt-[140px]">
         <div className="px-8 space-y-8 pb-24">
           {/* Display Section */}
           <div>

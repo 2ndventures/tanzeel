@@ -24,10 +24,10 @@ All UI components use viewport-relative units for mobile responsiveness:
 
 The application implements safe-area handling for native mobile deployment with collapsible headers on reading screens:
 - **StatusBarShim Component**: Fixed z-50 overlay that reserves space for device status bar
-- **Fixed Header (HomePage)**: HomePage features a fixed header with `header-safe-padding` and static `pt-[160px]` padding for content
-- **Collapsible Headers (Reading Screens)**: SurahJuz, ChapterView, and Settings feature headers that hide on scroll down and reappear on scroll up using the `useCollapsibleHeader` hook
-- **Dynamic Padding**: Scroll containers on reading screens use responsive padding that transitions smoothly between expanded and collapsed states:
-  - ChapterView & Settings: `pt-[140px]` expanded → `pt-[80px]` collapsed
+- **Fixed Headers (HomePage, Settings)**: HomePage and Settings pages feature fixed headers with `header-safe-padding` and static padding for content (HomePage: `pt-[160px]`, Settings: `pt-[140px]`)
+- **Collapsible Headers (Reading Screens)**: SurahJuz and ChapterView feature headers that hide on scroll down and reappear on scroll up using the `useCollapsibleHeader` hook
+- **Dynamic Padding**: Scroll containers on reading screens with collapsible headers use responsive padding that transitions smoothly between expanded and collapsed states:
+  - ChapterView: `pt-[140px]` expanded → `pt-[80px]` collapsed
   - SurahJuz: Fixed `paddingTop: '280px'` (accounts for search bar and mode toggle)
 - **Safe-Area Handling**: 
   - All headers use `.header-safe-padding` utility class for top safe-area padding
