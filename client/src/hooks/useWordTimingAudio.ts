@@ -246,7 +246,9 @@ export function useWordTimingAudio(
 
       // Create audio element in DOM
       const audio = document.createElement('audio');
-      audio.preload = 'auto';
+      // Use 'metadata' preload for large files - only loads metadata, not entire file
+      // This prevents timeout/premature close errors on 110MB+ files
+      audio.preload = 'metadata';
       // Remove crossOrigin since we're proxying through our backend - no CORS needed
       audioContainerRef.current.appendChild(audio);
 
