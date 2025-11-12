@@ -4,6 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { chapters } from "@/lib/quranData";
 import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
+import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 
 interface HomePageProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
@@ -12,6 +13,7 @@ interface HomePageProps {
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
   const [stats, setStats] = useState(() => getReadingStats());
+  const { isCollapsed: isHeaderCollapsed, scrollContainerRef } = useCollapsibleHeader();
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -34,33 +36,60 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background pb-24">
-      {/* Simplified single gradient layer for performance */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-amber-500/5 dark:from-indigo-900/20 dark:to-amber-500/8 pointer-events-none" />
+    <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+      {/* Rich layered gradients for depth - outside scroll container */}
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70 pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent pointer-events-none" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10 pointer-events-none" />
 
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 bg-card/98 dark:bg-slate-900/98 border-b border-border header-safe-padding">
-        <div className="px-8 pt-4 pb-6">
-          <div className="flex items-center justify-between py-2">
-            <div>
-              <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
-              <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
-                Simple Quran
-              </h2>
-            </div>
-            <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
-              <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" />
+      {/* Collapsible Header */}
+      <div 
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isHeaderCollapsed ? 'translate-y-0' : 'translate-y-0'
+        }`}
+        style={{
+          height: isHeaderCollapsed ? '80px' : '140px'
+        }}
+      >
+        <div className="absolute inset-0 bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-border" />
+        <div className="relative header-safe-padding">
+          <div className="px-8 pt-4 pb-6">
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <p className={`text-sm text-muted-foreground transition-opacity duration-300 ${isHeaderCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                  As-salamu alaykum
+                </p>
+                <h2 className={`font-heading font-black tracking-tighter text-foreground transition-all duration-300 ${
+                  isHeaderCollapsed ? 'text-2xl' : 'text-4xl'
+                }`}>
+                  Simple Quran
+                </h2>
+              </div>
+              <div className={`relative flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border transition-all duration-300 ${
+                isHeaderCollapsed ? 'size-12' : 'size-16'
+              }`}>
+                <Icon icon="solar:book-bold" className={`text-primary-foreground transition-all duration-300 ${
+                  isHeaderCollapsed ? 'size-7' : 'size-10'
+                }`} />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Scrollable Content */}
-      <div className="relative h-screen overflow-y-auto pt-[160px] will-change-scroll" style={{WebkitOverflowScrolling: 'touch'}}>
-        <div className="px-8 space-y-6 transform-gpu">
+      <div 
+        ref={scrollContainerRef}
+        className="relative flex-1 overflow-y-auto transition-[padding] duration-300"
+        style={{
+          paddingTop: isHeaderCollapsed ? '80px' : '140px',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        <div className="relative px-8 space-y-6 pb-24">
         {/* Continue Reading Card - Multi-layer glass */}
         <div 
           className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate active-elevate-2 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 transform-gpu"
@@ -73,8 +102,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         >
           {/* Gradient border */}
           <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
-          {/* Inner panel - solid background for performance */}
-          <div className="relative overflow-hidden rounded-3xl bg-card dark:bg-slate-900/95 p-8">
+          {/* Inner glass panel */}
+          <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/60 p-8 backdrop-blur-sm" style={{contain: 'paint'}}>
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-3xl" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
@@ -117,7 +146,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               data-testid="button-bookmarks"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card dark:bg-slate-900/95 p-6">
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-sm" style={{contain: 'paint'}}>
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-md shadow-inner ring-1 ring-border">
                   <Icon icon="solar:bookmark-bold" className="size-7 text-primary" />
                 </div>
@@ -134,7 +163,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               data-testid="button-favorites"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card dark:bg-slate-900/95 p-6">
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-sm" style={{contain: 'paint'}}>
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 shadow-md shadow-inner ring-1 ring-border">
                   <Icon icon="solar:star-bold" className="size-7 text-amber-500" />
                 </div>
@@ -151,7 +180,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               data-testid="button-settings"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card dark:bg-slate-900/95 p-6">
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-sm" style={{contain: 'paint'}}>
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-md shadow-inner ring-1 ring-border">
                   <Icon icon="solar:settings-bold" className="size-7 text-primary" />
                 </div>
@@ -176,8 +205,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           >
             {/* Gradient border */}
             <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
-            {/* Inner panel - solid background for performance */}
-            <div className="relative overflow-hidden rounded-3xl bg-card dark:bg-slate-900/95 p-6">
+            {/* Inner glass panel */}
+            <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-sm" style={{contain: 'paint'}}>
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <h4 className="font-heading text-2xl font-bold tracking-tighter text-foreground">
