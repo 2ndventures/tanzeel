@@ -13,7 +13,6 @@ interface HomePageProps {
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
   const [stats, setStats] = useState(() => getReadingStats());
-  const { isCollapsed: isHeaderCollapsed, scrollContainerRef } = useCollapsibleHeader();
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -36,7 +35,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
       {/* Rich layered gradients for depth - outside scroll container */}
       <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70 pointer-events-none" />
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent pointer-events-none" />
@@ -45,35 +44,22 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Collapsible Header */}
-      <div 
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          isHeaderCollapsed ? 'translate-y-0' : 'translate-y-0'
-        }`}
-        style={{
-          height: isHeaderCollapsed ? '80px' : '140px'
-        }}
-      >
+      {/* Fixed Header - Non-collapsible */}
+      <div className="fixed top-0 left-0 right-0 z-40">
         <div className="absolute inset-0 bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-border" />
         <div className="relative header-safe-padding">
           <div className="px-8 pt-4 pb-6">
             <div className="flex items-center justify-between py-2">
               <div>
-                <p className={`text-sm text-muted-foreground transition-opacity duration-300 ${isHeaderCollapsed ? 'opacity-0' : 'opacity-100'}`}>
+                <p className="text-sm text-muted-foreground">
                   As-salamu alaykum
                 </p>
-                <h2 className={`font-heading font-black tracking-tighter text-foreground transition-all duration-300 ${
-                  isHeaderCollapsed ? 'text-2xl' : 'text-4xl'
-                }`}>
+                <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
                   Simple Quran
                 </h2>
               </div>
-              <div className={`relative flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border transition-all duration-300 ${
-                isHeaderCollapsed ? 'size-12' : 'size-16'
-              }`}>
-                <Icon icon="solar:book-bold" className={`text-primary-foreground transition-all duration-300 ${
-                  isHeaderCollapsed ? 'size-7' : 'size-10'
-                }`} />
+              <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
+                <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" />
               </div>
             </div>
           </div>
@@ -82,10 +68,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
       {/* Scrollable Content */}
       <div 
-        ref={scrollContainerRef}
-        className="relative flex-1 overflow-y-auto transition-[padding] duration-300"
+        className="relative h-full overflow-y-auto pt-[140px]"
         style={{
-          paddingTop: isHeaderCollapsed ? '80px' : '140px',
           WebkitOverflowScrolling: 'touch'
         }}
       >
