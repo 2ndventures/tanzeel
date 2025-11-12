@@ -52,14 +52,14 @@ export default function AudioPlayer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 safe-area-bottom" data-testid="audio-player-wrapper">
+    <div className="fixed inset-x-0 bottom-0 z-20" data-testid="audio-player-wrapper">
       {/* Glass background with gradient borders */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-card/90 dark:bg-slate-900/90 backdrop-blur-2xl" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
         
-        <div className="relative px-6 py-6 pb-8 space-y-4 shadow-2xl" data-testid="audio-player-content">
+        <div className="relative px-6 pt-6 space-y-4 shadow-2xl safe-area-bottom" data-testid="audio-player-content">
           {/* Surah Information - Above progress bar, side by side */}
           {(surahNameArabic || surahNameEnglish) && (
             <div className="flex items-center justify-start gap-3 py-1" data-testid="surah-info">
