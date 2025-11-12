@@ -164,7 +164,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <div 
         ref={scrollContainerRef}
         className="relative h-screen overflow-y-auto"
-        style={{ paddingTop: '280px' }}
+        style={{ paddingTop: '320px' }}
       >
 
         {/* Chapter List */}

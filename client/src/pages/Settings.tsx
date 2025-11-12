@@ -98,7 +98,7 @@ export default function Settings({
       </div>
 
       {/* Scrollable Content */}
-      <div className="relative h-screen overflow-y-auto pt-[140px]">
+      <div className="relative h-screen overflow-y-auto pt-[180px]">
         <div className="px-8 space-y-8 pb-24">
           {/* Display Section */}
           <div>

@@ -643,8 +643,8 @@ export default function ChapterView({
       {/* Scrollable content area - padding adjusts based on header state */}
       <div 
         ref={scrollContainerRef}
-        className={`relative flex-1 overflow-y-auto px-6 pb-[200px] transition-[padding] duration-300 ${
-          isCollapsed ? 'pt-[80px]' : 'pt-[140px]'
+        className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
+          isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
         }`}
       >
         <div className="max-w-2xl mx-auto space-y-4">
