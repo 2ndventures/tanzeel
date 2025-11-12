@@ -34,29 +34,25 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
-      {/* Rich layered gradients for depth - adapts to theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10" />
-      {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-primary/5 to-background pb-24">
+      {/* Simplified single gradient layer for performance */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-amber-500/5 dark:from-indigo-900/20 dark:to-amber-500/8 pointer-events-none" />
 
       {/* Status Bar Shim */}
       <StatusBarShim />
 
       {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-card/98 dark:bg-slate-900/98 border-b border-border header-safe-padding">
         <div className="px-8 pt-4 pb-6">
           <div className="flex items-center justify-between py-2">
             <div>
               <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
-              <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground" style={{textShadow: '0 4px 12px rgba(0,0,0,0.2)'}}>
+              <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
                 Simple Quran
               </h2>
             </div>
             <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-amber-500 shadow-lg ring-2 ring-border">
-              <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" style={{filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'}} />
+              <Icon icon="solar:book-bold" className="size-10 text-primary-foreground" />
             </div>
           </div>
         </div>
@@ -77,13 +73,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         >
           {/* Gradient border */}
           <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
-          {/* Inner glass panel */}
-          <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/60 p-8 backdrop-blur-2xl">
+          {/* Inner panel - solid background for performance */}
+          <div className="relative overflow-hidden rounded-3xl bg-card dark:bg-slate-900/95 p-8">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-3xl" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
-                <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
+                <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground">
                   Surah {currentChapter.englishName}
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground">
@@ -121,9 +117,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               data-testid="button-bookmarks"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-xl">
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card dark:bg-slate-900/95 p-6">
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-md shadow-inner ring-1 ring-border">
-                  <Icon icon="solar:bookmark-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-primary" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
@@ -138,9 +134,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               data-testid="button-favorites"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-xl">
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card dark:bg-slate-900/95 p-6">
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-amber-500/20 shadow-md shadow-inner ring-1 ring-border">
-                  <Icon icon="solar:star-bold" className="size-7 text-amber-500" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <Icon icon="solar:star-bold" className="size-7 text-amber-500" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Favorites</span>
               </div>
@@ -155,9 +151,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               data-testid="button-settings"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-xl">
+              <div className="relative flex flex-col items-center justify-center rounded-3xl bg-card dark:bg-slate-900/95 p-6">
                 <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-md shadow-inner ring-1 ring-border">
-                  <Icon icon="solar:settings-bold" className="size-7 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  <Icon icon="solar:settings-bold" className="size-7 text-primary" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Settings</span>
               </div>
@@ -171,7 +167,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
               SURAH OF THE DAY
             </h3>
-            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+            <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" />
           </div>
           <div 
             className="relative group overflow-hidden rounded-3xl p-[1px] shadow-2xl hover-elevate cursor-pointer transform-gpu"
@@ -180,11 +176,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           >
             {/* Gradient border */}
             <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
-            {/* Inner glass panel */}
-            <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 p-6 backdrop-blur-2xl">
+            {/* Inner panel - solid background for performance */}
+            <div className="relative overflow-hidden rounded-3xl bg-card dark:bg-slate-900/95 p-6">
               <div className="mb-4 flex items-start justify-between">
                 <div>
-                  <h4 className="font-heading text-2xl font-bold tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
+                  <h4 className="font-heading text-2xl font-bold tracking-tighter text-foreground">
                     Surah Ar-Rahman
                   </h4>
                   <p className="mt-2 text-sm text-muted-foreground">The Most Merciful • 78 Ayahs</p>
