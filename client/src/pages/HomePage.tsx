@@ -63,11 +63,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       </div>
 
       {/* Scrollable Content */}
-      <div className="relative h-screen overflow-y-auto pt-[160px]">
-        <div className="px-8 space-y-6">
+      <div className="relative h-screen overflow-y-auto pt-[160px] will-change-scroll" style={{WebkitOverflowScrolling: 'touch'}}>
+        <div className="px-8 space-y-6 transform-gpu">
         {/* Continue Reading Card - Multi-layer glass */}
         <div 
-          className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate active-elevate-2 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+          className="relative group mb-6 overflow-hidden rounded-3xl p-[1px] shadow-xl hover-elevate active-elevate-2 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 transform-gpu"
           onClick={() => onNavigate("chapter", stats.lastReadChapter)}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter); }}}
           role="button"
@@ -112,7 +112,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </h3>
           <div className="grid grid-cols-3 gap-6">
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 transform-gpu"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
               role="button"
@@ -129,7 +129,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               </div>
             </div>
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 transform-gpu"
               onClick={() => onNavigate("surah-juz", undefined, "surah")}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
               role="button"
@@ -146,7 +146,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               </div>
             </div>
             <div 
-              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
+              className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 transform-gpu"
               onClick={() => onNavigate("settings", undefined, "settings")}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("settings", undefined, "settings"); }}}
               role="button"
@@ -174,7 +174,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
           </div>
           <div 
-            className="relative group overflow-hidden rounded-3xl p-[1px] shadow-2xl hover-elevate cursor-pointer"
+            className="relative group overflow-hidden rounded-3xl p-[1px] shadow-2xl hover-elevate cursor-pointer transform-gpu"
             onClick={() => onNavigate("chapter", 55)}
             data-testid="card-todays-reading"
           >
