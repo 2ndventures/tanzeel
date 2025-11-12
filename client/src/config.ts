@@ -1,18 +1,28 @@
 import { Capacitor } from '@capacitor/core';
 
 // API Configuration
-// This determines the backend URL based on the environment
-// - Development (npm run dev): Uses relative URLs to call local backend
-// - Production (deployed URL or iOS/Android app): Uses full Replit URL
+// This determines the backend URL based on the runtime environment
+// - Local development: Uses relative URLs (localhost or .replit.dev domains)
+// - Production deployment or native apps: Uses full Replit production URL
 
 const getApiBaseUrl = (): string => {
-  // Native app (iOS/Android) OR production build: use full URL
-  if (Capacitor.isNativePlatform() || !import.meta.env.DEV) {
+  // Native app (iOS/Android): always use full production URL
+  if (Capacitor.isNativePlatform()) {
     return 'https://11424-newest-version-web266.replit.app';
   }
   
-  // Development web browser: use relative URLs
-  return '';
+  // Web browser: check the actual runtime hostname
+  const hostname = window.location.hostname;
+  
+  // If running on localhost or Replit dev domains, use relative URLs
+  if (hostname === 'localhost' || 
+      hostname.includes('replit.dev') || 
+      hostname.includes('repl.co')) {
+    return '';
+  }
+  
+  // Otherwise (production deployment), use full URL
+  return 'https://11424-newest-version-web266.replit.app';
 };
 
 export const API_BASE_URL = getApiBaseUrl();
