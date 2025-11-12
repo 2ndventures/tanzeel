@@ -68,7 +68,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
       {/* Scrollable Content */}
       <div 
-        className="relative h-full overflow-y-auto pt-[180px]"
+        className="relative h-full overflow-y-auto pt-[200px]"
         style={{
           WebkitOverflowScrolling: 'touch'
         }}

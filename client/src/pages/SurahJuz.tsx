@@ -91,12 +91,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Collapsible Header */}
-      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
-        <div className="px-8 pt-4 pb-6 space-y-6">
-          {/* Title and Settings */}
+      {/* Fixed Title Header - Always visible */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
+        <div className="px-8 pt-4 pb-6">
           <div className="flex items-center justify-between">
-            <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}}>
+            <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
               Surahs
             </h1>
             <Button 
@@ -110,7 +109,17 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               <Settings className="size-6" aria-hidden="true" />
             </Button>
           </div>
+        </div>
+      </div>
 
+      {/* Collapsible Search & Tabs Section */}
+      <div 
+        className="fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300"
+        style={{
+          top: isCollapsed ? '-200px' : '100px',
+        }}
+      >
+        <div className="px-8 pt-6 pb-6 space-y-6">
           {/* Search Bar - Glass */}
           <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
             <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
@@ -163,8 +172,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       {/* Scrollable Content */}
       <div 
         ref={scrollContainerRef}
-        className="relative h-screen overflow-y-auto"
-        style={{ paddingTop: '320px' }}
+        className="relative h-screen overflow-y-auto transition-[padding] duration-300"
+        style={{ 
+          paddingTop: isCollapsed ? '140px' : '340px'
+        }}
       >
 
         {/* Chapter List */}
