@@ -258,10 +258,9 @@ export function useWordTimingAudio(
         throw new Error('No audio URL found in timing data');
       }
       
-      // Prepend API_BASE_URL for relative paths (mobile apps need full URLs)
-      if (audioUrl.startsWith('/')) {
-        audioUrl = `${API_BASE_URL}${audioUrl}`;
-      }
+      // The audio URL is now a direct CDN URL (https://download.quranicaudio.com/...)
+      // No need to prepend API_BASE_URL since we're using the CDN directly
+      // This avoids backend proxy timeout issues with large files (110MB+)
 
       console.log('🎵 Loading audio from:', audioUrl);
       console.log('📊 Audio URL breakdown:', {

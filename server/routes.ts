@@ -189,24 +189,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Unexpected API response format" });
       }
       
-      // Rewrite audio URLs to use our proxy instead of direct Quran.com URLs
-      // This fixes CORS issues in mobile apps (iOS/Android)
-      audioFiles = audioFiles.map((audioFile: any) => {
-        // Extract reciter ID from the original URL
-        // URL format: https://download.quranicaudio.com/qdc/[reciter]/murattal/[chapter].mp3
-        const originalUrl = audioFile.audio_url;
-        if (originalUrl) {
-          const urlParts = originalUrl.split('/');
-          // URL structure: ["https:", "", "download.quranicaudio.com", "qdc", "reciter_name", "murattal", "chapter.mp3"]
-          const reciterFromUrl = urlParts[4]; // Extract reciter from URL (index 4)
-          
-          // Rewrite to use our backend proxy
-          // Our proxy URL: /api/audio/[reciter]/[chapter]
-          audioFile.audio_url = `/api/audio/${reciterFromUrl}/${chapter}`;
-          console.log(`🔄 Rewrote audio URL: ${originalUrl} → ${audioFile.audio_url}`);
-        }
-        return audioFile;
-      });
+      // Keep original CDN URLs - no proxy needed
+      // The Quran CDN has proper CORS headers and can handle large files efficiently
+      // Proxying 110MB+ files through our backend causes timeout issues in production
+      console.log(`✅ Using direct CDN URLs for chapter ${chapter} (${audioFiles.length} files)`);
       
       // Always return normalized format with audio_files array
       const normalizedData = {
