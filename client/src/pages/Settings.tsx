@@ -253,6 +253,46 @@ export default function Settings({
               </div>
             </div>
           </div>
+
+          {/* Legal Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Legal</h2>
+            <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
+              {/* Gradient border */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
+              
+              {/* Inner glass panel */}
+              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70 divide-y divide-border">
+                <button
+                  onClick={() => onNavigate?.("privacy-policy")}
+                  className="w-full flex items-center justify-between p-6 hover-elevate active-elevate-2 text-left"
+                  data-testid="button-privacy-policy"
+                >
+                  <span className="text-lg text-foreground">Privacy Policy</span>
+                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => onNavigate?.("terms-of-service")}
+                  className="w-full flex items-center justify-between p-6 hover-elevate active-elevate-2 text-left"
+                  data-testid="button-terms-of-service"
+                >
+                  <span className="text-lg text-foreground">Terms of Service</span>
+                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* App Information */}
+          <div className="text-center text-sm text-muted-foreground space-y-2 pb-8">
+            <p>Simple Quran</p>
+            <p>Version 1.0.0</p>
+            <p>© 2025 Third Ventures, LLC</p>
+          </div>
         </div>
       </div>
 

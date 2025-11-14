@@ -8,10 +8,12 @@ import HomePage from "@/pages/HomePage";
 import SurahJuz from "@/pages/SurahJuz";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import TermsOfService from "@/pages/TermsOfService";
 import OnboardingScreen from "@/components/OnboardingScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 
-type Page = "home" | "surah-juz" | "chapter" | "settings";
+type Page = "home" | "surah-juz" | "chapter" | "settings" | "privacy-policy" | "terms-of-service";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
@@ -282,6 +284,22 @@ function App() {
                 onLineSpacingChange={setLineSpacing}
                 showVerseNumbers={showVerseNumbers}
                 onShowVerseNumbersChange={setShowVerseNumbers}
+              />
+            )}
+            {currentPage === "privacy-policy" && (
+              <PrivacyPolicy
+                onBack={() => {
+                  setCurrentPage("settings");
+                  setActiveTab("settings");
+                }}
+              />
+            )}
+            {currentPage === "terms-of-service" && (
+              <TermsOfService
+                onBack={() => {
+                  setCurrentPage("settings");
+                  setActiveTab("settings");
+                }}
               />
             )}
           </div>
