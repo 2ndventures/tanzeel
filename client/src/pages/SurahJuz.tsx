@@ -106,7 +106,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               aria-label="Open settings"
               data-testid="button-settings"
             >
-              <Settings className="size-10" aria-hidden="true" />
+              <Settings className="w-8 h-8" aria-hidden="true" />
             </Button>
           </div>
         </div>
