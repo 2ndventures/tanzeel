@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { getDisplayArabicName } from "@/lib/quranData";
+import { getDisplayArabicName } from "@/lib/quranMetadata";
 
 interface ChapterCardProps {
   number: number;

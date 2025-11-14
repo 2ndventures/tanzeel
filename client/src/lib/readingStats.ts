@@ -1,5 +1,5 @@
 // Reading statistics tracking for Quran app
-import { chapters } from './quranData';
+import { chapters } from './quranMetadata';
 
 interface ReadingStats {
   dayStreak: number;

@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
-import { chapters } from "@/lib/quranData";
+import { chapters } from "@/lib/quranMetadata";
 import { getReadingStats, formatReadingTime } from "@/lib/readingStats";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 

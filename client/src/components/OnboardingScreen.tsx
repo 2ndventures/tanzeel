@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { getChapterInfo, getChapterVerses } from "@/lib/quranData";
+import { chapters, Verse } from "@/lib/quranMetadata";
+import { lazyChapterService } from "@/services/lazyChapterService";
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -26,6 +27,21 @@ export default function OnboardingScreen({
   darkMode,
 }: OnboardingScreenProps) {
   const [step, setStep] = useState(0);
+  const [exampleVerses, setExampleVerses] = useState<Verse[]>([]);
+  const [isLoadingVerses, setIsLoadingVerses] = useState(true);
+
+  // Load Al-Fatiha verses for preview
+  useEffect(() => {
+    lazyChapterService.getVerses(1)
+      .then(verses => {
+        setExampleVerses(verses);
+        setIsLoadingVerses(false);
+      })
+      .catch(err => {
+        console.error('Failed to load example verses:', err);
+        setIsLoadingVerses(false);
+      });
+  }, []);
 
   const getArabicFontSize = (size: string) => {
     switch(size) {
@@ -102,10 +118,9 @@ export default function OnboardingScreen({
     return "Large";
   };
 
-  // Example verse - Al-Fatiha verse 1
-  const exampleChapter = getChapterInfo(1);
-  const exampleVerses = getChapterVerses(1);
-  const exampleVerse = exampleVerses[0];
+  // Example chapter and verse - Al-Fatiha
+  const exampleChapter = chapters.find(ch => ch.id === 1);
+  const exampleVerse = exampleVerses.length > 0 ? exampleVerses[0] : null;
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">

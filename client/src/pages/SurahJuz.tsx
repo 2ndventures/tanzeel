@@ -7,7 +7,7 @@ import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { chapters } from "@/lib/quranData";
+import { chapters } from "@/lib/quranMetadata";
 import { Settings } from "lucide-react";
 
 interface SurahJuzProps {

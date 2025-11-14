@@ -5,12 +5,14 @@ import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { getChapterVerses, getChapterInfo, getDisplayArabicName } from "@/lib/quranData";
+import { chapters, getDisplayArabicName, Verse } from "@/lib/quranMetadata";
+import { lazyChapterService } from "@/services/lazyChapterService";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 
 interface ChapterViewProps {
@@ -72,8 +74,12 @@ export default function ChapterView({
   onLineSpacingChange,
   onShowVerseNumbersChange
 }: ChapterViewProps) {
-  const chapterInfo = getChapterInfo(chapterId);
-  const verses = getChapterVerses(chapterId);
+  const chapterInfo = chapters.find(ch => ch.id === chapterId);
+  
+  // Lazy loading state for verses
+  const [verses, setVerses] = useState<Verse[]>([]);
+  const [isLoadingVerses, setIsLoadingVerses] = useState(true);
+  const [versesError, setVersesError] = useState<string | null>(null);
   
   // Collapsible header hook
   const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
@@ -96,12 +102,45 @@ export default function ChapterView({
   };
   const quranComReciterId = reciterToQuranComId[reciter] || 7;
 
-  // Scroll to top when chapter changes
+  // Load verses when chapter changes
   useEffect(() => {
+    let isMounted = true;
+    setIsLoadingVerses(true);
+    setVersesError(null);
+    
+    lazyChapterService.getVerses(chapterId)
+      .then(loadedVerses => {
+        // Only update state if this is still the current chapter
+        if (isMounted) {
+          setVerses(loadedVerses);
+          setIsLoadingVerses(false);
+        }
+      })
+      .catch(err => {
+        if (isMounted) {
+          console.error('Failed to load chapter verses:', err);
+          setVersesError('Failed to load chapter verses. Please try again.');
+          setIsLoadingVerses(false);
+        }
+      });
+    
+    // Scroll to top when chapter changes
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
+
+    // Cleanup function to prevent race conditions
+    return () => {
+      isMounted = false;
+    };
   }, [chapterId]);
+
+  // Preload next chapter when autoplay is enabled
+  useEffect(() => {
+    if (autoplay && chapterId < 114) {
+      lazyChapterService.preloadChapter(chapterId + 1);
+    }
+  }, [autoplay, chapterId]);
 
   // Track completed verses
   const completedVersesRef = useRef(new Set<string>());
@@ -648,7 +687,34 @@ export default function ChapterView({
         }`}
       >
         <div className="max-w-2xl mx-auto space-y-4">
-          {verses.map((verse, index) => {
+          {/* Loading state */}
+          {isLoadingVerses && (
+            <>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="space-y-3 p-6 rounded-2xl bg-card/80 backdrop-blur-xl">
+                  <Skeleton className="h-8 w-3/4" />
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-5/6" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-4/5" />
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Error state */}
+          {versesError && !isLoadingVerses && (
+            <div className="text-center py-12 space-y-4">
+              <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
+              <p className="text-lg text-destructive">{versesError}</p>
+              <Button onClick={() => window.location.reload()}>
+                Reload Page
+              </Button>
+            </div>
+          )}
+
+          {/* Verses */}
+          {!isLoadingVerses && !versesError && verses.map((verse, index) => {
             const verseNumber = index + 1;
             const isCurrentVerse = currentVerse === verseNumber;
 
