@@ -254,6 +254,35 @@ export default function Settings({
             </div>
           </div>
 
+          {/* Help Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-foreground mb-4">Help</h2>
+            <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
+              {/* Gradient border */}
+              <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
+              
+              {/* Inner glass panel */}
+              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70">
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('onboardingCompleted');
+                    window.location.reload();
+                  }}
+                  className="w-full flex items-center justify-between p-6 hover-elevate active-elevate-2 text-left"
+                  data-testid="button-restart-onboarding"
+                >
+                  <div>
+                    <div className="text-lg text-foreground">Restart Tutorial</div>
+                    <div className="text-sm text-muted-foreground mt-1">View the welcome guide again</div>
+                  </div>
+                  <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Legal Section */}
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-4">Legal</h2>
