@@ -20,17 +20,19 @@ All UI components use viewport-relative units for mobile responsiveness:
 - **Spacing**: Percentage-based and viewport-relative units rather than fixed pixels
 - **Touch targets**: Minimum 48px for accessibility on touch devices (verified across all screens)
 
-### Status Bar System (Updated November 11, 2025)
+### Status Bar System (Updated November 14, 2025)
 
 The application implements safe-area handling for native mobile deployment with collapsible headers on reading screens:
 - **StatusBarShim Component**: Fixed z-50 overlay that reserves space for device status bar
 - **Fixed Headers (HomePage, Settings)**: HomePage and Settings pages feature fixed headers with `header-safe-padding` and static padding for content (HomePage: `pt-[160px]`, Settings: `pt-[140px]`)
 - **Collapsible Headers (Reading Screens)**: SurahJuz and ChapterView feature headers that hide on scroll down and reappear on scroll up using the `useCollapsibleHeader` hook
-- **Dynamic Padding**: Scroll containers on reading screens with collapsible headers use responsive padding that transitions smoothly between expanded and collapsed states:
-  - ChapterView: `pt-[140px]` expanded → `pt-[80px]` collapsed
-  - SurahJuz: Fixed `paddingTop: '280px'` (accounts for search bar and mode toggle)
+- **Dynamic Padding with Safe Area**: Scroll containers and collapsible sections use `calc()` expressions to properly account for safe-area-inset-top on devices with notches/Dynamic Island:
+  - ChapterView: CSS classes with transform for collapsing (header-collapsed/header-expanded)
+  - SurahJuz Collapsible Section: `top: calc(100px + env(safe-area-inset-top, 0px))` when expanded
+  - SurahJuz Scroll Container: `paddingTop: calc(340px + env(safe-area-inset-top, 0px))` expanded, `calc(140px + env(safe-area-inset-top, 0px))` collapsed
 - **Safe-Area Handling**: 
   - All headers use `.header-safe-padding` utility class for top safe-area padding
+  - Collapsible sections use inline calc() styles to position below fixed headers accounting for safe area
   - Bottom navigation and audio player use `.safe-area-bottom` for bottom safe-area padding
   - Deprecated: `.safe-area-pad` and `.safe-area-top` classes removed
 - **Smooth Transitions**: Reading screens with collapsible headers include `transition-[padding] duration-300` for seamless animation matching header collapse behavior

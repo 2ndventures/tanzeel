@@ -114,9 +114,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
       {/* Collapsible Search & Tabs Section */}
       <div 
-        className="fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300"
+        className={`fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ${
+          isCollapsed ? '' : 'collapsible-top-100'
+        }`}
         style={{
-          top: isCollapsed ? '-200px' : '100px',
+          top: isCollapsed ? '-200px' : undefined,
         }}
       >
         <div className="px-8 pt-6 pb-6 space-y-6">
@@ -172,10 +174,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       {/* Scrollable Content */}
       <div 
         ref={scrollContainerRef}
-        className="relative h-screen overflow-y-auto transition-[padding] duration-300"
-        style={{ 
-          paddingTop: isCollapsed ? '140px' : '340px'
-        }}
+        className={`relative h-screen overflow-y-auto transition-[padding] duration-300 ${
+          isCollapsed ? 'scroll-pt-140-safe' : 'scroll-pt-340-safe'
+        }`}
       >
 
         {/* Chapter List */}
