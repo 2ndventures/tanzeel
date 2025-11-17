@@ -104,6 +104,7 @@ export default function Settings({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: JSON.stringify({
           message: feedback,
@@ -355,7 +356,7 @@ export default function Settings({
                         <Button
                           variant="outline"
                           onClick={() => setFeedbackOpen(false)}
-                          className="flex-1"
+                          className="flex-1 min-h-12"
                           disabled={isSubmitting}
                           data-testid="button-cancel-feedback"
                         >
@@ -363,7 +364,7 @@ export default function Settings({
                         </Button>
                         <Button
                           onClick={handleFeedbackSubmit}
-                          className="flex-1"
+                          className="flex-1 min-h-12"
                           disabled={isSubmitting}
                           data-testid="button-submit-feedback"
                         >
@@ -431,7 +432,7 @@ export default function Settings({
           <div className="text-center text-sm text-muted-foreground space-y-2 pb-8">
             <p>Simple Quran</p>
             <p>Version 1.0.0</p>
-            <p>© 2025 Third Ventures, LLC</p>
+            <p>© 2026 Third Ventures, LLC</p>
           </div>
         </div>
       </div>
