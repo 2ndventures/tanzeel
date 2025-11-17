@@ -1,8 +1,13 @@
+import { useState } from "react";
 import { Icon } from "@iconify/react";
 import SettingItem from "@/components/SettingItem";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { getAllReciters, getReciterDisplayName } from "@/lib/reciters";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface SettingsProps {
   onBack: () => void;
@@ -74,6 +79,58 @@ export default function Settings({
     value: r.id,
     label: r.style ? `${r.name} - ${r.style}` : r.name,
   }));
+
+  // Feedback form state
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleFeedbackSubmit = async () => {
+    if (!feedback.trim()) {
+      toast({
+        title: "Please enter feedback",
+        description: "Your feedback is important to us!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Using Formspree for feedback submission
+      const response = await fetch("https://formspree.io/f/xbljowyl", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: feedback,
+          _subject: "Simple Quran - User Feedback",
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Feedback sent!",
+          description: "Thank you for helping us improve Simple Quran.",
+        });
+        setFeedback("");
+        setFeedbackOpen(false);
+      } else {
+        throw new Error("Failed to send feedback");
+      }
+    } catch (error) {
+      toast({
+        title: "Failed to send feedback",
+        description: "Please try again later or email us at support@thirdventures.com",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
@@ -262,7 +319,61 @@ export default function Settings({
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
               
               {/* Inner glass panel */}
-              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70">
+              <div className="relative overflow-visible rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70 divide-y divide-border">
+                <Sheet open={feedbackOpen} onOpenChange={setFeedbackOpen}>
+                  <SheetTrigger asChild>
+                    <button
+                      className="w-full flex items-center justify-between p-6 hover-elevate active-elevate-2 text-left"
+                      data-testid="button-give-feedback"
+                    >
+                      <div>
+                        <div className="text-lg text-foreground">Give Feedback</div>
+                        <div className="text-sm text-muted-foreground mt-1">Share your thoughts with us</div>
+                      </div>
+                      <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                      </svg>
+                    </button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl">
+                    <SheetHeader>
+                      <SheetTitle className="text-2xl font-bold">Send Feedback</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-6 space-y-4">
+                      <p className="text-muted-foreground">
+                        We'd love to hear your thoughts! Your feedback helps us make Simple Quran better.
+                      </p>
+                      <Textarea
+                        placeholder="Tell us what you think..."
+                        value={feedback}
+                        onChange={(e) => setFeedback(e.target.value)}
+                        className="min-h-[200px] resize-none text-base"
+                        disabled={isSubmitting}
+                        data-testid="textarea-feedback"
+                      />
+                      <div className="flex gap-3 pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => setFeedbackOpen(false)}
+                          className="flex-1"
+                          disabled={isSubmitting}
+                          data-testid="button-cancel-feedback"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleFeedbackSubmit}
+                          className="flex-1"
+                          disabled={isSubmitting}
+                          data-testid="button-submit-feedback"
+                        >
+                          {isSubmitting ? "Sending..." : "Send Feedback"}
+                        </Button>
+                      </div>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+                
                 <button
                   onClick={() => {
                     localStorage.removeItem('onboardingCompleted');
