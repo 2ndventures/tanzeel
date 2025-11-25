@@ -161,3 +161,27 @@ The app automatically detects its runtime environment and configures API calls a
 - **iOS/Android app**: Uses the production Replit URL (`https://11424-newest-version-web266.replit.app`)
 
 This configuration is managed in `client/src/config.ts` using Capacitor's `isNativePlatform()` API. The backend must be deployed and accessible at the configured URL for the mobile app to function (audio loading, timing data, etc.).
+
+### App Store Readiness (Updated November 25, 2025)
+
+The application is configured for App Store and Play Store submission with the following native configurations:
+
+**iOS (Info.plist)**:
+- **Background Audio**: `UIBackgroundModes` includes `audio` capability for Quran playback when screen locks
+- **App Transport Security**: Configured with specific exception domains (quran.com, everyayah.com, replit.app) - all HTTPS only, no insecure loads allowed
+- **Bundle ID**: `com.simplequran.app`
+- **Display Name**: Simple Quran
+
+**Android (AndroidManifest.xml)**:
+- **Permissions**: 
+  - `INTERNET` - Network access for API calls
+  - `WAKE_LOCK` - Keep device awake during audio playback
+  - `FOREGROUND_SERVICE` - Background audio service
+  - `FOREGROUND_SERVICE_MEDIA_PLAYBACK` - Media playback foreground service
+- **Security**: `android:usesCleartextTraffic="false"` - Only HTTPS connections allowed
+- **Package Name**: `com.simplequran.app`
+
+**Build Pipeline**:
+- Run `npm run build` to create production bundle in `dist/public`
+- Run `npx cap sync` to sync web assets and Info.plist/AndroidManifest changes to native projects
+- Chapter JSON data files are bundled in `client/public/data/chapters/` and sync to native assets
