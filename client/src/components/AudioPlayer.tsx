@@ -1,5 +1,5 @@
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 interface AudioPlayerProps {
@@ -38,18 +38,82 @@ export default function AudioPlayer({
   surahNameEnglish,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
-  
+
+  const [showSpeedSlider, setShowSpeedSlider] = useState(false);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPressRef = useRef(false);
+  const speedButtonRef = useRef<HTMLButtonElement>(null);
+  const sliderContainerRef = useRef<HTMLDivElement>(null);
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const cycleSpeed = () => {
-    const currentIndex = speedOptions.indexOf(speed);
-    const nextIndex = (currentIndex + 1) % speedOptions.length;
-    onSpeedChange?.(speedOptions[nextIndex]);
+  const formatSpeed = (s: number) => {
+    return s % 1 === 0 ? `${s.toFixed(0)}x` : `${parseFloat(s.toFixed(1))}x`;
   };
+
+  const cycleSpeed = () => {
+    const currentIndex = speedOptions.findIndex(s => Math.abs(s - speed) < 0.01);
+    if (currentIndex >= 0) {
+      const nextIndex = (currentIndex + 1) % speedOptions.length;
+      onSpeedChange?.(speedOptions[nextIndex]);
+    } else {
+      const next = speedOptions.find(s => s > speed + 0.01) ?? speedOptions[0];
+      onSpeedChange?.(next);
+    }
+  };
+
+  const handlePointerDown = useCallback(() => {
+    didLongPressRef.current = false;
+    longPressTimerRef.current = setTimeout(() => {
+      didLongPressRef.current = true;
+      setShowSpeedSlider(true);
+    }, 400);
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    if (!didLongPressRef.current) {
+      // If slider is already open, tap closes it instead of cycling
+      if (showSpeedSlider) {
+        setShowSpeedSlider(false);
+      } else {
+        cycleSpeed();
+      }
+    }
+  }, [speed, onSpeedChange, showSpeedSlider]);
+
+  const handlePointerCancel = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  // Close slider when clicking outside
+  useEffect(() => {
+    if (!showSpeedSlider) return;
+    const handleClickOutside = (e: PointerEvent) => {
+      const container = sliderContainerRef.current;
+      const btn = speedButtonRef.current;
+      if (container && !container.contains(e.target as Node) && btn && !btn.contains(e.target as Node)) {
+        setShowSpeedSlider(false);
+      }
+    };
+    const timeout = setTimeout(() => {
+      document.addEventListener('pointerdown', handleClickOutside);
+    }, 50);
+    return () => {
+      clearTimeout(timeout);
+      document.removeEventListener('pointerdown', handleClickOutside);
+    };
+  }, [showSpeedSlider]);
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-20" data-testid="audio-player-wrapper">
@@ -103,15 +167,65 @@ export default function AudioPlayer({
             </div>
           </div>
           
+          {/* Speed slider panel — slides in above controls on long-press */}
+          {showSpeedSlider && (
+            <div
+              ref={sliderContainerRef}
+              className="rounded-2xl bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl ring-1 ring-border p-4 animate-in fade-in slide-in-from-bottom-2 duration-200"
+              data-testid="speed-slider-panel"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Speed</span>
+                <button
+                  onClick={() => {
+                    onSpeedChange?.(1.0);
+                  }}
+                  className="text-xs text-primary font-semibold px-2 py-0.5 rounded-md hover:bg-primary/10 transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-medium text-muted-foreground w-8 text-right shrink-0">0.5x</span>
+                <Slider
+                  value={[speed]}
+                  min={0.5}
+                  max={2.0}
+                  step={0.1}
+                  showTooltip
+                  tooltipContent={(v) => `${formatSpeed(v)}`}
+                  onValueChange={(value) => {
+                    const rounded = Math.round(value[0] * 10) / 10;
+                    onSpeedChange?.(rounded);
+                  }}
+                  onValueCommit={() => {
+                    setShowSpeedSlider(false);
+                  }}
+                  className="flex-1"
+                  aria-label="Fine playback speed"
+                  data-testid="slider-speed"
+                />
+                <span className="text-xs font-medium text-muted-foreground w-8 shrink-0">2x</span>
+              </div>
+              <div className="text-center mt-2">
+                <span className="text-sm font-bold text-foreground">{formatSpeed(speed)}</span>
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between gap-2">
             <button
-              onClick={cycleSpeed}
-              className="min-h-[48px] min-w-[60px] px-3 rounded-2xl bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate active-elevate-2 flex items-center justify-center ring-1 ring-border"
-              aria-label={`Playback speed ${speed.toFixed(2)}x. Click to change`}
-              title="Click to cycle playback speed"
+              ref={speedButtonRef}
+              onPointerDown={handlePointerDown}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerCancel}
+              onContextMenu={(e) => e.preventDefault()}
+              className="min-h-[48px] min-w-[60px] px-3 rounded-2xl bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate active-elevate-2 flex items-center justify-center ring-1 ring-border select-none touch-none"
+              aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
+              title="Tap to cycle speed, hold for fine control"
               data-testid="button-speed"
             >
-              <span className="text-base font-semibold text-foreground">{speed.toFixed(2)}x</span>
+              <span className="text-base font-semibold text-foreground">{formatSpeed(speed)}</span>
             </button>
             
             <div className="flex items-center justify-center gap-3">

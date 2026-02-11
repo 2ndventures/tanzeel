@@ -80,6 +80,7 @@
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --font-arabic: "Amiri", "Scheherazade New", serif;
+  --font-indopak: "Noto Nastaliq Urdu", "Amiri", serif;
   --radius: .75rem; /* 12px */
   --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.02);
   --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.04);

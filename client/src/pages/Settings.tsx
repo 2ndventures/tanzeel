@@ -18,8 +18,8 @@ interface SettingsProps {
   onTransliterationChange: (value: boolean) => void;
   showTranslation: boolean;
   onShowTranslationChange: (value: boolean) => void;
-  font: string;
-  onFontChange: (value: string) => void;
+  arabicScript: 'uthmani' | 'indopak' | 'tajweed';
+  onArabicScriptChange: (value: 'uthmani' | 'indopak' | 'tajweed') => void;
   reciter: string;
   onReciterChange: (value: string) => void;
   autoScroll: boolean;
@@ -51,8 +51,8 @@ export default function Settings({
   onTransliterationChange,
   showTranslation,
   onShowTranslationChange,
-  font,
-  onFontChange,
+  arabicScript,
+  onArabicScriptChange,
   reciter,
   onReciterChange,
   autoScroll,
@@ -199,6 +199,18 @@ export default function Settings({
                   value={showVerseNumbers}
                   onToggle={onShowVerseNumbersChange}
                   testId="toggle-verse-numbers"
+                />
+                <SettingItem
+                  label="Arabic script"
+                  type="select"
+                  value={arabicScript}
+                  options={[
+                    { value: "uthmani", label: "Uthmani" },
+                    { value: "indopak", label: "IndoPak" },
+                    { value: "tajweed", label: "Tajweed" },
+                  ]}
+                  onSelect={(v) => onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed')}
+                  testId="select-arabic-script"
                 />
               </div>
             </div>

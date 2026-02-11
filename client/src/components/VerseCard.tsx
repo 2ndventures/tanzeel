@@ -18,6 +18,7 @@ interface VerseCardProps {
   transliterationFontSize?: string;
   lineSpacing?: string;
   showVerseNumbers?: boolean;
+  arabicScript?: 'uthmani' | 'indopak' | 'tajweed';
 }
 
 export default function VerseCard({
@@ -38,13 +39,17 @@ export default function VerseCard({
   transliterationFontSize = "Small",
   lineSpacing = "Normal",
   showVerseNumbers = true,
+  arabicScript = "uthmani",
 }: VerseCardProps) {
   // Calculate if this verse should be highlighted
   // Keep highlighting even when paused - only need current verse/range
   const highlighted = isCurrentVerse && isInVerseRange;
-  
-  // Split Arabic text into words for word-level highlighting
-  const words = arabicText.split(' ');
+
+  // Split Arabic text into words for word-level highlighting (non-Tajweed only)
+  const words = arabicScript !== 'tajweed' ? arabicText.split(' ') : [];
+
+  // Font class based on script
+  const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
   
   // Font size mappings
   const getArabicFontSize = (size: string) => {
@@ -82,6 +87,18 @@ export default function VerseCard({
       case "Relaxed": return "leading-[2.25]";
       case "Loose": return "leading-[2.5]";
       default: return "leading-loose";
+    }
+  };
+
+  // Arabic script with diacritical marks (tashkeel) needs extra line-height
+  // to prevent overlapping between lines on lengthy ayahs
+  const getArabicLineSpacing = (spacing: string) => {
+    switch(spacing) {
+      case "Compact": return "leading-[2]";
+      case "Normal": return "leading-[2.4]";
+      case "Relaxed": return "leading-[2.8]";
+      case "Loose": return "leading-[3.2]";
+      default: return "leading-[2.4]";
     }
   };
   
@@ -130,32 +147,40 @@ export default function VerseCard({
               </span>
             </div>
           )}
-          <p 
-            className={`${getArabicFontSize(arabicFontSize)} font-arabic text-right transition-colors ${
-              highlighted ? 'text-foreground' : 'text-foreground'
-            }`}
-            dir="rtl"
-            data-testid={`text-arabic-${verseNumber}`}
-          >
-            {words.map((word, index) => {
-              // Only highlight if currentWordIndex is valid and within bounds
-              const isCurrentWord = highlighted && 
-                currentWordIndex !== null && 
-                currentWordIndex === index &&
-                currentWordIndex < words.length;
-              return (
-                <span
-                  key={`word-${chapterId}-${verseNumber}-${index}`}
-                  id={`word-${chapterId}-${verseNumber}-${index}`}
-                  className={`transition-all duration-200 ${
-                    isCurrentWord ? 'text-primary font-bold' : ''
-                  }`}
-                >
-                  {word}{index < words.length - 1 ? ' ' : ''}
-                </span>
-              );
-            })}
-          </p>
+          {arabicScript === 'tajweed' ? (
+            // Tajweed: render color-coded HTML from the API (trusted source)
+            <p
+              className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
+              dir="rtl"
+              data-testid={`text-arabic-${verseNumber}`}
+              dangerouslySetInnerHTML={{ __html: arabicText }}
+            />
+          ) : (
+            // Uthmani / IndoPak: word-split rendering with highlighting
+            <p
+              className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
+              dir="rtl"
+              data-testid={`text-arabic-${verseNumber}`}
+            >
+              {words.map((word, index) => {
+                const isCurrentWord = highlighted &&
+                  currentWordIndex !== null &&
+                  currentWordIndex === index &&
+                  currentWordIndex < words.length;
+                return (
+                  <span
+                    key={`word-${chapterId}-${verseNumber}-${index}`}
+                    id={`word-${chapterId}-${verseNumber}-${index}`}
+                    className={`transition-all duration-200 ${
+                      isCurrentWord ? 'text-primary font-bold' : ''
+                    }`}
+                  >
+                    {word}{index < words.length - 1 ? ' ' : ''}
+                  </span>
+                );
+              })}
+            </p>
+          )}
           {showTransliteration && transliteration && (
             <p 
               className={`${getTransliterationFontSize(transliterationFontSize)} italic transition-colors ${

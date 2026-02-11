@@ -43,6 +43,8 @@ interface ChapterViewProps {
   onTransliterationFontSizeChange?: (size: string) => void;
   onLineSpacingChange?: (spacing: string) => void;
   onShowVerseNumbersChange?: (enabled: boolean) => void;
+  arabicScript?: 'uthmani' | 'indopak' | 'tajweed';
+  onArabicScriptChange?: (script: 'uthmani' | 'indopak' | 'tajweed') => void;
 }
 
 export default function ChapterView({ 
@@ -72,7 +74,9 @@ export default function ChapterView({
   onTranslationFontSizeChange,
   onTransliterationFontSizeChange,
   onLineSpacingChange,
-  onShowVerseNumbersChange
+  onShowVerseNumbersChange,
+  arabicScript = 'uthmani',
+  onArabicScriptChange,
 }: ChapterViewProps) {
   const chapterInfo = chapters.find(ch => ch.id === chapterId);
   
@@ -85,7 +89,7 @@ export default function ChapterView({
   const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
   
   // State for managing menu navigation
-  const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing'>('main');
+  const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Map our reciter IDs to Quran.com reciter IDs
@@ -108,7 +112,7 @@ export default function ChapterView({
     setIsLoadingVerses(true);
     setVersesError(null);
     
-    lazyChapterService.getVerses(chapterId)
+    lazyChapterService.getVerses(chapterId, arabicScript)
       .then(loadedVerses => {
         // Only update state if this is still the current chapter
         if (isMounted) {
@@ -133,12 +137,12 @@ export default function ChapterView({
     return () => {
       isMounted = false;
     };
-  }, [chapterId]);
+  }, [chapterId, arabicScript]);
 
   // Preload next chapter when autoplay is enabled
   useEffect(() => {
     if (autoplay && chapterId < 114) {
-      lazyChapterService.preloadChapter(chapterId + 1);
+      lazyChapterService.preloadChapter(chapterId + 1, arabicScript);
     }
   }, [autoplay, chapterId]);
 
@@ -341,6 +345,7 @@ export default function ChapterView({
                   {menuView === 'translation' && 'Translation Text Size'}
                   {menuView === 'transliteration' && 'Transliteration Text Size'}
                   {menuView === 'spacing' && 'Line Spacing'}
+                  {menuView === 'script' && 'Arabic Script'}
                 </SheetTitle>
               </SheetHeader>
 
@@ -371,6 +376,33 @@ export default function ChapterView({
                               "text-4xl"
                             }`}>أ</span>
                             <span className="text-xs font-semibold">{size}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Arabic Script Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-script">
+                        Arabic Script
+                      </h3>
+                      <div className="grid grid-cols-3 gap-2 px-2">
+                        {([
+                          { value: 'uthmani', label: 'Uthmani' },
+                          { value: 'indopak', label: 'IndoPak' },
+                          { value: 'tajweed', label: 'Tajweed' },
+                        ] as const).map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => onArabicScriptChange?.(option.value)}
+                            className={`p-4 min-h-[56px] rounded-xl hover-elevate active-elevate-2 flex items-center justify-center transition-all ${
+                              arabicScript === option.value
+                                ? 'bg-primary/20 ring-2 ring-primary text-primary'
+                                : 'bg-muted/40 dark:bg-slate-800/40'
+                            }`}
+                            data-testid={`button-script-${option.value}`}
+                          >
+                            <span className="text-sm font-semibold">{option.label}</span>
                           </button>
                         ))}
                       </div>
@@ -738,6 +770,7 @@ export default function ChapterView({
                 transliterationFontSize={transliterationFontSize}
                 lineSpacing={lineSpacing}
                 showVerseNumbers={showVerseNumbers}
+                arabicScript={arabicScript}
               />
             );
           })}

@@ -210,6 +210,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Quran text proxy for different Arabic script editions (IndoPak, Tajweed)
+  // Uthmani text is served from bundled static JSON, no proxy needed
+  app.get("/api/quran-text/:script/:chapter", async (req, res) => {
+    try {
+      const { script, chapter } = req.params;
+
+      // Map our script names to Quran.com API endpoint names and response field names
+      const scriptConfig: Record<string, { endpoint: string; field: string }> = {
+        indopak: { endpoint: "indopak", field: "text_indopak" },
+        tajweed: { endpoint: "uthmani_tajweed", field: "text_uthmani_tajweed" },
+      };
+
+      const config = scriptConfig[script];
+      if (!config) {
+        return res.status(400).json({ error: `Unknown script: ${script}` });
+      }
+
+      const apiUrl = `https://api.quran.com/api/v4/quran/verses/${config.endpoint}?chapter_number=${chapter}`;
+      console.log(`📡 Fetching ${script} text: ${apiUrl}`);
+
+      const response = await fetch(apiUrl);
+
+      if (!response.ok) {
+        console.error(`❌ Quran text API error: ${response.status}`);
+        return res.status(response.status).json({ error: "Failed to fetch Quran text" });
+      }
+
+      const data = await response.json();
+      console.log(`✅ Loaded ${script} text for chapter ${chapter}`);
+
+      const verses = (data.verses || []).map((v: any) => ({
+        verse_key: v.verse_key,
+        text: v[config.field] || "",
+      }));
+
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.setHeader("Content-Type", "application/json");
+      res.json({ verses });
+    } catch (error) {
+      console.error("❌ Quran text proxy error:", error);
+      res.status(500).json({ error: "Failed to fetch Quran text" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

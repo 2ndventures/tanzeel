@@ -42,7 +42,10 @@ function App() {
     return saved ? JSON.parse(saved) : true;
   });
   
-  const [font, setFont] = useState("System");
+  const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>(() => {
+    const saved = localStorage.getItem('arabicScript');
+    return (saved === 'indopak' || saved === 'tajweed') ? saved : 'uthmani';
+  });
   
   const [reciter, setReciter] = useState(() => {
     const saved = localStorage.getItem('reciter');
@@ -165,6 +168,10 @@ function App() {
     localStorage.setItem('showVerseNumbers', JSON.stringify(showVerseNumbers));
   }, [showVerseNumbers]);
 
+  useEffect(() => {
+    localStorage.setItem('arabicScript', arabicScript);
+  }, [arabicScript]);
+
   // Scroll to top whenever the page changes
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -247,6 +254,8 @@ function App() {
                 onTransliterationFontSizeChange={setTransliterationFontSize}
                 onLineSpacingChange={setLineSpacing}
                 onShowVerseNumbersChange={setShowVerseNumbers}
+                arabicScript={arabicScript}
+                onArabicScriptChange={setArabicScript}
               />
             )}
             {currentPage === "settings" && (
@@ -262,8 +271,8 @@ function App() {
                 onTransliterationChange={setTransliteration}
                 showTranslation={showTranslation}
                 onShowTranslationChange={setShowTranslation}
-                font={font}
-                onFontChange={setFont}
+                arabicScript={arabicScript}
+                onArabicScriptChange={setArabicScript}
                 reciter={reciter}
                 onReciterChange={setReciter}
                 autoScroll={autoScroll}
