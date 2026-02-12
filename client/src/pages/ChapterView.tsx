@@ -3,9 +3,13 @@ import { Icon } from "@iconify/react";
 import { ArrowLeft, MoreVertical, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
+import FocusedFlowView from "@/components/FocusedFlowView";
+import MushafPageView from "@/components/MushafPageView";
+import HifzView from "@/components/HifzView";
+import ScientificView from "@/components/ScientificView";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { chapters, getDisplayArabicName, Verse } from "@/lib/quranMetadata";
+import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
@@ -45,6 +49,8 @@ interface ChapterViewProps {
   onShowVerseNumbersChange?: (enabled: boolean) => void;
   arabicScript?: 'uthmani' | 'indopak' | 'tajweed';
   onArabicScriptChange?: (script: 'uthmani' | 'indopak' | 'tajweed') => void;
+  layoutMode: LayoutMode;
+  onLayoutModeChange: (mode: LayoutMode) => void;
 }
 
 export default function ChapterView({ 
@@ -77,6 +83,8 @@ export default function ChapterView({
   onShowVerseNumbersChange,
   arabicScript = 'uthmani',
   onArabicScriptChange,
+  layoutMode,
+  onLayoutModeChange,
 }: ChapterViewProps) {
   const chapterInfo = chapters.find(ch => ch.id === chapterId);
   
@@ -711,71 +719,141 @@ export default function ChapterView({
         </div>
       </div>
 
-      {/* Scrollable content area - padding adjusts based on header state */}
-      <div 
-        ref={scrollContainerRef}
-        className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-          isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
-        }`}
-      >
-        <div className="max-w-2xl mx-auto space-y-4">
-          {/* Loading state */}
-          {isLoadingVerses && (
-            <>
-              {[...Array(5)].map((_, i) => (
-                <div key={i} className="space-y-3 p-6 rounded-2xl bg-card/80 backdrop-blur-xl">
-                  <Skeleton className="h-8 w-3/4" />
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-5/6" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-4/5" />
-                </div>
-              ))}
-            </>
-          )}
+      {/* Content area - Standard / Focused Flow / Mushaf */}
+      {layoutMode === 'standard' ? (
+        <div
+          ref={scrollContainerRef}
+          className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
+            isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+          }`}
+        >
+          <div className="max-w-2xl mx-auto space-y-4">
+            {/* Loading state */}
+            {isLoadingVerses && (
+              <>
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="space-y-3 p-6 rounded-2xl bg-card/80 backdrop-blur-xl">
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-6 w-full" />
+                    <Skeleton className="h-6 w-5/6" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-4/5" />
+                  </div>
+                ))}
+              </>
+            )}
 
-          {/* Error state */}
-          {versesError && !isLoadingVerses && (
-            <div className="text-center py-12 space-y-4">
-              <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
-              <p className="text-lg text-destructive">{versesError}</p>
-              <Button onClick={() => window.location.reload()}>
-                Reload Page
-              </Button>
-            </div>
-          )}
+            {/* Error state */}
+            {versesError && !isLoadingVerses && (
+              <div className="text-center py-12 space-y-4">
+                <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
+                <p className="text-lg text-destructive">{versesError}</p>
+                <Button onClick={() => window.location.reload()}>
+                  Reload Page
+                </Button>
+              </div>
+            )}
 
-          {/* Verses */}
-          {!isLoadingVerses && !versesError && verses.map((verse, index) => {
-            const verseNumber = index + 1;
-            const isCurrentVerse = currentVerse === verseNumber;
+            {/* Verses */}
+            {!isLoadingVerses && !versesError && verses.map((verse, index) => {
+              const verseNumber = index + 1;
+              const isCurrentVerse = currentVerse === verseNumber;
 
-            return (
-              <VerseCard
-                key={verseNumber}
-                chapterId={chapterId}
-                verseNumber={verseNumber}
-                arabicText={verse.arabicText}
-                transliteration={verse.transliteration}
-                translation={verse.translation}
-                showTransliteration={showTransliteration}
-                showTranslation={showTranslation}
-                isPlaying={isPlaying}
-                isCurrentVerse={isCurrentVerse}
-                isInVerseRange={isCurrentVerse}
-                currentWordIndex={isCurrentVerse ? currentWordIndex : null}
-                onClick={() => handleVerseClick(verseNumber)}
-                arabicFontSize={arabicFontSize}
-                translationFontSize={translationFontSize}
-                transliterationFontSize={transliterationFontSize}
-                lineSpacing={lineSpacing}
-                showVerseNumbers={showVerseNumbers}
-                arabicScript={arabicScript}
-              />
-            );
-          })}
+              return (
+                <VerseCard
+                  key={verseNumber}
+                  chapterId={chapterId}
+                  verseNumber={verseNumber}
+                  arabicText={verse.arabicText}
+                  transliteration={verse.transliteration}
+                  translation={verse.translation}
+                  showTransliteration={showTransliteration}
+                  showTranslation={showTranslation}
+                  isPlaying={isPlaying}
+                  isCurrentVerse={isCurrentVerse}
+                  isInVerseRange={isCurrentVerse}
+                  currentWordIndex={isCurrentVerse ? currentWordIndex : null}
+                  onClick={() => handleVerseClick(verseNumber)}
+                  arabicFontSize={arabicFontSize}
+                  translationFontSize={translationFontSize}
+                  transliterationFontSize={transliterationFontSize}
+                  lineSpacing={lineSpacing}
+                  showVerseNumbers={showVerseNumbers}
+                  arabicScript={arabicScript}
+                />
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : layoutMode === 'focused-flow' ? (
+        <FocusedFlowView
+          verses={verses}
+          isLoadingVerses={isLoadingVerses}
+          versesError={versesError}
+          chapterId={chapterId}
+          currentVerse={currentVerse}
+          currentWordIndex={currentWordIndex}
+          isPlaying={isPlaying}
+          showTranslation={showTranslation}
+          arabicFontSize={arabicFontSize}
+          translationFontSize={translationFontSize}
+          lineSpacing={lineSpacing}
+          arabicScript={arabicScript}
+          onVerseClick={handleVerseClick}
+          isCollapsed={isCollapsed}
+        />
+      ) : layoutMode === 'hifz' ? (
+        <HifzView
+          verses={verses}
+          isLoadingVerses={isLoadingVerses}
+          versesError={versesError}
+          chapterId={chapterId}
+          currentVerse={currentVerse}
+          currentWordIndex={currentWordIndex}
+          isPlaying={isPlaying}
+          showTranslation={showTranslation}
+          arabicFontSize={arabicFontSize}
+          translationFontSize={translationFontSize}
+          lineSpacing={lineSpacing}
+          arabicScript={arabicScript}
+          onVerseClick={handleVerseClick}
+          isCollapsed={isCollapsed}
+        />
+      ) : layoutMode === 'scientific' ? (
+        <ScientificView
+          verses={verses}
+          isLoadingVerses={isLoadingVerses}
+          versesError={versesError}
+          chapterId={chapterId}
+          currentVerse={currentVerse}
+          currentWordIndex={currentWordIndex}
+          isPlaying={isPlaying}
+          showTranslation={showTranslation}
+          arabicFontSize={arabicFontSize}
+          translationFontSize={translationFontSize}
+          lineSpacing={lineSpacing}
+          arabicScript={arabicScript}
+          onVerseClick={handleVerseClick}
+          isCollapsed={isCollapsed}
+        />
+      ) : (
+        <MushafPageView
+          verses={verses}
+          isLoadingVerses={isLoadingVerses}
+          versesError={versesError}
+          chapterId={chapterId}
+          currentVerse={currentVerse}
+          currentWordIndex={currentWordIndex}
+          isPlaying={isPlaying}
+          showTranslation={showTranslation}
+          arabicFontSize={arabicFontSize}
+          translationFontSize={translationFontSize}
+          lineSpacing={lineSpacing}
+          arabicScript={arabicScript}
+          onVerseClick={handleVerseClick}
+          isCollapsed={isCollapsed}
+        />
+      )}
 
       <AudioPlayer
         currentTime={currentTime}
@@ -793,6 +871,9 @@ export default function ChapterView({
         surahNumber={chapterId}
         surahNameArabic={chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : undefined}
         surahNameEnglish={chapterInfo?.englishName}
+        layoutMode={layoutMode}
+        onLayoutModeChange={onLayoutModeChange}
+        compact={layoutMode === 'scientific'}
       />
     </div>
   );

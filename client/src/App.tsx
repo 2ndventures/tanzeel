@@ -11,7 +11,9 @@ import Settings from "@/pages/Settings";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import OnboardingScreen from "@/components/OnboardingScreen";
+import SplashScreen from "@/components/SplashScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
+import type { LayoutMode } from "@/lib/quranMetadata";
 
 type Page = "home" | "surah-juz" | "chapter" | "settings" | "privacy-policy" | "terms-of-service";
 
@@ -20,6 +22,9 @@ function App() {
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
   
+  // Splash screen state
+  const [showSplash, setShowSplash] = useState(true);
+
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(() => {
     const completed = localStorage.getItem('onboardingCompleted');
@@ -87,6 +92,12 @@ function App() {
     return saved ? JSON.parse(saved) : true;
   });
   
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
+    const saved = localStorage.getItem('layoutMode');
+    if (saved === 'focused-flow' || saved === 'mushaf' || saved === 'hifz' || saved === 'scientific') return saved;
+    return 'standard';
+  });
+
   const [translation, setTranslation] = useState("English");
 
   // Text display settings
@@ -172,6 +183,10 @@ function App() {
     localStorage.setItem('arabicScript', arabicScript);
   }, [arabicScript]);
 
+  useEffect(() => {
+    localStorage.setItem('layoutMode', layoutMode);
+  }, [layoutMode]);
+
   // Scroll to top whenever the page changes
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -200,8 +215,13 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
+          {/* Splash screen on every launch */}
+          {showSplash && (
+            <SplashScreen onFinish={() => setShowSplash(false)} />
+          )}
+
           {/* Show onboarding on first launch */}
-          {showOnboarding && (
+          {!showSplash && showOnboarding && (
             <OnboardingScreen
               onComplete={handleOnboardingComplete}
               arabicFontSize={arabicFontSize}
@@ -256,6 +276,8 @@ function App() {
                 onShowVerseNumbersChange={setShowVerseNumbers}
                 arabicScript={arabicScript}
                 onArabicScriptChange={setArabicScript}
+                layoutMode={layoutMode}
+                onLayoutModeChange={setLayoutMode}
               />
             )}
             {currentPage === "settings" && (

@@ -254,6 +254,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Tafsir list proxy — returns available tafsirs from Quran.com API
+  app.get("/api/tafsirs", async (_req, res) => {
+    try {
+      const apiUrl = "https://api.quran.com/api/v4/resources/tafsirs?language=en";
+      console.log(`📡 Fetching tafsir list: ${apiUrl}`);
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        console.error(`❌ Tafsir list API error: ${response.status}`);
+        return res.status(response.status).json({ error: "Failed to fetch tafsir list" });
+      }
+
+      const data = await response.json();
+      console.log(`✅ Loaded tafsir list`);
+
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.setHeader("Content-Type", "application/json");
+      res.json(data);
+    } catch (error) {
+      console.error("❌ Tafsir list proxy error:", error);
+      res.status(500).json({ error: "Failed to fetch tafsir list" });
+    }
+  });
+
+  // Tafsir content proxy — returns tafsir for a specific chapter
+  app.get("/api/tafsir/:tafsirId/by-chapter/:chapter", async (req, res) => {
+    try {
+      const { tafsirId, chapter } = req.params;
+      const apiUrl = `https://api.quran.com/api/v4/tafsirs/${tafsirId}?chapter_number=${chapter}`;
+      console.log(`📡 Fetching tafsir ${tafsirId} for chapter ${chapter}: ${apiUrl}`);
+
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        console.error(`❌ Tafsir API error: ${response.status}`);
+        return res.status(response.status).json({ error: "Failed to fetch tafsir" });
+      }
+
+      const data = await response.json();
+      console.log(`✅ Loaded tafsir ${tafsirId} for chapter ${chapter}`);
+
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.setHeader("Content-Type", "application/json");
+      res.json(data);
+    } catch (error) {
+      console.error("❌ Tafsir proxy error:", error);
+      res.status(500).json({ error: "Failed to fetch tafsir" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

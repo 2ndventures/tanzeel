@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -148,9 +147,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 onClick={() => setMode("surah")}
                 className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
                   mode === "surah"
-                    ? "bg-primary text-primary-foreground shadow-md"
+                    ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
                     : "text-muted-foreground"
                 }`}
+                style={mode === "surah" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
                 data-testid="button-mode-surah"
               >
                 All Surahs
@@ -159,9 +159,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 onClick={() => setMode("juz")}
                 className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
                   mode === "juz"
-                    ? "bg-primary text-primary-foreground shadow-md"
+                    ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
                     : "text-muted-foreground"
                 }`}
+                style={mode === "juz" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
                 data-testid="button-mode-juz"
               >
                 Juz
@@ -196,28 +197,39 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
             juzData.map((juz, index) => {
               const startChapter = chapters.find(ch => ch.id === juz.startChapter);
               const endChapter = chapters.find(ch => ch.id === juz.endChapter);
+              const juzBadgeStyles = [
+                { bg: "bg-primary/20", text: "text-primary" },
+                { bg: "bg-secondary/20", text: "text-secondary" },
+                { bg: "bg-accent/20", text: "text-accent" },
+              ];
+              const badge = juzBadgeStyles[(juz.id - 1) % juzBadgeStyles.length];
               return (
                 <div
                   key={juz.id}
-                  className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer transform-gpu animate-fadeInUp"
+                  className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
                   style={{ animationDelay: `${index * 30}ms` }}
                   onClick={() => onNavigate("chapter", juz.startChapter)}
                   data-testid={`juz-card-${juz.id}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-                  <div className="relative flex items-center gap-4 rounded-3xl bg-card/80 dark:bg-slate-900/60 p-5 backdrop-blur-sm">
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/20 shadow-inner ring-1 ring-border">
-                      <span className="text-lg font-bold text-primary">{juz.id}</span>
+                  <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 h-full flex items-center">
+                    <div className="flex items-center gap-4 w-full">
+                      <div className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}>
+                        <span className={`${badge.text} text-lg font-bold`}>{juz.id}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-bold text-foreground mb-1">
+                          Juz {juz.id}
+                        </h3>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {startChapter?.englishName} {juz.startVerse > 1 ? `(${juz.startVerse})` : ''} — {endChapter?.englishName}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-arabic text-foreground">
+                          {startChapter ? `جزء ${juz.id}` : ''}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-heading text-lg font-bold tracking-tight text-foreground">
-                        Juz {juz.id}
-                      </h3>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {startChapter?.englishName} {juz.startVerse > 1 ? `(${juz.startVerse})` : ''} — {endChapter?.englishName}
-                      </p>
-                    </div>
-                    <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-muted-foreground shrink-0" />
                   </div>
                 </div>
               );

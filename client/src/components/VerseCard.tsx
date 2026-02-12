@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 interface VerseCardProps {
   chapterId: number;
   verseNumber: number;
@@ -41,17 +39,12 @@ export default function VerseCard({
   showVerseNumbers = true,
   arabicScript = "uthmani",
 }: VerseCardProps) {
-  // Calculate if this verse should be highlighted
-  // Keep highlighting even when paused - only need current verse/range
   const highlighted = isCurrentVerse && isInVerseRange;
 
-  // Split Arabic text into words for word-level highlighting (non-Tajweed only)
   const words = arabicScript !== 'tajweed' ? arabicText.split(' ') : [];
 
-  // Font class based on script
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
-  
-  // Font size mappings
+
   const getArabicFontSize = (size: string) => {
     switch(size) {
       case "Small": return "text-xl md:text-2xl";
@@ -61,7 +54,7 @@ export default function VerseCard({
       default: return "text-3xl md:text-4xl";
     }
   };
-  
+
   const getTranslationFontSize = (size: string) => {
     switch(size) {
       case "Small": return "text-sm";
@@ -70,7 +63,7 @@ export default function VerseCard({
       default: return "text-base";
     }
   };
-  
+
   const getTransliterationFontSize = (size: string) => {
     switch(size) {
       case "Small": return "text-xs";
@@ -79,7 +72,7 @@ export default function VerseCard({
       default: return "text-sm";
     }
   };
-  
+
   const getLineSpacing = (spacing: string) => {
     switch(spacing) {
       case "Compact": return "leading-relaxed";
@@ -90,8 +83,6 @@ export default function VerseCard({
     }
   };
 
-  // Arabic script with diacritical marks (tashkeel) needs extra line-height
-  // to prevent overlapping between lines on lengthy ayahs
   const getArabicLineSpacing = (spacing: string) => {
     switch(spacing) {
       case "Compact": return "leading-[2]";
@@ -101,7 +92,7 @@ export default function VerseCard({
       default: return "leading-[2.4]";
     }
   };
-  
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
@@ -110,9 +101,11 @@ export default function VerseCard({
   };
 
   return (
-    <div 
-      className={`relative group overflow-hidden rounded-3xl p-[1px] shadow-lg cursor-pointer hover-elevate active-elevate-2 transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/50 ${
-        highlighted ? 'shadow-[0_16px_48px_rgba(59,130,246,0.4)] ring-2 ring-primary/50' : ''
+    <div
+      className={`relative cursor-pointer transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-2xl ${
+        highlighted
+          ? 'bg-primary/[0.06] dark:bg-primary/[0.08]'
+          : ''
       }`}
       data-testid={`card-verse-${verseNumber}`}
       data-playing={highlighted ? 'true' : 'false'}
@@ -123,32 +116,21 @@ export default function VerseCard({
       onClick={onClick}
       onKeyDown={handleKeyDown}
     >
-      {/* Gradient border */}
-      <div className={`absolute inset-0 rounded-3xl transition-all ${
-        highlighted ? 'bg-gradient-to-br from-primary/50 via-primary/20 to-transparent' : 'bg-gradient-to-br from-border to-transparent'
-      }`} />
-      
-      {/* Inner glass panel */}
-      <div className={`relative overflow-visible rounded-3xl p-6 backdrop-blur-xl transition-all ${
-        highlighted ? 'bg-primary/10 border-l-4 border-primary' : 'bg-card/80 dark:bg-slate-900/70'
-      }`}>
-        <div className={`space-y-6 ${getLineSpacing(lineSpacing)}`}>
+      <div className="px-5 py-3">
+        <div className={`space-y-2 ${getLineSpacing(lineSpacing)}`}>
           {showVerseNumbers && (
-            <div className="flex items-start gap-2">
-              <span 
-                className={`font-bold text-sm flex-shrink-0 transition-all px-4 py-2 rounded-full shadow-inner ring-1 ${
-                  highlighted 
-                    ? 'bg-primary/25 text-primary ring-primary/30 shadow-md' 
-                    : 'bg-muted/60 dark:bg-slate-800/60 text-muted-foreground ring-border shadow-sm'
-                }`}
-                data-testid={`text-verse-number-${verseNumber}`}
-              >
-                {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
-              </span>
-            </div>
+            <span
+              className={`inline-block text-xs font-semibold tabular-nums transition-colors ${
+                highlighted
+                  ? 'text-primary'
+                  : 'text-muted-foreground/70'
+              }`}
+              data-testid={`text-verse-number-${verseNumber}`}
+            >
+              {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
+            </span>
           )}
           {arabicScript === 'tajweed' ? (
-            // Tajweed: render color-coded HTML from the API (trusted source)
             <p
               className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
               dir="rtl"
@@ -156,7 +138,6 @@ export default function VerseCard({
               dangerouslySetInnerHTML={{ __html: arabicText }}
             />
           ) : (
-            // Uthmani / IndoPak: word-split rendering with highlighting
             <p
               className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
               dir="rtl"
@@ -171,7 +152,7 @@ export default function VerseCard({
                   <span
                     key={`word-${chapterId}-${verseNumber}-${index}`}
                     id={`word-${chapterId}-${verseNumber}-${index}`}
-                    className={`transition-all duration-200 ${
+                    className={`transition-all duration-150 ${
                       isCurrentWord ? 'text-primary font-bold' : ''
                     }`}
                   >
@@ -182,20 +163,20 @@ export default function VerseCard({
             </p>
           )}
           {showTransliteration && transliteration && (
-            <p 
+            <p
               className={`${getTransliterationFontSize(transliterationFontSize)} italic transition-colors ${
                 highlighted ? 'text-foreground/80' : 'text-muted-foreground'
-              }`} 
+              }`}
               data-testid={`text-transliteration-${verseNumber}`}
             >
               {transliteration}
             </p>
           )}
           {showTranslation && (
-            <p 
+            <p
               className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
-                highlighted ? 'text-foreground' : 'text-foreground/90'
-              }`} 
+                highlighted ? 'text-foreground' : 'text-foreground/80'
+              }`}
               data-testid={`text-translation-${verseNumber}`}
             >
               {translation}
@@ -203,6 +184,8 @@ export default function VerseCard({
           )}
         </div>
       </div>
+      {/* Thin divider at bottom */}
+      <div className="mx-5 h-px bg-border/30" />
     </div>
   );
 }
