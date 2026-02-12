@@ -823,3 +823,44 @@ export const chapters: Chapter[] = [
 export function getChapterInfo(chapterId: number): Chapter | undefined {
   return chapters.find(c => c.id === chapterId);
 }
+
+export interface Juz {
+  id: number;
+  startChapter: number;
+  startVerse: number;
+  endChapter: number;
+  endVerse: number;
+}
+
+export const juzData: Juz[] = [
+  { id: 1, startChapter: 1, startVerse: 1, endChapter: 2, endVerse: 141 },
+  { id: 2, startChapter: 2, startVerse: 142, endChapter: 2, endVerse: 252 },
+  { id: 3, startChapter: 2, startVerse: 253, endChapter: 3, endVerse: 92 },
+  { id: 4, startChapter: 3, startVerse: 93, endChapter: 4, endVerse: 23 },
+  { id: 5, startChapter: 4, startVerse: 24, endChapter: 4, endVerse: 147 },
+  { id: 6, startChapter: 4, startVerse: 148, endChapter: 5, endVerse: 82 },
+  { id: 7, startChapter: 5, startVerse: 83, endChapter: 6, endVerse: 110 },
+  { id: 8, startChapter: 6, startVerse: 111, endChapter: 7, endVerse: 87 },
+  { id: 9, startChapter: 7, startVerse: 88, endChapter: 8, endVerse: 40 },
+  { id: 10, startChapter: 8, startVerse: 41, endChapter: 9, endVerse: 92 },
+  { id: 11, startChapter: 9, startVerse: 93, endChapter: 11, endVerse: 5 },
+  { id: 12, startChapter: 11, startVerse: 6, endChapter: 12, endVerse: 52 },
+  { id: 13, startChapter: 12, startVerse: 53, endChapter: 14, endVerse: 52 },
+  { id: 14, startChapter: 15, startVerse: 1, endChapter: 16, endVerse: 128 },
+  { id: 15, startChapter: 17, startVerse: 1, endChapter: 18, endVerse: 74 },
+  { id: 16, startChapter: 18, startVerse: 75, endChapter: 20, endVerse: 135 },
+  { id: 17, startChapter: 21, startVerse: 1, endChapter: 22, endVerse: 78 },
+  { id: 18, startChapter: 23, startVerse: 1, endChapter: 25, endVerse: 20 },
+  { id: 19, startChapter: 25, startVerse: 21, endChapter: 27, endVerse: 55 },
+  { id: 20, startChapter: 27, startVerse: 56, endChapter: 29, endVerse: 45 },
+  { id: 21, startChapter: 29, startVerse: 46, endChapter: 33, endVerse: 30 },
+  { id: 22, startChapter: 33, startVerse: 31, endChapter: 36, endVerse: 27 },
+  { id: 23, startChapter: 36, startVerse: 28, endChapter: 39, endVerse: 31 },
+  { id: 24, startChapter: 39, startVerse: 32, endChapter: 41, endVerse: 46 },
+  { id: 25, startChapter: 41, startVerse: 47, endChapter: 45, endVerse: 37 },
+  { id: 26, startChapter: 46, startVerse: 1, endChapter: 51, endVerse: 30 },
+  { id: 27, startChapter: 51, startVerse: 31, endChapter: 57, endVerse: 29 },
+  { id: 28, startChapter: 58, startVerse: 1, endChapter: 66, endVerse: 12 },
+  { id: 29, startChapter: 67, startVerse: 1, endChapter: 77, endVerse: 50 },
+  { id: 30, startChapter: 78, startVerse: 1, endChapter: 114, endVerse: 6 },
+];

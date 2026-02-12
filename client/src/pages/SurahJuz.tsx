@@ -7,7 +7,7 @@ import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { chapters } from "@/lib/quranMetadata";
+import { chapters, juzData } from "@/lib/quranMetadata";
 import { Settings } from "lucide-react";
 
 interface SurahJuzProps {
@@ -179,7 +179,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
         }`}
       >
 
-        {/* Chapter List */}
+        {/* Chapter / Juz List */}
         <div className="px-8 space-y-3 pb-8">
           {isLoading ? (
             Array.from({ length: 8 }).map((_, index) => (
@@ -192,6 +192,36 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 <Skeleton className="w-5 h-5 rounded" />
               </div>
             ))
+          ) : mode === "juz" ? (
+            juzData.map((juz, index) => {
+              const startChapter = chapters.find(ch => ch.id === juz.startChapter);
+              const endChapter = chapters.find(ch => ch.id === juz.endChapter);
+              return (
+                <div
+                  key={juz.id}
+                  className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg hover-elevate active-elevate-2 cursor-pointer transform-gpu animate-fadeInUp"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                  onClick={() => onNavigate("chapter", juz.startChapter)}
+                  data-testid={`juz-card-${juz.id}`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
+                  <div className="relative flex items-center gap-4 rounded-3xl bg-card/80 dark:bg-slate-900/60 p-5 backdrop-blur-sm">
+                    <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/20 shadow-inner ring-1 ring-border">
+                      <span className="text-lg font-bold text-primary">{juz.id}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-heading text-lg font-bold tracking-tight text-foreground">
+                        Juz {juz.id}
+                      </h3>
+                      <p className="text-sm text-muted-foreground truncate">
+                        {startChapter?.englishName} {juz.startVerse > 1 ? `(${juz.startVerse})` : ''} — {endChapter?.englishName}
+                      </p>
+                    </div>
+                    <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-muted-foreground shrink-0" />
+                  </div>
+                </div>
+              );
+            })
           ) : filteredChapters.length > 0 ? (
             filteredChapters.map((chapter, index) => (
               <ChapterCard
