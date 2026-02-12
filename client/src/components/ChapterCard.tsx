@@ -45,11 +45,11 @@ export default function ChapterCard({
       <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
       
       {/* Inner glass panel */}
-      <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl p-5">
+      <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 py-3">
         <div className="flex items-center gap-4">
           {/* Chapter Number Badge */}
-          <div className={`flex size-14 shrink-0 items-center justify-center rounded-2xl ${colors.bg} ring-1 ${colors.ring} shadow-md`} data-testid={`text-chapter-number-${number}`}>
-            <span className="text-white text-xl font-bold" style={{textShadow: '0 1px 2px rgba(0,0,0,0.3)'}}>{number}</span>
+          <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${colors.bg} ring-1 ${colors.ring} shadow-md`} data-testid={`text-chapter-number-${number}`}>
+            <span className="text-white text-lg font-bold" style={{textShadow: '0 1px 2px rgba(0,0,0,0.3)'}}>{number}</span>
           </div>
           
           {/* Chapter Info */}
