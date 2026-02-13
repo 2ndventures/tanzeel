@@ -62,7 +62,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <div className="flex flex-col flex-1 px-8 gap-6 min-h-0">
           {/* Continue Reading Card */}
           <div
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
+            className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.1)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
             onClick={() => onNavigate("chapter", stats.lastReadChapter)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter); }}}
             role="button"
@@ -70,7 +70,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}
             data-testid="card-continue-reading"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-[2rem]" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-foreground/70">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
@@ -84,7 +84,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                   {stats.lastReadVerse > 0 ? `Ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}` : `${currentChapter.verseCount} Ayahs`}
                 </p>
               </div>
-              <Icon icon="solar:book-2-bold" className="size-14 text-foreground/20" />
+              <p className="font-arabic text-5xl text-foreground/15 leading-none">
+                {getDisplayArabicName(currentChapter.arabicName)}
+              </p>
             </div>
             <div className="mb-4 h-3 overflow-hidden rounded-full bg-foreground/10">
               <div
