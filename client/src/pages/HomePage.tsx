@@ -2,7 +2,7 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
-import { chapters } from "@/lib/quranMetadata";
+import { chapters, getDisplayArabicName } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 
 interface HomePageProps {
@@ -77,6 +77,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground">
                   Surah {currentChapter.englishName}
                 </h3>
+                <p className="mt-1 font-arabic text-xl text-foreground/80">
+                  {getDisplayArabicName(currentChapter.arabicName)}
+                </p>
                 <p className="mt-2 text-sm text-foreground/60">
                   {stats.lastReadVerse > 0 ? `Ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}` : `${currentChapter.verseCount} Ayahs`}
                 </p>
