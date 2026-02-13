@@ -6,7 +6,6 @@ import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
 import MushafPageView from "@/components/MushafPageView";
 import HifzView from "@/components/HifzView";
-import ScientificView from "@/components/ScientificView";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMetadata";
@@ -302,8 +301,8 @@ export default function ChapterView({
       {/* Status Bar Shim */}
       <StatusBarShim />
 
-      {/* Collapsible Header */}
-      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed ? 'header-collapsed' : 'header-expanded'}`}>
+      {/* Collapsible Header — only collapse in standard mode where scrollContainerRef is attached */}
+      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}>
         <div className="relative overflow-hidden">
           {/* Glass background */}
           <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />
@@ -819,23 +818,6 @@ export default function ChapterView({
           onVerseClick={handleVerseClick}
           isCollapsed={isCollapsed}
         />
-      ) : layoutMode === 'scientific' ? (
-        <ScientificView
-          verses={verses}
-          isLoadingVerses={isLoadingVerses}
-          versesError={versesError}
-          chapterId={chapterId}
-          currentVerse={currentVerse}
-          currentWordIndex={currentWordIndex}
-          isPlaying={isPlaying}
-          showTranslation={showTranslation}
-          arabicFontSize={arabicFontSize}
-          translationFontSize={translationFontSize}
-          lineSpacing={lineSpacing}
-          arabicScript={arabicScript}
-          onVerseClick={handleVerseClick}
-          isCollapsed={isCollapsed}
-        />
       ) : (
         <MushafPageView
           verses={verses}
@@ -871,9 +853,10 @@ export default function ChapterView({
         surahNumber={chapterId}
         surahNameArabic={chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : undefined}
         surahNameEnglish={chapterInfo?.englishName}
+        reciterName={getReciterById(reciter)?.name}
         layoutMode={layoutMode}
         onLayoutModeChange={onLayoutModeChange}
-        compact={layoutMode === 'scientific'}
+        compact={false}
       />
     </div>
   );

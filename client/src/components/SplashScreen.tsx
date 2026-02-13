@@ -37,9 +37,9 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
       </svg>
 
       {/* Content */}
-      <div className="relative flex flex-col items-center gap-6">
-        <Icon icon="solar:moon-stars-bold" className="size-40 text-white" />
-        <h1 className="text-7xl font-black tracking-tighter text-white">
+      <div className="relative flex flex-col items-center justify-center gap-4 px-6 text-center">
+        <Icon icon="solar:moon-stars-bold" className="size-24 text-white" />
+        <h1 className="text-4xl font-black tracking-tight text-white">
           Simple Quran
         </h1>
       </div>

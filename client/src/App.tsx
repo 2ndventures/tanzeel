@@ -94,7 +94,7 @@ function App() {
   
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
     const saved = localStorage.getItem('layoutMode');
-    if (saved === 'focused-flow' || saved === 'mushaf' || saved === 'hifz' || saved === 'scientific') return saved;
+    if (saved === 'focused-flow' || saved === 'mushaf' || saved === 'hifz') return saved;
     return 'standard';
   });
 
