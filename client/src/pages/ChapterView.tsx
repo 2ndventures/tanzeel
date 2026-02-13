@@ -322,8 +322,8 @@ export default function ChapterView({
               <h1 className="text-2xl font-bold text-foreground mb-1" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-chapter-title-english">
                 {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
               </h1>
-              <p className="text-sm text-muted-foreground" data-testid="text-surah-number">
-                {chapterInfo?.revelationType || 'The Opening'}
+              <p className="text-sm font-arabic text-muted-foreground" data-testid="text-surah-number">
+                {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
               </p>
             </div>
             
