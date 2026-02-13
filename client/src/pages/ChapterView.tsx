@@ -346,13 +346,7 @@ export default function ChapterView({
                 )}
                 <SheetTitle className="text-xl">
                   {menuView === 'main' && 'Options'}
-                  {menuView === 'display' && 'Display Options'}
                   {menuView === 'reciter' && 'Select Reciter'}
-                  {menuView === 'arabic' && 'Arabic Text Size'}
-                  {menuView === 'translation' && 'Translation Text Size'}
-                  {menuView === 'transliteration' && 'Transliteration Text Size'}
-                  {menuView === 'spacing' && 'Line Spacing'}
-                  {menuView === 'script' && 'Arabic Script'}
                 </SheetTitle>
               </SheetHeader>
 
@@ -539,84 +533,44 @@ export default function ChapterView({
                             data-testid="switch-translation"
                           />
                         </div>
+
+                        <div className="flex items-center justify-between p-4" data-testid="menu-item-verse-numbers">
+                          <span className="text-lg">Verse numbers</span>
+                          <Switch 
+                            checked={showVerseNumbers} 
+                            onCheckedChange={onShowVerseNumbersChange}
+                            data-testid="switch-verse-numbers"
+                          />
+                        </div>
                       </div>
                     </div>
 
-                    {/* More Options Section */}
+                    {/* Line Spacing Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-more-options">
-                        More Options
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-line-spacing">
+                        Line Spacing
                       </h3>
-                      <div className="space-y-1">
-                        <button
-                          onClick={() => setMenuView('display')}
-                          className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
-                          data-testid="menu-item-display"
-                        >
-                          <span className="text-lg">Verse numbers & line spacing</span>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                        </button>
+                      <div className="grid grid-cols-4 gap-2 px-2">
+                        {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
+                          <button
+                            key={spacing}
+                            onClick={() => onLineSpacingChange?.(spacing)}
+                            className={`p-3 min-h-[50px] rounded-xl hover-elevate active-elevate-2 flex items-center justify-center transition-all ${
+                              lineSpacing === spacing 
+                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
+                                : 'bg-muted/40 dark:bg-slate-800/40'
+                            }`}
+                            data-testid={`button-spacing-${spacing.toLowerCase()}`}
+                          >
+                            <span className="text-xs font-semibold">{spacing}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
+
                   </div>
                 )}
 
-                {menuView === 'display' && (
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between p-4" data-testid="menu-item-verse-numbers">
-                      <span className="text-lg">Verse numbers</span>
-                      <Switch 
-                        checked={showVerseNumbers} 
-                        onCheckedChange={onShowVerseNumbersChange}
-                        data-testid="switch-verse-numbers"
-                      />
-                    </div>
-
-                    <button
-                      onClick={() => setMenuView('arabic')}
-                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                    >
-                      <span className="text-lg">Arabic text</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{arabicFontSize}</span>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setMenuView('translation')}
-                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                    >
-                      <span className="text-lg">Translation text</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{translationFontSize}</span>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setMenuView('transliteration')}
-                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                    >
-                      <span className="text-lg">Transliteration text</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{transliterationFontSize}</span>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setMenuView('spacing')}
-                      className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                    >
-                      <span className="text-lg">Line spacing</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{lineSpacing}</span>
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    </button>
-                  </div>
-                )}
 
                 {menuView === 'reciter' && (
                   <div className="space-y-1">
@@ -640,77 +594,6 @@ export default function ChapterView({
                   </div>
                 )}
 
-                {menuView === 'arabic' && (
-                  <div className="space-y-1">
-                    {["Small", "Medium", "Large", "Extra Large"].map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => {
-                          onArabicFontSizeChange?.(size);
-                          setMenuView('display');
-                        }}
-                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                      >
-                        <span className="text-lg">{size}</span>
-                        {arabicFontSize === size && <Check className="w-5 h-5 text-primary" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {menuView === 'translation' && (
-                  <div className="space-y-1">
-                    {["Small", "Medium", "Large"].map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => {
-                          onTranslationFontSizeChange?.(size);
-                          setMenuView('display');
-                        }}
-                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                      >
-                        <span className="text-lg">{size}</span>
-                        {translationFontSize === size && <Check className="w-5 h-5 text-primary" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {menuView === 'transliteration' && (
-                  <div className="space-y-1">
-                    {["Small", "Medium", "Large"].map((size) => (
-                      <button
-                        key={size}
-                        onClick={() => {
-                          onTransliterationFontSizeChange?.(size);
-                          setMenuView('display');
-                        }}
-                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                      >
-                        <span className="text-lg">{size}</span>
-                        {transliterationFontSize === size && <Check className="w-5 h-5 text-primary" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {menuView === 'spacing' && (
-                  <div className="space-y-1">
-                    {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
-                      <button
-                        key={spacing}
-                        onClick={() => {
-                          onLineSpacingChange?.(spacing);
-                          setMenuView('display');
-                        }}
-                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                      >
-                        <span className="text-lg">{spacing}</span>
-                        {lineSpacing === spacing && <Check className="w-5 h-5 text-primary" />}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             </SheetContent>
           </Sheet>
