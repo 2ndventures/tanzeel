@@ -14,6 +14,9 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
+  --header-gradient-start: rgba(248, 250, 252, 0.95);
+  --header-gradient-mid: rgba(248, 250, 252, 0.6);
+
   --background: 0 0% 100%;
 
   --foreground: 222 47% 11%;
@@ -133,6 +136,9 @@
   /* Backgrounds applied on top of other backgrounds when hovered/active */
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
+
+  --header-gradient-start: rgba(10, 10, 14, 0.95);
+  --header-gradient-mid: rgba(10, 10, 14, 0.7);
 
   --background: 217 44% 11%;
 

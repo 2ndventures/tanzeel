@@ -297,34 +297,35 @@ export default function ChapterView({
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
 
-      {/* Floating Glassmorphism Header */}
+      {/* Gradient Fade Header */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}
         style={{ willChange: 'transform' }}
       >
-        <header className="mx-4 mt-3 rounded-[24px] overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
-          {/* Glass layers — identical to bottom player */}
-          <div className="absolute inset-0 [-webkit-backdrop-filter:blur(25px)_saturate(150%)] [backdrop-filter:blur(25px)_saturate(150%)]" />
-          <div className="absolute inset-0 bg-[rgba(20,20,20,0.55)]" />
-          <div className="absolute inset-0 rounded-[24px] ring-[0.5px] ring-inset ring-white/[0.12] pointer-events-none" />
-
-          <div className="relative flex items-center justify-between px-4 py-3">
+        <header
+          className="w-full"
+          style={{
+            background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 60%, transparent 100%)',
+            paddingBottom: '12px',
+          }}
+        >
+          <div className="relative flex items-center justify-between px-5 pt-3 pb-1">
             {/* Left: Back button */}
             <button
-              className="flex size-10 items-center justify-center rounded-full bg-white/10 transition-colors active:bg-white/5 shrink-0"
+              className="flex size-10 items-center justify-center transition-colors active:opacity-60 shrink-0"
               onClick={onBack}
               aria-label="Go back to surahs list"
               data-testid="button-back"
             >
-              <ArrowLeft className="w-5 h-5 text-white/90" aria-hidden="true" />
+              <ArrowLeft className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
             </button>
 
             {/* Center: Surah name + Arabic subtitle */}
             <div className="flex flex-col items-center flex-1 mx-3 min-w-0">
-              <h1 className="text-[15px] font-semibold text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
+              <h1 className="text-[15px] font-semibold text-foreground/90 dark:text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
                 {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
               </h1>
-              <p className="text-xs font-arabic text-white/40 truncate" data-testid="text-surah-arabic-name">
+              <p className="text-xs font-arabic text-muted-foreground dark:text-white/50 truncate" data-testid="text-surah-arabic-name">
                 {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : ''}
               </p>
             </div>
@@ -333,11 +334,11 @@ export default function ChapterView({
             <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
               <SheetTrigger asChild>
                 <button
-                  className="flex size-10 items-center justify-center rounded-full bg-white/10 transition-colors active:bg-white/5 shrink-0"
+                  className="flex size-10 items-center justify-center transition-colors active:opacity-60 shrink-0"
                   aria-label="Open menu for display settings and reciter selection"
                   data-testid="button-menu"
                 >
-                  <Icon icon="solar:settings-linear" className="w-5 h-5 text-white/90" aria-hidden="true" />
+                  <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
             <SheetContent side="bottom" className="h-[85vh]">
