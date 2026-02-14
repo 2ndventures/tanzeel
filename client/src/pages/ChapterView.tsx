@@ -339,14 +339,14 @@ export default function ChapterView({
                   <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[85vh]">
+            <SheetContent side="bottom" className="h-[85vh] bg-[#000000] border-white/10">
               <SheetHeader className="mb-4">
                 {menuView !== 'main' && (
-                  <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px]" onClick={() => setMenuView('main')}>
+                  <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px] text-white/80 hover:text-white" onClick={() => setMenuView('main')}>
                     <ChevronLeft className="w-6 h-6" />
                   </Button>
                 )}
-                <SheetTitle className="text-xl">
+                <SheetTitle className="text-xl text-white/95">
                   {menuView === 'main' && 'Options'}
                   {menuView === 'reciter' && 'Select Reciter'}
                 </SheetTitle>
@@ -357,7 +357,7 @@ export default function ChapterView({
                   <div className="space-y-6">
                     {/* Arabic Text Size Section - Prioritized at top */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-size">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-size">
                         Arabic Text Size
                       </h3>
                       <div className="grid grid-cols-2 gap-2 px-2">
@@ -368,7 +368,7 @@ export default function ChapterView({
                             className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
                               arabicFontSize === size 
                                 ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-muted/40 dark:bg-slate-800/40'
+                                : 'bg-white/[0.06] text-white/80'
                             }`}
                             data-testid={`button-arabic-size-${size.toLowerCase().replace(' ', '-')}`}
                           >
@@ -386,7 +386,7 @@ export default function ChapterView({
 
                     {/* Arabic Script Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-script">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-script">
                         Arabic Script
                       </h3>
                       <div className="grid grid-cols-3 gap-2 px-2">
@@ -401,7 +401,7 @@ export default function ChapterView({
                             className={`p-4 min-h-[56px] rounded-xl hover-elevate active-elevate-2 flex items-center justify-center transition-all ${
                               arabicScript === option.value
                                 ? 'bg-primary/20 ring-2 ring-primary text-primary'
-                                : 'bg-muted/40 dark:bg-slate-800/40'
+                                : 'bg-white/[0.06] text-white/80'
                             }`}
                             data-testid={`button-script-${option.value}`}
                           >
@@ -413,7 +413,7 @@ export default function ChapterView({
 
                     {/* Translation Text Size Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-translation-size">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-translation-size">
                         Translation Text Size
                       </h3>
                       <div className="grid grid-cols-3 gap-2 px-2">
@@ -424,7 +424,7 @@ export default function ChapterView({
                             className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
                               translationFontSize === size 
                                 ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-muted/40 dark:bg-slate-800/40'
+                                : 'bg-white/[0.06] text-white/80'
                             }`}
                             data-testid={`button-translation-size-${size.toLowerCase()}`}
                           >
@@ -441,7 +441,7 @@ export default function ChapterView({
 
                     {/* Transliteration Text Size Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-transliteration-size">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-transliteration-size">
                         Transliteration Text Size
                       </h3>
                       <div className="grid grid-cols-3 gap-2 px-2">
@@ -452,7 +452,7 @@ export default function ChapterView({
                             className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
                               transliterationFontSize === size 
                                 ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-muted/40 dark:bg-slate-800/40'
+                                : 'bg-white/[0.06] text-white/80'
                             }`}
                             data-testid={`button-transliteration-size-${size.toLowerCase()}`}
                           >
@@ -469,7 +469,7 @@ export default function ChapterView({
 
                     {/* Audio Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
                         Audio
                       </h3>
                       <div className="space-y-1">
@@ -478,15 +478,15 @@ export default function ChapterView({
                           className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
                           data-testid="menu-item-reciter"
                         >
-                          <span className="text-lg">Reciter</span>
+                          <span className="text-lg text-white/90">Reciter</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                            <span className="text-sm text-white/45">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
+                            <ChevronRight className="w-5 h-5 text-white/45" />
                           </div>
                         </button>
 
                         <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-autoplay">
-                          <span className="text-lg">Autoplay next surah</span>
+                          <span className="text-lg text-white/90">Autoplay next surah</span>
                           <Switch 
                             checked={autoplay} 
                             onCheckedChange={onAutoplayChange}
@@ -498,12 +498,12 @@ export default function ChapterView({
 
                     {/* Display Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-display">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-display">
                         Display
                       </h3>
                       <div className="space-y-1">
                         <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-theme">
-                          <span className="text-lg">Theme</span>
+                          <span className="text-lg text-white/90">Theme</span>
                           <div className="relative">
                             <Switch 
                               checked={darkMode} 
@@ -519,7 +519,7 @@ export default function ChapterView({
                         </div>
 
                         <div className="flex items-center justify-between p-4" data-testid="menu-item-transliteration">
-                          <span className="text-lg">Transliteration</span>
+                          <span className="text-lg text-white/90">Transliteration</span>
                           <Switch 
                             checked={showTransliteration} 
                             onCheckedChange={onTransliterationChange}
@@ -528,7 +528,7 @@ export default function ChapterView({
                         </div>
 
                         <div className="flex items-center justify-between p-4" data-testid="menu-item-translation">
-                          <span className="text-lg">Translation</span>
+                          <span className="text-lg text-white/90">Translation</span>
                           <Switch 
                             checked={showTranslation} 
                             onCheckedChange={onShowTranslationChange}
@@ -537,7 +537,7 @@ export default function ChapterView({
                         </div>
 
                         <div className="flex items-center justify-between p-4" data-testid="menu-item-verse-numbers">
-                          <span className="text-lg">Verse numbers</span>
+                          <span className="text-lg text-white/90">Verse numbers</span>
                           <Switch 
                             checked={showVerseNumbers} 
                             onCheckedChange={onShowVerseNumbersChange}
@@ -549,7 +549,7 @@ export default function ChapterView({
 
                     {/* Line Spacing Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-4 mb-3" data-testid="section-line-spacing">
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-line-spacing">
                         Line Spacing
                       </h3>
                       <div className="grid grid-cols-4 gap-2 px-2">
@@ -560,7 +560,7 @@ export default function ChapterView({
                             className={`p-3 min-h-[50px] rounded-xl hover-elevate active-elevate-2 flex items-center justify-center transition-all ${
                               lineSpacing === spacing 
                                 ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-muted/40 dark:bg-slate-800/40'
+                                : 'bg-white/[0.06] text-white/80'
                             }`}
                             data-testid={`button-spacing-${spacing.toLowerCase()}`}
                           >
@@ -587,8 +587,8 @@ export default function ChapterView({
                         data-testid={`reciter-option-${r.id}`}
                       >
                         <div className="flex flex-col items-start">
-                          <span className="text-lg">{r.name}</span>
-                          <span className="text-sm text-muted-foreground">{r.arabicName}</span>
+                          <span className="text-lg text-white/90">{r.name}</span>
+                          <span className="text-sm text-white/45">{r.arabicName}</span>
                         </div>
                         {reciter === r.id && <Check className="w-5 h-5 text-primary" />}
                       </button>
