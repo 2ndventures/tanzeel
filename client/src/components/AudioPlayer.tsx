@@ -47,7 +47,7 @@ interface AudioPlayerProps {
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
   return (
-    <DrawerContent>
+    <DrawerContent className="bg-[#000000]">
       <DrawerHeader>
         <DrawerTitle>Select Layout</DrawerTitle>
       </DrawerHeader>
