@@ -380,7 +380,7 @@ export default function AudioPlayer({
             </button>
 
             <button
-              className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+              className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 bg-[#f8c630] text-[#ffffff]"
               onClick={onPlayPause}
               disabled={isLoading}
               aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
