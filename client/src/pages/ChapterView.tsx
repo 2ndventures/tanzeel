@@ -291,12 +291,10 @@ export default function ChapterView({
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10" />
       {/* Vignette effect */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
-
       {/* Screen reader announcements for verse changes */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
-
       {/* Gradient Fade Header */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}
@@ -325,7 +323,7 @@ export default function ChapterView({
               <h1 className="text-[15px] font-semibold text-foreground/90 dark:text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
                 {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
               </h1>
-              <p className="text-xs font-arabic text-muted-foreground dark:text-white/50 truncate" data-testid="text-surah-arabic-name">
+              <p className="font-arabic text-muted-foreground dark:text-white/50 truncate text-[18px]" data-testid="text-surah-arabic-name">
                 {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : ''}
               </p>
             </div>
@@ -604,7 +602,6 @@ export default function ChapterView({
         </div>
       </header>
       </div>
-
       {/* Content area - Standard / Focused Flow / Mushaf */}
       {layoutMode === 'standard' ? (
         <div
@@ -723,7 +720,6 @@ export default function ChapterView({
           isCollapsed={isCollapsed}
         />
       )}
-
       <AudioPlayer
         currentTime={currentTime}
         duration={duration}
