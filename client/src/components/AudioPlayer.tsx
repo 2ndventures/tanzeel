@@ -61,30 +61,33 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                 onClick={() => onLayoutModeChange?.(opt.mode)}
                 className={`relative rounded-xl overflow-hidden transition-all ${
                   isSelected
-                    ? 'ring-2 ring-primary shadow-lg shadow-primary/20'
-                    : 'ring-1 ring-border/50 dark:ring-white/10'
+                    ? 'ring-2 ring-primary shadow-md shadow-primary/15'
+                    : 'ring-1 ring-border/40 dark:ring-white/8'
                 }`}
                 data-testid={`layout-option-${opt.mode}`}
               >
-                <div className="aspect-[3/4] w-full overflow-hidden bg-muted/30 dark:bg-slate-800/50">
+                <div className="aspect-[3/4] w-full overflow-hidden bg-muted/20 dark:bg-slate-900/60">
                   <img
                     src={opt.preview}
                     alt={`${opt.label} layout preview`}
                     className={`w-full h-full object-cover transition-opacity ${
-                      isSelected ? 'opacity-100' : 'opacity-70'
+                      isSelected ? 'opacity-100' : 'opacity-60'
                     }`}
+                    data-testid={`img-layout-preview-${opt.mode}`}
                   />
                   {isSelected && (
                     <div className="absolute inset-0 bg-primary/10" />
                   )}
                 </div>
                 <div className={`px-3 py-2.5 text-left ${
-                  isSelected ? 'bg-primary/15 dark:bg-primary/20' : 'bg-card/80 dark:bg-slate-800/60'
+                  isSelected
+                    ? 'bg-primary/10 dark:bg-primary/15'
+                    : 'bg-muted/30 dark:bg-slate-900/70'
                 }`}>
                   <p className={`text-sm font-semibold truncate ${
-                    isSelected ? 'text-primary' : 'text-foreground'
-                  }`}>{opt.label}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{opt.desc}</p>
+                    isSelected ? 'text-primary' : 'text-foreground dark:text-white/90'
+                  }`} data-testid={`text-layout-label-${opt.mode}`}>{opt.label}</p>
+                  <p className="text-[11px] text-muted-foreground dark:text-white/45 truncate" data-testid={`text-layout-desc-${opt.mode}`}>{opt.desc}</p>
                 </div>
               </button>
             );
