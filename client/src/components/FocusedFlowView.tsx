@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
+import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
 
 interface FocusedFlowViewProps {
   verses: Verse[];
@@ -159,7 +160,7 @@ export default function FocusedFlowView({
           const verseNumber = index + 1;
           const distance = Math.abs(verseNumber - currentVerse);
           const isCurrentVerse = distance === 0;
-          const words = arabicScript !== 'tajweed' ? verse.arabicText.split(' ') : [];
+          const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(verse.arabicText) : [];
 
           let scaleOpacityClass = 'opacity-100 scale-100';
           if (distance === 1) {

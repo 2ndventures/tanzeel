@@ -240,28 +240,31 @@ export default function AudioPlayer({
   const remaining = Math.max(0, duration - currentTime);
 
   return (
-    <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
+    <div className={`fixed inset-x-0 bottom-0 z-20 px-4 pb-4 safe-area-bottom transition-all duration-300 ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-    }`} data-testid="audio-player-wrapper">
-      {/* Gradient background: transparent at top, solid at bottom — content bleeds through */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background to-transparent dark:from-slate-950 dark:via-slate-950 dark:to-transparent pointer-events-none" />
+    }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
+      <div className="relative rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]" data-testid="audio-player-content">
+        {/* Glass layers */}
+        <div className="absolute inset-0 [-webkit-backdrop-filter:blur(25px)_saturate(150%)] [backdrop-filter:blur(25px)_saturate(150%)]" />
+        <div className="absolute inset-0 bg-[rgba(20,20,20,0.55)]" />
+        <div className="absolute inset-0 rounded-[28px] ring-[0.5px] ring-inset ring-white/[0.12] pointer-events-none" />
 
-      <div className="relative px-6 pt-10 pb-10 safe-area-bottom" data-testid="audio-player-content">
+        <div className="relative px-6 pt-5 pb-5">
 
         {/* ── Surah info: bold name left, Arabic right ── */}
-        <div className="flex items-end justify-between mb-5 px-1" data-testid="surah-info">
-          <div className="flex flex-col gap-1 min-w-0">
-            <h2 className="text-xl font-bold text-foreground tracking-tight truncate" data-testid="text-surah-english">
+        <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <h2 className="text-lg font-bold text-white/95 tracking-tight truncate" data-testid="text-surah-english">
               {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
             </h2>
             {reciterName && (
-              <p className="text-sm font-medium text-muted-foreground truncate" data-testid="text-reciter-name">
+              <p className="text-xs font-medium text-white/50 truncate" data-testid="text-reciter-name">
                 {reciterName}
               </p>
             )}
           </div>
           {surahNameArabic && (
-            <span className="font-arabic text-xl text-foreground/60 shrink-0 ml-4" data-testid="text-surah-arabic">
+            <span className="font-arabic text-lg text-white/40 shrink-0 ml-4" data-testid="text-surah-arabic">
               {surahNameArabic}
             </span>
           )}
@@ -274,14 +277,14 @@ export default function AudioPlayer({
             max={duration}
             step={1}
             onValueChange={(value) => onSeek?.(value[0])}
-            className="w-full [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-range]]:bg-foreground/80"
+            className="w-full [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-track]]:bg-white/20 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:border-white/20"
             data-testid="slider-audio-progress"
           />
           <div className="flex items-center justify-between mt-1.5 px-0.5">
-            <span className="text-[11px] tabular-nums font-medium text-muted-foreground" data-testid="text-current-time">
+            <span className="text-[11px] tabular-nums font-medium text-white/50" data-testid="text-current-time">
               {formatTime(currentTime)}
             </span>
-            <span className="text-[11px] tabular-nums font-medium text-muted-foreground" data-testid="text-duration">
+            <span className="text-[11px] tabular-nums font-medium text-white/50" data-testid="text-duration">
               -{formatTime(remaining)}
             </span>
           </div>
@@ -291,17 +294,17 @@ export default function AudioPlayer({
         {showSpeedSlider && (
           <div
             ref={sliderContainerRef}
-            className="rounded-2xl bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl ring-1 ring-border p-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+            className="rounded-2xl bg-white/10 ring-1 ring-white/10 p-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
             data-testid="speed-slider-panel"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Speed</span>
-              <button onClick={() => onSpeedChange?.(1.0)} className="text-xs text-primary font-semibold px-2 py-0.5 rounded-md hover:bg-primary/10 transition-colors">
+              <span className="text-xs font-semibold text-white/50 uppercase tracking-wide">Speed</span>
+              <button onClick={() => onSpeedChange?.(1.0)} className="text-xs text-white/80 font-semibold px-2 py-0.5 rounded-md hover:bg-white/10 transition-colors">
                 Reset
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-medium text-muted-foreground w-8 text-right shrink-0">0.5x</span>
+              <span className="text-xs font-medium text-white/40 w-8 text-right shrink-0">0.5x</span>
               <Slider
                 value={[speed]} min={0.5} max={2.0} step={0.1}
                 showTooltip tooltipContent={(v) => `${formatSpeed(v)}`}
@@ -309,16 +312,16 @@ export default function AudioPlayer({
                 onValueCommit={() => setShowSpeedSlider(false)}
                 className="flex-1" aria-label="Fine playback speed" data-testid="slider-speed"
               />
-              <span className="text-xs font-medium text-muted-foreground w-8 shrink-0">2x</span>
+              <span className="text-xs font-medium text-white/40 w-8 shrink-0">2x</span>
             </div>
             <div className="text-center mt-2">
-              <span className="text-sm font-bold text-foreground">{formatSpeed(speed)}</span>
+              <span className="text-sm font-bold text-white/90">{formatSpeed(speed)}</span>
             </div>
           </div>
         )}
 
         {/* ── Controls row ── */}
-        <div className="flex items-center justify-between mt-6 px-2">
+        <div className="flex items-center justify-between mt-4 px-2">
 
           {/* Speed — plain text, green when not 1x */}
           <button
@@ -328,7 +331,7 @@ export default function AudioPlayer({
             onPointerCancel={handlePointerCancel}
             onContextMenu={(e) => e.preventDefault()}
             className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none transition-colors ${
-              speedIsModified ? 'text-emerald-500' : 'text-muted-foreground'
+              speedIsModified ? 'text-emerald-400' : 'text-white/50'
             }`}
             aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
             data-testid="button-speed"
@@ -343,36 +346,36 @@ export default function AudioPlayer({
           <div className="flex items-center gap-8">
             <button
               onClick={onPrevious}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground hover:text-foreground/80 active:scale-95 transition-all"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 hover:text-white active:scale-95 transition-all"
               aria-label="Previous chapter"
               data-testid="button-previous"
             >
-              <Icon icon="solar:skip-previous-bold" className="size-9" aria-hidden="true" />
+              <Icon icon="solar:skip-previous-bold" className="size-8" aria-hidden="true" />
             </button>
 
             <button
-              className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+              className="w-14 h-14 rounded-full bg-white/95 flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
               onClick={onPlayPause}
               disabled={isLoading}
               aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
               data-testid="button-play-pause"
             >
               {isLoading ? (
-                <div className="size-7 border-[2.5px] border-background border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
+                <div className="size-6 border-[2.5px] border-black/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
               ) : isPlaying ? (
-                <Icon icon="solar:pause-bold" className="size-9 text-background" aria-hidden="true" />
+                <Icon icon="solar:pause-bold" className="size-7 text-black/85" aria-hidden="true" />
               ) : (
-                <Icon icon="solar:play-bold" className="size-9 text-background ml-1" aria-hidden="true" />
+                <Icon icon="solar:play-bold" className="size-7 text-black/85 ml-0.5" aria-hidden="true" />
               )}
             </button>
 
             <button
               onClick={onNext}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground hover:text-foreground/80 active:scale-95 transition-all"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 hover:text-white active:scale-95 transition-all"
               aria-label="Next chapter"
               data-testid="button-next"
             >
-              <Icon icon="solar:skip-next-bold" className="size-9" aria-hidden="true" />
+              <Icon icon="solar:skip-next-bold" className="size-8" aria-hidden="true" />
             </button>
           </div>
 
@@ -381,7 +384,7 @@ export default function AudioPlayer({
             <DrawerTrigger asChild>
               <button
                 className={`min-h-[44px] w-10 flex items-center justify-center transition-colors ${
-                  layoutMode !== 'standard' ? 'text-primary' : 'text-muted-foreground'
+                  layoutMode !== 'standard' ? 'text-white/90' : 'text-white/50'
                 }`}
                 aria-label="Select layout mode"
                 data-testid="button-layout"
@@ -392,6 +395,7 @@ export default function AudioPlayer({
             <LayoutDrawerContent layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} />
           </Drawer>
         </div>
+      </div>
       </div>
     </div>
   );

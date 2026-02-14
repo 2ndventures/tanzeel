@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Verse } from "@/lib/quranMetadata";
+import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
 import { tafsirService, DEFAULT_TAFSIR_ID, TafsirEntry } from "@/services/tafsirService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ export default function ScientificView({
   if (isLoadingVerses) {
     return (
       <div className={`relative flex-1 overflow-y-auto px-4 pb-[120px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
         <div className="max-w-4xl mx-auto space-y-4">
           <Skeleton className="h-32 w-full" />
@@ -121,7 +122,7 @@ export default function ScientificView({
   if (versesError) {
     return (
       <div className={`relative flex-1 overflow-y-auto px-4 pb-[120px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
         <div className="text-center py-12 space-y-4">
           <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
@@ -135,7 +136,7 @@ export default function ScientificView({
   const verse = verses[currentVerse - 1];
   if (!verse) return null;
 
-  const arabicWords = arabicScript !== 'tajweed' ? verse.arabicText.split(' ') : [];
+  const arabicWords = arabicScript !== 'tajweed' ? tokenizeArabicWords(verse.arabicText) : [];
   const translitWords = verse.transliteration ? verse.transliteration.split(' ') : [];
   // Pad arrays to same length
   const maxLen = Math.max(arabicWords.length, translitWords.length);
@@ -157,7 +158,7 @@ export default function ScientificView({
 
   return (
     <div className={`relative flex-1 overflow-y-auto px-4 pb-[120px] transition-[padding] duration-300 ${
-      isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+      isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
     }`}>
       <div className="max-w-4xl mx-auto space-y-4">
         {/* Top Pane: Arabic text */}

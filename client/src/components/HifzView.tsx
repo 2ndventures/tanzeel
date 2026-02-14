@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
+import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -106,7 +107,7 @@ export default function HifzView({
   if (isLoadingVerses) {
     return (
       <div className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
         <div className="max-w-2xl mx-auto space-y-4">
           {[...Array(5)].map((_, i) => (
@@ -124,7 +125,7 @@ export default function HifzView({
   if (versesError) {
     return (
       <div className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
         <div className="text-center py-12 space-y-4">
           <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
@@ -139,7 +140,7 @@ export default function HifzView({
     <div
       ref={scrollContainerRef}
       className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}
     >
       {/* Score bar */}
@@ -168,7 +169,7 @@ export default function HifzView({
           const isCurrentVerse = currentVerse === verseNumber;
           const isRevealed = revealedVerse === verseNumber;
           const isRetained = retained.has(verseNumber);
-          const words = arabicScript !== 'tajweed' ? verse.arabicText.split(' ') : [];
+          const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(verse.arabicText) : [];
 
           return (
             <div

@@ -1,12 +1,11 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, MoreVertical, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
 import MushafPageView from "@/components/MushafPageView";
 import HifzView from "@/components/HifzView";
-import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
@@ -196,7 +195,7 @@ export default function ChapterView({
           if (verseElement && container) {
             // Get the header element to measure its actual height
             const headerElement = document.querySelector('.header-safe-padding');
-            const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : (isCollapsed ? 70 : 120);
+            const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : (isCollapsed ? 60 : 80);
             
             // Get the verse's and container's bounding rectangles
             const verseRect = (verseElement as HTMLElement).getBoundingClientRect();
@@ -298,43 +297,47 @@ export default function ChapterView({
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
 
-      {/* Status Bar Shim */}
-      <StatusBarShim />
+      {/* Floating Glassmorphism Header */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}
+        style={{ willChange: 'transform' }}
+      >
+        <header className="mx-4 mt-3 rounded-[24px] overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.3)]">
+          {/* Glass layers — identical to bottom player */}
+          <div className="absolute inset-0 [-webkit-backdrop-filter:blur(25px)_saturate(150%)] [backdrop-filter:blur(25px)_saturate(150%)]" />
+          <div className="absolute inset-0 bg-[rgba(20,20,20,0.55)]" />
+          <div className="absolute inset-0 rounded-[24px] ring-[0.5px] ring-inset ring-white/[0.12] pointer-events-none" />
 
-      {/* Collapsible Header — only collapse in standard mode where scrollContainerRef is attached */}
-      <div className={`fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}>
-        <div className="relative overflow-hidden">
-          {/* Glass background */}
-          <div className="absolute inset-0 bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl" />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-          
-          <div className="relative flex items-center justify-between px-6 py-6 shadow-xl">
-            <button 
-              className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate active-elevate-2 ring-1 ring-border"
+          <div className="relative flex items-center justify-between px-4 py-3">
+            {/* Left: Back button */}
+            <button
+              className="flex size-10 items-center justify-center rounded-full bg-white/10 transition-colors active:bg-white/5 shrink-0"
               onClick={onBack}
               aria-label="Go back to surahs list"
               data-testid="button-back"
             >
-              <ArrowLeft className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
+              <ArrowLeft className="w-5 h-5 text-white/90" aria-hidden="true" />
             </button>
-            
-            <div className="flex flex-col items-center flex-1 mx-4">
-              <h1 className="text-2xl font-bold text-foreground mb-1" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-chapter-title-english">
+
+            {/* Center: Surah name + Arabic subtitle */}
+            <div className="flex flex-col items-center flex-1 mx-3 min-w-0">
+              <h1 className="text-[15px] font-semibold text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
                 {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
               </h1>
-              <p className="text-sm font-arabic text-muted-foreground" data-testid="text-surah-number">
-                {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : 'ٱلْفَاتِحَةِ'}
+              <p className="text-xs font-arabic text-white/40 truncate" data-testid="text-surah-arabic-name">
+                {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : ''}
               </p>
             </div>
-            
+
+            {/* Right: Settings button */}
             <Sheet open={isMenuOpen} onOpenChange={(open) => { setIsMenuOpen(open); if (!open) setMenuView('main'); }}>
               <SheetTrigger asChild>
-                <button 
-                  className="flex size-12 items-center justify-center rounded-full bg-muted/60 dark:bg-slate-800/60 backdrop-blur-xl shadow-md hover-elevate active-elevate-2 ring-1 ring-border" 
+                <button
+                  className="flex size-10 items-center justify-center rounded-full bg-white/10 transition-colors active:bg-white/5 shrink-0"
                   aria-label="Open menu for display settings and reciter selection"
                   data-testid="button-menu"
                 >
-                  <MoreVertical className="w-5 h-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} aria-hidden="true" />
+                  <Icon icon="solar:settings-linear" className="w-5 h-5 text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
             <SheetContent side="bottom" className="h-[85vh]">
@@ -597,16 +600,16 @@ export default function ChapterView({
               </div>
             </SheetContent>
           </Sheet>
-          </div>
         </div>
+      </header>
       </div>
 
       {/* Content area - Standard / Focused Flow / Mushaf */}
       {layoutMode === 'standard' ? (
         <div
           ref={scrollContainerRef}
-          className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-            isCollapsed ? 'pt-[100px]' : 'pt-[180px]'
+          className={`relative flex-1 overflow-y-auto px-6 pb-[260px] transition-[padding] duration-300 ${
+            isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
           }`}
         >
           <div className="max-w-2xl mx-auto space-y-4">

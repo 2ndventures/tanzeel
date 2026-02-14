@@ -1,3 +1,5 @@
+import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+
 interface VerseCardProps {
   chapterId: number;
   verseNumber: number;
@@ -41,7 +43,7 @@ export default function VerseCard({
 }: VerseCardProps) {
   const highlighted = isCurrentVerse && isInVerseRange;
 
-  const words = arabicScript !== 'tajweed' ? arabicText.split(' ') : [];
+  const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(arabicText) : [];
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
