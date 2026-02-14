@@ -11,11 +11,16 @@ import {
 
 import type { LayoutMode } from "@/lib/quranMetadata";
 
-const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: string }[] = [
-  { mode: 'standard', icon: 'solar:align-vertical-spacing-bold', label: 'Standard', desc: 'Vertical scrolling layout' },
-  { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Horizontal reading mode' },
-  { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Classic Medinan page view' },
-  { mode: 'hifz', icon: 'solar:square-academic-cap-bold', label: 'Hifz', desc: 'Memorization mode' },
+import layoutStandardImg from "@/assets/images/layout-standard.png";
+import layoutFocusedImg from "@/assets/images/layout-focused.png";
+import layoutMushafImg from "@/assets/images/layout-mushaf.png";
+import layoutHifzImg from "@/assets/images/layout-hifz.png";
+
+const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: string; preview: string }[] = [
+  { mode: 'standard', icon: 'solar:align-vertical-spacing-bold', label: 'Standard', desc: 'Vertical scrolling', preview: layoutStandardImg },
+  { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Horizontal reading', preview: layoutFocusedImg },
+  { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Medinan page view', preview: layoutMushafImg },
+  { mode: 'hifz', icon: 'solar:square-academic-cap-bold', label: 'Hifz', desc: 'Memorization mode', preview: layoutHifzImg },
 ];
 
 interface AudioPlayerProps {
@@ -46,27 +51,45 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
       <DrawerHeader>
         <DrawerTitle>Select Layout</DrawerTitle>
       </DrawerHeader>
-      <div className="px-4 pb-8 space-y-3">
-        {LAYOUT_OPTIONS.map((opt) => (
-          <button
-            key={opt.mode}
-            onClick={() => onLayoutModeChange?.(opt.mode)}
-            className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
-              layoutMode === opt.mode ? 'bg-primary/20 ring-2 ring-primary' : 'bg-muted/40 dark:bg-slate-800/40'
-            }`}
-            data-testid={`layout-option-${opt.mode}`}
-          >
-            <div className={`size-12 rounded-full flex items-center justify-center ${
-              layoutMode === opt.mode ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'
-            }`}>
-              <Icon icon={opt.icon} className="size-6" />
-            </div>
-            <div className="text-left">
-              <p className="font-semibold text-foreground">{opt.label}</p>
-              <p className="text-sm text-muted-foreground">{opt.desc}</p>
-            </div>
-          </button>
-        ))}
+      <div className="px-4 pb-8">
+        <div className="grid grid-cols-2 gap-3">
+          {LAYOUT_OPTIONS.map((opt) => {
+            const isSelected = layoutMode === opt.mode;
+            return (
+              <button
+                key={opt.mode}
+                onClick={() => onLayoutModeChange?.(opt.mode)}
+                className={`relative rounded-xl overflow-hidden transition-all ${
+                  isSelected
+                    ? 'ring-2 ring-primary shadow-lg shadow-primary/20'
+                    : 'ring-1 ring-border/50 dark:ring-white/10'
+                }`}
+                data-testid={`layout-option-${opt.mode}`}
+              >
+                <div className="aspect-[3/4] w-full overflow-hidden bg-muted/30 dark:bg-slate-800/50">
+                  <img
+                    src={opt.preview}
+                    alt={`${opt.label} layout preview`}
+                    className={`w-full h-full object-cover transition-opacity ${
+                      isSelected ? 'opacity-100' : 'opacity-70'
+                    }`}
+                  />
+                  {isSelected && (
+                    <div className="absolute inset-0 bg-primary/10" />
+                  )}
+                </div>
+                <div className={`px-3 py-2.5 text-left ${
+                  isSelected ? 'bg-primary/15 dark:bg-primary/20' : 'bg-card/80 dark:bg-slate-800/60'
+                }`}>
+                  <p className={`text-sm font-semibold truncate ${
+                    isSelected ? 'text-primary' : 'text-foreground'
+                  }`}>{opt.label}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{opt.desc}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </DrawerContent>
   );
