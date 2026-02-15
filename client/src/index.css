@@ -638,35 +638,8 @@
     opacity: 0.05;
   }
 
-  /* Ornamental double-line border */
   .mushaf-border {
     position: relative;
-    border: 2px solid hsl(var(--primary) / 0.30);
-    outline: 1px solid hsl(var(--primary) / 0.15);
-    outline-offset: 4px;
-    border-radius: 4px;
-  }
-
-  /* Decorative corner characters */
-  .mushaf-border::before {
-    content: "﴾";
-    position: absolute;
-    top: -2px;
-    left: 4px;
-    font-size: 1.1rem;
-    line-height: 1;
-    color: hsl(var(--primary) / 0.35);
-    pointer-events: none;
-  }
-  .mushaf-border::after {
-    content: "﴿";
-    position: absolute;
-    bottom: -2px;
-    right: 4px;
-    font-size: 1.1rem;
-    line-height: 1;
-    color: hsl(var(--primary) / 0.35);
-    pointer-events: none;
   }
 
   /* Active verse golden glow */
