@@ -48,6 +48,15 @@ The system provides continuous chapter audio playback with word-level synchroniz
 
 A customizable verse bookmarking system is implemented, stored in `localStorage`. It allows users to add/remove bookmarks, organize them into custom folders, add notes, and navigate directly to bookmarked verses. The system includes duplicate prevention for folder names and is integrated into `VerseCard` and a dedicated `Bookmarks` page.
 
+## Deep Search System
+
+The SurahJuz page features a 3-layer search system triggered when users type 3+ characters:
+1. **Surah Name Filtering**: Instant client-side filtering of chapter names with transliteration normalization
+2. **Topic Index Matching**: Client-side keyword matching against 50+ curated Quranic themes (`client/src/lib/topicIndex.ts`)
+3. **AI Semantic Search**: Server-side OpenAI GPT-4o-mini call (`POST /api/ai-search`) for natural language queries
+
+Results are debounced (800ms), deduplicated, and displayed with stale-response protection. Topic results appear instantly; AI results append after. Gracefully degrades if AI is unavailable. Uses Replit AI Integrations for OpenAI access.
+
 ## Data Management
 
 Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored client-side. User preferences (theme, reciter, speed, auto-scroll, repeat, autoplay) are managed using local storage. Word-level timing data is fetched dynamically from the Quran.com API.

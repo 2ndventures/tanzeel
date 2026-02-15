@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Readable, pipeline } from "stream";
+import OpenAI from "openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Verse-by-verse audio proxy for EveryAyah.com
@@ -300,6 +301,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("❌ Tafsir proxy error:", error);
       res.status(500).json({ error: "Failed to fetch tafsir" });
+    }
+  });
+
+  app.post("/api/ai-search", async (req, res) => {
+    try {
+      const { query } = req.body;
+      if (!query || typeof query !== "string" || query.trim().length < 3) {
+        return res.status(400).json({ error: "Query must be at least 3 characters" });
+      }
+
+      const openai = new OpenAI({
+        apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+        baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+      });
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a Quran verse search assistant. Given a user's query about Quranic topics, themes, stories, or concepts, return the most relevant verses from the Quran.
+
+Return a JSON array of objects with this exact format:
+[{"chapterId": number, "verseNumber": number, "reason": "brief explanation of relevance"}]
+
+Rules:
+- Return 3-10 most relevant verses
+- Only return verses that actually exist in the Quran
+- Chapter IDs are 1-114, verse numbers must be valid for that chapter
+- Provide a brief 5-15 word reason for each verse's relevance
+- Focus on the most directly relevant verses, not tangentially related ones
+- If the query is not related to the Quran or Islam, return an empty array []`,
+          },
+          {
+            role: "user",
+            content: query.trim(),
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 1000,
+      });
+
+      const content = completion.choices[0]?.message?.content || "[]";
+      let parsed;
+      try {
+        const jsonMatch = content.match(/\[[\s\S]*\]/);
+        parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      } catch {
+        parsed = [];
+      }
+
+      const results = Array.isArray(parsed)
+        ? parsed
+            .filter(
+              (r: any) =>
+                r.chapterId &&
+                r.verseNumber &&
+                typeof r.chapterId === "number" &&
+                typeof r.verseNumber === "number" &&
+                r.chapterId >= 1 &&
+                r.chapterId <= 114
+            )
+            .map((r: any) => ({
+              chapterId: r.chapterId,
+              verseNumber: r.verseNumber,
+              reason: r.reason || "",
+            }))
+        : [];
+
+      res.json({ results, source: "ai" });
+    } catch (error: any) {
+      console.error("AI search error:", error?.message || error);
+      res.status(500).json({ error: "AI search failed" });
     }
   });
 
