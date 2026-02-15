@@ -362,6 +362,14 @@ export default function ChapterView({
                       lineSpacing === "Relaxed" ? "space-y-3" :
                       "space-y-4"
                     }`}>
+                      {showVerseNumbers && (
+                        <span
+                          className="inline-block text-xs font-semibold tabular-nums text-muted-foreground/70 transition-all duration-200"
+                          data-testid="preview-verse-number"
+                        >
+                          1:1
+                        </span>
+                      )}
                       <p
                         dir="rtl"
                         className={`${
