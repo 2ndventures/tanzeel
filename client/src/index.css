@@ -732,7 +732,8 @@ tajweed.madda_necessary {
   color: #DD1D1D;
 }
 tajweed.qlq,
-tajweed.qalqalah {
+tajweed.qalqalah,
+tajweed.qalaqah {
   color: #19B8D2;
 }
 tajweed.ikhf_shfw,
@@ -740,7 +741,8 @@ tajweed.ikhafa_shafawi {
   color: #2CA82C;
 }
 tajweed.ikhf,
-tajweed.ikhfa {
+tajweed.ikhfa,
+tajweed.ikhafa {
   color: #2CA82C;
 }
 tajweed.idghm_shfw,
@@ -756,7 +758,8 @@ tajweed.idgham_ghunnah {
   color: #2CA82C;
 }
 tajweed.idgh_w_ghn,
-tajweed.idgham_no_ghunnah {
+tajweed.idgham_no_ghunnah,
+tajweed.idgham_wo_ghunnah {
   color: #4271C1;
 }
 tajweed.idgh_mus,
