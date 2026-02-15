@@ -1,0 +1,48 @@
+## Feature: Add "Deep Search" Toggle for AI Semantic Search
+
+### UI:
+- Add a small toggle switch near the search bar labeled "Deep Search"
+- Next to the label, add a subtle info icon (ⓘ) — tapping it shows a
+  tooltip: "Finds verses by topic or context using AI (requires internet)"
+- Toggle default state: OFF
+- Save toggle state to localStorage so it persists across sessions
+
+### Search Logic Based on Toggle State:
+
+**Toggle OFF (default):**
+- Run Layer 1 (Full-Text) and Layer 2 (Topic Index) only
+- Results appear near-instantly, works fully offline
+- No loading indicators needed
+
+**Toggle ON:**
+- Run all three layers (Full-Text + Topic Index + AI Semantic)
+- Layer 1+2 results appear immediately
+- Show an "AI is searching..." shimmer/skeleton below the instant results
+  while Layer 3 processes
+- When Layer 3 returns, merge its results below with an "AI Results" section
+  label
+- If Layer 3 fails (no internet), show a subtle inline message:
+  "AI search unavailable — showing offline results only"
+
+### Result Priority (always this order regardless of toggle):
+1. **Exact surah name matches** — always first. "Mary" → Surah Maryam card
+   at the top, always, no matter what.
+2. **Topic Index matches** (Layer 2) — high confidence keyword/synonym hits
+3. **Full-text translation matches** (Layer 1)
+4. **AI semantic results** (Layer 3) — shown last, only when toggle is ON,
+   with a subtle "AI-powered" indicator badge on each result
+
+### Disambiguation Example:
+User types "Mary" with Deep Search ON:
+→ Result 1: Surah Maryam (19) — direct surah name match, shown as surah card
+→ Results 2-4: Verses mentioning Mary from topic index (19:16-34, 3:36-37, etc.)
+→ Results 5+: Additional AI-suggested verses about Mary
+
+### Deduplication:
+If the same verse appears from multiple layers, show it once using the
+highest-priority layer's presentation. Do not show duplicate verse cards.
+
+### Do NOT:
+- Default the toggle to ON — it must be OFF by default
+- Block or delay Layer 1+2 results while waiting for Layer 3
+- Hide surah name matches behind AI results
