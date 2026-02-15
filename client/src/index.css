@@ -787,3 +787,8 @@ span.end {
   color: hsl(var(--muted-foreground));
   font-size: 0.75em;
 }
+.verse-end-ornament {
+  color: hsl(var(--primary) / 0.7);
+  font-family: 'Traditional Arabic', 'Scheherazade New', serif;
+  letter-spacing: -0.05em;
+}

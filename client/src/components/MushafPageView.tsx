@@ -50,6 +50,9 @@ export default function MushafPageView({
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const toArabicIndic = (n: number): string =>
+    String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
+
   const arabicFontClass =
     arabicScript === "indopak" ? "font-indopak" : "font-arabic";
 
@@ -245,9 +248,9 @@ export default function MushafPageView({
                               );
                             })
                           )}
-                          {/* Verse end marker */}
-                          <span className="inline-block text-primary/60 mx-1 select-none text-[0.6em] align-middle font-sans">
-                            ﴿{verse.number}﴾
+                          {/* Verse end marker — traditional ornament with Arabic-Indic numeral */}
+                          <span className="inline-block mx-1 select-none text-[0.7em] align-middle verse-end-ornament">
+                            {'\u06DD'}{toArabicIndic(verse.number)}
                           </span>
                         </span>
                       );
