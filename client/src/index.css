@@ -602,7 +602,6 @@
   /* Paper texture: warm cream in light mode, dark parchment in dark mode */
   .mushaf-page {
     position: relative;
-    background-color: hsl(40 30% 96%);
     max-height: calc(
       100vh
       - env(safe-area-inset-top, 0px)
@@ -618,24 +617,6 @@
       - env(safe-area-inset-bottom, 0px)
     );
     overflow-y: auto;
-  }
-  .dark .mushaf-page {
-    background-color: hsl(30 15% 14%);
-  }
-  /* Subtle paper-grain noise via SVG feTurbulence */
-  .mushaf-page::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    z-index: 0;
-  }
-  .dark .mushaf-page::before {
-    opacity: 0.05;
   }
 
   .mushaf-border {

@@ -201,7 +201,7 @@ export default function MushafPageView({
               className="flex-[0_0_100%] min-w-0 h-full flex items-center justify-center px-3 py-2"
             >
               {/* Mushaf page */}
-              <div className="mushaf-page w-full max-w-xl overflow-y-auto rounded-md px-1 py-3">
+              <div className="mushaf-page w-full max-w-xl overflow-y-auto px-1 py-3">
                 <div className="mushaf-border px-4 py-4 relative z-[1]">
                   {/* Surah header on first page only */}
                   {page.pageIndex === 0 && (
