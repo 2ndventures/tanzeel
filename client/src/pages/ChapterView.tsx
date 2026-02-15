@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
+import TajweedLegend from "@/components/TajweedLegend";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -767,6 +768,7 @@ export default function ChapterView({
           isCollapsed={isCollapsed}
         />
       )}
+      {arabicScript === 'tajweed' && <TajweedLegend />}
       <AudioPlayer
         currentTime={currentTime}
         duration={duration}
