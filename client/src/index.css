@@ -706,3 +706,84 @@
     text-decoration: underline;
   }
 }
+
+tajweed {
+  font-style: normal;
+}
+tajweed.ham_wasl {
+  color: #AAAAAA;
+}
+tajweed.slnt {
+  color: #AAAAAA;
+}
+tajweed.laam_shamsiyah {
+  color: #AAAAAA;
+}
+tajweed.madda_normal {
+  color: #537FFF;
+}
+tajweed.madda_permissible {
+  color: #4050FF;
+}
+tajweed.madda_obligatory {
+  color: #2144C1;
+}
+tajweed.madda_necessary {
+  color: #000EBC;
+}
+.dark tajweed.madda_necessary {
+  color: #6B7FFF;
+}
+tajweed.qlq,
+tajweed.qalqalah {
+  color: #DD0008;
+}
+tajweed.ikhf_shfw,
+tajweed.ikhafa_shafawi {
+  color: #D500B7;
+}
+tajweed.ikhf,
+tajweed.ikhfa {
+  color: #9400A8;
+}
+.dark tajweed.ikhf,
+.dark tajweed.ikhfa {
+  color: #C86BD8;
+}
+tajweed.idghm_shfw,
+tajweed.idgham_shafawi {
+  color: #58B800;
+}
+tajweed.iqlb,
+tajweed.iqlab {
+  color: #26BFFD;
+}
+tajweed.idgh_ghn,
+tajweed.idgham_ghunnah {
+  color: #169777;
+}
+.dark tajweed.idgh_ghn,
+.dark tajweed.idgham_ghunnah {
+  color: #2DD4A8;
+}
+tajweed.idgh_w_ghn,
+tajweed.idgham_no_ghunnah {
+  color: #169200;
+}
+.dark tajweed.idgh_w_ghn,
+.dark tajweed.idgham_no_ghunnah {
+  color: #4ADE80;
+}
+tajweed.idgh_mus,
+tajweed.idgham_mutajanisayn,
+tajweed.idgham_mutaqaribayn {
+  color: #A1A1A1;
+}
+tajweed.ghn,
+tajweed.ghunnah {
+  color: #FF7E1E;
+}
+span.end {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75em;
+}
