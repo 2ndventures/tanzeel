@@ -413,115 +413,119 @@ export default function ChapterView({
               <div className="overflow-y-auto flex-1 pb-16">
                 {menuView === 'main' && (
                   <div className="space-y-6">
-                    {/* Arabic Text Size Section - Prioritized at top */}
+                    {/* Text Size Section — consolidated */}
                     <div>
-                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-size">
-                        Arabic Text Size
+                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-text-size">
+                        Text Size
                       </h3>
-                      <div className="grid grid-cols-2 gap-2 px-2">
-                        {["Small", "Medium", "Large", "Extra Large"].map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => onArabicFontSizeChange?.(size)}
-                            className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
-                              arabicFontSize === size 
-                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-white/[0.06] text-white/80'
-                            }`}
-                            data-testid={`button-arabic-size-${size.toLowerCase().replace(' ', '-')}`}
-                          >
-                            <span className={`font-arabic ${
-                              size === "Small" ? "text-xl" :
-                              size === "Medium" ? "text-2xl" :
-                              size === "Large" ? "text-3xl" :
-                              "text-4xl"
-                            }`}>أ</span>
-                            <span className="text-xs font-semibold">{size}</span>
-                          </button>
-                        ))}
+                      <div className="space-y-2 px-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-white/80 shrink-0">Arabic</span>
+                          <div className="flex gap-1.5">
+                            {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map((s) => (
+                              <button
+                                key={s.value}
+                                onClick={() => onArabicFontSizeChange?.(s.value)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                  arabicFontSize === s.value
+                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    : 'bg-white/[0.06] text-white/60'
+                                }`}
+                                data-testid={`button-arabic-size-${s.value.toLowerCase().replace(' ', '-')}`}
+                              >
+                                {s.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-white/80 shrink-0">Translation</span>
+                          <div className="flex gap-1.5">
+                            {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
+                              <button
+                                key={s.value}
+                                onClick={() => onTranslationFontSizeChange?.(s.value)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                  translationFontSize === s.value
+                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    : 'bg-white/[0.06] text-white/60'
+                                }`}
+                                data-testid={`button-translation-size-${s.value.toLowerCase()}`}
+                              >
+                                {s.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-sm text-white/80 shrink-0">Transliteration</span>
+                          <div className="flex gap-1.5">
+                            {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
+                              <button
+                                key={s.value}
+                                onClick={() => onTransliterationFontSizeChange?.(s.value)}
+                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                  transliterationFontSize === s.value
+                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    : 'bg-white/[0.06] text-white/60'
+                                }`}
+                                data-testid={`button-transliteration-size-${s.value.toLowerCase()}`}
+                              >
+                                {s.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Arabic Script Section */}
+                    {/* Arabic Script — inline */}
                     <div>
-                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-arabic-script">
-                        Arabic Script
-                      </h3>
-                      <div className="grid grid-cols-3 gap-2 px-2">
-                        {([
-                          { value: 'uthmani', label: 'Uthmani' },
-                          { value: 'indopak', label: 'IndoPak' },
-                          { value: 'tajweed', label: 'Tajweed' },
-                        ] as const).map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => onArabicScriptChange?.(option.value)}
-                            className={`p-4 min-h-[56px] rounded-xl hover-elevate active-elevate-2 flex items-center justify-center transition-all ${
-                              arabicScript === option.value
-                                ? 'bg-primary/20 ring-2 ring-primary text-primary'
-                                : 'bg-white/[0.06] text-white/80'
-                            }`}
-                            data-testid={`button-script-${option.value}`}
-                          >
-                            <span className="text-sm font-semibold">{option.label}</span>
-                          </button>
-                        ))}
+                      <div className="flex items-center justify-between gap-3 px-4">
+                        <span className="text-sm text-white/80 shrink-0">Arabic Script</span>
+                        <div className="flex gap-1.5">
+                          {([
+                            { value: 'uthmani', label: 'Uthmani' },
+                            { value: 'indopak', label: 'IndoPak' },
+                            { value: 'tajweed', label: 'Tajweed' },
+                          ] as const).map((option) => (
+                            <button
+                              key={option.value}
+                              onClick={() => onArabicScriptChange?.(option.value)}
+                              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                arabicScript === option.value
+                                  ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                  : 'bg-white/[0.06] text-white/60'
+                              }`}
+                              data-testid={`button-script-${option.value}`}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Translation Text Size Section */}
+                    {/* Line Spacing — inline */}
                     <div>
-                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-translation-size">
-                        Translation Text Size
-                      </h3>
-                      <div className="grid grid-cols-3 gap-2 px-2">
-                        {["Small", "Medium", "Large"].map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => onTranslationFontSizeChange?.(size)}
-                            className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
-                              translationFontSize === size 
-                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-white/[0.06] text-white/80'
-                            }`}
-                            data-testid={`button-translation-size-${size.toLowerCase()}`}
-                          >
-                            <span className={`font-semibold ${
-                              size === "Small" ? "text-sm" :
-                              size === "Medium" ? "text-base" :
-                              "text-lg"
-                            }`}>A</span>
-                            <span className="text-xs font-semibold">{size}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Transliteration Text Size Section */}
-                    <div>
-                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-transliteration-size">
-                        Transliteration Text Size
-                      </h3>
-                      <div className="grid grid-cols-3 gap-2 px-2">
-                        {["Small", "Medium", "Large"].map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => onTransliterationFontSizeChange?.(size)}
-                            className={`p-4 min-h-[70px] rounded-xl hover-elevate active-elevate-2 flex flex-col items-center justify-center gap-2 transition-all ${
-                              transliterationFontSize === size 
-                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-white/[0.06] text-white/80'
-                            }`}
-                            data-testid={`button-transliteration-size-${size.toLowerCase()}`}
-                          >
-                            <span className={`italic font-medium ${
-                              size === "Small" ? "text-xs" :
-                              size === "Medium" ? "text-sm" :
-                              "text-base"
-                            }`}>A</span>
-                            <span className="text-xs font-semibold">{size}</span>
-                          </button>
-                        ))}
+                      <div className="flex items-center justify-between gap-3 px-4">
+                        <span className="text-sm text-white/80 shrink-0">Line Spacing</span>
+                        <div className="flex gap-1.5">
+                          {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
+                            <button
+                              key={spacing}
+                              onClick={() => onLineSpacingChange?.(spacing)}
+                              className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                lineSpacing === spacing
+                                  ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                  : 'bg-white/[0.06] text-white/60'
+                              }`}
+                              data-testid={`button-spacing-${spacing.toLowerCase()}`}
+                            >
+                              {spacing}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
 
@@ -602,29 +606,6 @@ export default function ChapterView({
                             data-testid="switch-verse-numbers"
                           />
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Line Spacing Section */}
-                    <div>
-                      <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wide px-4 mb-3" data-testid="section-line-spacing">
-                        Line Spacing
-                      </h3>
-                      <div className="grid grid-cols-4 gap-2 px-2">
-                        {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
-                          <button
-                            key={spacing}
-                            onClick={() => onLineSpacingChange?.(spacing)}
-                            className={`p-3 min-h-[50px] rounded-xl hover-elevate active-elevate-2 flex items-center justify-center transition-all ${
-                              lineSpacing === spacing 
-                                ? 'bg-primary/20 ring-2 ring-primary text-primary' 
-                                : 'bg-white/[0.06] text-white/80'
-                            }`}
-                            data-testid={`button-spacing-${spacing.toLowerCase()}`}
-                          >
-                            <span className="text-xs font-semibold">{spacing}</span>
-                          </button>
-                        ))}
                       </div>
                     </div>
 
