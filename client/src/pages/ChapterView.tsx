@@ -20,6 +20,7 @@ import TajweedLegend from "@/components/TajweedLegend";
 
 interface ChapterViewProps {
   chapterId: number;
+  initialVerse?: number;
   onBack: () => void;
   showTransliteration: boolean;
   showTranslation: boolean;
@@ -54,6 +55,7 @@ interface ChapterViewProps {
 
 export default function ChapterView({ 
   chapterId, 
+  initialVerse,
   onBack, 
   showTransliteration, 
   showTranslation,
@@ -236,12 +238,10 @@ export default function ChapterView({
         }
       });
     
-    // Scroll to top when chapter changes
-    if (scrollContainerRef.current) {
+    if (!initialVerse && scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
 
-    // Cleanup function to prevent race conditions
     return () => {
       isMounted = false;
     };
@@ -350,6 +350,31 @@ export default function ChapterView({
   useEffect(() => {
     completedVersesRef.current.clear();
   }, [chapterId]);
+
+  const initialVerseHandledRef = useRef(false);
+
+  useEffect(() => {
+    if (!initialVerse || initialVerse <= 1 || initialVerseHandledRef.current) return;
+    if (isLoadingVerses || verses.length === 0) return;
+
+    initialVerseHandledRef.current = true;
+
+    requestAnimationFrame(() => {
+      const verseElement = document.querySelector(`[data-testid="card-verse-${initialVerse}"]`);
+      const container = scrollContainerRef.current;
+      if (verseElement && container) {
+        const headerHeight = 60;
+        const verseRect = verseElement.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const scrollOffset = verseRect.top - containerRect.top + container.scrollTop - headerHeight;
+        container.scrollTo({ top: scrollOffset, behavior: 'instant' });
+      }
+
+      const verseKey = `${chapterId}:${initialVerse}`;
+      seekToVerse(verseKey);
+      playAudio();
+    });
+  }, [initialVerse, isLoadingVerses, verses, chapterId, seekToVerse, playAudio]);
 
   // Extract current verse number from verse key
   const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;

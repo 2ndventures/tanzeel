@@ -21,6 +21,7 @@ type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "priva
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
+  const [initialVerse, setInitialVerse] = useState<number | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings" | "bookmarks">("home");
   
   // Splash screen state
@@ -193,7 +194,7 @@ function App() {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
-  const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => {
+  const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => {
     setCurrentPage(page as Page);
     if (tab) {
       setActiveTab(tab);
@@ -207,6 +208,7 @@ function App() {
       setActiveTab("home");
     }
     if (chapterId) setSelectedChapter(chapterId);
+    setInitialVerse(verseNumber);
   };
 
   const handleOnboardingComplete = () => {
@@ -248,6 +250,7 @@ function App() {
             {currentPage === "chapter" && (
               <ChapterView
                 chapterId={selectedChapter}
+                initialVerse={initialVerse}
                 onBack={() => {
                   setCurrentPage("surah-juz");
                   setActiveTab("surah");

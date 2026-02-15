@@ -10,6 +10,7 @@ import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
 import { Settings, Search, Sparkles, BookOpen, Loader2, ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { lazyChapterService } from "@/services/lazyChapterService";
 
 interface SearchResult {
   chapterId: number;
@@ -20,7 +21,7 @@ interface SearchResult {
 }
 
 interface SurahJuzProps {
-  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
+  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => void;
   activeTab?: "home" | "surah" | "settings" | "bookmarks";
 }
 
@@ -36,6 +37,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   const [aiError, setAiError] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const requestIdRef = useRef(0);
+  const [translationCache, setTranslationCache] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -153,6 +155,29 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [searchQuery, runDeepSearch]);
+
+  useEffect(() => {
+    if (deepSearchResults.length === 0) return;
+
+    const chapterIds = Array.from(new Set(deepSearchResults.map(r => r.chapterId)));
+    const missingChapters = chapterIds.filter(id =>
+      !deepSearchResults.some(r => r.chapterId === id && translationCache[`${id}:${r.verseNumber}`])
+    );
+
+    if (missingChapters.length === 0) return;
+
+    missingChapters.forEach(chId => {
+      lazyChapterService.getVerses(chId).then(verses => {
+        setTranslationCache(prev => {
+          const updates: Record<string, string> = {};
+          for (const v of verses) {
+            updates[`${chId}:${v.number}`] = v.translation;
+          }
+          return { ...prev, ...updates };
+        });
+      }).catch(() => {});
+    });
+  }, [deepSearchResults]);
 
   const hasSearchQuery = searchQuery.trim().length >= 3;
   const showDeepSearch = hasSearchQuery && (deepSearchResults.length > 0 || isDeepSearching || deepSearchDone);
@@ -279,16 +304,16 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                       <button
                         key={`${result.chapterId}-${result.verseNumber}-${idx}`}
                         className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all"
-                        onClick={() => onNavigate("chapter", result.chapterId)}
+                        onClick={() => onNavigate("chapter", result.chapterId, undefined, result.verseNumber)}
                         data-testid={`search-result-${result.chapterId}-${result.verseNumber}`}
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
-                              <BookOpen className="w-4 h-4 text-primary" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-start gap-3">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 mt-0.5">
+                            <BookOpen className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-2 flex-wrap min-w-0">
                                 <span className="text-sm font-semibold text-foreground">
                                   {chapter.englishName} {result.verseNumber}
                                 </span>
@@ -296,20 +321,28 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                                   ({result.chapterId}:{result.verseNumber})
                                 </span>
                               </div>
-                              <p className="text-xs text-muted-foreground mt-0.5 truncate">
-                                {result.source === "topic" && result.topic
-                                  ? result.topic
-                                  : result.reason || surahMeanings[result.chapterId] || ""}
-                              </p>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {result.source === "ai" && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-medium">
+                                    AI
+                                  </span>
+                                )}
+                                <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0">
-                            {result.source === "ai" && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-medium">
-                                AI
-                              </span>
+                            <p className="text-xs text-muted-foreground mt-0.5 truncate" data-testid={`search-result-topic-${result.chapterId}-${result.verseNumber}`}>
+                              {result.source === "topic" && result.topic
+                                ? result.topic
+                                : result.reason || surahMeanings[result.chapterId] || ""}
+                            </p>
+                            {translationCache[`${result.chapterId}:${result.verseNumber}`] && (
+                              <p
+                                className="text-xs text-muted-foreground/70 mt-1.5 line-clamp-3 leading-relaxed"
+                                data-testid={`search-result-preview-${result.chapterId}-${result.verseNumber}`}
+                              >
+                                "{translationCache[`${result.chapterId}:${result.verseNumber}`]}"
+                              </p>
                             )}
-                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
                           </div>
                         </div>
                       </button>
