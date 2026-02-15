@@ -130,7 +130,7 @@ export default function AudioPlayer({
   // Auto-hide logic
   const [isVisible, setIsVisible] = useState(true);
   const visibilityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const shouldAutoHide = layoutMode === 'focused-flow' || layoutMode === 'mushaf' || layoutMode === 'hifz';
+  const shouldAutoHide = layoutMode === 'focused-flow';
 
   const resetVisibilityTimer = useCallback(() => {
     setIsVisible(true);
