@@ -2,7 +2,7 @@ import { useState } from 'react';
 import BottomNav from '../BottomNav';
 
 export default function BottomNavExample() {
-  const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings" | "bookmarks">("home");
 
   return (
     <BottomNav

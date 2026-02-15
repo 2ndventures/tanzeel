@@ -22,7 +22,7 @@ interface ChapterViewProps {
   onBack: () => void;
   showTransliteration: boolean;
   showTranslation: boolean;
-  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
+  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
   reciter: string;
   autoScroll: boolean;
   repeat: boolean;

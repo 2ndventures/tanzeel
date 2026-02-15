@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface SettingsProps {
   onBack: () => void;
-  onNavigate?: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
+  onNavigate?: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
   darkMode: boolean;
   onDarkModeChange: (value: boolean) => void;
   transliteration: boolean;
@@ -457,6 +457,8 @@ export default function Settings({
               onNavigate("home", undefined, "home");
             } else if (tab === "surah") {
               onNavigate("surah-juz", undefined, "surah");
+            } else if (tab === "bookmarks") {
+              onNavigate("bookmarks", undefined, "bookmarks");
             }
           } else {
             if (tab === "home" || tab === "surah") onBack();

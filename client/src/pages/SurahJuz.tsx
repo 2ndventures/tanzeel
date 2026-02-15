@@ -10,8 +10,8 @@ import { chapters, juzData } from "@/lib/quranMetadata";
 import { Settings } from "lucide-react";
 
 interface SurahJuzProps {
-  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => void;
-  activeTab?: "home" | "surah" | "settings";
+  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
+  activeTab?: "home" | "surah" | "settings" | "bookmarks";
 }
 
 export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzProps) {
@@ -263,6 +263,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
             onNavigate("settings", undefined, "settings");
           } else if (tab === "surah") {
             onNavigate("surah-juz", undefined, "surah");
+          } else if (tab === "bookmarks") {
+            onNavigate("bookmarks", undefined, "bookmarks");
           } else {
             onNavigate("home", undefined, "home");
           }

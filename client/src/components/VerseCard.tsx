@@ -1,4 +1,7 @@
+import { useState, useCallback } from "react";
+import { Icon } from "@iconify/react";
 import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
 
 interface VerseCardProps {
   chapterId: number;
@@ -19,6 +22,7 @@ interface VerseCardProps {
   lineSpacing?: string;
   showVerseNumbers?: boolean;
   arabicScript?: 'uthmani' | 'indopak' | 'tajweed';
+  onBookmarkChange?: () => void;
 }
 
 export default function VerseCard({
@@ -40,12 +44,33 @@ export default function VerseCard({
   lineSpacing = "Normal",
   showVerseNumbers = true,
   arabicScript = "uthmani",
+  onBookmarkChange,
 }: VerseCardProps) {
   const highlighted = isCurrentVerse && isInVerseRange;
+  const [bookmarked, setBookmarked] = useState(() => isBookmarked(chapterId, verseNumber));
 
   const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(arabicText) : [];
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
+
+  const handleBookmarkToggle = useCallback((e: React.MouseEvent | React.KeyboardEvent) => {
+    e.stopPropagation();
+    if (bookmarked) {
+      removeBookmark(chapterId, verseNumber);
+      setBookmarked(false);
+    } else {
+      addBookmark(chapterId, verseNumber);
+      setBookmarked(true);
+    }
+    onBookmarkChange?.();
+  }, [bookmarked, chapterId, verseNumber, onBookmarkChange]);
+
+  const handleBookmarkKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleBookmarkToggle(e);
+    }
+  }, [handleBookmarkToggle]);
 
   const getArabicFontSize = (size: string) => {
     switch(size) {
@@ -120,18 +145,35 @@ export default function VerseCard({
     >
       <div className="px-5 py-3">
         <div className={`space-y-2 ${getLineSpacing(lineSpacing)}`}>
-          {showVerseNumbers && (
-            <span
-              className={`inline-block text-xs font-semibold tabular-nums transition-colors ${
-                highlighted
-                  ? 'text-primary'
-                  : 'text-muted-foreground/70'
-              }`}
-              data-testid={`text-verse-number-${verseNumber}`}
+          <div className="flex items-center justify-between gap-2">
+            {showVerseNumbers && (
+              <span
+                className={`inline-block text-xs font-semibold tabular-nums transition-colors ${
+                  highlighted
+                    ? 'text-primary'
+                    : 'text-muted-foreground/70'
+                }`}
+                data-testid={`text-verse-number-${verseNumber}`}
+              >
+                {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
+              </span>
+            )}
+            {!showVerseNumbers && <span />}
+            <button
+              onClick={handleBookmarkToggle}
+              onKeyDown={handleBookmarkKeyDown}
+              className="flex items-center justify-center w-8 h-8 rounded-full transition-colors shrink-0"
+              aria-label={bookmarked ? `Remove bookmark for verse ${chapterId}:${verseNumber}` : `Bookmark verse ${chapterId}:${verseNumber}`}
+              data-testid={`button-bookmark-${verseNumber}`}
             >
-              {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
-            </span>
-          )}
+              <Icon
+                icon={bookmarked ? "solar:bookmark-bold" : "solar:bookmark-linear"}
+                className={`size-4 transition-colors ${
+                  bookmarked ? 'text-primary' : 'text-muted-foreground/50'
+                }`}
+              />
+            </button>
+          </div>
           {arabicScript === 'tajweed' ? (
             <p
               className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
@@ -186,7 +228,6 @@ export default function VerseCard({
           )}
         </div>
       </div>
-      {/* Thin divider at bottom */}
       <div className="mx-5 h-px bg-border/30" />
     </div>
   );

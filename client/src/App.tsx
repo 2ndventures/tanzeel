@@ -8,6 +8,7 @@ import HomePage from "@/pages/HomePage";
 import SurahJuz from "@/pages/SurahJuz";
 import ChapterView from "@/pages/ChapterView";
 import Settings from "@/pages/Settings";
+import Bookmarks from "@/pages/Bookmarks";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import OnboardingScreen from "@/components/OnboardingScreen";
@@ -15,12 +16,12 @@ import SplashScreen from "@/components/SplashScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
 
-type Page = "home" | "surah-juz" | "chapter" | "settings" | "privacy-policy" | "terms-of-service";
+type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
-  const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings" | "bookmarks">("home");
   
   // Splash screen state
   const [showSplash, setShowSplash] = useState(true);
@@ -192,7 +193,7 @@ function App() {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
-  const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings") => {
+  const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => {
     setCurrentPage(page as Page);
     if (tab) {
       setActiveTab(tab);
@@ -200,6 +201,8 @@ function App() {
       setActiveTab("settings");
     } else if (page === "surah-juz") {
       setActiveTab("surah");
+    } else if (page === "bookmarks") {
+      setActiveTab("bookmarks");
     } else if (page === "home") {
       setActiveTab("home");
     }
@@ -279,6 +282,9 @@ function App() {
                 layoutMode={layoutMode}
                 onLayoutModeChange={setLayoutMode}
               />
+            )}
+            {currentPage === "bookmarks" && (
+              <Bookmarks onNavigate={handleNavigate} activeTab={activeTab} />
             )}
             {currentPage === "settings" && (
               <Settings

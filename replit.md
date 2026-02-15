@@ -1,6 +1,6 @@
 # Overview
 
-This mobile-first Quran Reading application allows users to read, listen to, and study the Holy Quran with translations, transliterations, and audio recitation. It features a modern interface built with React, TypeScript, and shadcn/ui, offering both light and dark theme variants with a premium glassmorphism aesthetic. The application focuses on delivering an optimized mobile experience with capabilities such as chapter browsing, continuous chapter audio playback with word-level synchronized highlighting (karaoke-style), and customizable display settings. The business vision is to provide a premium, aesthetically pleasing, and highly functional digital Quran experience.
+This mobile-first Quran Reading application provides users with an immersive experience to read, listen to, and study the Holy Quran. It features translations, transliterations, and audio recitation with word-level synchronized highlighting. Built with React, TypeScript, and shadcn/ui, it offers a modern, premium glassmorphism interface with adaptable light and dark themes, optimized for mobile. The application aims to deliver a highly functional and aesthetically pleasing digital Quran experience, enabling features like continuous chapter audio playback, customizable display settings, and robust bookmarking.
 
 # User Preferences
 
@@ -10,92 +10,47 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 
-The frontend uses React 18 with TypeScript and Vite, following a component-based architecture. The UI is built with shadcn/ui (New York variant) and styled using Tailwind CSS, emphasizing a mobile-first design with a premium glassmorphism aesthetic that adapts to both light and dark themes. State management utilizes React Hooks for local state and React Query for server state. Client-side navigation uses a page state system with HomePage, SurahJuz, and Settings screens. The application features a consistent premium glassmorphism design system across all UI elements, including pages, components, modals, dropdowns, and sheets, with elegant shadows and gradient backgrounds that automatically adapt to the selected theme. All page headers (Surahs, Settings) use consistent large, bold typography (text-5xl font-black) with non-sticky layouts and circular action buttons for optimal visual harmony.
+The frontend uses React 18 with TypeScript and Vite, adopting a component-based architecture. UI is built with shadcn/ui (New York variant) and Tailwind CSS, focusing on a mobile-first design with a premium glassmorphism aesthetic that supports both light and dark themes. State management relies on React Hooks and React Query. Navigation is handled client-side across HomePage, SurahJuz, Bookmarks, and Settings screens. The design system ensures consistent premium glassmorphism across all UI elements, adapting seamlessly to themes with elegant shadows and gradient backgrounds. Headers use large, bold typography and circular action buttons.
 
-### Mobile-First Responsive Design (Updated November 10, 2025)
+### Mobile-First Responsive Design
 
-All UI components use viewport-relative units for mobile responsiveness:
-- **Dropdowns**: Select dropdowns use `max-h-[60vh]` to ensure proper scrolling on all mobile screen sizes
-- **Modals**: Constrained to viewport height with proper scrolling
-- **Spacing**: Percentage-based and viewport-relative units rather than fixed pixels
-- **Touch targets**: Minimum 48px for accessibility on touch devices (verified across all screens)
+All UI components utilize viewport-relative units for responsiveness, ensuring proper display and scrolling on various mobile screen sizes. This includes dropdowns, modals, spacing, and minimum 48px touch targets for accessibility.
 
-### Status Bar System (Updated November 14, 2025)
+### Status Bar System
 
-The application implements safe-area handling for native mobile deployment with collapsible headers on reading screens:
-- **StatusBarShim Component**: Fixed z-50 overlay that reserves space for device status bar
-- **Fixed Headers (HomePage, Settings)**: HomePage and Settings pages feature fixed headers with `header-safe-padding` and static padding for content (HomePage: `pt-[160px]`, Settings: `pt-[140px]`)
-- **Collapsible Headers (Reading Screens)**: SurahJuz and ChapterView feature headers that hide on scroll down and reappear on scroll up using the `useCollapsibleHeader` hook
-- **Dynamic Padding with Safe Area**: Scroll containers and collapsible sections use `calc()` expressions to properly account for safe-area-inset-top on devices with notches/Dynamic Island:
-  - ChapterView: CSS classes with transform for collapsing (header-collapsed/header-expanded)
-  - SurahJuz Collapsible Section: `top: calc(100px + env(safe-area-inset-top, 0px))` when expanded
-  - SurahJuz Scroll Container: `paddingTop: calc(340px + env(safe-area-inset-top, 0px))` expanded, `calc(140px + env(safe-area-inset-top, 0px))` collapsed
-- **Safe-Area Handling**: 
-  - All headers use `.header-safe-padding` utility class for top safe-area padding
-  - Collapsible sections use inline calc() styles to position below fixed headers accounting for safe area
-  - Bottom navigation and audio player use `.safe-area-bottom` for bottom safe-area padding
-  - Deprecated: `.safe-area-pad` and `.safe-area-top` classes removed
-- **Smooth Transitions**: Reading screens with collapsible headers include `transition-[padding] duration-300` for seamless animation matching header collapse behavior
-- **Layout Structure**: Pages use `flex flex-col h-screen` (ChapterView) or `h-screen` scroll containers (HomePage, Settings, SurahJuz) for proper mobile layout
+The application incorporates safe-area handling for native mobile deployment. It features a `StatusBarShim` component, fixed headers for Home and Settings pages, and collapsible headers for reading screens (SurahJuz, ChapterView) that hide on scroll down and reappear on scroll up. Dynamic padding with `calc()` expressions correctly accounts for `safe-area-inset-top` on devices with notches or dynamic islands, ensuring smooth transitions.
 
-### Accessibility Compliance (Updated November 10, 2025)
+### Accessibility Compliance
 
-The application meets WCAG 2.1 accessibility standards for inclusive use:
-- **Semantic HTML**: All interactive elements use proper semantic markup (buttons, not divs)
-- **Keyboard Navigation**: 
-  - All interactive elements support keyboard access with `role="button"`, `tabIndex="0"`
-  - Enter/Space key handlers implemented on all custom interactive elements
-  - Focus-visible styling for visual keyboard navigation feedback
-- **Screen Reader Support**:
-  - Comprehensive ARIA labels on all interactive elements (audio controls, navigation, settings)
-  - Decorative icons marked with `aria-hidden="true"`
-  - Search field properly labeled with sr-only text and aria-label
-  - aria-live region in ChapterView announces verse changes during navigation
-  - Switch components have accessible names via aria-label
-- **Touch Optimization**: All interactive elements meet 48px minimum touch target size
-- **No Nested Buttons**: All button nesting issues resolved for valid HTML structure
+The application meets WCAG 2.1 standards through semantic HTML, comprehensive keyboard navigation with `focus-visible` styling, extensive ARIA labels for screen reader support, and optimized touch targets.
 
-### Onboarding Experience (Added November 10, 2025)
+### Onboarding Experience
 
-The application provides a first-time user onboarding flow to introduce the app and customize reading preferences:
-- **First Launch Detection**: Checks localStorage for 'onboardingCompleted' flag to determine if onboarding should display
-- **Welcome Screen**: Introduces Simple Quran with app branding, feature highlights (translations, audio, customization), and "Get Started" button
-- **Font Customization Screen**: 
-  - Live preview of Quran verse (Al-Fatiha 1:1) with Arabic text, transliteration, and translation
-  - Interactive sliders for Arabic, Translation, and Transliteration font sizes
-  - Real-time updates as users adjust sliders to preview font changes
-  - Navigation with Back and "Start Reading" buttons
-- **Design**: Full-screen overlay with premium glassmorphism aesthetic matching the app theme
-- **Integration**: Uses existing font size state setters from App.tsx, changes persist via localStorage
-- **Completion**: Saves 'onboardingCompleted' flag to localStorage, preventing re-display on subsequent launches
+A first-time user onboarding flow guides users through initial setup. It includes a welcome screen highlighting features and a font customization screen with live previews for Arabic, transliteration, and translation text sizes. Preferences are persisted via localStorage.
 
-### Theme System (Updated October 29, 2025)
+### Theme System
 
-The application implements a comprehensive light and dark theme system using CSS variables in `client/src/index.css`:
-- **Light Mode**: Soft backgrounds (slate-50), dark text (slate-950), subtle shadows and borders
-- **Dark Mode**: Deep backgrounds (slate-950), light text, stronger shadows with indigo/amber accents
-- **Theme Toggle**: Available in Settings page, persists in localStorage via App.tsx
-- **Components**: All pages and UI components use semantic theme tokens (bg-background, bg-card, text-foreground, text-muted-foreground, border) for automatic theme adaptation
-- **Glassmorphism**: Multi-layer glass effects adapt to each theme while maintaining premium aesthetic
-- **Visual Consistency**: Background gradients, card styling, text colors, borders, and shadows all respond seamlessly to theme changes
+A comprehensive light and dark theme system is implemented using CSS variables. Themes adapt automatically across all UI components using semantic tokens, maintaining a consistent premium glassmorphism aesthetic with responsive background gradients, card styling, text colors, borders, and shadows.
 
 ## Backend Architecture
 
-The backend is an Express.js server running on Node.js with TypeScript. It provides a RESTful API, serves the production frontend, and handles audio proxying to resolve CORS issues for the audio CDN. Data storage is currently in-memory via an `IStorage` interface, designed for future migration to a database.
+The backend is an Express.js server in Node.js with TypeScript, providing a RESTful API, serving the production frontend, and proxying audio to resolve CORS issues. It uses an in-memory `IStorage` interface, designed for future database migration.
 
 ## Database Architecture
 
-The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabase/serverless`). The schema is defined in `shared/schema.ts`, including a `users` table with Zod validation. Drizzle Kit handles migrations. While set up for Neon (serverless PostgreSQL), it currently uses in-memory storage.
+The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabase/serverless`) and Drizzle Kit for migrations. It currently uses in-memory storage but is set up for serverless PostgreSQL.
 
-## Audio Playback System (Updated November 7, 2025)
+## Audio Playback System
 
-The application employs a continuous chapter audio architecture with word-level synchronized highlighting using `useWordTimingAudio` hook. It loads a single audio file per chapter with timing data from Quran.com, enabling seamless playback without gaps between verses. Playback speed is globally persistent, stored in `localStorage`, and applies across all chapters. The system supports 10 professional reciters from EveryAyah.com, with metadata defined in `client/src/lib/reciters.ts`. Word and verse highlighting are automatically synchronized with audio playback, featuring visual indicators and auto-scrolling to the current verse.
+The system provides continuous chapter audio playback with word-level synchronized highlighting using a `useWordTimingAudio` hook. It loads single audio files per chapter with timing data from Quran.com, supporting seamless playback. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling. The backend normalizes inconsistent Quran.com API responses for audio timing.
 
-**API Response Normalization**: The backend timing proxy (`/api/audio-timing/:reciterId/:chapter`) handles inconsistent Quran.com API responses that return either `{audio_files: [...]}` (plural array) or `{audio_file: {...}}` (singular object) depending on the chapter. The proxy normalizes both formats to always return `{audio_files: [...]}` ensuring consistent behavior across all 114 chapters.
+## Bookmarking System
+
+A customizable verse bookmarking system is implemented, stored in `localStorage`. It allows users to add/remove bookmarks, organize them into custom folders, add notes, and navigate directly to bookmarked verses. The system includes duplicate prevention for folder names and is integrated into `VerseCard` and a dedicated `Bookmarks` page.
 
 ## Data Management
 
-All Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored in `client/src/lib/quranData.ts`. User preferences (theme, reciter, speed, auto-scroll, repeat, autoplay) are managed client-side using local storage. Word-level timing data is fetched dynamically from the Quran.com API as needed.
+Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored client-side. User preferences (theme, reciter, speed, auto-scroll, repeat, autoplay) are managed using local storage. Word-level timing data is fetched dynamically from the Quran.com API.
 
 # External Dependencies
 
@@ -106,82 +61,6 @@ All Quran data (chapters, verses, Arabic text, English translations, translitera
 - **Database & ORM**: Drizzle ORM, @neondatabase/serverless, connect-pg-simple.
 - **Fonts**: Google Fonts (Amiri).
 - **External APIs & Data Sources**:
-    - **Quran.com Audio API**: Provides continuous chapter audio files with word-level timing data via a backend proxy.
+    - **Quran.com Audio API**: Provides continuous chapter audio files and word-level timing data via a backend proxy.
     - **Al-Quran Cloud API**: Used for pre-fetching static Quran text data (Arabic, Sahih International English translation, transliteration).
-
-# Mobile App Deployment (Updated November 4, 2025)
-
-## Capacitor Integration
-
-The application is configured with Capacitor to enable native iOS and Android app deployment to the App Store and Google Play Store. Capacitor wraps the existing React web application in a native container while preserving all functionality and UI.
-
-### Configuration
-
-- **App ID**: `com.simplequran.app`
-- **App Name**: Simple Quran
-- **Web Directory**: `dist/public` (Vite build output)
-- **Platforms**: iOS and Android
-
-### Project Structure
-
-```
-ios/                 # iOS (Xcode) native project
-android/             # Android (Android Studio) native project
-resources/           # Source files for app icons and splash screens
-capacitor.config.ts  # Capacitor configuration
-```
-
-### Development Workflow
-
-1. **Build the web app**: Run `vite build` to create production bundle in `dist/public`
-2. **Sync to native platforms**: Run `npx cap sync` to copy web assets and sync plugins
-3. **Open in IDE**: 
-   - iOS: `npx cap open ios` (requires macOS and Xcode)
-   - Android: `npx cap open android` (requires Android Studio)
-4. **Test on devices**: Use Xcode/Android Studio to build and run on simulators or physical devices
-5. **Build for release**: Create signed builds through Xcode/Android Studio for app store submission
-
-### App Icons and Splash Screens
-
-App branding assets are managed in the `resources/` directory. See `resources/README.md` for detailed setup instructions. The recommended approach is to:
-
-1. Place a 1024x1024px app icon as `resources/icon.png`
-2. Place a 2732x2732px splash screen as `resources/splash.png`
-3. Run `npx capacitor-assets generate` to create all required sizes
-
-### Publishing Requirements
-
-- **Apple App Store**: Requires Apple Developer account ($99/year) and macOS with Xcode
-- **Google Play Store**: Requires Google Play Developer account ($25 one-time fee) and Android Studio
-
-### Backend Considerations (Updated November 11, 2025)
-
-The app automatically detects its runtime environment and configures API calls accordingly:
-- **Web browser**: Uses relative URLs (`/api/...`) to call the local development server
-- **iOS/Android app**: Uses the production Replit URL (`https://11424-newest-version-web266.replit.app`)
-
-This configuration is managed in `client/src/config.ts` using Capacitor's `isNativePlatform()` API. The backend must be deployed and accessible at the configured URL for the mobile app to function (audio loading, timing data, etc.).
-
-### App Store Readiness (Updated November 25, 2025)
-
-The application is configured for App Store and Play Store submission with the following native configurations:
-
-**iOS (Info.plist)**:
-- **Background Audio**: `UIBackgroundModes` includes `audio` capability for Quran playback when screen locks
-- **App Transport Security**: Configured with specific exception domains (quran.com, everyayah.com, replit.app) - all HTTPS only, no insecure loads allowed
-- **Bundle ID**: `com.simplequran.app`
-- **Display Name**: Simple Quran
-
-**Android (AndroidManifest.xml)**:
-- **Permissions**: 
-  - `INTERNET` - Network access for API calls
-  - `WAKE_LOCK` - Keep device awake during audio playback
-  - `FOREGROUND_SERVICE` - Background audio service
-  - `FOREGROUND_SERVICE_MEDIA_PLAYBACK` - Media playback foreground service
-- **Security**: `android:usesCleartextTraffic="false"` - Only HTTPS connections allowed
-- **Package Name**: `com.simplequran.app`
-
-**Build Pipeline**:
-- Run `npm run build` to create production bundle in `dist/public`
-- Run `npx cap sync` to sync web assets and Info.plist/AndroidManifest changes to native projects
-- Chapter JSON data files are bundled in `client/public/data/chapters/` and sync to native assets
+- **Mobile Deployment**: Capacitor for native iOS and Android app deployment.

@@ -107,12 +107,14 @@ export function getFolders(): string[] {
   }
 }
 
-export function addFolder(name: string) {
+export function addFolder(name: string): boolean {
+  const trimmed = name.trim();
+  if (!trimmed) return false;
   const folders = getFolders();
-  if (!folders.includes(name)) {
-    folders.push(name);
-    localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
-  }
+  if (folders.some((f) => f.toLowerCase() === trimmed.toLowerCase())) return false;
+  folders.push(trimmed);
+  localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+  return true;
 }
 
 export function removeFolder(name: string) {
@@ -125,12 +127,16 @@ export function removeFolder(name: string) {
   saveBookmarks(bookmarks);
 }
 
-export function renameFolder(oldName: string, newName: string) {
-  if (oldName === DEFAULT_FOLDER || !newName.trim()) return;
-  const folders = getFolders().map((f) => (f === oldName ? newName : f));
+export function renameFolder(oldName: string, newName: string): boolean {
+  const trimmed = newName.trim();
+  if (oldName === DEFAULT_FOLDER || !trimmed) return false;
+  const existing = getFolders();
+  if (existing.some((f) => f.toLowerCase() === trimmed.toLowerCase() && f !== oldName)) return false;
+  const folders = existing.map((f) => (f === oldName ? trimmed : f));
   localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
   const bookmarks = loadBookmarks().map((b) =>
-    b.folder === oldName ? { ...b, folder: newName } : b
+    b.folder === oldName ? { ...b, folder: trimmed } : b
   );
   saveBookmarks(bookmarks);
+  return true;
 }
