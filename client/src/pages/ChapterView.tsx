@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft, Play, Pause, Loader2 } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
@@ -98,6 +98,107 @@ export default function ChapterView({
   // State for managing menu navigation
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Reciter preview state
+  const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
+  const [previewProgress, setPreviewProgress] = useState(0);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const previewTimerRef = useRef<number | null>(null);
+
+  const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopPreview = useCallback(() => {
+    if (previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current.src = '';
+      previewAudioRef.current = null;
+    }
+    if (previewTimerRef.current) {
+      cancelAnimationFrame(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+    if (previewTimeoutRef.current) {
+      clearTimeout(previewTimeoutRef.current);
+      previewTimeoutRef.current = null;
+    }
+    setPreviewingReciter(null);
+    setPreviewProgress(0);
+    setPreviewLoading(false);
+  }, []);
+
+  const startPreview = useCallback((reciterId: string) => {
+    stopPreview();
+    setPreviewError(null);
+
+    const reciterData = getReciterById(reciterId);
+    if (!reciterData) return;
+
+    setPreviewingReciter(reciterId);
+    setPreviewLoading(true);
+
+    const audio = new Audio(`/api/verse-audio/${reciterData.everyAyahFolder}/001/002`);
+    previewAudioRef.current = audio;
+
+    const showError = () => {
+      setPreviewError("Preview unavailable offline");
+      stopPreview();
+      setTimeout(() => setPreviewError(null), 2500);
+    };
+
+    previewTimeoutRef.current = setTimeout(() => {
+      if (previewAudioRef.current === audio && audio.paused) {
+        showError();
+      }
+    }, 10000);
+
+    audio.addEventListener('canplay', () => {
+      setPreviewLoading(false);
+      if (previewTimeoutRef.current) {
+        clearTimeout(previewTimeoutRef.current);
+        previewTimeoutRef.current = null;
+      }
+      audio.play().catch(() => showError());
+    }, { once: true });
+
+    audio.addEventListener('error', () => showError(), { once: true });
+
+    audio.addEventListener('ended', () => stopPreview(), { once: true });
+
+    const updateProgress = () => {
+      if (audio && audio.duration && !audio.paused) {
+        setPreviewProgress(audio.currentTime / audio.duration);
+        previewTimerRef.current = requestAnimationFrame(updateProgress);
+      }
+    };
+    audio.addEventListener('play', () => {
+      previewTimerRef.current = requestAnimationFrame(updateProgress);
+    });
+
+    audio.load();
+  }, [stopPreview]);
+
+  useEffect(() => {
+    if (!isMenuOpen || menuView !== 'reciter') {
+      stopPreview();
+    }
+  }, [isMenuOpen, menuView, stopPreview]);
+
+  useEffect(() => {
+    return () => {
+      if (previewAudioRef.current) {
+        previewAudioRef.current.pause();
+        previewAudioRef.current.src = '';
+      }
+      if (previewTimerRef.current) {
+        cancelAnimationFrame(previewTimerRef.current);
+      }
+      if (previewTimeoutRef.current) {
+        clearTimeout(previewTimeoutRef.current);
+      }
+    };
+  }, []);
   
   // Map our reciter IDs to Quran.com reciter IDs
   // https://api.qurancdn.com/api/qdc/audio/reciters
@@ -624,23 +725,78 @@ export default function ChapterView({
 
                 {menuView === 'reciter' && (
                   <div className="space-y-1">
-                    {getFeaturedReciters().map((r) => (
-                      <button
-                        key={r.id}
-                        onClick={() => {
-                          onReciterChange(r.id);
-                          setMenuView('main');
-                        }}
-                        className="w-full flex items-center justify-between p-4 hover-elevate active-elevate-2 rounded-md"
-                        data-testid={`reciter-option-${r.id}`}
-                      >
-                        <div className="flex flex-col items-start">
-                          <span className="text-lg text-white/90">{r.name}</span>
-                          <span className="text-sm text-white/45">{r.arabicName}</span>
+                    {getFeaturedReciters().map((r) => {
+                      const isSelected = reciter === r.id;
+                      const isPreviewing = previewingReciter === r.id;
+                      const isLoadingPreview = isPreviewing && previewLoading;
+
+                      return (
+                        <div
+                          key={r.id}
+                          className="flex items-center gap-2 rounded-md"
+                          data-testid={`reciter-option-${r.id}`}
+                        >
+                          <button
+                            onClick={() => {
+                              onReciterChange(r.id);
+                              setMenuView('main');
+                            }}
+                            className="flex-1 flex items-center gap-2 p-4 hover-elevate active-elevate-2 rounded-md min-w-0"
+                            data-testid={`reciter-select-${r.id}`}
+                          >
+                            <div className="flex flex-col items-start min-w-0 flex-1">
+                              <span className="text-base text-white/90 flex items-center gap-2 flex-wrap">
+                                <span className="truncate">{r.name}{r.style ? ` (${r.style})` : ''}</span>
+                                {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
+                              </span>
+                              <span className="text-sm text-white/45">{r.arabicName}</span>
+                            </div>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isPreviewing && !isLoadingPreview) {
+                                stopPreview();
+                              } else {
+                                startPreview(r.id);
+                              }
+                            }}
+                            className="relative flex items-center justify-center size-10 shrink-0 mr-2 rounded-full"
+                            aria-label={isPreviewing ? `Stop preview for ${r.name}` : `Preview ${r.name}`}
+                            data-testid={`reciter-preview-${r.id}`}
+                          >
+                            {isPreviewing && !isLoadingPreview && (
+                              <svg className="absolute inset-0 w-10 h-10 -rotate-90" viewBox="0 0 40 40">
+                                <circle cx="20" cy="20" r="17" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2.5" />
+                                <circle
+                                  cx="20" cy="20" r="17"
+                                  fill="none"
+                                  stroke="hsl(var(--primary))"
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeDasharray={`${2 * Math.PI * 17}`}
+                                  strokeDashoffset={`${2 * Math.PI * 17 * (1 - previewProgress)}`}
+                                  style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+                                />
+                              </svg>
+                            )}
+                            {isLoadingPreview ? (
+                              <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                            ) : isPreviewing ? (
+                              <Pause className="w-4 h-4 text-primary" />
+                            ) : (
+                              <Play className="w-4 h-4 text-white/60 ml-0.5" />
+                            )}
+                          </button>
                         </div>
-                        {reciter === r.id && <Check className="w-5 h-5 text-primary" />}
-                      </button>
-                    ))}
+                      );
+                    })}
+                    {previewError && (
+                      <div className="text-center py-2">
+                        <span className="text-xs text-red-400">{previewError}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
