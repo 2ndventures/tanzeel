@@ -179,18 +179,6 @@ export default function MushafPageView({
 
   return (
     <div className="relative flex-1 overflow-hidden flex flex-col">
-      {/* Translation toggle */}
-      <button
-        onClick={() => setTranslationVisible((v) => !v)}
-        className={`fixed top-24 right-6 z-30 size-10 rounded-full bg-muted/80 backdrop-blur-xl flex items-center justify-center shadow-lg ring-1 ring-border/50 transition-all duration-300 ${
-          translationVisible ? "text-primary" : "text-muted-foreground"
-        }`}
-        aria-label={
-          translationVisible ? "Hide translation" : "Show translation"
-        }
-      >
-        <span className="text-xs font-bold">T</span>
-      </button>
 
       {/* ── Embla Carousel ── */}
       <div className="flex-1 overflow-hidden" ref={emblaRef}>
@@ -203,16 +191,6 @@ export default function MushafPageView({
               {/* Mushaf page */}
               <div className="mushaf-page w-full max-w-xl overflow-y-auto px-1 py-3">
                 <div className="mushaf-border px-4 py-4 relative z-[1]">
-                  {/* Surah header on first page only */}
-                  {page.pageIndex === 0 && (
-                    <div className="mushaf-surah-header">
-                      <span
-                        className={`${arabicFontClass} text-base md:text-lg text-foreground/80`}
-                      >
-                        {displayArabicName}
-                      </span>
-                    </div>
-                  )}
 
                   {/* Continuous RTL text block */}
                   <div
