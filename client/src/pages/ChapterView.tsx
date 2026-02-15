@@ -339,8 +339,8 @@ export default function ChapterView({
                   <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[85vh] bg-[#000000] border-white/10">
-              <SheetHeader className="mb-4">
+            <SheetContent side="bottom" className="h-[85vh] bg-[#000000] border-white/10 flex flex-col">
+              <SheetHeader className="mb-4 shrink-0">
                 {menuView !== 'main' && (
                   <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px] text-white/80 hover:text-white" onClick={() => setMenuView('main')}>
                     <ChevronLeft className="w-6 h-6" />
@@ -352,7 +352,65 @@ export default function ChapterView({
                 </SheetTitle>
               </SheetHeader>
 
-              <div className="overflow-y-auto h-[calc(85vh-80px)] pb-16">
+              {menuView === 'main' && (
+                <div className="shrink-0 px-4 pb-3" data-testid="options-live-preview">
+                  <div className="rounded-xl bg-white/[0.04] px-4 py-3 border-b border-white/[0.06]">
+                    <p className="text-[10px] uppercase tracking-wider text-white/30 mb-2">Preview</p>
+                    <div className={`transition-all duration-200 ${
+                      lineSpacing === "Compact" ? "space-y-1" :
+                      lineSpacing === "Normal" ? "space-y-2" :
+                      lineSpacing === "Relaxed" ? "space-y-3" :
+                      "space-y-4"
+                    }`}>
+                      <p
+                        dir="rtl"
+                        className={`${
+                          arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic'
+                        } text-foreground transition-all duration-200 ${
+                          arabicFontSize === "Small" ? "text-xl md:text-2xl" :
+                          arabicFontSize === "Medium" ? "text-2xl md:text-3xl" :
+                          arabicFontSize === "Large" ? "text-3xl md:text-4xl" :
+                          "text-4xl md:text-5xl"
+                        } ${
+                          lineSpacing === "Compact" ? "leading-[2]" :
+                          lineSpacing === "Normal" ? "leading-[2.4]" :
+                          lineSpacing === "Relaxed" ? "leading-[2.8]" :
+                          "leading-[3.2]"
+                        }`}
+                        data-testid="preview-arabic"
+                      >
+                        بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+                      </p>
+                      {showTransliteration && (
+                        <p
+                          className={`italic text-muted-foreground transition-all duration-200 ${
+                            transliterationFontSize === "Small" ? "text-xs" :
+                            transliterationFontSize === "Medium" ? "text-sm" :
+                            "text-base"
+                          }`}
+                          data-testid="preview-transliteration"
+                        >
+                          Bismi l-lāhi r-raḥmāni r-raḥīm
+                        </p>
+                      )}
+                      {showTranslation && (
+                        <p
+                          className={`text-muted-foreground transition-all duration-200 ${
+                            translationFontSize === "Small" ? "text-sm" :
+                            translationFontSize === "Medium" ? "text-base" :
+                            "text-lg"
+                          }`}
+                          data-testid="preview-translation"
+                        >
+                          In the name of Allah, the Entirely Merciful, the Especially Merciful.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="overflow-y-auto flex-1 pb-16">
                 {menuView === 'main' && (
                   <div className="space-y-6">
                     {/* Arabic Text Size Section - Prioritized at top */}
