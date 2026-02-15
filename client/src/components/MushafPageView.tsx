@@ -186,11 +186,11 @@ export default function MushafPageView({
           {pages.map((page) => (
             <div
               key={page.pageIndex}
-              className="flex-[0_0_100%] min-w-0 h-full flex items-center justify-center px-3 py-2"
+              className="flex-[0_0_100%] min-w-0 h-full flex items-start justify-center px-3 pt-1 pb-2"
             >
               {/* Mushaf page */}
-              <div className="mushaf-page w-full max-w-xl overflow-y-auto px-1 py-3">
-                <div className="mushaf-border px-4 py-4 relative z-[1]">
+              <div className="mushaf-page w-full max-w-xl overflow-y-auto px-1 pt-1 pb-3">
+                <div className="mushaf-border px-4 pt-1 pb-4 relative z-[1]">
 
                   {/* Continuous RTL text block */}
                   <div
