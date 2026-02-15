@@ -603,6 +603,21 @@
   .mushaf-page {
     position: relative;
     background-color: hsl(40 30% 96%);
+    max-height: calc(
+      100vh
+      - env(safe-area-inset-top, 0px)
+      - 100px
+      - 220px
+      - env(safe-area-inset-bottom, 0px)
+    );
+    max-height: calc(
+      100dvh
+      - env(safe-area-inset-top, 0px)
+      - 100px
+      - 220px
+      - env(safe-area-inset-bottom, 0px)
+    );
+    overflow-y: auto;
   }
   .dark .mushaf-page {
     background-color: hsl(30 15% 14%);

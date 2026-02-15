@@ -198,10 +198,10 @@ export default function MushafPageView({
           {pages.map((page) => (
             <div
               key={page.pageIndex}
-              className="flex-[0_0_100%] min-w-0 h-full flex items-start justify-center px-3 pt-2 pb-2"
+              className="flex-[0_0_100%] min-w-0 h-full flex items-center justify-center px-3 py-2"
             >
               {/* Mushaf page */}
-              <div className="mushaf-page w-full max-w-xl max-h-[calc(100vh-280px)] overflow-y-auto rounded-md px-1 py-3">
+              <div className="mushaf-page w-full max-w-xl overflow-y-auto rounded-md px-1 py-3">
                 <div className="mushaf-border px-4 py-4 relative z-[1]">
                   {/* Surah header on first page only */}
                   {page.pageIndex === 0 && (
@@ -306,7 +306,7 @@ export default function MushafPageView({
         <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
           <DrawerTrigger asChild>
             <button
-              className="fixed bottom-[180px] left-1/2 -translate-x-1/2 z-30 px-4 py-1.5 rounded-full bg-muted/80 backdrop-blur-xl text-xs font-semibold tabular-nums text-muted-foreground shadow-lg ring-1 ring-border/50 transition-all hover:bg-muted"
+              className="fixed bottom-[200px] left-1/2 -translate-x-1/2 z-30 px-4 py-1.5 rounded-full bg-muted/80 backdrop-blur-xl text-xs font-semibold tabular-nums text-muted-foreground shadow-lg ring-1 ring-border/50 transition-all hover:bg-muted"
               aria-label="Jump to page"
             >
               Page {currentPageIndex + 1} / {pages.length}
