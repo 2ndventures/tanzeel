@@ -623,18 +623,8 @@
     position: relative;
   }
 
-  /* Active verse golden glow */
   .mushaf-verse-active {
-    background-color: hsl(45 93% 58% / 0.08);
-    box-shadow: 0 0 20px rgba(245, 183, 36, 0.12);
-    border-radius: 6px;
-    padding: 2px 4px;
-    margin: -2px -4px;
-    transition: background-color 0.35s ease, box-shadow 0.35s ease;
-  }
-  .dark .mushaf-verse-active {
-    background-color: hsl(45 93% 58% / 0.12);
-    box-shadow: 0 0 24px rgba(245, 183, 36, 0.18);
+    transition: opacity 0.35s ease;
   }
 
   /* Background dimming for non-active verses during playback */
