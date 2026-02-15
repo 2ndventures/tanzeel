@@ -5,7 +5,7 @@ interface ChapterCardProps {
   arabicName: string;
   englishName: string;
   verseCount: number;
-  revelationType: string;
+  meaning: string;
   onClick?: () => void;
   style?: React.CSSProperties;
   isFirst?: boolean;
@@ -23,7 +23,7 @@ export default function ChapterCard({
   arabicName,
   englishName,
   verseCount,
-  revelationType,
+  meaning,
   onClick,
   style,
 }: ChapterCardProps) {
@@ -57,7 +57,7 @@ export default function ChapterCard({
               {englishName}
             </h3>
             <p className="text-xs text-muted-foreground">
-              {revelationType} • {verseCount} Ayahs
+              {meaning} • {verseCount} Ayahs
             </p>
           </div>
 

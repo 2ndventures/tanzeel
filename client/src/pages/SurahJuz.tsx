@@ -6,7 +6,7 @@ import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
-import { chapters, juzData } from "@/lib/quranMetadata";
+import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { Settings } from "lucide-react";
 
 interface SurahJuzProps {
@@ -242,7 +242,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 arabicName={chapter.arabicName}
                 englishName={chapter.englishName}
                 verseCount={chapter.verseCount}
-                revelationType={chapter.revelationType}
+                meaning={surahMeanings[chapter.id] || chapter.revelationType}
                 onClick={() => onNavigate("chapter", chapter.id)}
                 style={{ animationDelay: `${index * 30}ms` }}
                 isFirst={index === 0}
