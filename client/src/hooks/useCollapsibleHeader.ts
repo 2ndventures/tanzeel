@@ -35,7 +35,7 @@ export function useCollapsibleHeader(options?: CollapsibleHeaderOptions) {
         setIsCollapsed(false);
       }
       // Hide header when scrolling down AND past threshold (50px)
-      else if (scrollingDown && currentScrollY > 50) {
+      else if (scrollingDown && currentScrollY > 200) {
         setIsCollapsed(true);
       }
 
