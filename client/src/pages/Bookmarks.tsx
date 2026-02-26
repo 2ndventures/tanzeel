@@ -112,13 +112,15 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
       <StatusBarShim />
 
       <div className="relative flex flex-col h-full pb-20">
-        <div className="px-8 py-6 header-safe-padding">
-          <h2 className="font-heading text-5xl font-black tracking-tighter text-foreground" data-testid="text-bookmarks-title">
-            Bookmarks
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {bookmarks.length} saved {bookmarks.length === 1 ? 'verse' : 'verses'}
-          </p>
+        <div className="header-safe-padding">
+          <div className="px-8 py-6">
+            <h2 className="font-heading text-5xl font-black tracking-tighter text-foreground" data-testid="text-bookmarks-title">
+              Bookmarks
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {bookmarks.length} saved {bookmarks.length === 1 ? 'verse' : 'verses'}
+            </p>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 pb-4">

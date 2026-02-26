@@ -44,16 +44,18 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       {/* Content - fills viewport between header and bottom nav */}
       <div className="relative flex flex-col h-full pb-20">
         {/* Header */}
-        <div className="px-8 py-6 header-safe-padding">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
-              <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
-                Simple Quran
-              </h2>
-            </div>
-            <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_rgba(255,214,10,0.3)]">
-              <Icon icon="solar:book-bold" className="size-8 text-primary-foreground" />
+        <div className="header-safe-padding">
+          <div className="px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
+                <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
+                  Simple Quran
+                </h2>
+              </div>
+              <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_rgba(255,214,10,0.3)]">
+                <Icon icon="solar:book-bold" className="size-8 text-primary-foreground" />
+              </div>
             </div>
           </div>
         </div>

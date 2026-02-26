@@ -7,6 +7,10 @@ const config: CapacitorConfig = {
   server: {
     hostname: 'localhost',
     androidScheme: 'https'
+  },
+  ios: {
+    contentInset: 'always',
+    scrollEnabled: false
   }
 };
 

@@ -29,7 +29,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<"surah" | "juz">("surah");
-  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
+  const hasActiveSearch = searchQuery.trim().length >= 3;
+  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader({ disabled: hasActiveSearch });
 
   const [deepSearchResults, setDeepSearchResults] = useState<SearchResult[]>([]);
   const [isDeepSearching, setIsDeepSearching] = useState(false);
@@ -179,9 +180,27 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
     });
   }, [deepSearchResults]);
 
-  const hasSearchQuery = searchQuery.trim().length >= 3;
+  const hasSearchQuery = hasActiveSearch;
   const showDeepSearch = hasSearchQuery && (deepSearchResults.length > 0 || isDeepSearching || deepSearchDone);
   const noSurahMatch = hasSearchQuery && filteredChapters.length === 0;
+
+  const filteredJuz = juzData.filter((juz) => {
+    const query = searchQuery.toLowerCase().trim();
+    if (!query) return true;
+    // Match if the juz number matches, or if any surah in the juz's range matches the query
+    if (juz.id.toString() === query) return true;
+    const juzLabel = `juz ${juz.id}`.toLowerCase();
+    if (juzLabel.includes(query)) return true;
+    // Check if any chapter in this juz range matches
+    return chapters.some((ch) => {
+      if (ch.id < juz.startChapter || ch.id > juz.endChapter) return false;
+      const englishName = ch.englishName.toLowerCase();
+      if (englishName.includes(query) || ch.id.toString().includes(query)) return true;
+      const normalizedQuery = normalizeSearch(query);
+      const normalizedEnglish = normalizeSearch(englishName);
+      return normalizedEnglish.includes(normalizedQuery);
+    });
+  });
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
@@ -281,7 +300,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           isCollapsed ? 'scroll-pt-140-safe' : 'scroll-pt-340-safe'
         }`}
       >
-        <div className="px-8 space-y-3 pb-8">
+        <div className="px-8 space-y-3 pb-28">
           {showDeepSearch && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-4">
@@ -303,7 +322,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                     return (
                       <button
                         key={`${result.chapterId}-${result.verseNumber}-${idx}`}
-                        className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all"
+                        className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
                         onClick={() => onNavigate("chapter", result.chapterId, undefined, result.verseNumber)}
                         data-testid={`search-result-${result.chapterId}-${result.verseNumber}`}
                       >
@@ -382,46 +401,57 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               </div>
             ))
           ) : mode === "juz" ? (
-            juzData.map((juz, index) => {
-              const startChapter = chapters.find(ch => ch.id === juz.startChapter);
-              const endChapter = chapters.find(ch => ch.id === juz.endChapter);
-              const juzBadgeStyles = [
-                { bg: "bg-primary/20", text: "text-primary" },
-                { bg: "bg-secondary/20", text: "text-secondary" },
-                { bg: "bg-accent/20", text: "text-accent" },
-              ];
-              const badge = juzBadgeStyles[(juz.id - 1) % juzBadgeStyles.length];
-              return (
-                <div
-                  key={juz.id}
-                  className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
-                  style={{ animationDelay: `${index * 30}ms` }}
-                  onClick={() => onNavigate("chapter", juz.startChapter)}
-                  data-testid={`juz-card-${juz.id}`}
-                >
-                  <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 h-full flex items-center">
-                    <div className="flex items-center gap-4 w-full">
-                      <div className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}>
-                        <span className={`${badge.text} text-lg font-bold`}>{juz.id}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-foreground mb-1">
-                          Juz {juz.id}
-                        </h3>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {startChapter?.englishName} {juz.startVerse > 1 ? `(${juz.startVerse})` : ''} — {endChapter?.englishName}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-arabic text-foreground">
-                          {startChapter ? `جزء ${juz.id}` : ''}
-                        </p>
+            filteredJuz.length > 0 ? (
+              filteredJuz.map((juz, index) => {
+                const startChapter = chapters.find(ch => ch.id === juz.startChapter);
+                const endChapter = chapters.find(ch => ch.id === juz.endChapter);
+                const juzBadgeStyles = [
+                  { bg: "bg-primary/20", text: "text-primary" },
+                  { bg: "bg-secondary/20", text: "text-secondary" },
+                  { bg: "bg-accent/20", text: "text-accent" },
+                ];
+                const badge = juzBadgeStyles[(juz.id - 1) % juzBadgeStyles.length];
+                return (
+                  <div
+                    key={juz.id}
+                    className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
+                    style={{ animationDelay: `${index * 30}ms` }}
+                    onClick={() => onNavigate("chapter", juz.startChapter)}
+                    data-testid={`juz-card-${juz.id}`}
+                  >
+                    <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 h-full flex items-center">
+                      <div className="flex items-center gap-4 w-full">
+                        <div className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}>
+                          <span className={`${badge.text} text-lg font-bold`}>{juz.id}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-lg font-bold text-foreground mb-1">
+                            Juz {juz.id}
+                          </h3>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {startChapter?.englishName} {juz.startVerse > 1 ? `(${juz.startVerse})` : ''} — {endChapter?.englishName}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-arabic text-foreground">
+                            {startChapter ? `جزء ${juz.id}` : ''}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
+                );
+              })
+            ) : !showDeepSearch ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">No juz found</p>
+                {hasSearchQuery && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Try a different search term
+                  </p>
+                )}
+              </div>
+            ) : null
           ) : filteredChapters.length > 0 ? (
             filteredChapters.map((chapter, index) => (
               <ChapterCard

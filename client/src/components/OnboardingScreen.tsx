@@ -123,7 +123,7 @@ export default function OnboardingScreen({
   const exampleVerse = exampleVerses.length > 0 ? exampleVerses[0] : null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6 safe-area-pad">
       {/* Multi-layer gradient background - adapts to theme */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
