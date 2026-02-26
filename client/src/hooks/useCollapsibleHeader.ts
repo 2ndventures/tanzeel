@@ -5,7 +5,7 @@ interface CollapsibleHeaderOptions {
 }
 
 export function useCollapsibleHeader(options?: CollapsibleHeaderOptions) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const lastScrollYRef = useRef(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
