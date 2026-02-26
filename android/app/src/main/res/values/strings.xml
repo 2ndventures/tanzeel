@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Simple Quran</string>
-    <string name="title_activity_main">Simple Quran</string>
+    <string name="app_name">Tanzeel</string>
+    <string name="title_activity_main">Tanzeel</string>
     <string name="package_name">com.simplequran.app</string>
     <string name="custom_url_scheme">com.simplequran.app</string>
 </resources>

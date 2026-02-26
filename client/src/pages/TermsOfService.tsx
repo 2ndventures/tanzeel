@@ -44,7 +44,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
               <h2 className="text-2xl font-bold text-foreground mb-4">Agreement to Terms</h2>
               <p className="text-foreground/90 leading-relaxed">
                 These Terms of Service ("Terms") constitute a legally binding agreement between you and Third Ventures, LLC 
-                ("Company," "we," "us," or "our") concerning your access to and use of the Simple Quran mobile application 
+                ("Company," "we," "us," or "our") concerning your access to and use of the Tanzeel mobile application 
                 (the "App"). By downloading, installing, or using the App, you agree to be bound by these Terms. If you do 
                 not agree to these Terms, you may not access or use the App.
               </p>

@@ -40,7 +40,7 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
       <div className="relative flex flex-col items-center justify-center gap-4 px-6 text-center">
         <Icon icon="solar:moon-stars-bold" className="size-24 text-white" />
         <h1 className="text-4xl font-black tracking-tight text-white">
-          Simple Quran
+          Tanzeel
         </h1>
       </div>
 

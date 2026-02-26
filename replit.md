@@ -1,6 +1,6 @@
 # Overview
 
-This mobile-first Quran Reading application provides users with an immersive experience to read, listen to, and study the Holy Quran. It features translations, transliterations, and audio recitation with word-level synchronized highlighting. Built with React, TypeScript, and shadcn/ui, it offers a modern, premium glassmorphism interface with adaptable light and dark themes, optimized for mobile. The application aims to deliver a highly functional and aesthetically pleasing digital Quran experience, enabling features like continuous chapter audio playback, customizable display settings, and robust bookmarking.
+Tanzeel is a mobile-first Quran Reading application that provides users with an immersive experience to read, listen to, and study the Holy Quran. It features translations, transliterations, and audio recitation with word-level synchronized highlighting. Built with React, TypeScript, and shadcn/ui, it offers a modern, premium glassmorphism interface with adaptable light and dark themes, optimized for mobile. The application aims to deliver a highly functional and aesthetically pleasing digital Quran experience, enabling features like continuous chapter audio playback, customizable display settings, and robust bookmarking.
 
 # User Preferences
 

@@ -43,7 +43,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Introduction</h2>
               <p className="text-foreground/90 leading-relaxed">
-                Third Ventures, LLC ("we," "us," or "our") operates the Simple Quran mobile application (the "App"). 
+                Third Ventures, LLC ("we," "us," or "our") operates the Tanzeel mobile application (the "App"). 
                 This Privacy Policy explains our practices regarding the collection, use, and disclosure of information 
                 when you use our App. We are committed to protecting your privacy and complying with applicable privacy 
                 laws, including GDPR (General Data Protection Regulation) and CCPA (California Consumer Privacy Act).
@@ -53,7 +53,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Information We Collect</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
-                <strong>Simple Quran does not collect, store, or transmit any personal data to our servers.</strong>
+                <strong>Tanzeel does not collect, store, or transmit any personal data to our servers.</strong>
               </p>
               <p className="text-foreground/90 leading-relaxed">
                 All app functionality operates entirely on your device using local storage. This includes:

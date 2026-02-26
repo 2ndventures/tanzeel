@@ -108,14 +108,14 @@ export default function Settings({
         },
         body: JSON.stringify({
           message: feedback,
-          _subject: "Simple Quran - User Feedback",
+          _subject: "Tanzeel - User Feedback",
         }),
       });
 
       if (response.ok) {
         toast({
           title: "Feedback sent!",
-          description: "Thank you for helping us improve Simple Quran.",
+          description: "Thank you for helping us improve Tanzeel.",
         });
         setFeedback("");
         setFeedbackOpen(false);
@@ -354,7 +354,7 @@ export default function Settings({
                     </SheetHeader>
                     <div className="mt-6 space-y-4">
                       <p className="text-muted-foreground">
-                        We'd love to hear your thoughts! Your feedback helps us make Simple Quran better.
+                        We'd love to hear your thoughts! Your feedback helps us make Tanzeel better.
                       </p>
                       <Textarea
                         placeholder="Tell us what you think..."
@@ -442,7 +442,7 @@ export default function Settings({
 
           {/* App Information */}
           <div className="text-center text-sm text-muted-foreground space-y-2 pb-8">
-            <p>Simple Quran</p>
+            <p>Tanzeel</p>
             <p>Version 1.0.0</p>
             <p>© 2026 Third Ventures, LLC</p>
           </div>

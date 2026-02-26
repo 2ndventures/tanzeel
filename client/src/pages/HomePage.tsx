@@ -50,7 +50,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               <div>
                 <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
                 <h2 className="font-heading text-4xl font-black tracking-tighter text-foreground">
-                  Simple Quran
+                  Tanzeel
                 </h2>
               </div>
               <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_rgba(255,214,10,0.3)]">
