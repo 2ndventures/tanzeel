@@ -266,14 +266,14 @@ export default function AudioPlayer({
   const remaining = Math.max(0, duration - currentTime);
 
   return (
-    <div className={`fixed inset-x-0 bottom-0 z-20 px-4 pb-4 safe-area-bottom transition-all duration-300 ${
+    <div className={`fixed inset-x-0 bottom-0 z-20 safe-area-bottom transition-all duration-300 ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
-      <div className="relative rounded-[28px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]" data-testid="audio-player-content">
+      <div className="relative overflow-hidden shadow-[0_-4px_30px_rgba(0,0,0,0.4)]" data-testid="audio-player-content">
         {/* Glass layers */}
         <div className="absolute inset-0 [-webkit-backdrop-filter:blur(25px)_saturate(150%)] [backdrop-filter:blur(25px)_saturate(150%)]" />
         <div className="absolute inset-0 bg-[rgba(20,20,20,0.55)]" />
-        <div className="absolute inset-0 rounded-[28px] ring-[0.5px] ring-inset ring-white/[0.12] pointer-events-none" />
+        <div className="absolute inset-0 ring-[0.5px] ring-inset ring-white/[0.12] pointer-events-none" />
 
         <div className="relative px-6 pt-5 pb-5">
 
@@ -349,15 +349,15 @@ export default function AudioPlayer({
         {/* ── Controls row ── */}
         <div className="flex items-center justify-between mt-4 px-2">
 
-          {/* Speed — plain text, green when not 1x */}
+          {/* Speed — plain text, gold when not 1x */}
           <button
             ref={speedButtonRef}
             onPointerDown={handlePointerDown}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerCancel}
             onContextMenu={(e) => e.preventDefault()}
-            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none transition-colors ${
-              speedIsModified ? 'text-emerald-400' : 'text-white/50'
+            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-white/15 ${
+              speedIsModified ? 'text-[#f8c630]' : 'text-white/50'
             }`}
             aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
             data-testid="button-speed"
@@ -368,19 +368,19 @@ export default function AudioPlayer({
             </span>
           </button>
 
-          {/* Center: prev, play/pause, next */}
+          {/* Center: skip back 15s, play/pause, skip forward 15s */}
           <div className="flex items-center gap-8">
             <button
-              onClick={onPrevious}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 hover:text-white active:scale-95 transition-all"
-              aria-label="Previous chapter"
-              data-testid="button-previous"
+              onClick={() => onSeek?.(Math.max(0, currentTime - 15))}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 rounded-xl active:bg-white/15 active:scale-95 transition-all"
+              aria-label="Skip back 15 seconds"
+              data-testid="button-skip-back"
             >
-              <Icon icon="solar:skip-previous-bold" className="size-8" aria-hidden="true" />
+              <Icon icon="solar:rewind-15-seconds-back-bold" className="size-8" aria-hidden="true" />
             </button>
 
             <button
-              className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 bg-[#f8c630] text-[#ffffff]"
+              className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 bg-[#f8c630] text-[#ffffff]"
               onClick={onPlayPause}
               disabled={isLoading}
               aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
@@ -396,12 +396,12 @@ export default function AudioPlayer({
             </button>
 
             <button
-              onClick={onNext}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 hover:text-white active:scale-95 transition-all"
-              aria-label="Next chapter"
-              data-testid="button-next"
+              onClick={() => onSeek?.(Math.min(duration, currentTime + 15))}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 rounded-xl active:bg-white/15 active:scale-95 transition-all"
+              aria-label="Skip forward 15 seconds"
+              data-testid="button-skip-forward"
             >
-              <Icon icon="solar:skip-next-bold" className="size-8" aria-hidden="true" />
+              <Icon icon="solar:rewind-15-seconds-forward-bold" className="size-8" aria-hidden="true" />
             </button>
           </div>
 
@@ -409,7 +409,7 @@ export default function AudioPlayer({
           <Drawer>
             <DrawerTrigger asChild>
               <button
-                className={`min-h-[44px] w-10 flex items-center justify-center transition-colors ${
+                className={`min-h-[44px] w-10 flex items-center justify-center rounded-xl transition-colors active:bg-white/15 ${
                   layoutMode !== 'standard' ? 'text-white/90' : 'text-white/50'
                 }`}
                 aria-label="Select layout mode"
