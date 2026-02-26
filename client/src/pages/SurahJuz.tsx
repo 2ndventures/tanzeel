@@ -211,7 +211,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
       <StatusBarShim />
 
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl header-safe-padding">
         <div className="px-8 pt-4 pb-2">
           <div className="flex items-center justify-between">
             <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
