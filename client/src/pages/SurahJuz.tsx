@@ -296,9 +296,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
       <div
         ref={scrollContainerRef}
-        className={`relative h-screen overflow-y-auto transition-[padding] duration-300 ${
-          isCollapsed ? 'scroll-pt-140-safe' : 'scroll-pt-340-safe'
-        }`}
+        className="relative h-screen overflow-y-auto scroll-pt-140-safe"
       >
         <div className="px-8 space-y-3 pb-28">
           {showDeepSearch && (
