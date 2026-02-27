@@ -515,8 +515,13 @@ export default function ChapterView({
                   <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[85vh] flex flex-col" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
-              <SheetHeader className="mb-4 shrink-0">
+            <SheetContent side="bottom" className="h-[85vh] flex flex-col overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-900/30 dark:to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent dark:from-amber-500/8" />
+              </div>
+              <SheetHeader className="mb-4 shrink-0 relative z-10">
                 {menuView !== 'main' && (
                   <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px] text-foreground/80 hover:text-foreground" onClick={() => setMenuView('main')}>
                     <ChevronLeft className="w-6 h-6" />
@@ -529,7 +534,7 @@ export default function ChapterView({
               </SheetHeader>
 
               {menuView === 'main' && (
-                <div className="shrink-0 px-4 pb-3" data-testid="options-live-preview">
+                <div className="shrink-0 px-4 pb-3 relative z-10" data-testid="options-live-preview">
                   <div className="rounded-xl px-4 py-3" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.5)', borderBottom: '1px solid hsl(var(--sheet-muted))' }}>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mb-2">Preview</p>
                     <div className={`transition-all duration-200 ${
@@ -594,7 +599,7 @@ export default function ChapterView({
                 </div>
               )}
 
-              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16">
+              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16 relative z-10">
                 {menuView === 'main' && (
                   <div className="space-y-6">
                     {/* Text Size Section — consolidated */}

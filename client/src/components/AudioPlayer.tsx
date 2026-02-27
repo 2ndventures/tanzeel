@@ -47,11 +47,16 @@ interface AudioPlayerProps {
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
   return (
-    <DrawerContent style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
-      <DrawerHeader>
+    <DrawerContent className="overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-900/30 dark:to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent dark:from-amber-500/8" />
+      </div>
+      <DrawerHeader className="relative z-10">
         <DrawerTitle>Select Layout</DrawerTitle>
       </DrawerHeader>
-      <div className="px-4 pb-8">
+      <div className="px-4 pb-8 relative z-10">
         <div className="grid grid-cols-2 gap-3">
           {LAYOUT_OPTIONS.map((opt) => {
             const isSelected = layoutMode === opt.mode;
