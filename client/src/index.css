@@ -318,9 +318,9 @@
 
 /* Collapsible section positioning with safe area (for SurahJuz search section) */
 .collapsible-top-100 {
-  top: 92px;
-  top: calc(92px + constant(safe-area-inset-top));
-  top: calc(92px + env(safe-area-inset-top));
+  top: 84px;
+  top: calc(84px + constant(safe-area-inset-top));
+  top: calc(84px + env(safe-area-inset-top));
 }
 
 /* Scroll padding for collapsible headers with safe area */
@@ -331,9 +331,9 @@
 }
 
 .scroll-pt-340-safe {
-  padding-top: 308px;
-  padding-top: calc(308px + constant(safe-area-inset-top));
-  padding-top: calc(308px + env(safe-area-inset-top));
+  padding-top: 300px;
+  padding-top: calc(300px + constant(safe-area-inset-top));
+  padding-top: calc(300px + env(safe-area-inset-top));
 }
 
 /**
