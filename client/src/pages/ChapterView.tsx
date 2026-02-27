@@ -594,7 +594,7 @@ export default function ChapterView({
                 </div>
               )}
 
-              <div className="overflow-y-auto flex-1 pb-16">
+              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16">
                 {menuView === 'main' && (
                   <div className="space-y-6">
                     {/* Text Size Section — consolidated */}
@@ -605,12 +605,12 @@ export default function ChapterView({
                       <div className="space-y-2 px-4">
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-sm text-foreground/80 shrink-0">Arabic</span>
-                          <div className="flex gap-1.5">
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onArabicFontSizeChange?.(s.value)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   arabicFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
@@ -625,12 +625,12 @@ export default function ChapterView({
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-sm text-foreground/80 shrink-0">Translation</span>
-                          <div className="flex gap-1.5">
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onTranslationFontSizeChange?.(s.value)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   translationFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
@@ -645,12 +645,12 @@ export default function ChapterView({
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <span className="text-sm text-foreground/80 shrink-0">Transliteration</span>
-                          <div className="flex gap-1.5">
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onTransliterationFontSizeChange?.(s.value)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   transliterationFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
@@ -670,7 +670,7 @@ export default function ChapterView({
                     <div>
                       <div className="flex items-center justify-between gap-3 px-4">
                         <span className="text-sm text-foreground/80 shrink-0">Arabic Script</span>
-                        <div className="flex gap-1.5">
+                        <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                           {([
                             { value: 'uthmani', label: 'Uthmani' },
                             { value: 'indopak', label: 'IndoPak' },
@@ -679,7 +679,7 @@ export default function ChapterView({
                             <button
                               key={option.value}
                               onClick={() => onArabicScriptChange?.(option.value)}
-                              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                 arabicScript === option.value
                                   ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                   : 'text-muted-foreground'
@@ -698,12 +698,12 @@ export default function ChapterView({
                     <div>
                       <div className="flex items-center justify-between gap-3 px-4">
                         <span className="text-sm text-foreground/80 shrink-0">Line Spacing</span>
-                        <div className="flex gap-1.5">
+                        <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                           {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
                             <button
                               key={spacing}
                               onClick={() => onLineSpacingChange?.(spacing)}
-                              className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                              className={`shrink-0 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                                 lineSpacing === spacing
                                   ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                   : 'text-muted-foreground'
