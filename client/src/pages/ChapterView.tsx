@@ -96,6 +96,42 @@ export default function ChapterView({
   
   // Collapsible header hook
   const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
+
+  // Auto-hide header in focused-flow mode (mirrors AudioPlayer auto-hide)
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const headerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shouldAutoHideHeader = layoutMode === 'focused-flow';
+
+  const resetHeaderTimer = useCallback(() => {
+    setHeaderVisible(true);
+    if (headerTimeoutRef.current) clearTimeout(headerTimeoutRef.current);
+    if (shouldAutoHideHeader) {
+      headerTimeoutRef.current = setTimeout(() => setHeaderVisible(false), 3000);
+    }
+  }, [shouldAutoHideHeader]);
+
+  useEffect(() => {
+    if (shouldAutoHideHeader) {
+      resetHeaderTimer();
+    } else {
+      setHeaderVisible(true);
+      if (headerTimeoutRef.current) clearTimeout(headerTimeoutRef.current);
+    }
+    return () => { if (headerTimeoutRef.current) clearTimeout(headerTimeoutRef.current); };
+  }, [shouldAutoHideHeader]);
+
+  useEffect(() => {
+    if (!shouldAutoHideHeader) return;
+    const handleInteraction = () => resetHeaderTimer();
+    window.addEventListener('touchstart', handleInteraction, { passive: true });
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('mousemove', handleInteraction);
+    return () => {
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('mousemove', handleInteraction);
+    };
+  }, [shouldAutoHideHeader, resetHeaderTimer]);
   
   // State for managing menu navigation
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
@@ -423,11 +459,15 @@ export default function ChapterView({
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
-      <div className="fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none" style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+      <div className={`fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`} style={{ height: 'env(safe-area-inset-top, 0px)' }} />
 
       {/* Gradient Fade Header */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}
+        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding transition-all duration-300 ${
+          shouldAutoHideHeader
+            ? (headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none')
+            : (isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded')
+        } ${!shouldAutoHideHeader ? 'header-transition' : ''}`}
         style={{ willChange: 'transform' }}
       >
         <header
