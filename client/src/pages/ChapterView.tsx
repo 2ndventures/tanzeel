@@ -422,6 +422,9 @@ export default function ChapterView({
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
+      {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
+      <div className="fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none" style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+
       {/* Gradient Fade Header */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 header-safe-padding header-transition ${isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded'}`}
