@@ -318,9 +318,9 @@
 
 /* Collapsible section positioning with safe area (for SurahJuz search section) */
 .collapsible-top-100 {
-  top: 84px;
-  top: calc(84px + constant(safe-area-inset-top));
-  top: calc(84px + env(safe-area-inset-top));
+  top: 82px;
+  top: calc(82px + constant(safe-area-inset-top));
+  top: calc(82px + env(safe-area-inset-top));
 }
 
 /* Scroll padding for collapsible headers with safe area */
