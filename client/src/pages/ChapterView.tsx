@@ -96,6 +96,8 @@ export default function ChapterView({
   
   // Collapsible header hook
   const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
+  
+  const didSeekRef = useRef(false);
 
   // Auto-hide header in focused-flow mode (mirrors AudioPlayer auto-hide)
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -382,9 +384,11 @@ export default function ChapterView({
             const breathingRoom = 20;
             const targetScroll = verseRelativeTop - headerHeight - breathingRoom;
             
+            const scrollBehavior = didSeekRef.current ? 'instant' : 'smooth';
+            didSeekRef.current = false;
             container.scrollTo({ 
               top: Math.max(0, targetScroll),
-              behavior: 'smooth' 
+              behavior: scrollBehavior as ScrollBehavior,
             });
           }
         });
@@ -1108,7 +1112,7 @@ export default function ChapterView({
         isLoading={isLoading}
         repeat={repeat}
         onPlayPause={togglePlayPause}
-        onSeek={seek}
+        onSeek={(time) => { didSeekRef.current = true; seek(time); }}
         onSpeedChange={setSpeed}
         onPrevious={goToPreviousSurah}
         onNext={goToNextSurah}
