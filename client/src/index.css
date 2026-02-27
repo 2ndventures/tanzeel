@@ -17,6 +17,9 @@
   --header-gradient-start: rgba(248, 250, 252, 0.95);
   --header-gradient-mid: rgba(248, 250, 252, 0.6);
 
+  --sheet-bg: 0 0% 97%;
+  --sheet-muted: 0 0% 92%;
+
   --background: 0 0% 100%;
 
   --foreground: 222 47% 11%;
@@ -139,6 +142,9 @@
 
   --header-gradient-start: rgba(10, 10, 14, 0.95);
   --header-gradient-mid: rgba(10, 10, 14, 0.7);
+
+  --sheet-bg: 240 6% 6%;
+  --sheet-muted: 240 5% 12%;
 
   --background: 217 44% 11%;
 

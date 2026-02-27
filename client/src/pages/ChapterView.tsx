@@ -469,7 +469,7 @@ export default function ChapterView({
                   <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[85vh] bg-background border-border flex flex-col">
+            <SheetContent side="bottom" className="h-[85vh] flex flex-col" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
               <SheetHeader className="mb-4 shrink-0">
                 {menuView !== 'main' && (
                   <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px] text-foreground/80 hover:text-foreground" onClick={() => setMenuView('main')}>
@@ -484,7 +484,7 @@ export default function ChapterView({
 
               {menuView === 'main' && (
                 <div className="shrink-0 px-4 pb-3" data-testid="options-live-preview">
-                  <div className="rounded-xl bg-muted/30 px-4 py-3 border-b border-border/50">
+                  <div className="rounded-xl px-4 py-3" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.5)', borderBottom: '1px solid hsl(var(--sheet-muted))' }}>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mb-2">Preview</p>
                     <div className={`transition-all duration-200 ${
                       lineSpacing === "Compact" ? "space-y-1" :
@@ -567,8 +567,9 @@ export default function ChapterView({
                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   arabicFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                    : 'bg-muted/50 text-muted-foreground'
+                                    : 'text-muted-foreground'
                                 }`}
+                                style={arabicFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                                 data-testid={`button-arabic-size-${s.value.toLowerCase().replace(' ', '-')}`}
                               >
                                 {s.label}
@@ -586,8 +587,9 @@ export default function ChapterView({
                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   translationFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                    : 'bg-muted/50 text-muted-foreground'
+                                    : 'text-muted-foreground'
                                 }`}
+                                style={translationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                                 data-testid={`button-translation-size-${s.value.toLowerCase()}`}
                               >
                                 {s.label}
@@ -605,8 +607,9 @@ export default function ChapterView({
                                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   transliterationFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                    : 'bg-muted/50 text-muted-foreground'
+                                    : 'text-muted-foreground'
                                 }`}
+                                style={transliterationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                                 data-testid={`button-transliteration-size-${s.value.toLowerCase()}`}
                               >
                                 {s.label}
@@ -633,8 +636,9 @@ export default function ChapterView({
                               className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                 arabicScript === option.value
                                   ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                  : 'bg-muted/50 text-muted-foreground'
+                                  : 'text-muted-foreground'
                               }`}
+                              style={arabicScript !== option.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                               data-testid={`button-script-${option.value}`}
                             >
                               {option.label}
@@ -656,8 +660,9 @@ export default function ChapterView({
                               className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                 lineSpacing === spacing
                                   ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                  : 'bg-muted/50 text-muted-foreground'
+                                  : 'text-muted-foreground'
                               }`}
+                              style={lineSpacing !== spacing ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                               data-testid={`button-spacing-${spacing.toLowerCase()}`}
                             >
                               {spacing}
@@ -796,7 +801,7 @@ export default function ChapterView({
                           >
                             {isPreviewing && !isLoadingPreview && (
                               <svg className="absolute inset-0 w-10 h-10 -rotate-90" viewBox="0 0 40 40">
-                                <circle cx="20" cy="20" r="17" fill="none" stroke="hsl(var(--muted))" strokeWidth="2.5" />
+                                <circle cx="20" cy="20" r="17" fill="none" stroke="hsl(var(--sheet-muted))" strokeWidth="2.5" />
                                 <circle
                                   cx="20" cy="20" r="17"
                                   fill="none"

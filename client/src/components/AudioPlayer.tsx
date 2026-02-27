@@ -47,7 +47,7 @@ interface AudioPlayerProps {
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
   return (
-    <DrawerContent className="bg-background">
+    <DrawerContent style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
       <DrawerHeader>
         <DrawerTitle>Select Layout</DrawerTitle>
       </DrawerHeader>
