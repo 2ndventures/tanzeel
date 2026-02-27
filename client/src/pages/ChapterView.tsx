@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft, Play, Pause, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2 } from "lucide-react";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
@@ -133,6 +133,35 @@ export default function ChapterView({
     };
   }, [shouldAutoHideHeader, resetHeaderTimer]);
   
+  // Surah dropdown state
+  const [surahDropdownOpen, setSurahDropdownOpen] = useState(false);
+  const surahDropdownRef = useRef<HTMLDivElement>(null);
+  const surahListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (surahDropdownOpen && surahListRef.current) {
+      const currentItem = surahListRef.current.querySelector(`[data-surah-id="${chapterId}"]`) as HTMLElement;
+      if (currentItem) {
+        currentItem.scrollIntoView({ block: 'center', behavior: 'instant' });
+      }
+    }
+  }, [surahDropdownOpen, chapterId]);
+
+  useEffect(() => {
+    if (!surahDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (surahDropdownRef.current && !surahDropdownRef.current.contains(e.target as Node)) {
+        setSurahDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [surahDropdownOpen]);
+
   // State for managing menu navigation
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -494,14 +523,75 @@ export default function ChapterView({
               <ArrowLeft className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
             </button>
 
-            {/* Center: Surah name + Arabic subtitle */}
-            <div className="flex flex-col items-center flex-1 mx-3 min-w-0">
-              <h1 className="text-[15px] font-semibold text-foreground/90 dark:text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
-                {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
-              </h1>
-              <p className="font-arabic text-muted-foreground dark:text-white/50 truncate text-[18px]" data-testid="text-surah-arabic-name">
-                {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : ''}
-              </p>
+            {/* Center: Surah name + Arabic subtitle — tappable dropdown */}
+            <div className="flex flex-col items-center flex-1 mx-3 min-w-0 relative" ref={surahDropdownRef}>
+              <button
+                className="flex flex-col items-center gap-0 active:opacity-60 transition-opacity"
+                onClick={() => setSurahDropdownOpen(prev => !prev)}
+                aria-label="Select surah"
+                data-testid="button-surah-dropdown"
+              >
+                <div className="flex items-center gap-1">
+                  <h1 className="text-[15px] font-semibold text-foreground/90 dark:text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
+                    {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
+                  </h1>
+                  <ChevronDown className={`w-3.5 h-3.5 text-foreground/50 dark:text-white/50 transition-transform duration-200 shrink-0 ${surahDropdownOpen ? 'rotate-180' : ''}`} />
+                </div>
+                <p className="font-arabic text-muted-foreground dark:text-white/50 truncate text-[18px]" data-testid="text-surah-arabic-name">
+                  {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : ''}
+                </p>
+              </button>
+
+              {surahDropdownOpen && (
+                <div
+                  className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-[280px] max-h-[320px] rounded-xl overflow-hidden shadow-2xl border border-border/20 dark:border-white/10"
+                  style={{ backgroundColor: 'hsl(var(--sheet-bg) / 0.97)', backdropFilter: 'blur(40px) saturate(180%)' }}
+                >
+                  <div className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-900/30 dark:to-transparent" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+                  </div>
+                  <div ref={surahListRef} className="overflow-y-auto max-h-[320px] py-1.5 relative z-10">
+                    {chapters.map((ch) => {
+                      const isCurrent = ch.id === chapterId;
+                      return (
+                        <button
+                          key={ch.id}
+                          data-surah-id={ch.id}
+                          onClick={() => {
+                            setSurahDropdownOpen(false);
+                            if (ch.id !== chapterId) {
+                              onNavigate('chapter', ch.id);
+                            }
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 transition-colors ${
+                            isCurrent
+                              ? 'bg-primary/15 dark:bg-primary/20'
+                              : 'hover-elevate'
+                          }`}
+                          data-testid={`surah-dropdown-item-${ch.id}`}
+                        >
+                          <span className={`text-xs tabular-nums w-7 text-right shrink-0 ${
+                            isCurrent ? 'text-primary font-bold' : 'text-muted-foreground'
+                          }`}>
+                            {ch.id}
+                          </span>
+                          <span className={`text-sm truncate flex-1 text-left ${
+                            isCurrent ? 'text-primary font-semibold' : 'text-foreground/90 dark:text-white/85'
+                          }`}>
+                            {ch.englishName}
+                          </span>
+                          <span className={`font-arabic text-[15px] shrink-0 ${
+                            isCurrent ? 'text-primary' : 'text-muted-foreground dark:text-white/40'
+                          }`}>
+                            {getDisplayArabicName(ch.arabicName)}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right: Settings button */}
