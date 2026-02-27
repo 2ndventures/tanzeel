@@ -269,13 +269,12 @@ export default function AudioPlayer({
     <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
-      <div className="relative overflow-hidden shadow-[0_-4px_30px_rgba(0,0,0,0.4)]" data-testid="audio-player-content">
-        {/* Glass layers */}
-        <div className="absolute inset-0 [-webkit-backdrop-filter:blur(25px)_saturate(150%)] [backdrop-filter:blur(25px)_saturate(150%)]" />
-        <div className="absolute inset-0 bg-[rgba(20,20,20,0.55)]" />
-        <div className="absolute inset-0 ring-[0.5px] ring-inset ring-white/[0.12] pointer-events-none" />
+      <div className="relative" data-testid="audio-player-content">
+        {/* Seamless gradient + blur — fades from transparent to dark */}
+        <div className="absolute inset-0 [-webkit-backdrop-filter:blur(40px)_saturate(180%)] [backdrop-filter:blur(40px)_saturate(180%)]" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(10,10,14,0.4) 15%, rgba(10,10,14,0.75) 40%, rgba(10,10,14,0.92) 70%, rgba(10,10,14,0.98) 100%)' }} />
 
-        <div className="relative px-6 pt-5 pb-5 safe-area-bottom">
+        <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 
         {/* ── Surah info: bold name left, Arabic right ── */}
         <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
