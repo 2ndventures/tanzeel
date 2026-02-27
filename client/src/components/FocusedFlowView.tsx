@@ -151,10 +151,10 @@ export default function FocusedFlowView({
         <span className="text-sm font-bold">T</span>
       </button>
 
-      {/* Horizontal scroll container */}
+      {/* Vertical scroll container */}
       <div
         ref={scrollContainerRef}
-        className="horizontal-verse-scroll flex overflow-x-auto overflow-y-hidden h-full items-center"
+        className="vertical-verse-scroll flex flex-col overflow-y-auto overflow-x-hidden h-full"
       >
         {verses.map((verse, index) => {
           const verseNumber = index + 1;
