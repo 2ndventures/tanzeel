@@ -343,6 +343,7 @@ export default function ChapterView({
     seek,
     setSpeed,
     seekToVerse,
+    getTimingData,
   } = useWordTimingAudio(
     chapterId,
     quranComReciterId,
@@ -1119,6 +1120,7 @@ export default function ChapterView({
         layoutMode={layoutMode}
         onLayoutModeChange={onLayoutModeChange}
         compact={false}
+        verseTimings={getTimingData()?.verse_timings}
       />
     </div>
   );

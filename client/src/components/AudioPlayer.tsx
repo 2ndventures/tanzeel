@@ -25,6 +25,12 @@ const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: str
   { mode: 'hifz', icon: 'solar:square-academic-cap-bold', label: 'Hifz', desc: 'Memorization mode', preview: layoutHifzImg },
 ];
 
+interface VerseTimingInfo {
+  timestamp_from: number;
+  timestamp_to: number;
+  verse_key: string;
+}
+
 interface AudioPlayerProps {
   currentTime?: number;
   duration?: number;
@@ -45,6 +51,7 @@ interface AudioPlayerProps {
   layoutMode?: LayoutMode;
   onLayoutModeChange?: (mode: LayoutMode) => void;
   compact?: boolean;
+  verseTimings?: VerseTimingInfo[];
 }
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
@@ -129,6 +136,7 @@ export default function AudioPlayer({
   layoutMode = 'standard',
   onLayoutModeChange,
   compact = false,
+  verseTimings,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
@@ -137,6 +145,21 @@ export default function AudioPlayer({
   const didLongPressRef = useRef(false);
   const speedButtonRef = useRef<HTMLButtonElement>(null);
   const sliderContainerRef = useRef<HTMLDivElement>(null);
+
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const [scrubValue, setScrubValue] = useState(0);
+
+  const getVerseAtTime = useCallback((timeSeconds: number): string | null => {
+    if (!verseTimings || verseTimings.length === 0) return null;
+    const timeMs = timeSeconds * 1000;
+    for (const timing of verseTimings) {
+      if (timeMs >= timing.timestamp_from && timeMs <= timing.timestamp_to) {
+        const verseNum = timing.verse_key.split(':')[1];
+        return `Ayah ${verseNum}`;
+      }
+    }
+    return null;
+  }, [verseTimings]);
 
   // Auto-hide logic
   const [isVisible, setIsVisible] = useState(true);
@@ -309,19 +332,31 @@ export default function AudioPlayer({
         {/* ── Seek bar ── */}
         <div className="mb-1">
           <Slider
-            value={[currentTime]}
+            value={[isScrubbing ? scrubValue : currentTime]}
             max={duration}
-            step={1}
-            onValueChange={(value) => onSeek?.(value[0])}
+            step={0.1}
+            onValueChange={(value) => {
+              if (!isScrubbing) setIsScrubbing(true);
+              setScrubValue(value[0]);
+            }}
+            onValueCommit={(value) => {
+              onSeek?.(value[0]);
+              setIsScrubbing(false);
+            }}
+            showTooltip={true}
+            tooltipContent={(value) => {
+              const verse = getVerseAtTime(value);
+              return verse || formatTime(value);
+            }}
             className="w-full [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-track]]:bg-white/20 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:border-white/20"
             data-testid="slider-audio-progress"
           />
           <div className="flex items-center justify-between mt-1.5 px-0.5">
             <span className="text-[11px] tabular-nums font-medium text-white/50" data-testid="text-current-time">
-              {formatTime(currentTime)}
+              {formatTime(isScrubbing ? scrubValue : currentTime)}
             </span>
             <span className="text-[11px] tabular-nums font-medium text-white/50" data-testid="text-duration">
-              -{formatTime(remaining)}
+              -{formatTime(isScrubbing ? Math.max(0, duration - scrubValue) : remaining)}
             </span>
           </div>
         </div>

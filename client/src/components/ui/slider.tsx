@@ -16,8 +16,9 @@ const Slider = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
     showTooltip?: boolean;
     tooltipContent?: (value: number) => React.ReactNode;
+    onValueCommit?: (value: number[]) => void;
   }
->(({ className, showTooltip = false, tooltipContent, ...props }, ref) => {
+>(({ className, showTooltip = false, tooltipContent, onValueCommit, ...props }, ref) => {
   const [showTooltipState, setShowTooltipState] = React.useState(false);
   const [internalValue, setInternalValue] = React.useState<number[]>(
     (props.defaultValue as number[]) ?? (props.value as number[]) ?? [0],
@@ -89,6 +90,7 @@ const Slider = React.forwardRef<
         className,
       )}
       onValueChange={handleValueChange}
+      onValueCommit={onValueCommit}
       {...props}
     >
       <SliderPrimitive.Track data-slot="slider-track" className="relative grow overflow-hidden rounded-full bg-foreground/10 data-[orientation=horizontal]:h-2 data-[orientation=vertical]:h-full data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-2">
