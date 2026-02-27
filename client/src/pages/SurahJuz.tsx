@@ -1,14 +1,13 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
-import { Settings, Search, Sparkles, BookOpen, Loader2, ArrowRight } from "lucide-react";
+import { Search, Sparkles, BookOpen, Loader2, ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { lazyChapterService } from "@/services/lazyChapterService";
 
@@ -217,16 +216,6 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
             <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
               Surahs
             </h1>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => onNavigate("settings", undefined, "settings")}
-              className="size-14 rounded-full"
-              aria-label="Open settings"
-              data-testid="button-settings"
-            >
-              <Settings className="w-10 h-10" aria-hidden="true" style={{ width: '40px', height: '40px' }} />
-            </Button>
           </div>
         </div>
       </div>
