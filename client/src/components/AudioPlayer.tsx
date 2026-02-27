@@ -18,7 +18,7 @@ import layoutHifzImg from "@/assets/images/layout-hifz.png";
 
 const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: string; preview: string }[] = [
   { mode: 'standard', icon: 'solar:align-vertical-spacing-bold', label: 'Standard', desc: 'Vertical scrolling', preview: layoutStandardImg },
-  { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Horizontal reading', preview: layoutFocusedImg },
+  { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Vertical reading', preview: layoutFocusedImg },
   { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Medinan page view', preview: layoutMushafImg },
   { mode: 'hifz', icon: 'solar:square-academic-cap-bold', label: 'Hifz', desc: 'Memorization mode', preview: layoutHifzImg },
 ];
@@ -66,7 +66,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                 }`}
                 data-testid={`layout-option-${opt.mode}`}
               >
-                <div className="aspect-[3/4] w-full overflow-hidden bg-muted/20 dark:bg-slate-900/60">
+                <div className="aspect-square w-full overflow-hidden bg-muted/20 dark:bg-slate-900/60">
                   <img
                     src={opt.preview}
                     alt={`${opt.label} layout preview`}
