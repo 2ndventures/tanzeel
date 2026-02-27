@@ -23,38 +23,45 @@ const Slider = React.forwardRef<
   const [internalValue, setInternalValue] = React.useState<number[]>(
     (props.defaultValue as number[]) ?? (props.value as number[]) ?? [0],
   );
+  const isDraggingRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (props.value !== undefined) {
+    if (props.value !== undefined && !isDraggingRef.current) {
       setInternalValue(props.value as number[]);
     }
   }, [props.value]);
 
   const handleValueChange = (newValue: number[]) => {
+    isDraggingRef.current = true;
     setInternalValue(newValue);
     props.onValueChange?.(newValue);
   };
 
+  const handleValueCommit = (newValue: number[]) => {
+    isDraggingRef.current = false;
+    onValueCommit?.(newValue);
+  };
+
   const handlePointerDown = () => {
+    isDraggingRef.current = true;
     if (showTooltip) {
       setShowTooltipState(true);
     }
   };
 
   const handlePointerUp = React.useCallback(() => {
+    isDraggingRef.current = false;
     if (showTooltip) {
       setShowTooltipState(false);
     }
   }, [showTooltip]);
 
   React.useEffect(() => {
-    if (showTooltip) {
-      document.addEventListener("pointerup", handlePointerUp);
-      return () => {
-        document.removeEventListener("pointerup", handlePointerUp);
-      };
-    }
-  }, [showTooltip, handlePointerUp]);
+    document.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      document.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [handlePointerUp]);
 
   const renderThumb = (value: number) => {
     const thumb = (
@@ -90,7 +97,7 @@ const Slider = React.forwardRef<
         className,
       )}
       onValueChange={handleValueChange}
-      onValueCommit={onValueCommit}
+      onValueCommit={handleValueCommit}
       {...props}
     >
       <SliderPrimitive.Track data-slot="slider-track" className="relative grow overflow-hidden rounded-full bg-foreground/10 data-[orientation=horizontal]:h-2 data-[orientation=vertical]:h-full data-[orientation=horizontal]:w-full data-[orientation=vertical]:w-2">

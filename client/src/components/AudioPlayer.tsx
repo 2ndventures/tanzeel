@@ -149,6 +149,23 @@ export default function AudioPlayer({
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubValue, setScrubValue] = useState(0);
 
+  const isScrubbingRef = useRef(false);
+
+  useEffect(() => {
+    const handleGlobalPointerUp = () => {
+      if (isScrubbingRef.current) {
+        isScrubbingRef.current = false;
+        setIsScrubbing(false);
+      }
+    };
+    document.addEventListener('pointerup', handleGlobalPointerUp);
+    document.addEventListener('touchend', handleGlobalPointerUp);
+    return () => {
+      document.removeEventListener('pointerup', handleGlobalPointerUp);
+      document.removeEventListener('touchend', handleGlobalPointerUp);
+    };
+  }, []);
+
   const getVerseAtTime = useCallback((timeSeconds: number): string | null => {
     if (!verseTimings || verseTimings.length === 0) return null;
     const timeMs = timeSeconds * 1000;
@@ -337,10 +354,12 @@ export default function AudioPlayer({
             step={0.1}
             onValueChange={(value) => {
               if (!isScrubbing) setIsScrubbing(true);
+              isScrubbingRef.current = true;
               setScrubValue(value[0]);
             }}
             onValueCommit={(value) => {
               onSeek?.(value[0]);
+              isScrubbingRef.current = false;
               setIsScrubbing(false);
             }}
             showTooltip={true}
