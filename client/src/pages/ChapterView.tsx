@@ -137,6 +137,9 @@ export default function ChapterView({
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Ref to hold pauseAudio so startPreview can access it regardless of hook ordering
+  const pauseAudioRef = useRef<() => void>(() => {});
+
   // Reciter preview state
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
   const [previewProgress, setPreviewProgress] = useState(0);
@@ -169,6 +172,7 @@ export default function ChapterView({
   const startPreview = useCallback((reciterId: string) => {
     stopPreview();
     setPreviewError(null);
+    pauseAudioRef.current();
 
     const reciterData = getReciterById(reciterId);
     if (!reciterData) return;
@@ -363,6 +367,8 @@ export default function ChapterView({
     1.0,
     autoplay
   );
+
+  pauseAudioRef.current = pauseAudio;
   
   // Show audio error as alert (for debugging mobile)
   useEffect(() => {
