@@ -18,23 +18,23 @@ const Slider = React.forwardRef<
     tooltipContent?: (value: number) => React.ReactNode;
     onValueCommit?: (value: number[]) => void;
   }
->(({ className, showTooltip = false, tooltipContent, onValueCommit, ...props }, ref) => {
+>(({ className, showTooltip = false, tooltipContent, onValueCommit, value: propValue, onValueChange: propOnValueChange, ...props }, ref) => {
   const [showTooltipState, setShowTooltipState] = React.useState(false);
   const [internalValue, setInternalValue] = React.useState<number[]>(
-    (props.defaultValue as number[]) ?? (props.value as number[]) ?? [0],
+    (props.defaultValue as number[]) ?? (propValue as number[]) ?? [0],
   );
   const isDraggingRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (props.value !== undefined && !isDraggingRef.current) {
-      setInternalValue(props.value as number[]);
+    if (propValue !== undefined && !isDraggingRef.current) {
+      setInternalValue(propValue as number[]);
     }
-  }, [props.value]);
+  }, [propValue]);
 
   const handleValueChange = (newValue: number[]) => {
     isDraggingRef.current = true;
     setInternalValue(newValue);
-    props.onValueChange?.(newValue);
+    propOnValueChange?.(newValue);
   };
 
   const handleValueCommit = (newValue: number[]) => {
@@ -96,6 +96,7 @@ const Slider = React.forwardRef<
         "relative flex w-full touch-none select-none items-center data-[orientation=vertical]:h-full data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col data-[disabled]:opacity-50",
         className,
       )}
+      value={internalValue}
       onValueChange={handleValueChange}
       onValueCommit={handleValueCommit}
       {...props}
