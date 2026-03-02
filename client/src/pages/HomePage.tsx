@@ -45,7 +45,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
       <div className="relative flex flex-col h-full pb-20">
         {/* Header */}
         <div className="header-safe-padding">
-          <div className="px-8 py-6">
+          <div className="px-6 py-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">As-salamu alaykum</p>
@@ -61,7 +61,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
 
         {/* Main content area - flex to fill */}
-        <div className="flex flex-col flex-1 px-8 gap-6 min-h-0">
+        <div className="flex flex-col flex-1 px-6 gap-6 min-h-0">
           {/* Continue Reading Card */}
           <div
             className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"

@@ -274,7 +274,7 @@ export default function Settings({
       <StatusBarShim />
 
       <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
-        <div className="px-8 pt-4 pb-6">
+        <div className="px-6 pt-4 pb-6">
           <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
             Settings
           </h1>
@@ -396,11 +396,16 @@ export default function Settings({
                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-[55vh] rounded-t-3xl" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
-                  <SheetHeader>
+                <SheetContent side="bottom" className="h-[55vh] rounded-t-3xl overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
+                  <div className="absolute inset-0 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-900/30 dark:to-transparent" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent dark:from-amber-500/8" />
+                  </div>
+                  <SheetHeader className="relative z-10">
                     <SheetTitle className="text-xl font-semibold text-foreground">Send Feedback</SheetTitle>
                   </SheetHeader>
-                  <div className="mt-4 space-y-4">
+                  <div className="mt-4 space-y-4 relative z-10">
                     <p className="text-sm text-muted-foreground">
                       We'd love to hear your thoughts! Your feedback helps us make Tanzeel better.
                     </p>

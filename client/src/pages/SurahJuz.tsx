@@ -211,7 +211,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <StatusBarShim />
 
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl header-safe-padding">
-        <div className="px-8 pt-4 pb-5">
+        <div className="px-6 pt-4 pb-5">
           <div className="flex items-center justify-between">
             <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
               Surahs
@@ -228,7 +228,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           top: isCollapsed ? '-200px' : undefined,
         }}
       >
-        <div className="px-8 pt-2 pb-6 space-y-6">
+        <div className="px-6 pt-2 pb-6 space-y-6">
           <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
             <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
             <div className="relative">
@@ -287,7 +287,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
         ref={scrollContainerRef}
         className="relative h-screen overflow-y-auto scroll-pt-340-safe"
       >
-        <div className="px-8 space-y-3 pb-28">
+        <div className="px-6 space-y-3 pb-28">
           {showDeepSearch && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-4">

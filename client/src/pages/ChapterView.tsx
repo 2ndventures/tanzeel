@@ -694,23 +694,23 @@ export default function ChapterView({
                 </div>
               )}
 
-              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16 relative z-10">
+              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16 relative z-10 px-4">
                 {menuView === 'main' && (
-                  <div className="space-y-6">
-                    {/* Text Size Section — consolidated */}
+                  <div className="space-y-7">
+                    {/* Text Size Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide px-4 mb-3" data-testid="section-text-size">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-text-size">
                         Text Size
                       </h3>
-                      <div className="space-y-2 px-4">
-                        <div className="flex items-center justify-between gap-3">
+                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
+                        <div className="flex items-center justify-between gap-3 py-3">
                           <span className="text-sm text-foreground/80 shrink-0">Arabic</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onArabicFontSizeChange?.(s.value)}
-                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                                   arabicFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
@@ -723,7 +723,8 @@ export default function ChapterView({
                             ))}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between gap-3">
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between gap-3 py-3">
                           <span className="text-sm text-foreground/80 shrink-0">Translation</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
@@ -743,7 +744,8 @@ export default function ChapterView({
                             ))}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between gap-3">
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between gap-3 py-3">
                           <span className="text-sm text-foreground/80 shrink-0">Transliteration</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
@@ -766,78 +768,80 @@ export default function ChapterView({
                       </div>
                     </div>
 
-                    {/* Arabic Script — inline */}
+                    {/* Appearance Section */}
                     <div>
-                      <div className="flex items-center justify-between gap-3 px-4">
-                        <span className="text-sm text-foreground/80 shrink-0">Arabic Script</span>
-                        <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                          {([
-                            { value: 'uthmani', label: 'Uthmani' },
-                            { value: 'indopak', label: 'IndoPak' },
-                            { value: 'tajweed', label: 'Tajweed' },
-                          ] as const).map((option) => (
-                            <button
-                              key={option.value}
-                              onClick={() => onArabicScriptChange?.(option.value)}
-                              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                                arabicScript === option.value
-                                  ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                  : 'text-muted-foreground'
-                              }`}
-                              style={arabicScript !== option.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
-                              data-testid={`button-script-${option.value}`}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-appearance">
+                        Appearance
+                      </h3>
+                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
+                        <div className="flex items-center justify-between gap-3 py-3">
+                          <span className="text-sm text-foreground/80 shrink-0">Arabic Script</span>
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
+                            {([
+                              { value: 'uthmani', label: 'Uthmani' },
+                              { value: 'indopak', label: 'IndoPak' },
+                              { value: 'tajweed', label: 'Tajweed' },
+                            ] as const).map((option) => (
+                              <button
+                                key={option.value}
+                                onClick={() => onArabicScriptChange?.(option.value)}
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                  arabicScript === option.value
+                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    : 'text-muted-foreground'
+                                }`}
+                                style={arabicScript !== option.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
+                                data-testid={`button-script-${option.value}`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-
-                    {/* Line Spacing — inline */}
-                    <div>
-                      <div className="flex items-center justify-between gap-3 px-4">
-                        <span className="text-sm text-foreground/80 shrink-0">Line Spacing</span>
-                        <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                          {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
-                            <button
-                              key={spacing}
-                              onClick={() => onLineSpacingChange?.(spacing)}
-                              className={`shrink-0 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
-                                lineSpacing === spacing
-                                  ? 'bg-primary/20 ring-1 ring-primary text-primary'
-                                  : 'text-muted-foreground'
-                              }`}
-                              style={lineSpacing !== spacing ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
-                              data-testid={`button-spacing-${spacing.toLowerCase()}`}
-                            >
-                              {spacing}
-                            </button>
-                          ))}
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between gap-3 py-3">
+                          <span className="text-sm text-foreground/80 shrink-0">Line Spacing</span>
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
+                            {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
+                              <button
+                                key={spacing}
+                                onClick={() => onLineSpacingChange?.(spacing)}
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                                  lineSpacing === spacing
+                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    : 'text-muted-foreground'
+                                }`}
+                                style={lineSpacing !== spacing ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
+                                data-testid={`button-spacing-${spacing.toLowerCase()}`}
+                              >
+                                {spacing}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Audio Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide px-4 mb-3" data-testid="section-audio">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-audio">
                         Audio
                       </h3>
-                      <div className="space-y-1">
+                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
                         <button
                           onClick={() => setMenuView('reciter')}
-                          className="w-full flex items-center justify-between p-4 min-h-[60px] hover-elevate active-elevate-2 rounded-md"
+                          className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
                           data-testid="menu-item-reciter"
                         >
-                          <span className="text-lg text-foreground/90">Reciter</span>
+                          <span className="text-sm text-foreground/80">Reciter</span>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
-                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                            <span className="text-xs text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
                           </div>
                         </button>
-
-                        <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-autoplay">
-                          <span className="text-lg text-foreground/90">Autoplay next surah</span>
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between py-3" data-testid="menu-item-autoplay">
+                          <span className="text-sm text-foreground/80">Autoplay next surah</span>
                           <Switch 
                             checked={autoplay} 
                             onCheckedChange={onAutoplayChange}
@@ -849,12 +853,12 @@ export default function ChapterView({
 
                     {/* Display Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide px-4 mb-3" data-testid="section-display">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-display">
                         Display
                       </h3>
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between p-4 min-h-[60px]" data-testid="menu-item-theme">
-                          <span className="text-lg text-foreground/90">Theme</span>
+                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
+                        <div className="flex items-center justify-between py-3" data-testid="menu-item-theme">
+                          <span className="text-sm text-foreground/80">Theme</span>
                           <div className="relative">
                             <Switch 
                               checked={darkMode} 
@@ -868,27 +872,27 @@ export default function ChapterView({
                             </div>
                           </div>
                         </div>
-
-                        <div className="flex items-center justify-between p-4" data-testid="menu-item-transliteration">
-                          <span className="text-lg text-foreground/90">Transliteration</span>
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between py-3" data-testid="menu-item-transliteration">
+                          <span className="text-sm text-foreground/80">Transliteration</span>
                           <Switch 
                             checked={showTransliteration} 
                             onCheckedChange={onTransliterationChange}
                             data-testid="switch-transliteration"
                           />
                         </div>
-
-                        <div className="flex items-center justify-between p-4" data-testid="menu-item-translation">
-                          <span className="text-lg text-foreground/90">Translation</span>
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between py-3" data-testid="menu-item-translation">
+                          <span className="text-sm text-foreground/80">Translation</span>
                           <Switch 
                             checked={showTranslation} 
                             onCheckedChange={onShowTranslationChange}
                             data-testid="switch-translation"
                           />
                         </div>
-
-                        <div className="flex items-center justify-between p-4" data-testid="menu-item-verse-numbers">
-                          <span className="text-lg text-foreground/90">Verse numbers</span>
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <div className="flex items-center justify-between py-3" data-testid="menu-item-verse-numbers">
+                          <span className="text-sm text-foreground/80">Verse numbers</span>
                           <Switch 
                             checked={showVerseNumbers} 
                             onCheckedChange={onShowVerseNumbersChange}
