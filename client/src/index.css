@@ -16,6 +16,7 @@
 
   --header-gradient-start: rgba(248, 250, 252, 0.95);
   --header-gradient-mid: rgba(248, 250, 252, 0.6);
+  --player-gradient-rgb: 248, 250, 252;
 
   --sheet-bg: 0 0% 97%;
   --sheet-muted: 0 0% 92%;
@@ -142,6 +143,7 @@
 
   --header-gradient-start: rgba(16, 24, 42, 0.95);
   --header-gradient-mid: rgba(16, 24, 42, 0.7);
+  --player-gradient-rgb: 16, 24, 42;
 
   --sheet-bg: 240 6% 6%;
   --sheet-muted: 240 5% 12%;
