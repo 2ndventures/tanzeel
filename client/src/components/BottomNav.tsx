@@ -30,8 +30,8 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               <Icon 
                 icon={tab.icon} 
                 className={cn(
-                  "size-6 transition-all",
-                  isActive ? "text-primary" : "text-muted-foreground"
+                  "size-6 transition-all duration-200",
+                  isActive ? "text-primary scale-110" : "text-muted-foreground scale-100"
                 )} 
                 style={isActive ? {filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'} : undefined}
               />
@@ -41,6 +41,10 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               )}>
                 {tab.label}
               </span>
+              <div className={cn(
+                "h-1 w-1 rounded-full transition-all duration-200",
+                isActive ? "bg-primary scale-100 opacity-100" : "bg-transparent scale-0 opacity-0"
+              )} />
             </button>
           );
         })}

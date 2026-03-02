@@ -2,21 +2,51 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
 import { StatusBarShim } from "@/components/StatusBarShim";
-import { chapters } from "@/lib/quranMetadata";
+import { chapters, surahMeanings } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
+
+const DAILY_SURAHS = [
+  { id: 1, verse: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", translation: "Guide us to the straight path." },
+  { id: 2, verse: "ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ", translation: "This is the Book about which there is no doubt, a guidance for those conscious of God." },
+  { id: 18, verse: "إِنَّهُمْ فِتْيَةٌ آمَنُوا بِرَبِّهِمْ وَزِدْنَاهُمْ هُدًى", translation: "They were youths who believed in their Lord, and We increased them in guidance." },
+  { id: 19, verse: "وَهُزِّىٓ إِلَيْكِ بِجِذْعِ ٱلنَّخْلَةِ تُسَٰقِطْ عَلَيْكِ رُطَبًا جَنِيًّا", translation: "Shake toward you the trunk of the palm tree; it will drop upon you ripe, fresh dates." },
+  { id: 31, verse: "يَٰبُنَىَّ إِنَّهَآ إِن تَكُ مِثْقَالَ حَبَّةٍ مِّنْ خَرْدَلٍ", translation: "O my son, indeed if wrong be the weight of a mustard seed..." },
+  { id: 36, verse: "إِنَّمَآ أَمْرُهُۥٓ إِذَآ أَرَادَ شَيْـًٔا أَن يَقُولَ لَهُۥ كُن فَيَكُونُ", translation: "His command is only when He intends a thing that He says to it, 'Be,' and it is." },
+  { id: 39, verse: "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ ٱللَّهِ", translation: "Say, 'O My servants who have transgressed against themselves, do not despair of the mercy of God.'" },
+  { id: 55, verse: "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ", translation: "Then which of the favors of your Lord will you deny?" },
+  { id: 56, verse: "فَسَبِّحْ بِٱسْمِ رَبِّكَ ٱلْعَظِيمِ", translation: "So exalt the name of your Lord, the Most Great." },
+  { id: 67, verse: "تَبَٰرَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", translation: "Blessed is He in whose hand is dominion, and He is over all things competent." },
+  { id: 93, verse: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ", translation: "And your Lord is going to give you, and you will be satisfied." },
+  { id: 94, verse: "فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا", translation: "For indeed, with hardship will be ease." },
+  { id: 112, verse: "قُلْ هُوَ ٱللَّهُ أَحَدٌ", translation: "Say, 'He is God, the One.'" },
+  { id: 113, verse: "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ", translation: "Say, 'I seek refuge in the Lord of daybreak.'" },
+  { id: 114, verse: "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ", translation: "Say, 'I seek refuge in the Lord of mankind.'" },
+];
 
 interface HomePageProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
   activeTab?: "home" | "surah" | "settings" | "bookmarks";
 }
 
+function getDailySurah() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now.getTime() - start.getTime();
+  const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+  return DAILY_SURAHS[dayOfYear % DAILY_SURAHS.length];
+}
+
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
   const [stats, setStats] = useState(() => getReadingStats());
+  const [daily, setDaily] = useState(() => getDailySurah());
+  const dailyChapter = chapters.find(ch => ch.id === daily.id) || chapters[0];
+  const dailyMeaning = surahMeanings[daily.id] || "";
 
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         setStats(getReadingStats());
+        setDaily(getDailySurah());
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -64,7 +94,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <div className="flex flex-col flex-1 px-6 gap-4 min-h-0">
           {/* Continue Reading Card */}
           <div
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
+            style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
             onClick={() => onNavigate("chapter", stats.lastReadChapter)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter); }}}
             role="button"
@@ -98,7 +129,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </div>
 
           {/* Quick Access */}
-          <div>
+          <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="grid grid-cols-3 gap-4">
               <div
                 className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
@@ -146,7 +177,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </div>
 
           {/* Today's Reading */}
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col min-h-0 animate-fade-in-up" style={{ opacity: 0, animationDelay: '200ms', animationFillMode: 'forwards' }}>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
                 TODAY'S READING
@@ -155,27 +186,26 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             </div>
             <div
               className="rounded-3xl border border-border/50 bg-card/80 p-5 shadow-lg backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
-              onClick={() => onNavigate("chapter", 55)}
+              onClick={() => onNavigate("chapter", daily.id)}
               data-testid="card-todays-reading"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div>
                   <h4 className="font-heading text-xl font-bold tracking-tighter text-foreground">
-                    Surah Ar-Rahman
+                    Surah {dailyChapter.englishName}
                   </h4>
-
-                  <p className="mt-2 text-sm text-muted-foreground">The Most Merciful • 78 Ayahs</p>
+                  <p className="mt-2 text-sm text-muted-foreground">{dailyMeaning} • {dailyChapter.verseCount} Ayahs</p>
                 </div>
                 <div className="rounded-2xl bg-primary/20 px-4 py-2 shadow-inner">
-                  <span className="text-sm font-bold text-primary">55</span>
+                  <span className="text-sm font-bold text-primary">{daily.id}</span>
                 </div>
               </div>
               <div className="rounded-2xl bg-muted/10 p-4 border border-border/30">
                 <p className="text-center font-arabic text-2xl leading-relaxed text-foreground">
-                  فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
+                  {daily.verse}
                 </p>
                 <p className="mt-4 text-center text-sm italic text-muted-foreground">
-                  Then which of the favors of your Lord will you deny?
+                  {daily.translation}
                 </p>
               </div>
             </div>
