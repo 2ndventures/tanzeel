@@ -140,8 +140,8 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  --header-gradient-start: rgba(10, 10, 14, 0.95);
-  --header-gradient-mid: rgba(10, 10, 14, 0.7);
+  --header-gradient-start: rgba(16, 24, 42, 0.95);
+  --header-gradient-mid: rgba(16, 24, 42, 0.7);
 
   --sheet-bg: 240 6% 6%;
   --sheet-muted: 240 5% 12%;
