@@ -61,7 +61,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
 
         {/* Main content area - flex to fill */}
-        <div className="flex flex-col flex-1 px-6 gap-6 min-h-0">
+        <div className="flex flex-col flex-1 px-6 gap-4 min-h-0">
           {/* Continue Reading Card */}
           <div
             className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
@@ -99,12 +99,9 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
           {/* Quick Access */}
           <div>
-            <h3 className="mb-6 text-sm font-bold tracking-wider text-muted-foreground uppercase">
-              QUICK ACCESS
-            </h3>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-4">
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -118,7 +115,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -132,7 +129,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 <span className="text-xs font-semibold text-foreground">Favorites</span>
               </div>
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-6 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
                 onClick={() => onNavigate("settings", undefined, "settings")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("settings", undefined, "settings"); }}}
                 role="button"
@@ -150,30 +147,31 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
           {/* Today's Reading */}
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
                 TODAY'S READING
               </h3>
               <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" />
             </div>
             <div
-              className="rounded-3xl border border-border/50 bg-card/80 p-6 shadow-lg backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
+              className="rounded-3xl border border-border/50 bg-card/80 p-5 shadow-lg backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
               onClick={() => onNavigate("chapter", 55)}
               data-testid="card-todays-reading"
             >
-              <div className="mb-4 flex items-start justify-between">
+              <div className="mb-3 flex items-start justify-between">
                 <div>
-                  <h4 className="font-heading text-2xl font-bold tracking-tighter text-foreground">
+                  <h4 className="font-heading text-xl font-bold tracking-tighter text-foreground">
                     Surah Ar-Rahman
                   </h4>
+
                   <p className="mt-2 text-sm text-muted-foreground">The Most Merciful • 78 Ayahs</p>
                 </div>
                 <div className="rounded-2xl bg-primary/20 px-4 py-2 shadow-inner">
                   <span className="text-sm font-bold text-primary">55</span>
                 </div>
               </div>
-              <div className="rounded-2xl bg-muted/10 p-6 border border-border/30">
-                <p className="text-center font-arabic text-3xl leading-relaxed text-foreground">
+              <div className="rounded-2xl bg-muted/10 p-4 border border-border/30">
+                <p className="text-center font-arabic text-2xl leading-relaxed text-foreground">
                   فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ
                 </p>
                 <p className="mt-4 text-center text-sm italic text-muted-foreground">
