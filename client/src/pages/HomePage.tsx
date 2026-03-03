@@ -185,11 +185,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" />
             </div>
             <div
-              className="rounded-3xl border border-border/50 bg-card/80 p-5 shadow-lg backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center"
+              className="rounded-3xl border border-border/50 bg-card/80 px-5 py-4 shadow-lg backdrop-blur-sm cursor-pointer"
               onClick={() => onNavigate("chapter", daily.id)}
               data-testid="card-todays-reading"
             >
-              <div className="mb-3 flex items-start justify-between">
+              <div className="flex items-start justify-between">
                 <div>
                   <h4 className="font-heading text-xl font-bold tracking-tighter text-foreground">
                     Surah {dailyChapter.englishName}
