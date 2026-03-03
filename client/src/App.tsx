@@ -134,6 +134,14 @@ function App() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+    const themeColor = darkMode ? '#101828' : '#ffffff';
+    let meta = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', themeColor);
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
