@@ -330,17 +330,17 @@ export default function AudioPlayer({
         {/* ── Surah info: bold name left, Arabic right ── */}
         <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
           <div className="flex flex-col gap-0.5 min-w-0">
-            <h2 className="text-lg font-bold text-white/95 tracking-tight truncate" data-testid="text-surah-english">
+            <h2 className="text-lg font-bold text-foreground dark:text-white/95 tracking-tight truncate" data-testid="text-surah-english">
               {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
             </h2>
             {reciterName && (
-              <p className="text-xs font-medium text-white/50 truncate" data-testid="text-reciter-name">
+              <p className="text-xs font-medium text-muted-foreground dark:text-white/50 truncate" data-testid="text-reciter-name">
                 {reciterName}
               </p>
             )}
           </div>
           {surahNameArabic && (
-            <span className="font-arabic text-lg text-white/40 shrink-0 ml-4" data-testid="text-surah-arabic">
+            <span className="font-arabic text-lg text-muted-foreground/60 dark:text-white/40 shrink-0 ml-4" data-testid="text-surah-arabic">
               {surahNameArabic}
             </span>
           )}
@@ -367,14 +367,14 @@ export default function AudioPlayer({
               const verse = getVerseAtTime(value);
               return verse || formatTime(value);
             }}
-            className="w-full [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-track]]:bg-white/20 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:border-white/20"
+            className="w-full [&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-range]]:bg-foreground/70 dark:[&_[data-slot=slider-range]]:bg-white/80 [&_[data-slot=slider-track]]:bg-foreground/15 dark:[&_[data-slot=slider-track]]:bg-white/20 [&_[data-slot=slider-thumb]]:bg-foreground dark:[&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:border-foreground/20 dark:[&_[data-slot=slider-thumb]]:border-white/20"
             data-testid="slider-audio-progress"
           />
           <div className="flex items-center justify-between mt-1.5 px-0.5">
-            <span className="text-[11px] tabular-nums font-medium text-white/50" data-testid="text-current-time">
+            <span className="text-[11px] tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-current-time">
               {formatTime(isScrubbing ? scrubValue : currentTime)}
             </span>
-            <span className="text-[11px] tabular-nums font-medium text-white/50" data-testid="text-duration">
+            <span className="text-[11px] tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-duration">
               -{formatTime(isScrubbing ? Math.max(0, duration - scrubValue) : remaining)}
             </span>
           </div>
@@ -384,17 +384,17 @@ export default function AudioPlayer({
         {showSpeedSlider && (
           <div
             ref={sliderContainerRef}
-            className="rounded-2xl bg-white/10 ring-1 ring-white/10 p-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+            className="rounded-2xl bg-black/5 dark:bg-white/10 ring-1 ring-black/10 dark:ring-white/10 p-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
             data-testid="speed-slider-panel"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-white/50 uppercase tracking-wide">Speed</span>
-              <button onClick={() => onSpeedChange?.(1.0)} className="text-xs text-white/80 font-semibold px-2 py-0.5 rounded-md hover:bg-white/10 transition-colors">
+              <span className="text-xs font-semibold text-muted-foreground dark:text-white/50 uppercase tracking-wide">Speed</span>
+              <button onClick={() => onSpeedChange?.(1.0)} className="text-xs text-foreground/80 dark:text-white/80 font-semibold px-2 py-0.5 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
                 Reset
               </button>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-medium text-white/40 w-8 text-right shrink-0">0.5x</span>
+              <span className="text-xs font-medium text-muted-foreground/60 dark:text-white/40 w-8 text-right shrink-0">0.5x</span>
               <Slider
                 value={[speed]} min={0.5} max={2.0} step={0.1}
                 showTooltip tooltipContent={(v) => `${formatSpeed(v)}`}
@@ -402,10 +402,10 @@ export default function AudioPlayer({
                 onValueCommit={() => setShowSpeedSlider(false)}
                 className="flex-1" aria-label="Fine playback speed" data-testid="slider-speed"
               />
-              <span className="text-xs font-medium text-white/40 w-8 shrink-0">2x</span>
+              <span className="text-xs font-medium text-muted-foreground/60 dark:text-white/40 w-8 shrink-0">2x</span>
             </div>
             <div className="text-center mt-2">
-              <span className="text-sm font-bold text-white/90">{formatSpeed(speed)}</span>
+              <span className="text-sm font-bold text-foreground/90 dark:text-white/90">{formatSpeed(speed)}</span>
             </div>
           </div>
         )}
@@ -420,8 +420,8 @@ export default function AudioPlayer({
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerCancel}
             onContextMenu={(e) => e.preventDefault()}
-            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-white/15 ${
-              speedIsModified ? 'text-[#f8c630]' : 'text-white/50'
+            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-black/10 dark:active:bg-white/15 ${
+              speedIsModified ? 'text-[#f8c630]' : 'text-muted-foreground dark:text-white/50'
             }`}
             aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
             data-testid="button-speed"
@@ -436,7 +436,7 @@ export default function AudioPlayer({
           <div className="flex items-center gap-8">
             <button
               onClick={() => onSeek?.(Math.max(0, currentTime - 15))}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 rounded-xl active:bg-white/15 active:scale-95 transition-all"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/10 dark:active:bg-white/15 active:scale-95 transition-all"
               aria-label="Skip back 15 seconds"
               data-testid="button-skip-back"
             >
@@ -461,7 +461,7 @@ export default function AudioPlayer({
 
             <button
               onClick={() => onSeek?.(Math.min(duration, currentTime + 15))}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-white/80 rounded-xl active:bg-white/15 active:scale-95 transition-all"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/10 dark:active:bg-white/15 active:scale-95 transition-all"
               aria-label="Skip forward 15 seconds"
               data-testid="button-skip-forward"
             >
@@ -473,8 +473,8 @@ export default function AudioPlayer({
           <Drawer>
             <DrawerTrigger asChild>
               <button
-                className={`min-h-[44px] w-10 flex items-center justify-center rounded-xl transition-colors active:bg-white/15 ${
-                  layoutMode !== 'standard' ? 'text-white/90' : 'text-white/50'
+                className={`min-h-[44px] w-10 flex items-center justify-center rounded-xl transition-colors active:bg-black/10 dark:active:bg-white/15 ${
+                  layoutMode !== 'standard' ? 'text-foreground/90 dark:text-white/90' : 'text-muted-foreground dark:text-white/50'
                 }`}
                 aria-label="Select layout mode"
                 data-testid="button-layout"
