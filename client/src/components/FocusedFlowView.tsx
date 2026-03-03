@@ -1,7 +1,21 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
 import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+
+const WORDS_PER_PAGE = 18;
+
+interface PageEntry {
+  verseNumber: number;
+  verseIndex: number;
+  pageIndex: number;
+  totalPages: number;
+  words: string[];
+  wordOffset: number;
+  translation: string | null;
+  arabicText: string;
+  isTajweed: boolean;
+}
 
 interface FocusedFlowViewProps {
   verses: Verse[];
@@ -42,7 +56,6 @@ export default function FocusedFlowView({
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
-  // Bumped one tier larger than standard for focused reading
   const getArabicFontSize = (size: string) => {
     switch (size) {
       case "Small": return "text-2xl md:text-3xl";
@@ -72,7 +85,65 @@ export default function FocusedFlowView({
     }
   };
 
-  // Controls auto-hide
+  const pages = useMemo<PageEntry[]>(() => {
+    const result: PageEntry[] = [];
+    const isTajweed = arabicScript === 'tajweed';
+
+    verses.forEach((verse, index) => {
+      const verseNumber = index + 1;
+
+      if (isTajweed) {
+        result.push({
+          verseNumber,
+          verseIndex: index,
+          pageIndex: 0,
+          totalPages: 1,
+          words: [],
+          wordOffset: 0,
+          translation: verse.translation,
+          arabicText: verse.arabicText,
+          isTajweed: true,
+        });
+        return;
+      }
+
+      const words = tokenizeArabicWords(verse.arabicText);
+
+      if (words.length <= WORDS_PER_PAGE) {
+        result.push({
+          verseNumber,
+          verseIndex: index,
+          pageIndex: 0,
+          totalPages: 1,
+          words,
+          wordOffset: 0,
+          translation: verse.translation,
+          arabicText: verse.arabicText,
+          isTajweed: false,
+        });
+      } else {
+        const totalPages = Math.ceil(words.length / WORDS_PER_PAGE);
+        for (let p = 0; p < totalPages; p++) {
+          const start = p * WORDS_PER_PAGE;
+          const chunk = words.slice(start, start + WORDS_PER_PAGE);
+          result.push({
+            verseNumber,
+            verseIndex: index,
+            pageIndex: p,
+            totalPages,
+            words: chunk,
+            wordOffset: start,
+            translation: p === totalPages - 1 ? verse.translation : null,
+            arabicText: verse.arabicText,
+            isTajweed: false,
+          });
+        }
+      }
+    });
+
+    return result;
+  }, [verses, arabicScript]);
+
   const resetControlsTimer = useCallback(() => {
     setControlsVisible(true);
     if (controlsTimeoutRef.current) {
@@ -92,7 +163,6 @@ export default function FocusedFlowView({
     };
   }, []);
 
-  // Listen for interactions to show controls
   useEffect(() => {
     const handleInteraction = () => resetControlsTimer();
     const container = scrollContainerRef.current;
@@ -107,16 +177,30 @@ export default function FocusedFlowView({
     };
   }, [resetControlsTimer]);
 
-  // Auto-pan to current verse
   useEffect(() => {
     if (!scrollContainerRef.current || !currentVerse) return;
-    const verseEl = scrollContainerRef.current.querySelector(
-      `[data-verse-number="${currentVerse}"]`
-    );
-    if (verseEl) {
-      verseEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+
+    let targetPageIdx = -1;
+    if (currentWordIndex !== null && currentWordIndex >= 0) {
+      targetPageIdx = pages.findIndex(
+        (p) =>
+          p.verseNumber === currentVerse &&
+          currentWordIndex >= p.wordOffset &&
+          currentWordIndex < p.wordOffset + p.words.length
+      );
     }
-  }, [currentVerse]);
+    if (targetPageIdx === -1) {
+      targetPageIdx = pages.findIndex((p) => p.verseNumber === currentVerse && p.pageIndex === 0);
+    }
+    if (targetPageIdx === -1) return;
+
+    const el = scrollContainerRef.current.querySelector(
+      `[data-page-index="${targetPageIdx}"]`
+    );
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+    }
+  }, [currentVerse, currentWordIndex, pages]);
 
   if (isLoadingVerses) {
     return (
@@ -139,7 +223,6 @@ export default function FocusedFlowView({
 
   return (
     <div className="relative flex-1 overflow-hidden">
-      {/* Translation toggle button */}
       <button
         onClick={() => setTranslationVisible(v => !v)}
         className={`fixed top-24 right-6 z-30 size-12 rounded-full bg-muted/80 backdrop-blur-xl flex items-center justify-center shadow-lg ring-1 ring-border/50 transition-all duration-300 ${
@@ -151,16 +234,13 @@ export default function FocusedFlowView({
         <span className="text-sm font-bold">T</span>
       </button>
 
-      {/* Vertical scroll container */}
       <div
         ref={scrollContainerRef}
         className="vertical-verse-scroll flex flex-col overflow-y-auto overflow-x-hidden h-full"
       >
-        {verses.map((verse, index) => {
-          const verseNumber = index + 1;
-          const distance = Math.abs(verseNumber - currentVerse);
+        {pages.map((page, globalIdx) => {
+          const distance = Math.abs(page.verseNumber - currentVerse);
           const isCurrentVerse = distance === 0;
-          const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(verse.arabicText) : [];
 
           let scaleOpacityClass = 'opacity-100 scale-100';
           if (distance === 1) {
@@ -169,62 +249,71 @@ export default function FocusedFlowView({
             scaleOpacityClass = 'opacity-20 scale-75';
           }
 
+          const verseLabel = page.verseNumber === 0
+            ? 'Preamble'
+            : page.totalPages > 1
+              ? `${chapterId}:${page.verseNumber} (${page.pageIndex + 1}/${page.totalPages})`
+              : `${chapterId}:${page.verseNumber}`;
+
           return (
             <div
-              key={verseNumber}
-              data-verse-number={verseNumber}
-              className={`flex-shrink-0 w-full min-h-full py-16 snap-center flex items-center justify-center transition-all duration-500 ${scaleOpacityClass}`}
-              onClick={() => onVerseClick(verseNumber)}
+              key={`${page.verseNumber}-${page.pageIndex}`}
+              data-verse-number={page.verseNumber}
+              data-page-index={globalIdx}
+              className={`flex-shrink-0 w-full h-full snap-center flex items-center justify-center transition-all duration-500 ${scaleOpacityClass}`}
+              onClick={() => onVerseClick(page.verseNumber)}
             >
               <div className="max-w-lg w-full px-8 text-center space-y-6">
-                {/* Verse number label */}
                 <span className={`inline-block text-xs font-semibold tabular-nums ${
                   isCurrentVerse ? 'text-primary' : 'text-muted-foreground/70'
                 }`}>
-                  {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
+                  {verseLabel}
                 </span>
 
-                {/* Arabic text */}
-                {arabicScript === 'tajweed' ? (
+                {page.isTajweed ? (
                   <p
                     className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-center transition-colors`}
                     dir="rtl"
-                    dangerouslySetInnerHTML={{ __html: verse.arabicText }}
+                    dangerouslySetInnerHTML={{ __html: page.arabicText }}
                   />
                 ) : (
                   <p
                     className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-center transition-colors`}
                     dir="rtl"
                   >
-                    {words.map((word, wIdx) => {
+                    {page.words.map((word, wIdx) => {
+                      const globalWordIdx = page.wordOffset + wIdx;
                       const isCurrentWord = isCurrentVerse &&
                         currentWordIndex !== null &&
-                        currentWordIndex === wIdx &&
-                        currentWordIndex < words.length;
+                        currentWordIndex === globalWordIdx;
                       return (
                         <span
-                          key={`fw-${chapterId}-${verseNumber}-${wIdx}`}
+                          key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
                           className={`transition-all duration-150 ${
                             isCurrentWord ? 'text-primary font-bold' : ''
                           }`}
                         >
-                          {word}{wIdx < words.length - 1 ? ' ' : ''}
+                          {word}{wIdx < page.words.length - 1 ? ' ' : ''}
                         </span>
                       );
                     })}
+                    {page.totalPages > 1 && page.pageIndex < page.totalPages - 1 && (
+                      <span className="text-muted-foreground/40"> ...</span>
+                    )}
                   </p>
                 )}
 
-                {/* Translation */}
-                <div className={`transition-all duration-300 overflow-hidden ${
-                  translationVisible ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                }`}>
-                  <p className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
-                    isCurrentVerse ? 'text-foreground' : 'text-foreground/80'
+                {page.translation && (
+                  <div className={`transition-all duration-300 overflow-hidden ${
+                    translationVisible ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
-                    {verse.translation}
-                  </p>
-                </div>
+                    <p className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
+                      isCurrentVerse ? 'text-foreground' : 'text-foreground/80'
+                    }`}>
+                      {page.translation}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           );
