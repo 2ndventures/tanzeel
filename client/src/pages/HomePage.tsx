@@ -200,14 +200,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                   <span className="text-sm font-bold text-primary">{daily.id}</span>
                 </div>
               </div>
-              <div className="rounded-2xl bg-muted/10 p-4 border border-border/30">
-                <p className="text-center font-arabic text-2xl leading-relaxed text-foreground">
-                  {daily.verse}
-                </p>
-                <p className="mt-4 text-center text-sm italic text-muted-foreground">
-                  {daily.translation}
-                </p>
-              </div>
             </div>
           </div>
         </div>
