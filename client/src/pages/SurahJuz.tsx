@@ -387,7 +387,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 <Skeleton className="w-5 h-5 rounded" />
               </div>
             ))
-          ) : mode === "juz" ? (
+          ) : hasActiveSearch && showDeepSearch && filteredChapters.length === 0 ? null
+          : mode === "juz" ? (
             filteredJuz.length > 0 ? (
               filteredJuz.map((juz, index) => {
                 const startChapter = chapters.find(ch => ch.id === juz.startChapter);
