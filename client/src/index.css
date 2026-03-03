@@ -339,6 +339,12 @@
   padding-top: calc(300px + env(safe-area-inset-top));
 }
 
+.scroll-pt-search-safe {
+  padding-top: 110px;
+  padding-top: calc(110px + constant(safe-area-inset-top));
+  padding-top: calc(110px + env(safe-area-inset-top));
+}
+
 /**
  * Using the elevate system.
  * Automatic contrast adjustment.

@@ -210,7 +210,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
       <StatusBarShim />
 
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl header-safe-padding">
+      <div className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl header-safe-padding transition-all duration-300 ${
+        hasActiveSearch ? 'opacity-0 pointer-events-none -translate-y-full' : ''
+      }`}>
         <div className="px-6 pt-4 pb-5">
           <div className="flex items-center justify-between">
             <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
@@ -221,14 +223,14 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       </div>
 
       <div
-        className={`fixed left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ${
-          isCollapsed ? '' : 'collapsible-top-100'
+        className={`fixed left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ${
+          hasActiveSearch ? 'z-50 header-safe-padding' : isCollapsed ? '' : 'z-40 collapsible-top-100'
         }`}
         style={{
-          top: isCollapsed ? '-200px' : undefined,
+          top: !hasActiveSearch && isCollapsed ? '-200px' : undefined,
         }}
       >
-        <div className="px-6 pt-2 pb-6 space-y-6">
+        <div className={`px-6 ${hasActiveSearch ? 'pt-4 pb-4' : 'pt-2 pb-6'} space-y-6`}>
           <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
             <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
             <div className="relative">
@@ -251,41 +253,43 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-            <div className="relative flex gap-2 p-1 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl">
-              <button
-                onClick={() => setMode("surah")}
-                className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
-                  mode === "surah"
-                    ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
-                    : "text-muted-foreground"
-                }`}
-                style={mode === "surah" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
-                data-testid="button-mode-surah"
-              >
-                All Surahs
-              </button>
-              <button
-                onClick={() => setMode("juz")}
-                className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
-                  mode === "juz"
-                    ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
-                    : "text-muted-foreground"
-                }`}
-                style={mode === "juz" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
-                data-testid="button-mode-juz"
-              >
-                Juz
-              </button>
+          {!hasActiveSearch && (
+            <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
+              <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
+              <div className="relative flex gap-2 p-1 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl">
+                <button
+                  onClick={() => setMode("surah")}
+                  className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
+                    mode === "surah"
+                      ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
+                      : "text-muted-foreground"
+                  }`}
+                  style={mode === "surah" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
+                  data-testid="button-mode-surah"
+                >
+                  All Surahs
+                </button>
+                <button
+                  onClick={() => setMode("juz")}
+                  className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
+                    mode === "juz"
+                      ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
+                      : "text-muted-foreground"
+                  }`}
+                  style={mode === "juz" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
+                  data-testid="button-mode-juz"
+                >
+                  Juz
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div
         ref={scrollContainerRef}
-        className="relative h-screen overflow-y-auto scroll-pt-340-safe"
+        className={`relative h-screen overflow-y-auto ${hasActiveSearch ? 'scroll-pt-search-safe' : 'scroll-pt-340-safe'}`}
       >
         <div className="px-6 space-y-3 pb-28">
           {showDeepSearch && (
