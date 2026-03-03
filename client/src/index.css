@@ -605,7 +605,7 @@
 
   /* Focused Flow vertical scroll */
   .vertical-verse-scroll {
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }

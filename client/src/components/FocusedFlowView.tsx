@@ -173,7 +173,7 @@ export default function FocusedFlowView({
             <div
               key={verseNumber}
               data-verse-number={verseNumber}
-              className={`flex-shrink-0 w-full h-full snap-center flex items-center justify-center transition-all duration-500 ${scaleOpacityClass}`}
+              className={`flex-shrink-0 w-full min-h-full py-16 snap-center flex items-center justify-center transition-all duration-500 ${scaleOpacityClass}`}
               onClick={() => onVerseClick(verseNumber)}
             >
               <div className="max-w-lg w-full px-8 text-center space-y-6">
