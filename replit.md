@@ -44,6 +44,22 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 The system provides continuous chapter audio playback with word-level synchronized highlighting using a `useWordTimingAudio` hook. It loads single audio files per chapter with timing data from Quran.com, supporting seamless playback. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling. The backend normalizes inconsistent Quran.com API responses for audio timing.
 
+### Audio Caching
+
+Audio timing data and chapter audio files are cached locally using the browser Cache API (`client/src/lib/audioCache.ts`). Cache keys use deterministic `reciterId-chapterId` patterns for reliable eviction. An LRU strategy (tracked via localStorage) caps cached chapters at 50, evicting least-recently-used entries. Previously played chapters load instantly on repeat visits and work offline when cached.
+
+## Haptic Feedback
+
+A haptics utility (`client/src/lib/haptics.ts`) provides tactile feedback using Capacitor's Haptics plugin on native platforms and `navigator.vibrate()` as a web fallback. Two intensities: light (15ms / ImpactStyle.Light) for play/pause, bookmark, tab switch, speed change, and layout change; medium (40ms / ImpactStyle.Medium) for swipe navigation between surahs.
+
+## Swipe Navigation
+
+Horizontal swipe gestures in ChapterView allow navigating between surahs (left swipe → next, right swipe → previous). Thresholds: 75px horizontal distance, 100px max vertical tolerance, 600ms max duration. A floating pill indicator with the target surah name appears briefly before navigation. Disabled in Mushaf mode which uses horizontal swipe for page navigation.
+
+## Reading Position Tracking
+
+The reading stats system tracks verse-level position via scroll detection (debounced 500ms). When a user scrolls through verses, the visible verse at 40% viewport height is saved as `lastReadVerse`. The "Continue Reading" card on the Home page passes this verse number to ChapterView, which scrolls directly to that position on load.
+
 ## Bookmarking System
 
 A customizable verse bookmarking system is implemented, stored in `localStorage`. It allows users to add/remove bookmarks, organize them into custom folders, add notes, and navigate directly to bookmarked verses. The system includes duplicate prevention for folder names and is integrated into `VerseCard` and a dedicated `Bookmarks` page.
@@ -71,4 +87,4 @@ Quran data (chapters, verses, Arabic text, English translations, transliteration
 - **External APIs & Data Sources**:
     - **Quran.com Audio API**: Provides continuous chapter audio files and word-level timing data via a backend proxy.
     - **Al-Quran Cloud API**: Used for pre-fetching static Quran text data (Arabic, Sahih International English translation, transliteration).
-- **Mobile Deployment**: Capacitor for native iOS and Android app deployment.
+- **Mobile Deployment**: Capacitor for native iOS and Android app deployment, @capacitor/haptics for native haptic feedback.

@@ -156,10 +156,9 @@ export function useAudioPlayer(
       const target = e.target as HTMLAudioElement;
       const error = target.error;
       
-      console.error('❌ Audio error for verse', verseNum);
-      console.error('Error code:', error?.code);
-      console.error('Error message:', error?.message);
-      console.error('URL:', audioUrl);
+      if (error) {
+        console.error('Audio load error:', error.code, error.message);
+      }
       
       setState(prev => ({
         ...prev,
@@ -257,7 +256,6 @@ export function useAudioPlayer(
       preloadRef.current.playbackRate = newSpeed;
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
-    console.log(`⚡ Speed: ${newSpeed}x`);
   }, []);
 
   // Seek within current verse

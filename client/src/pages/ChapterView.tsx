@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -417,12 +418,54 @@ export default function ChapterView({
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(() => {
-        // Track 1 second of reading time
         addReadingTime(1);
       }, 1000);
       return () => clearInterval(interval);
     }
   }, [isPlaying]);
+
+  // Track verse-level reading position during scrolling
+  const lastTrackedVerseRef = useRef<number>(0);
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoadingVerses || verses.length === 0) return;
+
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    const handleScroll = () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const containerRect = container.getBoundingClientRect();
+        const viewportMid = containerRect.top + containerRect.height * 0.4;
+        let closestVerse = 0;
+        let closestDist = Infinity;
+
+        for (let i = 1; i <= verses.length; i++) {
+          const el = document.querySelector(`[data-testid="card-verse-${i}"]`) as HTMLElement | null;
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            const dist = Math.abs(rect.top - viewportMid);
+            if (dist < closestDist) {
+              closestDist = dist;
+              closestVerse = i;
+            }
+          }
+        }
+
+        if (closestVerse > 0 && closestVerse !== lastTrackedVerseRef.current) {
+          lastTrackedVerseRef.current = closestVerse;
+          const verseKey = `${chapterId}:${closestVerse}`;
+          incrementVersesRead(0, verseKey);
+        }
+      }, 500);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+    };
+  }, [chapterId, isLoadingVerses, verses.length]);
 
   // Reset completed verses when chapter changes
   useEffect(() => {
@@ -461,6 +504,7 @@ export default function ChapterView({
   const goToNextSurah = useCallback(() => {
     const nextChapterId = chapterId + 1;
     if (nextChapterId <= 114) {
+      triggerHaptic('medium');
       onNavigate('chapter', nextChapterId);
     }
   }, [chapterId, onNavigate]);
@@ -484,12 +528,67 @@ export default function ChapterView({
   const goToPreviousSurah = useCallback(() => {
     const prevChapterId = chapterId - 1;
     if (prevChapterId >= 1) {
+      triggerHaptic('medium');
       onNavigate('chapter', prevChapterId);
     }
   }, [chapterId, onNavigate]);
 
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  const [swipeIndicator, setSwipeIndicator] = useState<{ direction: 'left' | 'right'; visible: boolean } | null>(null);
+  const swipeIndicatorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const nextChapterInfo = chapterId < 114 ? chapters.find(ch => ch.id === chapterId + 1) : null;
+  const prevChapterInfo = chapterId > 1 ? chapters.find(ch => ch.id === chapterId - 1) : null;
+
+  const handleSwipeTouchStart = useCallback((e: React.TouchEvent) => {
+    if (layoutMode === 'mushaf') return;
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  }, [layoutMode]);
+
+  const handleSwipeTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (layoutMode === 'mushaf' || !touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - touchStartRef.current.x;
+    const deltaY = touch.clientY - touchStartRef.current.y;
+    const elapsed = Date.now() - touchStartRef.current.time;
+    touchStartRef.current = null;
+
+    const MIN_SWIPE_DISTANCE = 75;
+    const MAX_VERTICAL_TOLERANCE = 100;
+    const MAX_SWIPE_TIME = 600;
+
+    if (Math.abs(deltaX) >= MIN_SWIPE_DISTANCE && Math.abs(deltaY) <= MAX_VERTICAL_TOLERANCE && elapsed <= MAX_SWIPE_TIME) {
+      if (deltaX < 0 && chapterId < 114) {
+        setSwipeIndicator({ direction: 'left', visible: true });
+        if (swipeIndicatorTimeoutRef.current) clearTimeout(swipeIndicatorTimeoutRef.current);
+        swipeIndicatorTimeoutRef.current = setTimeout(() => {
+          setSwipeIndicator(null);
+          goToNextSurah();
+        }, 400);
+      } else if (deltaX > 0 && chapterId > 1) {
+        setSwipeIndicator({ direction: 'right', visible: true });
+        if (swipeIndicatorTimeoutRef.current) clearTimeout(swipeIndicatorTimeoutRef.current);
+        swipeIndicatorTimeoutRef.current = setTimeout(() => {
+          setSwipeIndicator(null);
+          goToPreviousSurah();
+        }, 400);
+      }
+    }
+  }, [layoutMode, chapterId, goToNextSurah, goToPreviousSurah]);
+
+  useEffect(() => {
+    return () => {
+      if (swipeIndicatorTimeoutRef.current) clearTimeout(swipeIndicatorTimeoutRef.current);
+    };
+  }, []);
+
   return (
-    <div className="relative flex flex-col h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+    <div
+      className="relative flex flex-col h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background"
+      onTouchStart={handleSwipeTouchStart}
+      onTouchEnd={handleSwipeTouchEnd}
+    >
       {/* Rich layered gradients for depth - adapts to theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
@@ -1111,6 +1210,31 @@ export default function ChapterView({
         />
       )}
       {arabicScript === 'tajweed' && <TajweedLegend />}
+
+      {swipeIndicator && (
+        <div
+          className={`fixed z-[60] top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-3 rounded-xl bg-foreground/80 dark:bg-white/80 text-background dark:text-black shadow-lg backdrop-blur-sm transition-all duration-300 ${
+            swipeIndicator.direction === 'left'
+              ? 'right-4 animate-in slide-in-from-right-4'
+              : 'left-4 animate-in slide-in-from-left-4'
+          }`}
+          data-testid={`swipe-indicator-${swipeIndicator.direction}`}
+        >
+          {swipeIndicator.direction === 'right' && prevChapterInfo && (
+            <>
+              <ChevronLeft className="w-4 h-4" />
+              <span className="text-sm font-medium">{prevChapterInfo.englishName}</span>
+            </>
+          )}
+          {swipeIndicator.direction === 'left' && nextChapterInfo && (
+            <>
+              <span className="text-sm font-medium">{nextChapterInfo.englishName}</span>
+              <ChevronRight className="w-4 h-4" />
+            </>
+          )}
+        </div>
+      )}
+
       <AudioPlayer
         currentTime={currentTime}
         duration={duration}

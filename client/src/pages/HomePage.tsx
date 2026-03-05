@@ -24,7 +24,7 @@ const DAILY_SURAHS = [
 ];
 
 interface HomePageProps {
-  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
+  onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => void;
   activeTab?: "home" | "surah" | "settings" | "bookmarks";
 }
 
@@ -96,8 +96,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           <div
             className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
-            onClick={() => onNavigate("chapter", stats.lastReadChapter)}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter); }}}
+            onClick={() => onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined)}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined); }}}
             role="button"
             tabIndex={0}
             aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}

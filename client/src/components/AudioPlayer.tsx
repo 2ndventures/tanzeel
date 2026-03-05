@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Slider } from "@/components/ui/slider";
 import { X } from "lucide-react";
+import { triggerHaptic } from "@/lib/haptics";
 import {
   Drawer,
   DrawerClose,
@@ -76,7 +77,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
             return (
               <button
                 key={opt.mode}
-                onClick={() => onLayoutModeChange?.(opt.mode)}
+                onClick={() => { triggerHaptic('light'); onLayoutModeChange?.(opt.mode); }}
                 className={`relative rounded-xl overflow-hidden transition-all ${
                   isSelected
                     ? 'ring-2 ring-primary shadow-md shadow-primary/15'
@@ -227,6 +228,7 @@ export default function AudioPlayer({
   const speedIsModified = Math.abs(speed - 1.0) > 0.01;
 
   const cycleSpeed = () => {
+    triggerHaptic('light');
     const currentIndex = speedOptions.findIndex(s => Math.abs(s - speed) < 0.01);
     if (currentIndex >= 0) {
       const nextIndex = (currentIndex + 1) % speedOptions.length;
@@ -292,7 +294,7 @@ export default function AudioPlayer({
         </Drawer>
         <button
           className="size-14 rounded-full bg-card/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 ring-border/40 disabled:opacity-50 relative"
-          onClick={onPlayPause}
+          onClick={() => { triggerHaptic('light'); onPlayPause?.(); }}
           disabled={isLoading}
           aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
           data-testid="compact-play-button"
@@ -399,7 +401,7 @@ export default function AudioPlayer({
                 value={[speed]} min={0.5} max={2.0} step={0.1}
                 showTooltip tooltipContent={(v) => `${formatSpeed(v)}`}
                 onValueChange={(value) => onSpeedChange?.(Math.round(value[0] * 10) / 10)}
-                onValueCommit={() => setShowSpeedSlider(false)}
+                onValueCommit={() => { triggerHaptic('light'); setShowSpeedSlider(false); }}
                 className="flex-1" aria-label="Fine playback speed" data-testid="slider-speed"
               />
               <span className="text-xs font-medium text-muted-foreground/60 dark:text-white/40 w-8 shrink-0">2x</span>
@@ -445,7 +447,7 @@ export default function AudioPlayer({
 
             <button
               className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 bg-[#f8c630] text-[#ffffff]"
-              onClick={onPlayPause}
+              onClick={() => { triggerHaptic('light'); onPlayPause?.(); }}
               disabled={isLoading}
               aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
               data-testid="button-play-pause"

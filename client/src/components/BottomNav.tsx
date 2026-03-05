@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
+import { triggerHaptic } from "@/lib/haptics";
 
 interface BottomNavProps {
   activeTab: "home" | "surah" | "settings" | "bookmarks";
@@ -23,7 +24,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
           return (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => { triggerHaptic('light'); onTabChange(tab.id); }}
               className="flex flex-col items-center gap-1.5 min-h-[48px] min-w-[48px] justify-center hover-elevate active-elevate-2 rounded-lg px-2"
               data-testid={`button-nav-${tab.id}`}
             >
