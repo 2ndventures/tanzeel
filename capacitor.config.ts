@@ -12,6 +12,11 @@ const config: CapacitorConfig = {
     contentInset: 'always',
     scrollEnabled: false,
     backgroundColor: '#101828'
+  },
+  plugins: {
+    Keyboard: {
+      resize: 'none'
+    }
   }
 };
 
