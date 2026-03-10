@@ -174,7 +174,12 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
+                onBlur={() => {
+                  setIsSearchFocused(false);
+                  window.scrollTo(0, 0);
+                  document.documentElement.scrollTop = 0;
+                  document.body.scrollTop = 0;
+                }}
                 aria-label="Search surahs, topics, or keywords"
                 data-testid="input-search"
               />

@@ -258,6 +258,18 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 
+  html::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background: hsl(var(--background));
+    z-index: 99999;
+    pointer-events: none;
+  }
+
   /* IndoPak / Nastaliq: enable OpenType layout features for proper ligatures */
   .font-indopak {
     font-feature-settings: "rlig" 1, "calt" 1, "kern" 1, "liga" 1;

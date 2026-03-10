@@ -10,7 +10,8 @@ const config: CapacitorConfig = {
   },
   ios: {
     contentInset: 'always',
-    scrollEnabled: false
+    scrollEnabled: false,
+    backgroundColor: '#101828'
   }
 };
 
