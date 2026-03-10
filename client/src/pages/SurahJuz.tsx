@@ -25,8 +25,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<"surah" | "juz">("surah");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const hasActiveSearch = searchQuery.trim().length >= 3;
-  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader({ disabled: hasActiveSearch });
+  const searchEngaged = isSearchFocused || hasActiveSearch;
+  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader({ disabled: searchEngaged });
 
   const [translationCache, setTranslationCache] = useState<Record<string, string>>({});
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -153,10 +155,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
       <div
         className={`fixed left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ${
-          hasActiveSearch ? 'z-50 header-safe-padding' : isCollapsed ? '' : 'z-40 collapsible-top-100'
+          hasActiveSearch ? 'z-50 header-safe-padding' : isCollapsed && !isSearchFocused ? '' : 'z-40 collapsible-top-100'
         }`}
         style={{
-          top: !hasActiveSearch && isCollapsed ? '-200px' : undefined,
+          top: !hasActiveSearch && isCollapsed && !isSearchFocused ? '-200px' : undefined,
         }}
       >
         <div className={`px-6 ${hasActiveSearch ? 'pt-4 pb-4' : 'pt-2 pb-6'} space-y-6`}>
@@ -171,6 +173,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
                 aria-label="Search surahs, topics, or keywords"
                 data-testid="input-search"
               />
