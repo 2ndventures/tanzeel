@@ -43,7 +43,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Introduction</h2>
               <p className="text-foreground/90 leading-relaxed">
-                Third Ventures, LLC ("we," "us," or "our") operates the Tanzeel mobile application (the "App"). 
+                2nd Ventures, LLC ("we," "us," or "our") operates the Tanzeel mobile application (the "App"). 
                 This Privacy Policy explains our practices regarding the collection, use, and disclosure of information 
                 when you use our App. We are committed to protecting your privacy and complying with applicable privacy 
                 laws, including GDPR (General Data Protection Regulation) and CCPA (California Consumer Privacy Act).
@@ -153,7 +153,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
                 If you have any questions about this Privacy Policy, please contact us:
               </p>
               <div className="bg-muted/30 dark:bg-black/40 p-6 rounded-xl border border-border">
-                <p className="text-foreground/90 mb-2"><strong>Third Ventures, LLC</strong></p>
+                <p className="text-foreground/90 mb-2"><strong>2nd Ventures, LLC</strong></p>
                 <p className="text-foreground/90">Email: support@thirdventures.com</p>
               </div>
             </section>

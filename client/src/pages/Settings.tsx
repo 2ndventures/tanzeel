@@ -485,7 +485,7 @@ export default function Settings({
           <div className="text-center text-xs text-muted-foreground/60 space-y-1 pb-8 pt-2">
             <p>Tanzeel</p>
             <p>Version 1.0.0</p>
-            <p>2026 Third Ventures, LLC</p>
+            <p>2026 2nd Ventures, LLC</p>
           </div>
         </div>
       </div>

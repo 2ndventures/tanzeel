@@ -43,7 +43,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Agreement to Terms</h2>
               <p className="text-foreground/90 leading-relaxed">
-                These Terms of Service ("Terms") constitute a legally binding agreement between you and Third Ventures, LLC 
+                These Terms of Service ("Terms") constitute a legally binding agreement between you and 2nd Ventures, LLC 
                 ("Company," "we," "us," or "our") concerning your access to and use of the Tanzeel mobile application 
                 (the "App"). By downloading, installing, or using the App, you agree to be bound by these Terms. If you do 
                 not agree to these Terms, you may not access or use the App.
@@ -84,7 +84,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
               <p className="text-foreground/90 leading-relaxed mb-4">
                 The App and its entire contents, features, and functionality (including but not limited to all information, 
                 software, text, displays, images, video, audio, design, and selection and arrangement thereof) are owned by 
-                Third Ventures, LLC, its licensors, or other providers of such material and are protected by United States 
+                2nd Ventures, LLC, its licensors, or other providers of such material and are protected by United States 
                 and international copyright, trademark, patent, trade secret, and other intellectual property or proprietary 
                 rights laws.
               </p>
@@ -160,7 +160,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Indemnification</h2>
               <p className="text-foreground/90 leading-relaxed">
-                You agree to indemnify, defend, and hold harmless Third Ventures, LLC and its affiliates, officers, directors, 
+                You agree to indemnify, defend, and hold harmless 2nd Ventures, LLC and its affiliates, officers, directors, 
                 employees, and agents from and against any claims, liabilities, damages, losses, costs, expenses, or fees 
                 (including reasonable attorneys' fees) arising from: (a) your use of the App; (b) your violation of these 
                 Terms; (c) your violation of any rights of another; or (d) any content you provide through the App.
@@ -243,7 +243,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
                 If you have any questions about these Terms, please contact us:
               </p>
               <div className="bg-muted/30 dark:bg-black/40 p-6 rounded-xl border border-border">
-                <p className="text-foreground/90 mb-2"><strong>Third Ventures, LLC</strong></p>
+                <p className="text-foreground/90 mb-2"><strong>2nd Ventures, LLC</strong></p>
                 <p className="text-foreground/90">Email: support@thirdventures.com</p>
               </div>
             </section>
