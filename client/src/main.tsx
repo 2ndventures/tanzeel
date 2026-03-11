@@ -5,9 +5,11 @@ import "./index.css";
 if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
   const resetScroll = () => {
     requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+      if (document.documentElement.scrollTop > 0 || document.body.scrollTop > 0) {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
     });
   };
 

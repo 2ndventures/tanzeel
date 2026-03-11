@@ -197,9 +197,11 @@ function App() {
     localStorage.setItem('layoutMode', layoutMode);
   }, [layoutMode]);
 
-  // Scroll to top whenever the page changes
+  // Reset any residual body scroll when page changes (flex containers handle their own scroll)
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (document.documentElement.scrollTop > 0 || document.body.scrollTop > 0) {
+      window.scrollTo(0, 0);
+    }
   }, [currentPage]);
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => {
