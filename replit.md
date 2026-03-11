@@ -16,9 +16,9 @@ The frontend uses React 18 with TypeScript and Vite, adopting a component-based 
 
 All UI components utilize viewport-relative units for responsiveness, ensuring proper display and scrolling on various mobile screen sizes. This includes dropdowns, modals, spacing, and minimum 48px touch targets for accessibility.
 
-### Status Bar System
+### Layout System
 
-The application incorporates safe-area handling for native mobile deployment. It features a `StatusBarShim` component, fixed headers for Home and Settings pages, and collapsible headers for reading screens (SurahJuz, ChapterView) that hide on scroll down and reappear on scroll up. Dynamic padding with `calc()` expressions correctly accounts for `safe-area-inset-top` on devices with notches or dynamic islands, ensuring smooth transitions.
+All pages use a flex-based layout pattern: outer container is `flex flex-col h-[100dvh]`, headers are in-flow `shrink-0` elements with `header-safe-padding` for safe area insets, content areas use `flex-1 overflow-y-auto min-h-0`, and BottomNav is an in-flow `shrink-0` element with `safe-area-bottom`. The SurahJuz page features a collapsible header using `max-h`/`opacity` CSS transitions that animate sections in/out based on scroll position and search state. ChapterView is an exception where the header keeps `position: fixed` due to complex auto-hide/gradient behavior. iOS safe area handling uses `html::before` pseudo-element in `@layer base`, Capacitor `resize: 'none'` keyboard mode, and global `focusout`/`visualViewport` scroll reset in main.tsx.
 
 ### Accessibility Compliance
 

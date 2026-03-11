@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 import BottomNav from "@/components/BottomNav";
-import { StatusBarShim } from "@/components/StatusBarShim";
 import { chapters, surahMeanings } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 
@@ -53,10 +52,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Get current chapter data from stats
   const currentChapter = chapters.find(ch => ch.id === stats.lastReadChapter) || chapters[0];
 
-  // Calculate progress with guards against undefined/NaN and clamp to 0-100
   const rawProgress = stats.lastReadVerse && currentChapter.verseCount > 0
     ? (stats.lastReadVerse / currentChapter.verseCount) * 100
     : 0;
@@ -64,17 +61,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-background to-card">
-      {/* Subtle background gradient */}
+    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background to-card">
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
 
-      {/* Status Bar Shim */}
-      <StatusBarShim />
-
-      {/* Content - fills viewport between header and bottom nav */}
-      <div className="relative flex flex-col h-full pb-20">
-        {/* Header */}
-        <div className="header-safe-padding">
+      <div className="relative flex flex-col flex-1 min-h-0">
+        <div className="header-safe-padding shrink-0">
           <div className="px-6 py-6">
             <div className="flex items-center justify-between">
               <div>
@@ -90,9 +81,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </div>
         </div>
 
-        {/* Main content area - flex to fill */}
-        <div className="flex flex-col flex-1 px-6 gap-4 min-h-0">
-          {/* Continue Reading Card */}
+        <div className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto">
           <div
             className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
@@ -128,7 +117,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             </div>
           </div>
 
-          {/* Quick Access */}
           <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="grid grid-cols-3 gap-4">
               <div
@@ -176,8 +164,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             </div>
           </div>
 
-          {/* Today's Reading */}
-          <div className="flex-1 flex flex-col min-h-0 animate-fade-in-up" style={{ opacity: 0, animationDelay: '200ms', animationFillMode: 'forwards' }}>
+          <div className="flex-1 flex flex-col min-h-0 animate-fade-in-up pb-4" style={{ opacity: 0, animationDelay: '200ms', animationFillMode: 'forwards' }}>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
                 TODAY'S READING
@@ -205,7 +192,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav
         activeTab={activeTab}
         onTabChange={(tab) => {

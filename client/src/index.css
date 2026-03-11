@@ -309,52 +309,14 @@
   padding-left: env(safe-area-inset-left);
 }
 
-.safe-area-top {
-  top: constant(safe-area-inset-top);
-  top: env(safe-area-inset-top);
-}
-
 .safe-area-bottom {
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Status bar shim that fills the notch area */
-.status-bar-height {
-  height: constant(safe-area-inset-top);
-  height: env(safe-area-inset-top);
-}
-
-/* Header with padding for safe area */
 .header-safe-padding {
   padding-top: constant(safe-area-inset-top);
   padding-top: env(safe-area-inset-top);
-}
-
-/* Collapsible section positioning with safe area (for SurahJuz search section) */
-.collapsible-top-100 {
-  top: 84px;
-  top: calc(84px + constant(safe-area-inset-top));
-  top: calc(84px + env(safe-area-inset-top));
-}
-
-/* Scroll padding for collapsible headers with safe area */
-.scroll-pt-140-safe {
-  padding-top: 140px;
-  padding-top: calc(140px + constant(safe-area-inset-top));
-  padding-top: calc(140px + env(safe-area-inset-top));
-}
-
-.scroll-pt-340-safe {
-  padding-top: 300px;
-  padding-top: calc(300px + constant(safe-area-inset-top));
-  padding-top: calc(300px + env(safe-area-inset-top));
-}
-
-.scroll-pt-search-safe {
-  padding-top: 110px;
-  padding-top: calc(110px + constant(safe-area-inset-top));
-  padding-top: calc(110px + env(safe-area-inset-top));
 }
 
 /**

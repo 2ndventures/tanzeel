@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import BottomNav from "@/components/BottomNav";
-import { StatusBarShim } from "@/components/StatusBarShim";
 import { chapters } from "@/lib/quranMetadata";
 import {
   getBookmarks,
@@ -107,12 +106,11 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
   }, {});
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-background to-card">
+    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background to-card">
       <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
-      <StatusBarShim />
 
-      <div className="relative flex flex-col h-full pb-20">
-        <div className="header-safe-padding">
+      <div className="relative flex flex-col flex-1 min-h-0">
+        <div className="header-safe-padding shrink-0">
           <div className="px-8 py-6">
             <h2 className="font-heading text-5xl font-black tracking-tighter text-foreground" data-testid="text-bookmarks-title">
               Bookmarks
@@ -123,7 +121,7 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 pb-4">
+        <div className="flex-1 overflow-y-auto px-5 pb-4 min-h-0">
           <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
             <button
               onClick={() => setSelectedFolder(null)}

@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
-import { StatusBarShim } from "@/components/StatusBarShim";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
@@ -133,101 +132,96 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   });
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
+    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background via-background/95 to-background">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30 pointer-events-none" />
 
-      <StatusBarShim />
-
-      <div className={`fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-xl header-safe-padding transition-all duration-300 ${
-        hasActiveSearch ? 'opacity-0 pointer-events-none -translate-y-full' : ''
-      }`}>
-        <div className="px-6 pt-4 pb-5">
-          <div className="flex items-center justify-between">
-            <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
-              Surahs
-            </h1>
+      <div className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
+        <div className={`header-safe-padding overflow-hidden transition-all duration-300 ${
+          hasActiveSearch ? 'max-h-0 opacity-0' : 'max-h-[200px] opacity-100'
+        }`}>
+          <div className="px-6 pt-4 pb-5">
+            <div className="flex items-center justify-between">
+              <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
+                Surahs
+              </h1>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div
-        className={`fixed left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-border transition-all duration-300 ${
-          hasActiveSearch ? 'z-50 header-safe-padding' : isCollapsed && !isSearchFocused ? '' : 'z-40 collapsible-top-100'
-        }`}
-        style={{
-          top: !hasActiveSearch && isCollapsed && !isSearchFocused ? '-200px' : undefined,
-        }}
-      >
-        <div className={`px-6 ${hasActiveSearch ? 'pt-4 pb-4' : 'pt-2 pb-6'} space-y-6`}>
-          <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-            <div className="relative">
-              <label htmlFor="surah-search" className="sr-only">Search surahs or topics</label>
-              <Input
-                id="surah-search"
-                type="search"
-                placeholder="Search surahs, topics, or keywords..."
-                className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => {
-                  setIsSearchFocused(false);
-                  window.scrollTo(0, 0);
-                  document.documentElement.scrollTop = 0;
-                  document.body.scrollTop = 0;
-                }}
-                aria-label="Search surahs, topics, or keywords"
-                data-testid="input-search"
-              />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                <Search className="w-5 h-5 text-muted-foreground" />
-              </div>
-            </div>
-          </div>
-
-          {!hasActiveSearch && (
+        <div className={`border-b border-border overflow-hidden transition-all duration-300 ${
+          !hasActiveSearch && isCollapsed && !isSearchFocused ? 'max-h-0 opacity-0 border-transparent' : 'max-h-[200px] opacity-100'
+        }`}>
+          <div className={`px-6 ${hasActiveSearch ? 'header-safe-padding pt-4 pb-4' : 'pt-2 pb-6'} space-y-6`}>
             <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-              <div className="relative flex gap-2 p-1 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl">
-                <button
-                  onClick={() => setMode("surah")}
-                  className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
-                    mode === "surah"
-                      ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
-                      : "text-muted-foreground"
-                  }`}
-                  style={mode === "surah" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
-                  data-testid="button-mode-surah"
-                >
-                  All Surahs
-                </button>
-                <button
-                  onClick={() => setMode("juz")}
-                  className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
-                    mode === "juz"
-                      ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
-                      : "text-muted-foreground"
-                  }`}
-                  style={mode === "juz" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
-                  data-testid="button-mode-juz"
-                >
-                  Juz
-                </button>
+              <div className="relative">
+                <label htmlFor="surah-search" className="sr-only">Search surahs or topics</label>
+                <Input
+                  id="surah-search"
+                  type="search"
+                  placeholder="Search surahs, topics, or keywords..."
+                  className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchFocused(true)}
+                  onBlur={() => {
+                    setIsSearchFocused(false);
+                    window.scrollTo(0, 0);
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+                  }}
+                  aria-label="Search surahs, topics, or keywords"
+                  data-testid="input-search"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <Search className="w-5 h-5 text-muted-foreground" />
+                </div>
               </div>
             </div>
-          )}
+
+            {!hasActiveSearch && (
+              <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
+                <div className="relative flex gap-2 p-1 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl">
+                  <button
+                    onClick={() => setMode("surah")}
+                    className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
+                      mode === "surah"
+                        ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
+                        : "text-muted-foreground"
+                    }`}
+                    style={mode === "surah" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
+                    data-testid="button-mode-surah"
+                  >
+                    All Surahs
+                  </button>
+                  <button
+                    onClick={() => setMode("juz")}
+                    className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
+                      mode === "juz"
+                        ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
+                        : "text-muted-foreground"
+                    }`}
+                    style={mode === "juz" ? { boxShadow: '0 0 20px rgba(255,214,10,0.3)' } : undefined}
+                    data-testid="button-mode-juz"
+                  >
+                    Juz
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       <div
         ref={scrollContainerRef}
-        className={`relative h-screen overflow-y-auto ${hasActiveSearch ? 'scroll-pt-search-safe' : 'scroll-pt-340-safe'}`}
+        className="relative flex-1 overflow-y-auto min-h-0"
       >
-        <div className="px-6 space-y-3 pb-28">
+        <div className="px-6 space-y-3 py-4 pb-4">
           {showTopicResults && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-4">

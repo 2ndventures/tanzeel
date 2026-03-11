@@ -1,6 +1,5 @@
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { StatusBarShim } from "@/components/StatusBarShim";
 
 interface TermsOfServiceProps {
   onBack: () => void;
@@ -8,12 +7,10 @@ interface TermsOfServiceProps {
 
 export default function TermsOfService({ onBack }: TermsOfServiceProps) {
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background">
+    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background via-background/95 to-background">
       <div className="fixed inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70 pointer-events-none" />
-      
-      <StatusBarShim />
 
-      <div className="fixed top-0 left-0 right-0 z-40 bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-border header-safe-padding">
+      <div className="relative bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
         <div className="px-8 pt-4 pb-6">
           <div className="flex items-center gap-4">
             <Button
@@ -33,8 +30,8 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
         </div>
       </div>
 
-      <div className="relative h-full overflow-y-auto pt-[180px] pb-24">
-        <div className="px-8 max-w-3xl mx-auto">
+      <div className="relative flex-1 overflow-y-auto min-h-0 pb-24">
+        <div className="px-8 max-w-3xl mx-auto pt-6">
           <div className="prose prose-slate dark:prose-invert max-w-none">
             <p className="text-sm text-muted-foreground mb-8">
               <strong>Last Updated:</strong> November 14, 2025

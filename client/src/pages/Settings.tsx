@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react";
 import BottomNav from "@/components/BottomNav";
-import { StatusBarShim } from "@/components/StatusBarShim";
 import { getAllReciters, getReciterById } from "@/lib/reciters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
@@ -191,16 +190,14 @@ export default function Settings({
 
   if (reciterView) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
+      <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background via-background/95 to-background">
         <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
         <div className="fixed inset-0 -z-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
         </div>
 
-        <StatusBarShim />
-
-        <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
+        <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
           <div className="px-6 pt-4 pb-4 flex items-center gap-3">
             <button
               onClick={() => setReciterView(false)}
@@ -215,8 +212,8 @@ export default function Settings({
           </div>
         </div>
 
-        <div className="relative h-screen overflow-y-auto pt-[120px]">
-          <div className="px-6 pb-24 space-y-1">
+        <div className="relative flex-1 overflow-y-auto min-h-0">
+          <div className="px-6 py-4 space-y-1">
             {allReciters.map((r) => {
               const isSelected = reciter === r.id;
               return (
@@ -263,7 +260,7 @@ export default function Settings({
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background pb-24">
+    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background via-background/95 to-background">
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -271,9 +268,7 @@ export default function Settings({
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl" />
       </div>
 
-      <StatusBarShim />
-
-      <div className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding">
+      <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
         <div className="px-6 pt-4 pb-6">
           <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
             Settings
@@ -281,8 +276,8 @@ export default function Settings({
         </div>
       </div>
 
-      <div className="relative h-screen overflow-y-auto pt-[180px]">
-        <div className="px-6 space-y-7 pb-24">
+      <div className="relative flex-1 overflow-y-auto min-h-0">
+        <div className="px-6 space-y-7 py-6">
 
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-display">
