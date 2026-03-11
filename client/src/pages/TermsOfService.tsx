@@ -141,7 +141,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Limitation of Liability</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
-                TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL THIRD VENTURES, LLC, ITS AFFILIATES, DIRECTORS, 
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL 2ND VENTURES, LLC, ITS AFFILIATES, DIRECTORS, 
                 EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, 
                 INCLUDING BUT NOT LIMITED TO:
               </p>
@@ -231,7 +231,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             <section className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-4">Entire Agreement</h2>
               <p className="text-foreground/90 leading-relaxed">
-                These Terms, together with our Privacy Policy, constitute the entire agreement between you and Third 
+                These Terms, together with our Privacy Policy, constitute the entire agreement between you and 2nd 
                 Ventures, LLC regarding the use of the App and supersede all prior agreements and understandings, whether 
                 written or oral.
               </p>
