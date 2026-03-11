@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
-import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
 import { Search, BookOpen, ArrowRight } from "lucide-react";
@@ -24,10 +23,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<"surah" | "juz">("surah");
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const hasActiveSearch = searchQuery.trim().length >= 3;
-  const searchEngaged = isSearchFocused || hasActiveSearch;
-  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader({ disabled: searchEngaged });
 
   const [translationCache, setTranslationCache] = useState<Record<string, string>>({});
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -151,9 +147,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
           </div>
         </div>
 
-        <div className={`border-b border-border overflow-hidden transition-all duration-300 ${
-          !hasActiveSearch && isCollapsed && !isSearchFocused ? 'max-h-0 opacity-0 border-transparent' : 'max-h-[200px] opacity-100'
-        }`}>
+        <div className="border-b border-border">
           <div className={`px-6 ${hasActiveSearch ? 'header-safe-padding pt-4 pb-4' : 'pt-2 pb-6'} space-y-6`}>
             <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
@@ -166,10 +160,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                   className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => setIsSearchFocused(true)}
-                  onBlur={() => {
-                    setIsSearchFocused(false);
-                  }}
+                  
                   aria-label="Search surahs, topics, or keywords"
                   data-testid="input-search"
                 />
@@ -215,7 +206,6 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       </div>
 
       <div
-        ref={scrollContainerRef}
         className="relative flex-1 overflow-y-auto min-h-0"
       >
         <div className="px-6 space-y-3 py-4 pb-4">
