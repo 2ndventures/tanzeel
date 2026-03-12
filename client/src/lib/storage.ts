@@ -1,13 +1,5 @@
-import { Capacitor, registerPlugin } from '@capacitor/core';
-
-interface PreferencesPlugin {
-  get(options: { key: string }): Promise<{ value: string | null }>;
-  set(options: { key: string; value: string }): Promise<void>;
-  remove(options: { key: string }): Promise<void>;
-  keys(): Promise<{ keys: string[] }>;
-}
-
-const CapPreferences = registerPlugin<PreferencesPlugin>('Preferences');
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 
 const MIGRATION_FLAG = '__storage_migrated_v1';
 
@@ -44,20 +36,20 @@ function isNative(): boolean {
 async function migrateFromLocalStorage(): Promise<void> {
   if (!isNative()) return;
 
-  const { value: migrated } = await CapPreferences.get({ key: MIGRATION_FLAG });
+  const { value: migrated } = await Preferences.get({ key: MIGRATION_FLAG });
   if (migrated) return;
 
   for (const key of KEYS_TO_MIGRATE) {
     try {
       const value = localStorage.getItem(key);
       if (value !== null) {
-        await CapPreferences.set({ key, value });
+        await Preferences.set({ key, value });
       }
     } catch {
     }
   }
 
-  await CapPreferences.set({ key: MIGRATION_FLAG, value: '1' });
+  await Preferences.set({ key: MIGRATION_FLAG, value: '1' });
 }
 
 export async function initStorage(): Promise<void> {
@@ -68,7 +60,7 @@ export async function initStorage(): Promise<void> {
 
     for (const key of KEYS_TO_MIGRATE) {
       try {
-        const { value } = await CapPreferences.get({ key });
+        const { value } = await Preferences.get({ key });
         if (value !== null) {
           cache.set(key, value);
         }
@@ -94,6 +86,9 @@ export function getItem(key: string): string | null {
   if (initialized) {
     return cache.get(key) ?? null;
   }
+  if (isNative()) {
+    return null;
+  }
   return localStorage.getItem(key);
 }
 
@@ -101,7 +96,7 @@ export function setItem(key: string, value: string): void {
   cache.set(key, value);
 
   if (isNative()) {
-    CapPreferences.set({ key, value }).catch(() => {});
+    Preferences.set({ key, value }).catch(() => {});
   } else {
     try {
       localStorage.setItem(key, value);
@@ -114,7 +109,7 @@ export function removeItem(key: string): void {
   cache.delete(key);
 
   if (isNative()) {
-    CapPreferences.remove({ key }).catch(() => {});
+    Preferences.remove({ key }).catch(() => {});
   } else {
     try {
       localStorage.removeItem(key);

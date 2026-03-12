@@ -16,6 +16,7 @@
     "@capacitor/core": "^7.4.4",
     "@capacitor/haptics": "^7.0.3",
     "@capacitor/ios": "^7.4.4",
+    "@capacitor/preferences": "^7.0.0",
     "@capgo/native-audio": "^7.9.2",
     "@hookform/resolvers": "^3.10.0",
     "@iconify/react": "^6.0.2",
