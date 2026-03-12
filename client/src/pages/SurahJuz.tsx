@@ -224,7 +224,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                     <button
                       key={`${result.chapterId}-${result.verseNumber}-${idx}`}
                       className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
-                      onClick={() => onNavigate("chapter", result.chapterId, undefined, result.verseNumber)}
+                      onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
                       data-testid={`search-result-${result.chapterId}-${result.verseNumber}`}
                     >
                       <div className="flex items-start gap-3">
@@ -305,7 +305,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                     key={juz.id}
                     className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
                     style={{ animationDelay: `${index * 30}ms` }}
-                    onClick={() => onNavigate("chapter", juz.startChapter)}
+                    onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", juz.startChapter); }}
                     data-testid={`juz-card-${juz.id}`}
                   >
                     <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 h-full flex items-center">
@@ -350,7 +350,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 englishName={chapter.englishName}
                 verseCount={chapter.verseCount}
                 meaning={surahMeanings[chapter.id] || chapter.revelationType}
-                onClick={() => onNavigate("chapter", chapter.id)}
+                onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", chapter.id); }}
                 style={{ animationDelay: `${index * 30}ms` }}
                 isFirst={index === 0}
               />

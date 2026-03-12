@@ -242,6 +242,10 @@ function App() {
   }, [handleBackButton]);
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => {
+    (document.activeElement as HTMLElement)?.blur();
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
     setCurrentPage(page as Page);
     if (tab) {
       setActiveTab(tab);
