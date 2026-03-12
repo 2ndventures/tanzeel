@@ -451,8 +451,8 @@ export default function Settings({
               </Sheet>
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <button
-                onClick={() => {
-                  removeItem('onboardingCompleted');
+                onClick={async () => {
+                  await removeItem('onboardingCompleted');
                   window.location.reload();
                 }}
                 className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 text-left"
