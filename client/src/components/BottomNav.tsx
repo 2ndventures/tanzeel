@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 import { triggerHaptic } from "@/lib/haptics";
@@ -8,12 +9,32 @@ interface BottomNavProps {
 }
 
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const threshold = 150;
+    const handleResize = () => {
+      const heightDiff = window.innerHeight - vv.height;
+      setKeyboardVisible(heightDiff > threshold);
+    };
+    vv.addEventListener('resize', handleResize);
+    vv.addEventListener('scroll', handleResize);
+    return () => {
+      vv.removeEventListener('resize', handleResize);
+      vv.removeEventListener('scroll', handleResize);
+    };
+  }, []);
+
   const tabs = [
     { id: "home" as const, icon: "solar:home-2-bold", label: "Home" },
     { id: "surah" as const, icon: "solar:book-bold", label: "Surahs" },
     { id: "bookmarks" as const, icon: "solar:bookmark-bold", label: "Bookmarks" },
     { id: "settings" as const, icon: "solar:settings-bold", label: "Settings" },
   ];
+
+  if (keyboardVisible) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 shrink-0 border-t border-border bg-card/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl safe-area-bottom">

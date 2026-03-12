@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
@@ -27,6 +27,24 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
   const [translationCache, setTranslationCache] = useState<Record<string, string>>({});
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleSearchBlur = useCallback(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const scrollEl = scrollContainerRef.current;
+    if (!scrollEl) return;
+    const handleScroll = () => {
+      if (document.activeElement === searchInputRef.current) {
+        searchInputRef.current?.blur();
+      }
+    };
+    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollEl.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -154,13 +172,18 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
               <div className="relative">
                 <label htmlFor="surah-search" className="sr-only">Search surahs or topics</label>
                 <Input
+                  ref={searchInputRef}
                   id="surah-search"
                   type="search"
+                  inputMode="search"
+                  enterKeyHint="search"
+                  autoComplete="off"
+                  autoCorrect="off"
                   placeholder="Search surahs, topics, or keywords..."
                   className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  
+                  onBlur={handleSearchBlur}
                   aria-label="Search surahs, topics, or keywords"
                   data-testid="input-search"
                 />
@@ -206,6 +229,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       </div>
 
       <div
+        ref={scrollContainerRef}
         className="relative flex-1 overflow-y-auto min-h-0"
       >
         <div className="px-6 space-y-3 py-4 pb-[120px]">
