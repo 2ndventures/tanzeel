@@ -410,7 +410,7 @@ export default function ChapterView({
 
   const reciterDisplayName = getReciterById(reciter)?.name || 'Mishary Rashid Alafasy';
   useMediaSession({
-    title: `${chapterInfo?.englishName || 'Quran'}${currentVerseKey ? ` - Ayah ${currentVerseKey.split(':')[1]}` : ''}`,
+    title: `${chapterInfo?.englishName || 'Quran'} (1-${chapterInfo?.verseCount || '?'})`,
     artist: reciterDisplayName,
     album: 'Tanzeel',
     isPlaying,
