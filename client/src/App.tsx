@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,6 +15,12 @@ import OnboardingScreen from "@/components/OnboardingScreen";
 import SplashScreen from "@/components/SplashScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
+import { Capacitor, registerPlugin } from "@capacitor/core";
+
+const CapApp = registerPlugin<{
+  exitApp: () => Promise<void>;
+  addListener: (eventName: string, callback: () => void) => Promise<{ remove: () => void }>;
+}>('App');
 
 type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service";
 
@@ -197,6 +203,45 @@ function App() {
     localStorage.setItem('layoutMode', layoutMode);
   }, [layoutMode]);
 
+  const settingsBackHandlerRef = useRef<(() => boolean) | null>(null);
+
+  const handleBackButton = useCallback(() => {
+    switch (currentPage) {
+      case "privacy-policy":
+      case "terms-of-service":
+        setCurrentPage("settings");
+        setActiveTab("settings");
+        break;
+      case "chapter":
+        setCurrentPage("surah-juz");
+        setActiveTab("surah");
+        break;
+      case "settings":
+        if (settingsBackHandlerRef.current && settingsBackHandlerRef.current()) {
+          break;
+        }
+        setCurrentPage("home");
+        setActiveTab("home");
+        break;
+      case "surah-juz":
+      case "bookmarks":
+        setCurrentPage("home");
+        setActiveTab("home");
+        break;
+      case "home":
+      default:
+        CapApp.exitApp();
+        break;
+    }
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    const listener = CapApp.addListener('backButton', handleBackButton);
+    return () => {
+      listener.then(l => l.remove());
+    };
+  }, [handleBackButton]);
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => {
     setCurrentPage(page as Page);
@@ -300,6 +345,7 @@ function App() {
                   setActiveTab("home");
                 }}
                 onNavigate={handleNavigate}
+                onRegisterBackHandler={(handler) => { settingsBackHandlerRef.current = handler; }}
                 darkMode={darkMode}
                 onDarkModeChange={setDarkMode}
                 transliteration={transliteration}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import BottomNav from "@/components/BottomNav";
 import { getAllReciters, getReciterById } from "@/lib/reciters";
@@ -12,6 +12,7 @@ import { ChevronRight, ChevronLeft, Check, Sun, Moon } from "lucide-react";
 interface SettingsProps {
   onBack: () => void;
   onNavigate?: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
+  onRegisterBackHandler?: (handler: () => boolean) => void;
   darkMode: boolean;
   onDarkModeChange: (value: boolean) => void;
   transliteration: boolean;
@@ -105,6 +106,7 @@ function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeT
 export default function Settings({
   onBack,
   onNavigate,
+  onRegisterBackHandler,
   darkMode,
   onDarkModeChange,
   transliteration,
@@ -141,6 +143,18 @@ export default function Settings({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reciterView, setReciterView] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (onRegisterBackHandler) {
+      onRegisterBackHandler(() => {
+        if (reciterView) {
+          setReciterView(false);
+          return true;
+        }
+        return false;
+      });
+    }
+  }, [onRegisterBackHandler, reciterView]);
 
   const handleFeedbackSubmit = async () => {
     if (!feedback.trim()) {
