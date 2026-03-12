@@ -205,7 +205,7 @@ export default function Settings({
 
   if (reciterView) {
     return (
-      <div className="flex flex-col h-screen bg-gradient-to-b from-background via-background/95 to-background">
+      <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
         <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
         <div className="fixed inset-0 -z-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
@@ -275,7 +275,7 @@ export default function Settings({
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-background via-background/95 to-background">
+    <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
