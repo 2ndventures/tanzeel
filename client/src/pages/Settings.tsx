@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
 import BottomNav from "@/components/BottomNav";
 import { getAllReciters, getReciterById } from "@/lib/reciters";
@@ -451,7 +452,7 @@ export default function Settings({
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <button
                 onClick={() => {
-                  localStorage.removeItem('onboardingCompleted');
+                  removeItem('onboardingCompleted');
                   window.location.reload();
                 }}
                 className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 text-left"

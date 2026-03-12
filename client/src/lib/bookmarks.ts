@@ -1,3 +1,5 @@
+import { getItem, setItem } from './storage';
+
 interface Bookmark {
   chapterId: number;
   verseNumber: number;
@@ -22,7 +24,7 @@ export function saveBookmark(chapterId: number, verseNumber: number): void {
     });
   }
 
-  localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+  setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
 }
 
 export function removeBookmark(chapterId: number, verseNumber: number): void {
@@ -30,11 +32,11 @@ export function removeBookmark(chapterId: number, verseNumber: number): void {
   const filtered = bookmarks.filter(
     b => !(b.chapterId === chapterId && b.verseNumber === verseNumber)
   );
-  localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(filtered));
+  setItem(BOOKMARKS_KEY, JSON.stringify(filtered));
 }
 
 export function getBookmarks(): Bookmark[] {
-  const stored = localStorage.getItem(BOOKMARKS_KEY);
+  const stored = getItem(BOOKMARKS_KEY);
   if (!stored) return [];
   try {
     return JSON.parse(stored);

@@ -16,6 +16,7 @@ import SplashScreen from "@/components/SplashScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
 import { Capacitor, registerPlugin } from "@capacitor/core";
+import { initStorage, getItem, setItem, removeItem } from "@/lib/storage";
 
 const CapApp = registerPlugin<{
   exitApp: () => Promise<void>;
@@ -30,109 +31,94 @@ function App() {
   const [initialVerse, setInitialVerse] = useState<number | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings" | "bookmarks">("home");
   
-  // Splash screen state
   const [showSplash, setShowSplash] = useState(true);
+  const [storageReady, setStorageReady] = useState(false);
+  const [splashAnimDone, setSplashAnimDone] = useState(false);
 
-  // Onboarding state
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    const completed = localStorage.getItem('onboardingCompleted');
-    return !completed;
-  });
-
-  // Initialize all settings from localStorage with defaults
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : true;
-  });
-  
-  const [transliteration, setTransliteration] = useState(() => {
-    const saved = localStorage.getItem('transliteration');
-    return saved ? JSON.parse(saved) : false;
-  });
-  
-  const [showTranslation, setShowTranslation] = useState(() => {
-    const saved = localStorage.getItem('showTranslation');
-    return saved ? JSON.parse(saved) : true;
-  });
-  
-  const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>(() => {
-    const saved = localStorage.getItem('arabicScript');
-    return (saved === 'indopak' || saved === 'tajweed') ? saved : 'uthmani';
-  });
-  
-  const [reciter, setReciter] = useState(() => {
-    const saved = localStorage.getItem('reciter');
-    if (saved) {
-      const trimmedId = saved.trim();
-      
-      // Check if this is a legacy ID that needs migration
-      const migratedId = getLegacyReciterId(trimmedId);
-      if (migratedId !== DEFAULT_RECITER || trimmedId in LEGACY_RECITER_MAP) {
-        // Legacy ID found - migrate it
-        localStorage.setItem('reciter', migratedId);
-        return migratedId;
-      }
-      
-      // Validate that the reciter ID exists in our current RECITERS list
-      if (isValidReciterId(trimmedId)) {
-        return trimmedId;
-      }
-      
-      // If reciter ID is invalid/removed, reset to default
-      localStorage.setItem('reciter', DEFAULT_RECITER);
-      return DEFAULT_RECITER;
+  useEffect(() => {
+    if (storageReady && splashAnimDone) {
+      setShowSplash(false);
     }
-    return DEFAULT_RECITER;
-  });
-  
-  const [autoScroll, setAutoScroll] = useState(() => {
-    const saved = localStorage.getItem('autoScroll');
-    return saved ? JSON.parse(saved) : true;
-  });
-  
-  const [repeat, setRepeat] = useState(() => {
-    const saved = localStorage.getItem('repeat');
-    return saved ? JSON.parse(saved) : false;
-  });
-  
-  const [autoplay, setAutoplay] = useState(() => {
-    const saved = localStorage.getItem('autoplay');
-    return saved ? JSON.parse(saved) : true;
-  });
-  
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
-    const saved = localStorage.getItem('layoutMode');
-    if (saved === 'focused-flow' || saved === 'mushaf' || saved === 'hifz') return saved;
-    return 'standard';
-  });
+  }, [storageReady, splashAnimDone]);
 
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [transliteration, setTransliteration] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(true);
+  const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>('uthmani');
+  const [reciter, setReciter] = useState(DEFAULT_RECITER);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [repeat, setRepeat] = useState(false);
+  const [autoplay, setAutoplay] = useState(true);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('standard');
   const [translation, setTranslation] = useState("English");
+  const [arabicFontSize, setArabicFontSize] = useState("Large");
+  const [translationFontSize, setTranslationFontSize] = useState("Medium");
+  const [transliterationFontSize, setTransliterationFontSize] = useState("Small");
+  const [lineSpacing, setLineSpacing] = useState("Normal");
+  const [showVerseNumbers, setShowVerseNumbers] = useState(true);
 
-  // Text display settings
-  const [arabicFontSize, setArabicFontSize] = useState(() => {
-    const saved = localStorage.getItem('arabicFontSize');
-    return saved || "Large";
-  });
+  useEffect(() => {
+    initStorage().then(() => {
+      const completed = getItem('onboardingCompleted');
+      setShowOnboarding(!completed);
 
-  const [translationFontSize, setTranslationFontSize] = useState(() => {
-    const saved = localStorage.getItem('translationFontSize');
-    return saved || "Medium";
-  });
+      const savedDark = getItem('darkMode');
+      if (savedDark !== null) setDarkMode(JSON.parse(savedDark));
 
-  const [transliterationFontSize, setTransliterationFontSize] = useState(() => {
-    const saved = localStorage.getItem('transliterationFontSize');
-    return saved || "Small";
-  });
+      const savedTranslit = getItem('transliteration');
+      if (savedTranslit !== null) setTransliteration(JSON.parse(savedTranslit));
 
-  const [lineSpacing, setLineSpacing] = useState(() => {
-    const saved = localStorage.getItem('lineSpacing');
-    return saved || "Normal";
-  });
+      const savedTranslation = getItem('showTranslation');
+      if (savedTranslation !== null) setShowTranslation(JSON.parse(savedTranslation));
 
-  const [showVerseNumbers, setShowVerseNumbers] = useState(() => {
-    const saved = localStorage.getItem('showVerseNumbers');
-    return saved ? JSON.parse(saved) : true;
-  });
+      const savedScript = getItem('arabicScript');
+      if (savedScript === 'indopak' || savedScript === 'tajweed') setArabicScript(savedScript);
+
+      const savedReciter = getItem('reciter');
+      if (savedReciter) {
+        const trimmedId = savedReciter.trim();
+        const migratedId = getLegacyReciterId(trimmedId);
+        if (migratedId !== DEFAULT_RECITER || trimmedId in LEGACY_RECITER_MAP) {
+          setItem('reciter', migratedId);
+          setReciter(migratedId);
+        } else if (isValidReciterId(trimmedId)) {
+          setReciter(trimmedId);
+        } else {
+          setItem('reciter', DEFAULT_RECITER);
+        }
+      }
+
+      const savedAutoScroll = getItem('autoScroll');
+      if (savedAutoScroll !== null) setAutoScroll(JSON.parse(savedAutoScroll));
+
+      const savedRepeat = getItem('repeat');
+      if (savedRepeat !== null) setRepeat(JSON.parse(savedRepeat));
+
+      const savedAutoplay = getItem('autoplay');
+      if (savedAutoplay !== null) setAutoplay(JSON.parse(savedAutoplay));
+
+      const savedLayout = getItem('layoutMode');
+      if (savedLayout === 'focused-flow' || savedLayout === 'mushaf' || savedLayout === 'hifz') setLayoutMode(savedLayout);
+
+      const savedArabicFont = getItem('arabicFontSize');
+      if (savedArabicFont) setArabicFontSize(savedArabicFont);
+
+      const savedTransFont = getItem('translationFontSize');
+      if (savedTransFont) setTranslationFontSize(savedTransFont);
+
+      const savedTranslitFont = getItem('transliterationFontSize');
+      if (savedTranslitFont) setTransliterationFontSize(savedTranslitFont);
+
+      const savedSpacing = getItem('lineSpacing');
+      if (savedSpacing) setLineSpacing(savedSpacing);
+
+      const savedVerseNums = getItem('showVerseNumbers');
+      if (savedVerseNums !== null) setShowVerseNumbers(JSON.parse(savedVerseNums));
+
+      setStorageReady(true);
+    });
+  }, []);
 
   useEffect(() => {
     if (darkMode) {
@@ -148,60 +134,72 @@ function App() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', themeColor);
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
   useEffect(() => {
-    localStorage.setItem('transliteration', JSON.stringify(transliteration));
-  }, [transliteration]);
+    if (!storageReady) return;
+    setItem('transliteration', JSON.stringify(transliteration));
+  }, [transliteration, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('showTranslation', JSON.stringify(showTranslation));
-  }, [showTranslation]);
+    if (!storageReady) return;
+    setItem('showTranslation', JSON.stringify(showTranslation));
+  }, [showTranslation, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('autoScroll', JSON.stringify(autoScroll));
-  }, [autoScroll]);
+    if (!storageReady) return;
+    setItem('autoScroll', JSON.stringify(autoScroll));
+  }, [autoScroll, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('repeat', JSON.stringify(repeat));
-  }, [repeat]);
+    if (!storageReady) return;
+    setItem('repeat', JSON.stringify(repeat));
+  }, [repeat, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('autoplay', JSON.stringify(autoplay));
-  }, [autoplay]);
+    if (!storageReady) return;
+    setItem('autoplay', JSON.stringify(autoplay));
+  }, [autoplay, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('reciter', reciter);
-  }, [reciter]);
+    if (!storageReady) return;
+    setItem('reciter', reciter);
+  }, [reciter, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('arabicFontSize', arabicFontSize);
-  }, [arabicFontSize]);
+    if (!storageReady) return;
+    setItem('arabicFontSize', arabicFontSize);
+  }, [arabicFontSize, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('translationFontSize', translationFontSize);
-  }, [translationFontSize]);
+    if (!storageReady) return;
+    setItem('translationFontSize', translationFontSize);
+  }, [translationFontSize, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('transliterationFontSize', transliterationFontSize);
-  }, [transliterationFontSize]);
+    if (!storageReady) return;
+    setItem('transliterationFontSize', transliterationFontSize);
+  }, [transliterationFontSize, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('lineSpacing', lineSpacing);
-  }, [lineSpacing]);
+    if (!storageReady) return;
+    setItem('lineSpacing', lineSpacing);
+  }, [lineSpacing, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('showVerseNumbers', JSON.stringify(showVerseNumbers));
-  }, [showVerseNumbers]);
+    if (!storageReady) return;
+    setItem('showVerseNumbers', JSON.stringify(showVerseNumbers));
+  }, [showVerseNumbers, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('arabicScript', arabicScript);
-  }, [arabicScript]);
+    if (storageReady) setItem('arabicScript', arabicScript);
+  }, [arabicScript, storageReady]);
 
   useEffect(() => {
-    localStorage.setItem('layoutMode', layoutMode);
-  }, [layoutMode]);
+    if (!storageReady) return;
+    setItem('layoutMode', layoutMode);
+  }, [layoutMode, storageReady]);
 
   const settingsBackHandlerRef = useRef<(() => boolean) | null>(null);
 
@@ -261,7 +259,7 @@ function App() {
   };
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem('onboardingCompleted', 'true');
+    setItem('onboardingCompleted', 'true');
     setShowOnboarding(false);
   };
 
@@ -271,7 +269,7 @@ function App() {
         <TooltipProvider>
           {/* Splash screen on every launch */}
           {showSplash && (
-            <SplashScreen onFinish={() => setShowSplash(false)} />
+            <SplashScreen onFinish={() => setSplashAnimDone(true)} />
           )}
 
           {/* Show onboarding on first launch */}

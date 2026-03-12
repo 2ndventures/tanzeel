@@ -2,15 +2,16 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { API_BASE_URL } from '@/config';
 import { getCachedTimingData, cacheTimingData, getCachedAudioUrl, cacheAudioFile } from '@/lib/audioCache';
+import { getItem, setItem, removeItem } from '@/lib/storage';
 
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
 const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
 
 function migrateOldSpeedData(): void {
   try {
-    const oldData = localStorage.getItem(OLD_CHAPTER_SPEEDS_KEY);
+    const oldData = getItem(OLD_CHAPTER_SPEEDS_KEY);
     if (oldData) {
-      localStorage.removeItem(OLD_CHAPTER_SPEEDS_KEY);
+      removeItem(OLD_CHAPTER_SPEEDS_KEY);
     }
   } catch (error) {
     console.error('Failed to migrate old speed data:', error);
@@ -21,7 +22,7 @@ function getGlobalSpeed(): number | null {
   try {
     migrateOldSpeedData();
     
-    const saved = localStorage.getItem(GLOBAL_SPEED_KEY);
+    const saved = getItem(GLOBAL_SPEED_KEY);
     if (saved) {
       const parsed = parseFloat(saved);
       if (Number.isFinite(parsed) && parsed > 0) {
@@ -36,7 +37,7 @@ function getGlobalSpeed(): number | null {
 
 function setGlobalSpeed(speed: number): void {
   try {
-    localStorage.setItem(GLOBAL_SPEED_KEY, speed.toString());
+    setItem(GLOBAL_SPEED_KEY, speed.toString());
   } catch (error) {
     console.error('Failed to save global speed:', error);
   }

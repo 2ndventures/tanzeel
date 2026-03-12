@@ -1,5 +1,5 @@
-// Reading statistics tracking for Quran app
 import { chapters } from './quranMetadata';
+import { getItem, setItem } from './storage';
 
 interface ReadingStats {
   dayStreak: number;
@@ -47,7 +47,7 @@ function isConsecutiveDay(lastDate: Date, currentDate: Date): boolean {
 
 export function getReadingStats(): ReadingStats {
   try {
-    const stored = localStorage.getItem(STATS_KEY);
+    const stored = getItem(STATS_KEY);
     if (!stored) return getDefaultStats();
     
     const stats: ReadingStats = JSON.parse(stored);
@@ -141,7 +141,7 @@ export function getReadingStats(): ReadingStats {
 
 export function saveReadingStats(stats: ReadingStats): void {
   try {
-    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    setItem(STATS_KEY, JSON.stringify(stats));
   } catch (error) {
     console.error('Failed to save reading stats:', error);
   }

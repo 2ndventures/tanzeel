@@ -1,3 +1,5 @@
+import { getItem, setItem } from './storage';
+
 export interface Bookmark {
   id: string;
   chapterId: number;
@@ -13,7 +15,7 @@ const DEFAULT_FOLDER = 'Favorites';
 
 function loadBookmarks(): Bookmark[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -21,7 +23,7 @@ function loadBookmarks(): Bookmark[] {
 }
 
 function saveBookmarks(bookmarks: Bookmark[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+  setItem(STORAGE_KEY, JSON.stringify(bookmarks));
 }
 
 export function getBookmarks(): Bookmark[] {
@@ -98,7 +100,7 @@ export function updateBookmark(
 
 export function getFolders(): string[] {
   try {
-    const raw = localStorage.getItem(FOLDERS_KEY);
+    const raw = getItem(FOLDERS_KEY);
     const folders: string[] = raw ? JSON.parse(raw) : [DEFAULT_FOLDER];
     if (!folders.includes(DEFAULT_FOLDER)) folders.unshift(DEFAULT_FOLDER);
     return folders;
@@ -113,14 +115,14 @@ export function addFolder(name: string): boolean {
   const folders = getFolders();
   if (folders.some((f) => f.toLowerCase() === trimmed.toLowerCase())) return false;
   folders.push(trimmed);
-  localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+  setItem(FOLDERS_KEY, JSON.stringify(folders));
   return true;
 }
 
 export function removeFolder(name: string) {
   if (name === DEFAULT_FOLDER) return;
   const folders = getFolders().filter((f) => f !== name);
-  localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+  setItem(FOLDERS_KEY, JSON.stringify(folders));
   const bookmarks = loadBookmarks().map((b) =>
     b.folder === name ? { ...b, folder: DEFAULT_FOLDER } : b
   );
@@ -133,7 +135,7 @@ export function renameFolder(oldName: string, newName: string): boolean {
   const existing = getFolders();
   if (existing.some((f) => f.toLowerCase() === trimmed.toLowerCase() && f !== oldName)) return false;
   const folders = existing.map((f) => (f === oldName ? trimmed : f));
-  localStorage.setItem(FOLDERS_KEY, JSON.stringify(folders));
+  setItem(FOLDERS_KEY, JSON.stringify(folders));
   const bookmarks = loadBookmarks().map((b) =>
     b.folder === oldName ? { ...b, folder: trimmed } : b
   );
