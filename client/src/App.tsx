@@ -134,8 +134,8 @@ function App() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', themeColor);
-    setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
+    if (storageReady) setItem('darkMode', JSON.stringify(darkMode));
+  }, [darkMode, storageReady]);
 
   useEffect(() => {
     if (!storageReady) return;

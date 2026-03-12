@@ -105,6 +105,28 @@ export function setItem(key: string, value: string): void {
   }
 }
 
+export async function getItemAsync(key: string): Promise<string | null> {
+  if (cache.has(key)) {
+    return cache.get(key)!;
+  }
+  if (isNative()) {
+    try {
+      const { value } = await Preferences.get({ key });
+      if (value !== null) {
+        cache.set(key, value);
+      }
+      return value;
+    } catch {
+      return null;
+    }
+  }
+  return localStorage.getItem(key);
+}
+
+export function isReady(): boolean {
+  return initialized;
+}
+
 export function removeItem(key: string): void {
   cache.delete(key);
 
