@@ -13,46 +13,46 @@ const STORAGE_KEY = 'quran_bookmarks';
 const FOLDERS_KEY = 'quran_bookmark_folders';
 const DEFAULT_FOLDER = 'Favorites';
 
-function loadBookmarks(): Bookmark[] {
+async function loadBookmarks(): Promise<Bookmark[]> {
   try {
-    const raw = getItem(STORAGE_KEY);
+    const raw = await getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 }
 
-function saveBookmarks(bookmarks: Bookmark[]) {
-  setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+async function saveBookmarks(bookmarks: Bookmark[]): Promise<void> {
+  await setItem(STORAGE_KEY, JSON.stringify(bookmarks));
 }
 
-export function getBookmarks(): Bookmark[] {
-  return loadBookmarks().sort((a, b) => b.createdAt - a.createdAt);
+export async function getBookmarks(): Promise<Bookmark[]> {
+  return (await loadBookmarks()).sort((a, b) => b.createdAt - a.createdAt);
 }
 
-export function getBookmarksByFolder(folder: string): Bookmark[] {
-  return getBookmarks().filter((b) => b.folder === folder);
+export async function getBookmarksByFolder(folder: string): Promise<Bookmark[]> {
+  return (await getBookmarks()).filter((b) => b.folder === folder);
 }
 
-export function isBookmarked(chapterId: number, verseNumber: number): boolean {
-  return loadBookmarks().some(
+export async function isBookmarked(chapterId: number, verseNumber: number): Promise<boolean> {
+  return (await loadBookmarks()).some(
     (b) => b.chapterId === chapterId && b.verseNumber === verseNumber
   );
 }
 
-export function getBookmark(chapterId: number, verseNumber: number): Bookmark | undefined {
-  return loadBookmarks().find(
+export async function getBookmark(chapterId: number, verseNumber: number): Promise<Bookmark | undefined> {
+  return (await loadBookmarks()).find(
     (b) => b.chapterId === chapterId && b.verseNumber === verseNumber
   );
 }
 
-export function addBookmark(
+export async function addBookmark(
   chapterId: number,
   verseNumber: number,
   folder: string = DEFAULT_FOLDER,
   note: string = ''
-): Bookmark {
-  const bookmarks = loadBookmarks();
+): Promise<Bookmark> {
+  const bookmarks = await loadBookmarks();
   const existing = bookmarks.find(
     (b) => b.chapterId === chapterId && b.verseNumber === verseNumber
   );
@@ -67,40 +67,40 @@ export function addBookmark(
     createdAt: Date.now(),
   };
   bookmarks.push(bookmark);
-  saveBookmarks(bookmarks);
-  addFolder(folder);
+  await saveBookmarks(bookmarks);
+  await addFolder(folder);
   return bookmark;
 }
 
-export function removeBookmark(chapterId: number, verseNumber: number) {
-  const bookmarks = loadBookmarks().filter(
+export async function removeBookmark(chapterId: number, verseNumber: number): Promise<void> {
+  const bookmarks = (await loadBookmarks()).filter(
     (b) => !(b.chapterId === chapterId && b.verseNumber === verseNumber)
   );
-  saveBookmarks(bookmarks);
+  await saveBookmarks(bookmarks);
 }
 
-export function updateBookmark(
+export async function updateBookmark(
   chapterId: number,
   verseNumber: number,
   updates: { folder?: string; note?: string }
-) {
-  const bookmarks = loadBookmarks();
+): Promise<void> {
+  const bookmarks = await loadBookmarks();
   const idx = bookmarks.findIndex(
     (b) => b.chapterId === chapterId && b.verseNumber === verseNumber
   );
   if (idx >= 0) {
     if (updates.folder !== undefined) {
       bookmarks[idx].folder = updates.folder;
-      addFolder(updates.folder);
+      await addFolder(updates.folder);
     }
     if (updates.note !== undefined) bookmarks[idx].note = updates.note;
-    saveBookmarks(bookmarks);
+    await saveBookmarks(bookmarks);
   }
 }
 
-export function getFolders(): string[] {
+export async function getFolders(): Promise<string[]> {
   try {
-    const raw = getItem(FOLDERS_KEY);
+    const raw = await getItem(FOLDERS_KEY);
     const folders: string[] = raw ? JSON.parse(raw) : [DEFAULT_FOLDER];
     if (!folders.includes(DEFAULT_FOLDER)) folders.unshift(DEFAULT_FOLDER);
     return folders;
@@ -109,36 +109,36 @@ export function getFolders(): string[] {
   }
 }
 
-export function addFolder(name: string): boolean {
+export async function addFolder(name: string): Promise<boolean> {
   const trimmed = name.trim();
   if (!trimmed) return false;
-  const folders = getFolders();
+  const folders = await getFolders();
   if (folders.some((f) => f.toLowerCase() === trimmed.toLowerCase())) return false;
   folders.push(trimmed);
-  setItem(FOLDERS_KEY, JSON.stringify(folders));
+  await setItem(FOLDERS_KEY, JSON.stringify(folders));
   return true;
 }
 
-export function removeFolder(name: string) {
+export async function removeFolder(name: string): Promise<void> {
   if (name === DEFAULT_FOLDER) return;
-  const folders = getFolders().filter((f) => f !== name);
-  setItem(FOLDERS_KEY, JSON.stringify(folders));
-  const bookmarks = loadBookmarks().map((b) =>
+  const folders = (await getFolders()).filter((f) => f !== name);
+  await setItem(FOLDERS_KEY, JSON.stringify(folders));
+  const bookmarks = (await loadBookmarks()).map((b) =>
     b.folder === name ? { ...b, folder: DEFAULT_FOLDER } : b
   );
-  saveBookmarks(bookmarks);
+  await saveBookmarks(bookmarks);
 }
 
-export function renameFolder(oldName: string, newName: string): boolean {
+export async function renameFolder(oldName: string, newName: string): Promise<boolean> {
   const trimmed = newName.trim();
   if (oldName === DEFAULT_FOLDER || !trimmed) return false;
-  const existing = getFolders();
+  const existing = await getFolders();
   if (existing.some((f) => f.toLowerCase() === trimmed.toLowerCase() && f !== oldName)) return false;
   const folders = existing.map((f) => (f === oldName ? trimmed : f));
-  setItem(FOLDERS_KEY, JSON.stringify(folders));
-  const bookmarks = loadBookmarks().map((b) =>
+  await setItem(FOLDERS_KEY, JSON.stringify(folders));
+  const bookmarks = (await loadBookmarks()).map((b) =>
     b.folder === oldName ? { ...b, folder: trimmed } : b
   );
-  saveBookmarks(bookmarks);
+  await saveBookmarks(bookmarks);
   return true;
 }

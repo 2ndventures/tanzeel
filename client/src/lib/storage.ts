@@ -3,7 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 
 const MIGRATION_FLAG = '__storage_migrated_v1';
 
-const KEYS_TO_MIGRATE = [
+const KNOWN_KEYS = [
   'onboardingCompleted',
   'darkMode',
   'transliteration',
@@ -39,7 +39,7 @@ async function migrateFromLocalStorage(): Promise<void> {
   const { value: migrated } = await Preferences.get({ key: MIGRATION_FLAG });
   if (migrated) return;
 
-  for (const key of KEYS_TO_MIGRATE) {
+  for (const key of KNOWN_KEYS) {
     try {
       const value = localStorage.getItem(key);
       if (value !== null) {
@@ -58,7 +58,7 @@ export async function initStorage(): Promise<void> {
   if (isNative()) {
     await migrateFromLocalStorage();
 
-    for (const key of KEYS_TO_MIGRATE) {
+    for (const key of KNOWN_KEYS) {
       try {
         const { value } = await Preferences.get({ key });
         if (value !== null) {
@@ -68,7 +68,7 @@ export async function initStorage(): Promise<void> {
       }
     }
   } else {
-    for (const key of KEYS_TO_MIGRATE) {
+    for (const key of KNOWN_KEYS) {
       try {
         const value = localStorage.getItem(key);
         if (value !== null) {
@@ -82,32 +82,12 @@ export async function initStorage(): Promise<void> {
   initialized = true;
 }
 
-export function getItem(key: string): string | null {
-  if (initialized) {
-    return cache.get(key) ?? null;
-  }
-  if (isNative()) {
-    return null;
-  }
-  return localStorage.getItem(key);
-}
-
-export function setItem(key: string, value: string): void {
-  cache.set(key, value);
-
-  if (isNative()) {
-    Preferences.set({ key, value }).catch(() => {});
-  } else {
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-    }
-  }
-}
-
-export async function getItemAsync(key: string): Promise<string | null> {
-  if (cache.has(key)) {
+export async function getItem(key: string): Promise<string | null> {
+  if (initialized && cache.has(key)) {
     return cache.get(key)!;
+  }
+  if (initialized) {
+    return null;
   }
   if (isNative()) {
     try {
@@ -123,19 +103,32 @@ export async function getItemAsync(key: string): Promise<string | null> {
   return localStorage.getItem(key);
 }
 
-export function isReady(): boolean {
-  return initialized;
+export async function setItem(key: string, value: string): Promise<void> {
+  cache.set(key, value);
+
+  if (isNative()) {
+    await Preferences.set({ key, value }).catch(() => {});
+  } else {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+    }
+  }
 }
 
-export function removeItem(key: string): void {
+export async function removeItem(key: string): Promise<void> {
   cache.delete(key);
 
   if (isNative()) {
-    Preferences.remove({ key }).catch(() => {});
+    await Preferences.remove({ key }).catch(() => {});
   } else {
     try {
       localStorage.removeItem(key);
     } catch {
     }
   }
+}
+
+export function isReady(): boolean {
+  return initialized;
 }

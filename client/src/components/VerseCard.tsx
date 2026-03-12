@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
@@ -48,20 +48,24 @@ export default function VerseCard({
   onBookmarkChange,
 }: VerseCardProps) {
   const highlighted = isCurrentVerse && isInVerseRange;
-  const [bookmarked, setBookmarked] = useState(() => isBookmarked(chapterId, verseNumber));
+  const [bookmarked, setBookmarked] = useState(false);
+
+  useEffect(() => {
+    isBookmarked(chapterId, verseNumber).then(setBookmarked);
+  }, [chapterId, verseNumber]);
 
   const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(arabicText) : [];
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
-  const handleBookmarkToggle = useCallback((e: React.MouseEvent | React.KeyboardEvent) => {
+  const handleBookmarkToggle = useCallback(async (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     triggerHaptic('light');
     if (bookmarked) {
-      removeBookmark(chapterId, verseNumber);
+      await removeBookmark(chapterId, verseNumber);
       setBookmarked(false);
     } else {
-      addBookmark(chapterId, verseNumber);
+      await addBookmark(chapterId, verseNumber);
       setBookmarked(true);
     }
     onBookmarkChange?.();

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import BottomNav from "@/components/BottomNav";
 import { chapters } from "@/lib/quranMetadata";
@@ -20,9 +20,10 @@ interface BookmarksProps {
 }
 
 export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: BookmarksProps) {
-  const [folders, setFolders] = useState(() => getFolders());
+  const [folders, setFolders] = useState<string[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
-  const [bookmarks, setBookmarks] = useState(() => getBookmarks());
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+  const [displayBookmarks, setDisplayBookmarks] = useState<Bookmark[]>([]);
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [editingFolder, setEditingFolder] = useState<string | null>(null);
@@ -31,14 +32,23 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
   const [editingNote, setEditingNote] = useState<Bookmark | null>(null);
   const [noteText, setNoteText] = useState("");
 
-  const refresh = useCallback(() => {
-    setBookmarks(getBookmarks());
-    setFolders(getFolders());
+  const refresh = useCallback(async () => {
+    const [bm, fl] = await Promise.all([getBookmarks(), getFolders()]);
+    setBookmarks(bm);
+    setFolders(fl);
   }, []);
 
-  const displayBookmarks = selectedFolder
-    ? getBookmarksByFolder(selectedFolder)
-    : bookmarks;
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    if (selectedFolder) {
+      getBookmarksByFolder(selectedFolder).then(setDisplayBookmarks);
+    } else {
+      setDisplayBookmarks(bookmarks);
+    }
+  }, [selectedFolder, bookmarks]);
 
   const getChapterName = (chapterId: number) => {
     const ch = chapters.find((c) => c.id === chapterId);
@@ -50,48 +60,48 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
     return ch ? ch.arabicName.replace(/^سُورَةُ\s+/, '') : '';
   };
 
-  const handleDelete = (b: Bookmark) => {
-    removeBookmark(b.chapterId, b.verseNumber);
-    refresh();
+  const handleDelete = async (b: Bookmark) => {
+    await removeBookmark(b.chapterId, b.verseNumber);
+    await refresh();
   };
 
-  const handleCreateFolder = () => {
+  const handleCreateFolder = async () => {
     if (newFolderName.trim()) {
-      addFolder(newFolderName.trim());
+      await addFolder(newFolderName.trim());
       setNewFolderName("");
       setShowNewFolder(false);
-      refresh();
+      await refresh();
     }
   };
 
-  const handleRenameFolder = () => {
+  const handleRenameFolder = async () => {
     if (editingFolder && editFolderName.trim()) {
-      renameFolder(editingFolder, editFolderName.trim());
+      await renameFolder(editingFolder, editFolderName.trim());
       if (selectedFolder === editingFolder) setSelectedFolder(editFolderName.trim());
       setEditingFolder(null);
       setEditFolderName("");
-      refresh();
+      await refresh();
     }
   };
 
-  const handleDeleteFolder = (folder: string) => {
-    removeFolder(folder);
+  const handleDeleteFolder = async (folder: string) => {
+    await removeFolder(folder);
     if (selectedFolder === folder) setSelectedFolder(null);
-    refresh();
+    await refresh();
   };
 
-  const handleMoveBookmark = (b: Bookmark, toFolder: string) => {
-    updateBookmark(b.chapterId, b.verseNumber, { folder: toFolder });
+  const handleMoveBookmark = async (b: Bookmark, toFolder: string) => {
+    await updateBookmark(b.chapterId, b.verseNumber, { folder: toFolder });
     setMovingBookmark(null);
-    refresh();
+    await refresh();
   };
 
-  const handleSaveNote = () => {
+  const handleSaveNote = async () => {
     if (editingNote) {
-      updateBookmark(editingNote.chapterId, editingNote.verseNumber, { note: noteText });
+      await updateBookmark(editingNote.chapterId, editingNote.verseNumber, { note: noteText });
       setEditingNote(null);
       setNoteText("");
-      refresh();
+      await refresh();
     }
   };
 
@@ -100,10 +110,18 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  const folderBookmarkCounts = folders.reduce<Record<string, number>>((acc, f) => {
-    acc[f] = getBookmarksByFolder(f).length;
-    return acc;
-  }, {});
+  const [folderBookmarkCounts, setFolderBookmarkCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    Promise.all(
+      folders.map(async (f) => {
+        const bm = await getBookmarksByFolder(f);
+        return [f, bm.length] as [string, number];
+      })
+    ).then((pairs) => {
+      setFolderBookmarkCounts(Object.fromEntries(pairs));
+    });
+  }, [folders, bookmarks]);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-background to-card">

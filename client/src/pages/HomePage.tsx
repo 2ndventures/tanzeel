@@ -36,15 +36,19 @@ function getDailySurah() {
 }
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
-  const [stats, setStats] = useState(() => getReadingStats());
+  const [stats, setStats] = useState({ dayStreak: 0, lastReadDate: '', versesRead: 0, weeklyMinutes: 0, weekStart: '', lastReadChapter: 1, lastReadVerse: 0 });
   const [daily, setDaily] = useState(() => getDailySurah());
   const dailyChapter = chapters.find(ch => ch.id === daily.id) || chapters[0];
   const dailyMeaning = surahMeanings[daily.id] || "";
 
   useEffect(() => {
+    getReadingStats().then(setStats);
+  }, []);
+
+  useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        setStats(getReadingStats());
+        getReadingStats().then(setStats);
         setDaily(getDailySurah());
       }
     };

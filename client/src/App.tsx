@@ -59,61 +59,61 @@ function App() {
   const [showVerseNumbers, setShowVerseNumbers] = useState(true);
 
   useEffect(() => {
-    initStorage().then(() => {
-      const completed = getItem('onboardingCompleted');
+    initStorage().then(async () => {
+      const completed = await getItem('onboardingCompleted');
       setShowOnboarding(!completed);
 
-      const savedDark = getItem('darkMode');
+      const savedDark = await getItem('darkMode');
       if (savedDark !== null) setDarkMode(JSON.parse(savedDark));
 
-      const savedTranslit = getItem('transliteration');
+      const savedTranslit = await getItem('transliteration');
       if (savedTranslit !== null) setTransliteration(JSON.parse(savedTranslit));
 
-      const savedTranslation = getItem('showTranslation');
+      const savedTranslation = await getItem('showTranslation');
       if (savedTranslation !== null) setShowTranslation(JSON.parse(savedTranslation));
 
-      const savedScript = getItem('arabicScript');
+      const savedScript = await getItem('arabicScript');
       if (savedScript === 'indopak' || savedScript === 'tajweed') setArabicScript(savedScript);
 
-      const savedReciter = getItem('reciter');
+      const savedReciter = await getItem('reciter');
       if (savedReciter) {
         const trimmedId = savedReciter.trim();
         const migratedId = getLegacyReciterId(trimmedId);
         if (migratedId !== DEFAULT_RECITER || trimmedId in LEGACY_RECITER_MAP) {
-          setItem('reciter', migratedId);
+          await setItem('reciter', migratedId);
           setReciter(migratedId);
         } else if (isValidReciterId(trimmedId)) {
           setReciter(trimmedId);
         } else {
-          setItem('reciter', DEFAULT_RECITER);
+          await setItem('reciter', DEFAULT_RECITER);
         }
       }
 
-      const savedAutoScroll = getItem('autoScroll');
+      const savedAutoScroll = await getItem('autoScroll');
       if (savedAutoScroll !== null) setAutoScroll(JSON.parse(savedAutoScroll));
 
-      const savedRepeat = getItem('repeat');
+      const savedRepeat = await getItem('repeat');
       if (savedRepeat !== null) setRepeat(JSON.parse(savedRepeat));
 
-      const savedAutoplay = getItem('autoplay');
+      const savedAutoplay = await getItem('autoplay');
       if (savedAutoplay !== null) setAutoplay(JSON.parse(savedAutoplay));
 
-      const savedLayout = getItem('layoutMode');
+      const savedLayout = await getItem('layoutMode');
       if (savedLayout === 'focused-flow' || savedLayout === 'mushaf' || savedLayout === 'hifz') setLayoutMode(savedLayout);
 
-      const savedArabicFont = getItem('arabicFontSize');
+      const savedArabicFont = await getItem('arabicFontSize');
       if (savedArabicFont) setArabicFontSize(savedArabicFont);
 
-      const savedTransFont = getItem('translationFontSize');
+      const savedTransFont = await getItem('translationFontSize');
       if (savedTransFont) setTranslationFontSize(savedTransFont);
 
-      const savedTranslitFont = getItem('transliterationFontSize');
+      const savedTranslitFont = await getItem('transliterationFontSize');
       if (savedTranslitFont) setTransliterationFontSize(savedTranslitFont);
 
-      const savedSpacing = getItem('lineSpacing');
+      const savedSpacing = await getItem('lineSpacing');
       if (savedSpacing) setLineSpacing(savedSpacing);
 
-      const savedVerseNums = getItem('showVerseNumbers');
+      const savedVerseNums = await getItem('showVerseNumbers');
       if (savedVerseNums !== null) setShowVerseNumbers(JSON.parse(savedVerseNums));
 
       setStorageReady(true);

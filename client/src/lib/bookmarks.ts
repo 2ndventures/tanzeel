@@ -8,8 +8,8 @@ interface Bookmark {
 
 const BOOKMARKS_KEY = 'quran_bookmarks';
 
-export function saveBookmark(chapterId: number, verseNumber: number): void {
-  const bookmarks = getBookmarks();
+export async function saveBookmark(chapterId: number, verseNumber: number): Promise<void> {
+  const bookmarks = await getBookmarks();
   const existingIndex = bookmarks.findIndex(
     b => b.chapterId === chapterId && b.verseNumber === verseNumber
   );
@@ -24,19 +24,19 @@ export function saveBookmark(chapterId: number, verseNumber: number): void {
     });
   }
 
-  setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+  await setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
 }
 
-export function removeBookmark(chapterId: number, verseNumber: number): void {
-  const bookmarks = getBookmarks();
+export async function removeBookmark(chapterId: number, verseNumber: number): Promise<void> {
+  const bookmarks = await getBookmarks();
   const filtered = bookmarks.filter(
     b => !(b.chapterId === chapterId && b.verseNumber === verseNumber)
   );
-  setItem(BOOKMARKS_KEY, JSON.stringify(filtered));
+  await setItem(BOOKMARKS_KEY, JSON.stringify(filtered));
 }
 
-export function getBookmarks(): Bookmark[] {
-  const stored = getItem(BOOKMARKS_KEY);
+export async function getBookmarks(): Promise<Bookmark[]> {
+  const stored = await getItem(BOOKMARKS_KEY);
   if (!stored) return [];
   try {
     return JSON.parse(stored);
@@ -45,15 +45,15 @@ export function getBookmarks(): Bookmark[] {
   }
 }
 
-export function isBookmarked(chapterId: number, verseNumber: number): boolean {
-  const bookmarks = getBookmarks();
+export async function isBookmarked(chapterId: number, verseNumber: number): Promise<boolean> {
+  const bookmarks = await getBookmarks();
   return bookmarks.some(
     b => b.chapterId === chapterId && b.verseNumber === verseNumber
   );
 }
 
-export function getChapterBookmark(chapterId: number): number | null {
-  const bookmarks = getBookmarks()
+export async function getChapterBookmark(chapterId: number): Promise<number | null> {
+  const bookmarks = (await getBookmarks())
     .filter(b => b.chapterId === chapterId)
     .sort((a, b) => b.timestamp - a.timestamp);
   

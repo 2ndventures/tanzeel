@@ -7,22 +7,22 @@ import { getItem, setItem, removeItem } from '@/lib/storage';
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
 const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
 
-function migrateOldSpeedData(): void {
+async function migrateOldSpeedData(): Promise<void> {
   try {
-    const oldData = getItem(OLD_CHAPTER_SPEEDS_KEY);
+    const oldData = await getItem(OLD_CHAPTER_SPEEDS_KEY);
     if (oldData) {
-      removeItem(OLD_CHAPTER_SPEEDS_KEY);
+      await removeItem(OLD_CHAPTER_SPEEDS_KEY);
     }
   } catch (error) {
     console.error('Failed to migrate old speed data:', error);
   }
 }
 
-function getGlobalSpeed(): number | null {
+async function getGlobalSpeed(): Promise<number | null> {
   try {
-    migrateOldSpeedData();
+    await migrateOldSpeedData();
     
-    const saved = getItem(GLOBAL_SPEED_KEY);
+    const saved = await getItem(GLOBAL_SPEED_KEY);
     if (saved) {
       const parsed = parseFloat(saved);
       if (Number.isFinite(parsed) && parsed > 0) {
@@ -35,9 +35,9 @@ function getGlobalSpeed(): number | null {
   return null;
 }
 
-function setGlobalSpeed(speed: number): void {
+async function setGlobalSpeed(speed: number): Promise<void> {
   try {
-    setItem(GLOBAL_SPEED_KEY, speed.toString());
+    await setItem(GLOBAL_SPEED_KEY, speed.toString());
   } catch (error) {
     console.error('Failed to save global speed:', error);
   }
@@ -83,22 +83,19 @@ export function useWordTimingAudio(
   initialSpeed: number = 1.0,
   autoplay: boolean = false
 ) {
-  const savedSpeed = getGlobalSpeed();
-  const effectiveSpeed = savedSpeed ?? initialSpeed;
-  
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContainerRef = useRef<HTMLDivElement | null>(null);
   
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
-  const speedRef = useRef(effectiveSpeed);
+  const speedRef = useRef(initialSpeed);
   const autoplayRef = useRef(autoplay);
   const timingDataRef = useRef<AudioFile | null>(null);
 
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
-    speed: effectiveSpeed,
+    speed: initialSpeed,
     isLoading: true,
     error: null,
     currentTime: 0,
@@ -123,8 +120,8 @@ export function useWordTimingAudio(
     autoplayRef.current = autoplay;
   }, [autoplay]);
 
-  const syncSpeed = useCallback(() => {
-    const savedSpeed = getGlobalSpeed();
+  const syncSpeed = useCallback(async () => {
+    const savedSpeed = await getGlobalSpeed();
     const newSpeed = savedSpeed ?? initialSpeed;
     
     speedRef.current = newSpeed;
@@ -430,7 +427,7 @@ export function useWordTimingAudio(
       audioRef.current.playbackRate = newSpeed;
     }
     setState(prev => ({ ...prev, speed: newSpeed }));
-    setGlobalSpeed(newSpeed);
+    setGlobalSpeed(newSpeed).catch(() => {});
   }, []);
 
   const getTimingData = useCallback((): AudioFile | null => {
