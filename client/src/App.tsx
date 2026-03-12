@@ -236,7 +236,7 @@ function App() {
   }, [currentPage]);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    if (Capacitor.getPlatform() !== 'android') return;
     const listener = CapApp.addListener('backButton', handleBackButton);
     return () => {
       listener.then(l => l.remove());
