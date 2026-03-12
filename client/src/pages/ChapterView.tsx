@@ -12,6 +12,7 @@ import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMe
 import { lazyChapterService } from "@/services/lazyChapterService";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
+import { useMediaSession } from "@/hooks/useMediaSession";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -406,7 +407,21 @@ export default function ChapterView({
   );
 
   pauseAudioRef.current = pauseAudio;
-  
+
+  const reciterDisplayName = getReciterById(reciter)?.name || 'Mishary Rashid Alafasy';
+  useMediaSession({
+    title: `${chapterInfo?.englishName || 'Quran'}${currentVerseKey ? ` - Ayah ${currentVerseKey.split(':')[1]}` : ''}`,
+    artist: reciterDisplayName,
+    album: 'Tanzeel',
+    isPlaying,
+    currentTime,
+    duration,
+    speed,
+    onPlay: playAudio,
+    onPause: pauseAudio,
+    onSeek: seek,
+  });
+
   // Show audio error as alert (for debugging mobile)
   useEffect(() => {
     if (error) {
