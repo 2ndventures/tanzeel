@@ -208,7 +208,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <div
         className="relative flex-1 overflow-y-auto min-h-0"
       >
-        <div className="px-6 space-y-3 py-4 pb-4">
+        <div className="px-6 space-y-3 py-4 pb-[100px]">
           {showTopicResults && (
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-4">

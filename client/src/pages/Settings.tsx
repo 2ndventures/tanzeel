@@ -227,7 +227,7 @@ export default function Settings({
           </div>
         </div>
 
-        <div className="relative flex-1 overflow-y-auto min-h-0">
+        <div className="relative flex-1 overflow-y-auto min-h-0 pb-[100px]">
           <div className="px-6 py-4 space-y-1">
             {allReciters.map((r) => {
               const isSelected = reciter === r.id;
@@ -291,7 +291,7 @@ export default function Settings({
         </div>
       </div>
 
-      <div className="relative flex-1 overflow-y-auto min-h-0">
+      <div className="relative flex-1 overflow-y-auto min-h-0 pb-[100px]">
         <div className="px-6 space-y-7 py-6">
 
           <div>

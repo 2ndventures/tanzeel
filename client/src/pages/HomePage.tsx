@@ -85,7 +85,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </div>
         </div>
 
-        <div className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto">
+        <div className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-[100px]">
           <div
             className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
