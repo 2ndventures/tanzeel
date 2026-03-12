@@ -243,9 +243,6 @@ function App() {
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => {
     (document.activeElement as HTMLElement)?.blur();
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     setCurrentPage(page as Page);
     if (tab) {
       setActiveTab(tab);
@@ -290,8 +287,8 @@ function App() {
             />
           )}
 
-          {storageReady && (<div className="min-h-screen transition-smooth">
-            <div key={currentPage} className="animate-fade-in">
+          {storageReady && (<div className="h-full">
+            <div key={currentPage} className="animate-fade-in h-full">
             {currentPage === "home" && (
               <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
             )}

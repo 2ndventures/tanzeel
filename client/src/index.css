@@ -258,20 +258,12 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     overflow: hidden;
-    height: 100vh;
-    height: 100dvh;
   }
 
-  html::before {
-    content: '';
+  #root {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-top, 0px);
-    background: hsl(var(--background));
-    z-index: 99999;
-    pointer-events: none;
+    inset: 0;
+    overflow: hidden;
   }
 
   /* IndoPak / Nastaliq: enable OpenType layout features for proper ligatures */
