@@ -3,7 +3,7 @@ import { Preferences } from '@capacitor/preferences';
 
 const MIGRATION_FLAG = '__storage_migrated_v1';
 
-const KNOWN_KEYS = [
+const KNOWN_KEYS: string[] = [
   'onboardingCompleted',
   'darkMode',
   'transliteration',
