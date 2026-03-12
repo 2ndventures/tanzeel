@@ -287,8 +287,8 @@ function App() {
             />
           )}
 
-          {storageReady && (<div className="h-full">
-            <div key={currentPage} className="animate-fade-in h-full">
+          {storageReady && (<div>
+            <div key={currentPage} className="animate-fade-in">
             {currentPage === "home" && (
               <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
             )}

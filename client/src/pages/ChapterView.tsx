@@ -600,7 +600,7 @@ export default function ChapterView({
 
   return (
     <div
-      className="relative flex flex-col h-full overflow-hidden bg-gradient-to-b from-background via-background/95 to-background"
+      className="relative flex flex-col h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background"
       onTouchStart={handleSwipeTouchStart}
       onTouchEnd={handleSwipeTouchEnd}
     >
