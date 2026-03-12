@@ -286,7 +286,7 @@ function App() {
             />
           )}
 
-          <div className="min-h-screen transition-smooth">
+          {storageReady && (<div className="min-h-screen transition-smooth">
             <div key={currentPage} className="animate-fade-in">
             {currentPage === "home" && (
               <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
@@ -391,7 +391,7 @@ function App() {
               />
             )}
           </div>
-        </div>
+        </div>)}
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
