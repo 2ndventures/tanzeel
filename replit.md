@@ -84,6 +84,7 @@ Quran data (chapters, verses, Arabic text, English translations, transliteration
 - **Data Fetching & State**: TanStack Query (React Query).
 - **Database & ORM**: Drizzle ORM, @neondatabase/serverless, connect-pg-simple.
 - **Fonts**: Google Fonts (Amiri).
+- **Tajweed Color System**: CSS colors for `<tajweed>` HTML tags map to the Quran.com V4 COLRv1 font's CPAL dark palette (palette index 1). Mapping: ham_wasl/slnt/laam_shamsiyah=#999999 [2], madda_normal=#ffc1e0 [5], madda_permissible=#ff5e8e [9], madda_obligatory=#ff8e3b [4], madda_necessary=#e30000 [3], ghunna/ikhfa=#26b55d [6], qalqala=#00deff [8], tafkhim=#3c84d5 [7]. Note: Quran.com's V4 COLR font additionally colors tafkhim (heavy) letters at the glyph level; these are not tagged by the HTML tajweed API and thus cannot be replicated via CSS alone.
 - **External APIs & Data Sources**:
     - **Quran.com Audio API**: Provides continuous chapter audio files and word-level timing data via a backend proxy.
     - **Al-Quran Cloud API**: Used for pre-fetching static Quran text data (Arabic, Sahih International English translation, transliteration).
