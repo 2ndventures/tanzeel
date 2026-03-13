@@ -2,14 +2,14 @@ import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
 const tajweedColors = [
-  { color: "#AAAAAA", label: "Silent" },
-  { color: "#E84F8C", label: "Madd (2)" },
-  { color: "#F59E39", label: "Madd (2/4/6)" },
-  { color: "#D72D6E", label: "Madd (4/5)" },
-  { color: "#DD1D1D", label: "Madd (6)" },
-  { color: "#2CA82C", label: "Ghunna / Ikhfa" },
-  { color: "#19B8D2", label: "Qalqala" },
-  { color: "#4271C1", label: "Tafkhim" },
+  { color: "#999999", label: "Silent letter" },
+  { color: "#ffc1e0", label: "Normal madd (2)" },
+  { color: "#ff8e3b", label: "Separated madd (2/4/6)" },
+  { color: "#ff5e8e", label: "Connected madd (4/5)" },
+  { color: "#e30000", label: "Necessary madd (6)" },
+  { color: "#26b55d", label: "Ghunna / Ikhfa" },
+  { color: "#00deff", label: "Qalqala (echo)" },
+  { color: "#3c84d5", label: "Tafkhim (heavy)" },
 ];
 
 export default function TajweedLegend() {
