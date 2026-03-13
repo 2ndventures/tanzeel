@@ -180,6 +180,7 @@ export default function FocusedFlowView({
   const userScrollingFFRef = useRef(false);
   const userScrollFFTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const programmaticScrollFFRef = useRef(0);
+  const lastScrolledPageRef = useRef(-1);
 
   useEffect(() => {
     const container = scrollContainerRef.current;
@@ -221,7 +222,8 @@ export default function FocusedFlowView({
     const el = scrollContainerRef.current.querySelector(
       `[data-page-index="${targetPageIdx}"]`
     );
-    if (el) {
+    if (el && targetPageIdx !== lastScrolledPageRef.current) {
+      lastScrolledPageRef.current = targetPageIdx;
       programmaticScrollFFRef.current = Date.now() + 800;
       el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }

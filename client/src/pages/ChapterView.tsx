@@ -571,7 +571,8 @@ export default function ChapterView({
 
     const headerElement = document.querySelector('.header-safe-padding');
     const headerH = headerElement ? headerElement.getBoundingClientRect().height : 70;
-    const playerH = 220;
+    const playerEl = document.querySelector('[data-testid="audio-player-wrapper"]') as HTMLElement | null;
+    const playerH = playerEl ? playerEl.getBoundingClientRect().height : 220;
 
     const visibleTop = containerRect.top + headerH;
     const visibleBottom = containerRect.bottom - playerH;
