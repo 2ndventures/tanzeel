@@ -265,6 +265,11 @@
     overscroll-behavior: none;
   }
 
+  body {
+    position: fixed;
+    width: 100%;
+  }
+
   #root {
     height: 100%;
     width: 100%;

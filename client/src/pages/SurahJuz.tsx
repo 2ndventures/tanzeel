@@ -32,6 +32,13 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
 
   const handleSearchBlur = useCallback(() => {
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
   }, []);
 
   useEffect(() => {
