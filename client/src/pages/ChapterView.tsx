@@ -102,6 +102,13 @@ export default function ChapterView({
   const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
   
   const didSeekRef = useRef(false);
+  const userScrollingRef = useRef(false);
+  const userScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const programmaticScrollUntilRef = useRef(0);
+
+  const markProgrammaticScroll = useCallback(() => {
+    programmaticScrollUntilRef.current = Date.now() + 800;
+  }, []);
 
   // Auto-hide header in focused-flow mode (mirrors AudioPlayer auto-hide)
   const [headerVisible, setHeaderVisible] = useState(true);
@@ -390,6 +397,7 @@ export default function ChapterView({
             
             const scrollBehavior = didSeekRef.current ? 'instant' : 'smooth';
             didSeekRef.current = false;
+            markProgrammaticScroll();
             container.scrollTo({ 
               top: Math.max(0, targetScroll),
               behavior: scrollBehavior as ScrollBehavior,
@@ -514,7 +522,54 @@ export default function ChapterView({
 
   // Extract current verse number from verse key
   const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;
-  
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleUserScroll = () => {
+      if (Date.now() < programmaticScrollUntilRef.current) return;
+      userScrollingRef.current = true;
+      if (userScrollTimeoutRef.current) clearTimeout(userScrollTimeoutRef.current);
+      userScrollTimeoutRef.current = setTimeout(() => {
+        userScrollingRef.current = false;
+      }, 4000);
+    };
+
+    container.addEventListener('scroll', handleUserScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleUserScroll);
+      if (userScrollTimeoutRef.current) clearTimeout(userScrollTimeoutRef.current);
+    };
+  }, [layoutMode]);
+
+  useEffect(() => {
+    if (!isPlaying || currentWordIndex === null || !autoScroll || userScrollingRef.current) return;
+
+    const wordEl = document.getElementById(`word-${chapterId}-${currentVerse}-${currentWordIndex}`);
+    const container = scrollContainerRef.current;
+    if (!wordEl || !container) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const wordRect = wordEl.getBoundingClientRect();
+
+    const headerElement = document.querySelector('.header-safe-padding');
+    const headerH = headerElement ? headerElement.getBoundingClientRect().height : 70;
+    const playerEl = container.parentElement?.querySelector('[class*="fixed"][class*="bottom-0"]') as HTMLElement | null;
+    const playerH = playerEl ? playerEl.getBoundingClientRect().height : 220;
+
+    const visibleTop = containerRect.top + headerH;
+    const visibleBottom = containerRect.bottom - playerH;
+
+    if (wordRect.top < visibleTop || wordRect.bottom > visibleBottom) {
+      const targetY = visibleTop + (visibleBottom - visibleTop) * 0.35;
+      const scrollDelta = wordRect.top - targetY;
+
+      markProgrammaticScroll();
+      container.scrollBy({ top: scrollDelta, behavior: 'smooth' });
+    }
+  }, [currentWordIndex, currentVerse, isPlaying, chapterId, autoScroll, markProgrammaticScroll]);
+
   // Navigation functions for next/previous surah
   const goToNextSurah = useCallback(() => {
     const nextChapterId = chapterId + 1;
