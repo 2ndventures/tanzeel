@@ -1224,7 +1224,6 @@ export default function ChapterView({
           isCollapsed={isCollapsed}
         />
       )}
-      {arabicScript === 'tajweed' && <TajweedLegend />}
 
       {swipeIndicator && (
         <div
