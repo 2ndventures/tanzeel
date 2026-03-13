@@ -177,8 +177,32 @@ export default function FocusedFlowView({
     };
   }, [resetControlsTimer]);
 
+  const userScrollingFFRef = useRef(false);
+  const userScrollFFTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const programmaticScrollFFRef = useRef(0);
+
   useEffect(() => {
-    if (!scrollContainerRef.current || !currentVerse) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleUserScroll = () => {
+      if (Date.now() < programmaticScrollFFRef.current) return;
+      userScrollingFFRef.current = true;
+      if (userScrollFFTimeoutRef.current) clearTimeout(userScrollFFTimeoutRef.current);
+      userScrollFFTimeoutRef.current = setTimeout(() => {
+        userScrollingFFRef.current = false;
+      }, 4000);
+    };
+
+    container.addEventListener('scroll', handleUserScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleUserScroll);
+      if (userScrollFFTimeoutRef.current) clearTimeout(userScrollFFTimeoutRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!scrollContainerRef.current || !currentVerse || !isPlaying || userScrollingFFRef.current) return;
 
     let targetPageIdx = -1;
     if (currentWordIndex !== null && currentWordIndex >= 0) {
@@ -198,9 +222,10 @@ export default function FocusedFlowView({
       `[data-page-index="${targetPageIdx}"]`
     );
     if (el) {
+      programmaticScrollFFRef.current = Date.now() + 800;
       el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
     }
-  }, [currentVerse, currentWordIndex, pages]);
+  }, [currentVerse, currentWordIndex, pages, isPlaying]);
 
   if (isLoadingVerses) {
     return (

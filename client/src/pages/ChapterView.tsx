@@ -535,8 +535,9 @@ export default function ChapterView({
 
     const containers: HTMLElement[] = [];
     if (scrollContainerRef.current) containers.push(scrollContainerRef.current);
-    const contentArea = document.querySelector('[class*="overflow-y-auto"][class*="flex-1"]') as HTMLElement | null;
-    if (contentArea && !containers.includes(contentArea)) containers.push(contentArea);
+    document.querySelectorAll('.mushaf-page, [class*="overflow-y-auto"][class*="flex-1"]').forEach(el => {
+      if (!containers.includes(el as HTMLElement)) containers.push(el as HTMLElement);
+    });
 
     containers.forEach(c => c.addEventListener('scroll', handleUserScroll, { passive: true }));
     return () => {
