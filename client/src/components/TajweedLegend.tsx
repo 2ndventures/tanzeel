@@ -2,14 +2,14 @@ import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
 const tajweedColors = [
-  { color: "#999999", label: "Silent letter" },
-  { color: "#ffc1e0", label: "Normal madd (2)" },
-  { color: "#ff8e3b", label: "Separated madd (2/4/6)" },
-  { color: "#ff5e8e", label: "Connected madd (4/5)" },
-  { color: "#e30000", label: "Necessary madd (6)" },
-  { color: "#26b55d", label: "Ghunna / Ikhfa" },
-  { color: "#00deff", label: "Qalqala (echo)" },
-  { color: "#3c84d5", label: "Tafkhim (heavy)" },
+  { varName: "--tajweed-silent", label: "Silent letter" },
+  { varName: "--tajweed-madda-normal", label: "Normal madd (2)" },
+  { varName: "--tajweed-madda-obligatory", label: "Separated madd (2/4/6)" },
+  { varName: "--tajweed-madda-permissible", label: "Connected madd (4/5)" },
+  { varName: "--tajweed-madda-necessary", label: "Necessary madd (6)" },
+  { varName: "--tajweed-ghunna", label: "Ghunna / Ikhfa" },
+  { varName: "--tajweed-qalqala", label: "Qalqala (echo)" },
+  { varName: "--tajweed-tafkhim", label: "Tafkhim (heavy)" },
 ];
 
 export default function TajweedLegend() {
@@ -39,7 +39,7 @@ export default function TajweedLegend() {
               <div key={item.label} className="flex items-center gap-2">
                 <span
                   className="w-3 h-3 rounded-sm shrink-0"
-                  style={{ backgroundColor: item.color }}
+                  style={{ backgroundColor: `var(${item.varName})` }}
                   aria-hidden="true"
                 />
                 <span className="text-[11px] text-muted-foreground leading-tight">
