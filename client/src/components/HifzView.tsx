@@ -227,6 +227,7 @@ export default function HifzView({
                       return (
                         <span
                           key={`hifz-${chapterId}-${verseNumber}-${wIdx}`}
+                          id={`word-${chapterId}-${verseNumber}-${wIdx}`}
                           className={`transition-all duration-150 ${
                             isCurrentWord ? 'text-primary font-bold' : ''
                           }`}

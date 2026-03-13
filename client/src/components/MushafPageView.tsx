@@ -236,6 +236,7 @@ export default function MushafPageView({
                               return (
                                 <span
                                   key={`m-${chapterId}-${verse.number}-${wIdx}`}
+                                  id={`word-${chapterId}-${verse.number}-${wIdx}`}
                                   className={`transition-colors duration-150 ${
                                     isCurrentWord
                                       ? "text-primary font-bold"

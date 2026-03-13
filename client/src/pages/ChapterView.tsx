@@ -524,9 +524,6 @@ export default function ChapterView({
   const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;
 
   useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
     const handleUserScroll = () => {
       if (Date.now() < programmaticScrollUntilRef.current) return;
       userScrollingRef.current = true;
@@ -536,9 +533,14 @@ export default function ChapterView({
       }, 4000);
     };
 
-    container.addEventListener('scroll', handleUserScroll, { passive: true });
+    const containers: HTMLElement[] = [];
+    if (scrollContainerRef.current) containers.push(scrollContainerRef.current);
+    const contentArea = document.querySelector('[class*="overflow-y-auto"][class*="flex-1"]') as HTMLElement | null;
+    if (contentArea && !containers.includes(contentArea)) containers.push(contentArea);
+
+    containers.forEach(c => c.addEventListener('scroll', handleUserScroll, { passive: true }));
     return () => {
-      container.removeEventListener('scroll', handleUserScroll);
+      containers.forEach(c => c.removeEventListener('scroll', handleUserScroll));
       if (userScrollTimeoutRef.current) clearTimeout(userScrollTimeoutRef.current);
     };
   }, [layoutMode]);
@@ -547,16 +549,28 @@ export default function ChapterView({
     if (!isPlaying || currentWordIndex === null || !autoScroll || userScrollingRef.current) return;
 
     const wordEl = document.getElementById(`word-${chapterId}-${currentVerse}-${currentWordIndex}`);
-    const container = scrollContainerRef.current;
-    if (!wordEl || !container) return;
+    if (!wordEl) return;
+
+    let container = scrollContainerRef.current;
+    if (!container || !container.contains(wordEl)) {
+      let el: HTMLElement | null = wordEl.parentElement;
+      while (el) {
+        const style = getComputedStyle(el);
+        if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) {
+          container = el as HTMLDivElement;
+          break;
+        }
+        el = el.parentElement;
+      }
+    }
+    if (!container) return;
 
     const containerRect = container.getBoundingClientRect();
     const wordRect = wordEl.getBoundingClientRect();
 
     const headerElement = document.querySelector('.header-safe-padding');
     const headerH = headerElement ? headerElement.getBoundingClientRect().height : 70;
-    const playerEl = container.parentElement?.querySelector('[class*="fixed"][class*="bottom-0"]') as HTMLElement | null;
-    const playerH = playerEl ? playerEl.getBoundingClientRect().height : 220;
+    const playerH = 220;
 
     const visibleTop = containerRect.top + headerH;
     const visibleBottom = containerRect.bottom - playerH;
