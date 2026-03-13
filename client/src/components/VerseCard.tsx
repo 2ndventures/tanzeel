@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -54,7 +54,9 @@ export default function VerseCard({
     isBookmarked(chapterId, verseNumber).then(setBookmarked);
   }, [chapterId, verseNumber]);
 
-  const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(arabicText) : [];
+  const words = arabicScript === 'tajweed'
+    ? tokenizeTajweedWords(arabicText)
+    : tokenizeArabicWords(arabicText);
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
@@ -180,38 +182,38 @@ export default function VerseCard({
               />
             </button>
           </div>
-          {arabicScript === 'tajweed' ? (
-            <p
-              className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
-              dir="rtl"
-              data-testid={`text-arabic-${verseNumber}`}
-              dangerouslySetInnerHTML={{ __html: arabicText }}
-            />
-          ) : (
-            <p
-              className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
-              dir="rtl"
-              data-testid={`text-arabic-${verseNumber}`}
-            >
-              {words.map((word, index) => {
-                const isCurrentWord = highlighted &&
-                  currentWordIndex !== null &&
-                  currentWordIndex === index &&
-                  currentWordIndex < words.length;
-                return (
-                  <span
-                    key={`word-${chapterId}-${verseNumber}-${index}`}
-                    id={`word-${chapterId}-${verseNumber}-${index}`}
-                    className={`transition-all duration-150 ${
-                      isCurrentWord ? 'text-primary font-bold' : ''
-                    }`}
-                  >
-                    {word}{index < words.length - 1 ? ' ' : ''}
-                  </span>
-                );
-              })}
-            </p>
-          )}
+          <p
+            className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
+            dir="rtl"
+            data-testid={`text-arabic-${verseNumber}`}
+          >
+            {words.map((word, index) => {
+              const isCurrentWord = highlighted &&
+                currentWordIndex !== null &&
+                currentWordIndex === index &&
+                currentWordIndex < words.length;
+              return arabicScript === 'tajweed' ? (
+                <span
+                  key={`word-${chapterId}-${verseNumber}-${index}`}
+                  id={`word-${chapterId}-${verseNumber}-${index}`}
+                  className={`transition-all duration-150 ${
+                    isCurrentWord ? 'text-primary font-bold' : ''
+                  }`}
+                  dangerouslySetInnerHTML={{ __html: word + (index < words.length - 1 ? ' ' : '') }}
+                />
+              ) : (
+                <span
+                  key={`word-${chapterId}-${verseNumber}-${index}`}
+                  id={`word-${chapterId}-${verseNumber}-${index}`}
+                  className={`transition-all duration-150 ${
+                    isCurrentWord ? 'text-primary font-bold' : ''
+                  }`}
+                >
+                  {word}{index < words.length - 1 ? ' ' : ''}
+                </span>
+              );
+            })}
+          </p>
           {showTransliteration && transliteration && (
             <p
               className={`${getTransliterationFontSize(transliterationFontSize)} italic transition-colors ${

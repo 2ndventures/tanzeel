@@ -242,7 +242,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const verses = (data.verses || []).map((v: any) => ({
         verse_key: v.verse_key,
-        text: v[config.field] || "",
+        text: script === 'tajweed'
+          ? (v[config.field] || "").replace(/\s*<span\s+class=end>[\u0660-\u0669\d]+<\/span>/g, '')
+          : v[config.field] || "",
       }));
 
       res.setHeader("Cache-Control", "public, max-age=86400");

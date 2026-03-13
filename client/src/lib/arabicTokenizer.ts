@@ -61,3 +61,82 @@ export function tokenizeArabicWords(text: string): string[] {
 
   return words;
 }
+
+function stripTajweedVerseEndMarker(html: string): string {
+  return html.replace(/\s*<span\s+class=end>[\u0660-\u0669\d]+<\/span>/g, '');
+}
+
+export function tokenizeTajweedWords(html: string): string[] {
+  const cleaned = stripTajweedVerseEndMarker(html);
+
+  const parts: string[] = [];
+  let current = '';
+  let inTag = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const ch = cleaned[i];
+    if (ch === '<') {
+      inTag = true;
+      current += ch;
+    } else if (ch === '>') {
+      inTag = false;
+      current += ch;
+    } else if (ch === ' ' && !inTag) {
+      if (current) parts.push(current);
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  if (current) parts.push(current);
+
+  const words: string[] = [];
+  let pendingPrefix = '';
+
+  for (const part of parts) {
+    const textOnly = part.replace(/<[^>]*>/g, '');
+    if (!textOnly.trim()) continue;
+
+    if (isStandaloneWaqfMark(textOnly.trim())) {
+      if (words.length > 0) {
+        words[words.length - 1] += ' ' + part;
+      } else {
+        pendingPrefix += (pendingPrefix ? ' ' : '') + part;
+      }
+    } else {
+      words.push(pendingPrefix ? pendingPrefix + ' ' + part : part);
+      pendingPrefix = '';
+    }
+  }
+
+  return words.map(w => balanceTajweedTags(w));
+}
+
+function balanceTajweedTags(html: string): string {
+  const openTagRe = /<tajweed\s+class=([^>]+)>/g;
+  const closeTagRe = /<\/tajweed>/g;
+
+  let openCount = 0;
+  let lastOpenClass = '';
+  let match;
+
+  const openPositions: string[] = [];
+  while ((match = openTagRe.exec(html)) !== null) {
+    openPositions.push(match[1]);
+  }
+  let closeCount = 0;
+  while (closeTagRe.exec(html) !== null) {
+    closeCount++;
+  }
+
+  openCount = openPositions.length;
+  if (openCount > closeCount) {
+    html += '</tajweed>'.repeat(openCount - closeCount);
+  } else if (closeCount > openCount) {
+    lastOpenClass = openPositions.length > 0 ? openPositions[openPositions.length - 1] : '';
+    const prefix = lastOpenClass ? `<tajweed class=${lastOpenClass}>` : '';
+    html = prefix.repeat(closeCount - openCount) + html;
+  }
+
+  return html;
+}
