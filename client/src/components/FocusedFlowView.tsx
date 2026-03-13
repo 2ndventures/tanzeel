@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
 
 const WORDS_PER_PAGE = 18;
 
@@ -274,7 +274,7 @@ export default function FocusedFlowView({
                   <p
                     className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-center transition-colors`}
                     dir="rtl"
-                    dangerouslySetInnerHTML={{ __html: page.arabicText }}
+                    dangerouslySetInnerHTML={{ __html: applyTafkhimColoring(page.arabicText) }}
                   />
                 ) : (
                   <p

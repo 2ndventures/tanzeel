@@ -109,7 +109,51 @@ export function tokenizeTajweedWords(html: string): string[] {
     }
   }
 
-  return words.map(w => balanceTajweedTags(w));
+  return words.map(w => applyTafkhimColoring(balanceTajweedTags(w)));
+}
+
+const TAFKHIM_LETTERS = /[\u0635\u0636\u0637\u0638\u0642\u063A\u062E]/;
+const ARABIC_DIACRITIC = /[\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06E8\u06EA-\u06ED\u08D4-\u08E1\u0610-\u061A]/;
+
+export function applyTafkhimColoring(html: string): string {
+  let result = '';
+  let i = 0;
+  let tajweedDepth = 0;
+
+  while (i < html.length) {
+    if (html[i] === '<') {
+      const closeIdx = html.indexOf('>', i);
+      if (closeIdx === -1) {
+        result += html[i];
+        i++;
+        continue;
+      }
+      const tag = html.substring(i, closeIdx + 1);
+      if (/^<tajweed\b/i.test(tag)) {
+        tajweedDepth++;
+      } else if (/^<\/tajweed\b/i.test(tag)) {
+        tajweedDepth = Math.max(0, tajweedDepth - 1);
+      }
+      result += tag;
+      i = closeIdx + 1;
+      continue;
+    }
+
+    if (tajweedDepth === 0 && TAFKHIM_LETTERS.test(html[i])) {
+      let run = html[i];
+      i++;
+      while (i < html.length && html[i] !== '<' && html[i] !== ' ' && ARABIC_DIACRITIC.test(html[i])) {
+        run += html[i];
+        i++;
+      }
+      result += `<span class="tafkhim">${run}</span>`;
+    } else {
+      result += html[i];
+      i++;
+    }
+  }
+
+  return result;
 }
 
 function balanceTajweedTags(html: string): string {

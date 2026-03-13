@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
 import { tafsirService, DEFAULT_TAFSIR_ID, TafsirEntry } from "@/services/tafsirService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -191,7 +191,7 @@ export default function ScientificView({
             <p
               className={`text-xl md:text-2xl ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right transition-colors`}
               dir="rtl"
-              dangerouslySetInnerHTML={{ __html: verse.arabicText }}
+              dangerouslySetInnerHTML={{ __html: applyTafkhimColoring(verse.arabicText) }}
             />
           ) : (
             <p

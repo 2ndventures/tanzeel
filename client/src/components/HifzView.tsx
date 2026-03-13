@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -212,7 +212,7 @@ export default function HifzView({
                   <p
                     className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right mb-3 transition-colors`}
                     dir="rtl"
-                    dangerouslySetInnerHTML={{ __html: verse.arabicText }}
+                    dangerouslySetInnerHTML={{ __html: applyTafkhimColoring(verse.arabicText) }}
                   />
                 ) : (
                   <p

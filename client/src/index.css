@@ -772,6 +772,9 @@ tajweed.ghn,
 tajweed.ghunnah {
   color: #26b55d;
 }
+.tafkhim {
+  color: #3c84d5;
+}
 span.end {
   color: hsl(var(--muted-foreground));
   font-size: 0.75em;

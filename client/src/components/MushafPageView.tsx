@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Verse, chapters, getDisplayArabicName } from "@/lib/quranMetadata";
-import { tokenizeArabicWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
 import { paginateVerses, getPageIndexForVerse } from "@/lib/mushafPagination";
 import {
   Drawer,
@@ -223,7 +223,7 @@ export default function MushafPageView({
                           {arabicScript === "tajweed" ? (
                             <span
                               dangerouslySetInnerHTML={{
-                                __html: verse.arabicText,
+                                __html: applyTafkhimColoring(verse.arabicText),
                               }}
                             />
                           ) : (
