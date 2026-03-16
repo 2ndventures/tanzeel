@@ -805,9 +805,9 @@ export default function ChapterView({
               </div>
               <SheetHeader className="mb-4 shrink-0 relative z-10">
                 {menuView !== 'main' && (
-                  <Button variant="ghost" size="icon" className="absolute left-4 top-4 min-h-[48px] min-w-[48px] text-foreground/80 hover:text-foreground" onClick={() => setMenuView('main')}>
-                    <ChevronLeft className="w-6 h-6" />
-                  </Button>
+                  <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 dark:bg-slate-800/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
+                    <ChevronLeft className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
+                  </button>
                 )}
                 <SheetTitle className="text-xl text-foreground">
                   {menuView === 'main' && 'Options'}
