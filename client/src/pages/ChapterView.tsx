@@ -1181,9 +1181,8 @@ export default function ChapterView({
       {layoutMode === 'standard' ? (
         <div
           ref={scrollContainerRef}
-          className={`relative flex-1 overflow-y-auto px-6 pb-[260px] transition-[padding] duration-300 ${
-            isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
-          }`}
+          className="relative flex-1 overflow-y-auto px-6 pb-[260px] transition-[padding] duration-300"
+          style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}
         >
           <div className="max-w-2xl mx-auto space-y-4">
             {/* Loading state */}

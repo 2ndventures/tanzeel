@@ -106,9 +106,8 @@ export default function HifzView({
 
   if (isLoadingVerses) {
     return (
-      <div className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
-      }`}>
+      <div className="relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300"
+        style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}>
         <div className="max-w-2xl mx-auto space-y-4">
           {[...Array(5)].map((_, i) => (
             <div key={i} className="space-y-3 p-6 rounded-2xl bg-card/80 backdrop-blur-xl">
@@ -124,9 +123,8 @@ export default function HifzView({
 
   if (versesError) {
     return (
-      <div className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
-      }`}>
+      <div className="relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300"
+        style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}>
         <div className="text-center py-12 space-y-4">
           <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
           <p className="text-lg text-destructive">{versesError}</p>
@@ -139,9 +137,8 @@ export default function HifzView({
   return (
     <div
       ref={scrollContainerRef}
-      className={`relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300 ${
-        isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
-      }`}
+      className="relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300"
+      style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}
     >
       {/* Score bar */}
       <div className="sticky top-0 z-10 max-w-2xl mx-auto mb-4">

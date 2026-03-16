@@ -189,7 +189,8 @@ export default function MushafPageView({
           {pages.map((page) => (
             <div
               key={page.pageIndex}
-              className="flex-[0_0_100%] min-w-0 h-full flex items-start justify-center px-3 pt-16 pb-2"
+              className="flex-[0_0_100%] min-w-0 h-full flex items-start justify-center px-3 pb-2"
+              style={{ paddingTop: 'calc(64px + env(safe-area-inset-top, 0px))' }}
             >
               {/* Mushaf page */}
               <div className="mushaf-page w-full max-w-xl overflow-y-auto px-1 py-3">
