@@ -798,15 +798,42 @@ span.end {
   font-size: 0.75em;
 }
 .verse-end-ornament {
-  color: hsl(var(--primary) / 0.7);
-  font-family: 'Traditional Arabic', 'Scheherazade New', serif;
-  letter-spacing: -0.05em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  border: 1.5px solid hsl(var(--primary) / 0.5);
+  color: hsl(var(--primary) / 0.8);
+  font-size: 0.45em;
+  font-family: system-ui, sans-serif;
+  line-height: 1;
+  vertical-align: middle;
+  margin-inline: 0.15em;
+  user-select: none;
+  letter-spacing: normal;
+  font-weight: 600;
 }
 .verse-end-ornament-tajweed {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+  border: 1.5px solid hsl(170 55% 42% / 0.5);
   color: hsl(170 55% 42% / 0.85);
-  font-family: 'Traditional Arabic', 'Scheherazade New', serif;
-  letter-spacing: -0.05em;
+  font-size: 0.45em;
+  font-family: system-ui, sans-serif;
+  line-height: 1;
+  vertical-align: middle;
+  margin-inline: 0.15em;
+  user-select: none;
+  letter-spacing: normal;
+  font-weight: 600;
 }
 .dark .verse-end-ornament-tajweed {
+  border-color: hsl(170 60% 50% / 0.45);
   color: hsl(170 60% 50% / 0.8);
 }

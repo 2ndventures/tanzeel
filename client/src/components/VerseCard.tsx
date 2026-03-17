@@ -217,10 +217,8 @@ export default function VerseCard({
               );
             })}
             {arabicScript !== 'indopak' && verseNumber > 0 && (
-              <span className={`inline-block mx-1 select-none text-[0.7em] align-middle ${
-                arabicScript === 'tajweed' ? 'verse-end-ornament-tajweed' : 'verse-end-ornament'
-              }`}>
-                {'\u06DD'}{toArabicIndic(verseNumber)}
+              <span className={arabicScript === 'tajweed' ? 'verse-end-ornament-tajweed' : 'verse-end-ornament'}>
+                {toArabicIndic(verseNumber)}
               </span>
             )}
           </p>
