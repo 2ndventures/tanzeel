@@ -30,15 +30,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
   const searchInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const headerRef = useRef<HTMLDivElement>(null);
   const handleSearchBlur = useCallback(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    });
+    if (headerRef.current) {
+      headerRef.current.scrollIntoView({ block: 'start', behavior: 'instant' });
+    }
   }, []);
 
   useEffect(() => {
@@ -159,7 +155,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30 pointer-events-none" />
 
-      <div className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
+      <div ref={headerRef} className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
         <div className={`overflow-hidden transition-all duration-300 ${
           hasActiveSearch ? 'max-h-0 opacity-0 p-0' : 'header-safe-padding max-h-[200px] opacity-100'
         }`}>
