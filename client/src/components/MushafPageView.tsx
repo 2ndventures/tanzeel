@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Verse, chapters, getDisplayArabicName } from "@/lib/quranMetadata";
-import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
 import { paginateVerses, getPageIndexForVerse } from "@/lib/mushafPagination";
 import {
   Drawer,
@@ -209,10 +209,10 @@ export default function MushafPageView({
                           : "mushaf-verse-dimmed"
                         : "mushaf-verse-idle";
 
-                      const words =
-                        arabicScript !== "tajweed"
-                          ? tokenizeArabicWords(verse.arabicText)
-                          : [];
+                      const isTajweed = arabicScript === "tajweed";
+                      const words = isTajweed
+                        ? tokenizeTajweedWords(verse.arabicText)
+                        : tokenizeArabicWords(verse.arabicText);
 
                       return (
                         <span
@@ -221,35 +221,40 @@ export default function MushafPageView({
                           className={`inline ${verseClass} cursor-pointer`}
                           onClick={() => onVerseClick(verse.number)}
                         >
-                          {arabicScript === "tajweed" ? (
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: applyTafkhimColoring(verse.arabicText),
-                              }}
-                            />
-                          ) : (
-                            words.map((word, wIdx) => {
-                              const isCurrentWord =
-                                isActive &&
-                                currentWordIndex !== null &&
-                                currentWordIndex === wIdx &&
-                                currentWordIndex < words.length;
-                              return (
-                                <span
-                                  key={`m-${chapterId}-${verse.number}-${wIdx}`}
-                                  id={`word-${chapterId}-${verse.number}-${wIdx}`}
-                                  className={`transition-colors duration-150 ${
-                                    isCurrentWord
-                                      ? "text-primary font-bold"
-                                      : ""
-                                  }`}
-                                >
-                                  {word}
-                                  {wIdx < words.length - 1 ? " " : ""}
-                                </span>
-                              );
-                            })
-                          )}
+                          {words.map((word, wIdx) => {
+                            const isCurrentWord =
+                              isActive &&
+                              currentWordIndex !== null &&
+                              currentWordIndex === wIdx &&
+                              currentWordIndex < words.length;
+                            return isTajweed ? (
+                              <span
+                                key={`m-${chapterId}-${verse.number}-${wIdx}`}
+                                id={`word-${chapterId}-${verse.number}-${wIdx}`}
+                                className={`transition-colors duration-150 ${
+                                  isCurrentWord
+                                    ? "text-primary font-bold"
+                                    : ""
+                                }`}
+                                dangerouslySetInnerHTML={{
+                                  __html: word + (wIdx < words.length - 1 ? " " : ""),
+                                }}
+                              />
+                            ) : (
+                              <span
+                                key={`m-${chapterId}-${verse.number}-${wIdx}`}
+                                id={`word-${chapterId}-${verse.number}-${wIdx}`}
+                                className={`transition-colors duration-150 ${
+                                  isCurrentWord
+                                    ? "text-primary font-bold"
+                                    : ""
+                                }`}
+                              >
+                                {word}
+                                {wIdx < words.length - 1 ? " " : ""}
+                              </span>
+                            );
+                          })}
                           {/* Verse end marker — traditional ornament with Arabic-Indic numeral */}
                           <span className="inline-block mx-1 select-none text-[0.7em] align-middle verse-end-ornament">
                             {'\u06DD'}{toArabicIndic(verse.number)}

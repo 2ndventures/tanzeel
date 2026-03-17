@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -166,7 +166,8 @@ export default function HifzView({
           const isCurrentVerse = currentVerse === verseNumber;
           const isRevealed = revealedVerse === verseNumber;
           const isRetained = retained.has(verseNumber);
-          const words = arabicScript !== 'tajweed' ? tokenizeArabicWords(verse.arabicText) : [];
+          const isTajweed = arabicScript === 'tajweed';
+          const words = isTajweed ? tokenizeTajweedWords(verse.arabicText) : tokenizeArabicWords(verse.arabicText);
 
           return (
             <div
@@ -205,36 +206,37 @@ export default function HifzView({
 
               {/* Arabic text — always crisp */}
               <div onClick={() => onVerseClick(verseNumber)} className="cursor-pointer">
-                {arabicScript === 'tajweed' ? (
-                  <p
-                    className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right mb-3 transition-colors`}
-                    dir="rtl"
-                    dangerouslySetInnerHTML={{ __html: applyTafkhimColoring(verse.arabicText) }}
-                  />
-                ) : (
-                  <p
-                    className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right mb-3 transition-colors`}
-                    dir="rtl"
-                  >
-                    {words.map((word, wIdx) => {
-                      const isCurrentWord = isCurrentVerse &&
-                        currentWordIndex !== null &&
-                        currentWordIndex === wIdx &&
-                        currentWordIndex < words.length;
-                      return (
-                        <span
-                          key={`hifz-${chapterId}-${verseNumber}-${wIdx}`}
-                          id={`word-${chapterId}-${verseNumber}-${wIdx}`}
-                          className={`transition-all duration-150 ${
-                            isCurrentWord ? 'text-primary font-bold' : ''
-                          }`}
-                        >
-                          {word}{wIdx < words.length - 1 ? ' ' : ''}
-                        </span>
-                      );
-                    })}
-                  </p>
-                )}
+                <p
+                  className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-right mb-3 transition-colors`}
+                  dir="rtl"
+                >
+                  {words.map((word, wIdx) => {
+                    const isCurrentWord = isCurrentVerse &&
+                      currentWordIndex !== null &&
+                      currentWordIndex === wIdx &&
+                      currentWordIndex < words.length;
+                    return isTajweed ? (
+                      <span
+                        key={`hifz-${chapterId}-${verseNumber}-${wIdx}`}
+                        id={`word-${chapterId}-${verseNumber}-${wIdx}`}
+                        className={`transition-all duration-150 ${
+                          isCurrentWord ? 'text-primary font-bold' : ''
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: word + (wIdx < words.length - 1 ? ' ' : '') }}
+                      />
+                    ) : (
+                      <span
+                        key={`hifz-${chapterId}-${verseNumber}-${wIdx}`}
+                        id={`word-${chapterId}-${verseNumber}-${wIdx}`}
+                        className={`transition-all duration-150 ${
+                          isCurrentWord ? 'text-primary font-bold' : ''
+                        }`}
+                      >
+                        {word}{wIdx < words.length - 1 ? ' ' : ''}
+                      </span>
+                    );
+                  })}
+                </p>
               </div>
 
               {/* Translation — blurred overlay, long-press to reveal */}

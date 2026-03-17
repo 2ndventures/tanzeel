@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
 
 const WORDS_PER_PAGE = 18;
 
@@ -93,12 +93,13 @@ export default function FocusedFlowView({
       const verseNumber = index + 1;
 
       if (isTajweed) {
+        const tajweedWords = tokenizeTajweedWords(verse.arabicText);
         result.push({
           verseNumber,
           verseIndex: index,
           pageIndex: 0,
           totalPages: 1,
-          words: [],
+          words: tajweedWords,
           wordOffset: 0,
           translation: verse.translation,
           arabicText: verse.arabicText,
@@ -298,38 +299,40 @@ export default function FocusedFlowView({
                   {verseLabel}
                 </span>
 
-                {page.isTajweed ? (
-                  <p
-                    className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-center transition-colors`}
-                    dir="rtl"
-                    dangerouslySetInnerHTML={{ __html: applyTafkhimColoring(page.arabicText) }}
-                  />
-                ) : (
-                  <p
-                    className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-center transition-colors`}
-                    dir="rtl"
-                  >
-                    {page.words.map((word, wIdx) => {
-                      const globalWordIdx = page.wordOffset + wIdx;
-                      const isCurrentWord = isCurrentVerse &&
-                        currentWordIndex !== null &&
-                        currentWordIndex === globalWordIdx;
-                      return (
-                        <span
-                          key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
-                          className={`transition-all duration-150 ${
-                            isCurrentWord ? 'text-primary font-bold' : ''
-                          }`}
-                        >
-                          {word}{wIdx < page.words.length - 1 ? ' ' : ''}
-                        </span>
-                      );
-                    })}
-                    {page.totalPages > 1 && page.pageIndex < page.totalPages - 1 && (
-                      <span className="text-muted-foreground/40"> ...</span>
-                    )}
-                  </p>
-                )}
+                <p
+                  className={`${getArabicFontSize(arabicFontSize)} ${getArabicLineSpacing(lineSpacing)} ${arabicFontClass} text-center transition-colors`}
+                  dir="rtl"
+                >
+                  {page.words.map((word, wIdx) => {
+                    const globalWordIdx = page.wordOffset + wIdx;
+                    const isCurrentWord = isCurrentVerse &&
+                      currentWordIndex !== null &&
+                      currentWordIndex === globalWordIdx;
+                    return page.isTajweed ? (
+                      <span
+                        key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
+                        id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
+                        className={`transition-all duration-150 ${
+                          isCurrentWord ? 'text-primary font-bold' : ''
+                        }`}
+                        dangerouslySetInnerHTML={{ __html: word + (wIdx < page.words.length - 1 ? ' ' : '') }}
+                      />
+                    ) : (
+                      <span
+                        key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
+                        id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
+                        className={`transition-all duration-150 ${
+                          isCurrentWord ? 'text-primary font-bold' : ''
+                        }`}
+                      >
+                        {word}{wIdx < page.words.length - 1 ? ' ' : ''}
+                      </span>
+                    );
+                  })}
+                  {page.totalPages > 1 && page.pageIndex < page.totalPages - 1 && (
+                    <span className="text-muted-foreground/40"> ...</span>
+                  )}
+                </p>
 
                 {page.translation && (
                   <div className={`transition-all duration-300 overflow-hidden ${
