@@ -10,41 +10,21 @@ if (isIOS) {
     document.body.scrollTop = 0;
   };
 
-  const vv = window.visualViewport;
-  if (vv) {
-    let activeInput: Element | null = null;
-
-    document.addEventListener('focusin', (e) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        activeInput = e.target;
-      }
-    });
-
-    vv.addEventListener('scroll', () => {
-      if (vv.offsetTop > 0) {
-        document.body.style.transform = `translateY(${-vv.offsetTop}px)`;
-      } else {
-        document.body.style.transform = '';
-      }
-    });
-
-    vv.addEventListener('resize', () => {
-      const heightDiff = window.innerHeight - vv.height;
-      const keyboardOpen = heightDiff > 100;
-      if (!keyboardOpen && activeInput) {
-        activeInput = null;
-        document.body.style.transform = '';
-        resetViewportScroll();
-        setTimeout(resetViewportScroll, 50);
-        setTimeout(resetViewportScroll, 150);
-        requestAnimationFrame(resetViewportScroll);
-      }
-    });
-  }
+  import('@capacitor/core').then(({ Capacitor }) => {
+    if (Capacitor.isNativePlatform()) {
+      import('@capacitor/keyboard').then(({ Keyboard }) => {
+        Keyboard.addListener('keyboardDidHide', () => {
+          resetViewportScroll();
+          setTimeout(resetViewportScroll, 50);
+          setTimeout(resetViewportScroll, 150);
+          requestAnimationFrame(resetViewportScroll);
+        });
+      }).catch(() => {});
+    }
+  }).catch(() => {});
 
   document.addEventListener('focusout', (e) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-      document.body.style.transform = '';
       resetViewportScroll();
       setTimeout(resetViewportScroll, 50);
       setTimeout(resetViewportScroll, 150);
