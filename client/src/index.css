@@ -802,3 +802,11 @@ span.end {
   font-family: 'Traditional Arabic', 'Scheherazade New', serif;
   letter-spacing: -0.05em;
 }
+.verse-end-ornament-tajweed {
+  color: hsl(170 55% 42% / 0.85);
+  font-family: 'Traditional Arabic', 'Scheherazade New', serif;
+  letter-spacing: -0.05em;
+}
+.dark .verse-end-ornament-tajweed {
+  color: hsl(170 60% 50% / 0.8);
+}

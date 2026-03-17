@@ -60,6 +60,9 @@ export default function VerseCard({
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
+  const toArabicIndic = (n: number): string =>
+    String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
+
   const handleBookmarkToggle = useCallback(async (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     triggerHaptic('light');
@@ -213,6 +216,13 @@ export default function VerseCard({
                 </span>
               );
             })}
+            {arabicScript !== 'indopak' && verseNumber > 0 && (
+              <span className={`inline-block mx-1 select-none text-[0.7em] align-middle ${
+                arabicScript === 'tajweed' ? 'verse-end-ornament-tajweed' : 'verse-end-ornament'
+              }`}>
+                {'\u06DD'}{toArabicIndic(verseNumber)}
+              </span>
+            )}
           </p>
           {showTransliteration && transliteration && (
             <p

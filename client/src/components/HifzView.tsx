@@ -50,6 +50,9 @@ export default function HifzView({
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
+  const toArabicIndic = (n: number): string =>
+    String(n).replace(/\d/g, (d) => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
+
   const getArabicFontSize = (size: string) => {
     switch (size) {
       case "Small": return "text-xl md:text-2xl";
@@ -236,6 +239,13 @@ export default function HifzView({
                       </span>
                     );
                   })}
+                  {arabicScript !== 'indopak' && (
+                    <span className={`inline-block mx-1 select-none text-[0.7em] align-middle ${
+                      isTajweed ? 'verse-end-ornament-tajweed' : 'verse-end-ornament'
+                    }`}>
+                      {'\u06DD'}{toArabicIndic(verseNumber)}
+                    </span>
+                  )}
                 </p>
               </div>
 

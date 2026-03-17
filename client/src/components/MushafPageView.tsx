@@ -255,10 +255,13 @@ export default function MushafPageView({
                               </span>
                             );
                           })}
-                          {/* Verse end marker — traditional ornament with Arabic-Indic numeral */}
-                          <span className="inline-block mx-1 select-none text-[0.7em] align-middle verse-end-ornament">
-                            {'\u06DD'}{toArabicIndic(verse.number)}
-                          </span>
+                          {arabicScript !== 'indopak' && (
+                            <span className={`inline-block mx-1 select-none text-[0.7em] align-middle ${
+                              arabicScript === 'tajweed' ? 'verse-end-ornament-tajweed' : 'verse-end-ornament'
+                            }`}>
+                              {'\u06DD'}{toArabicIndic(verse.number)}
+                            </span>
+                          )}
                         </span>
                       );
                     })}
