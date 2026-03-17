@@ -7,7 +7,6 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { ChevronRight, ChevronLeft, Check, Sun, Moon } from "lucide-react";
 
 interface SettingsProps {
@@ -143,8 +142,6 @@ export default function Settings({
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reciterView, setReciterView] = useState(false);
-  const { toast } = useToast();
-
   useEffect(() => {
     if (onRegisterBackHandler) {
       onRegisterBackHandler(() => {
@@ -159,11 +156,6 @@ export default function Settings({
 
   const handleFeedbackSubmit = async () => {
     if (!feedback.trim()) {
-      toast({
-        title: "Please enter feedback",
-        description: "Your feedback is important to us!",
-        variant: "destructive",
-      });
       return;
     }
 
@@ -183,21 +175,10 @@ export default function Settings({
       });
 
       if (response.ok) {
-        toast({
-          title: "Feedback sent!",
-          description: "Thank you for helping us improve Tanzeel.",
-        });
         setFeedback("");
         setFeedbackOpen(false);
-      } else {
-        throw new Error("Failed to send feedback");
       }
     } catch (error) {
-      toast({
-        title: "Failed to send feedback",
-        description: "Please try again later or email us at support@thirdventures.com",
-        variant: "destructive",
-      });
     } finally {
       setIsSubmitting(false);
     }

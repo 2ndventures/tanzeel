@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
 import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
@@ -91,7 +90,6 @@ export default function ChapterView({
   onLayoutModeChange,
 }: ChapterViewProps) {
   const chapterInfo = chapters.find(ch => ch.id === chapterId);
-  const { toast } = useToast();
   
   // Lazy loading state for verses
   const [verses, setVerses] = useState<Verse[]>([]);
@@ -431,23 +429,6 @@ export default function ChapterView({
     onSeek: seek,
   });
 
-  useEffect(() => {
-    if (error && error.includes('retry')) {
-      toast({
-        description: error,
-        duration: 8000,
-        action: (
-          <button
-            onClick={() => retryAudio()}
-            className="shrink-0 text-xs font-semibold text-primary px-3 py-1.5 rounded-md bg-primary/10 hover-elevate"
-            data-testid="button-audio-retry"
-          >
-            Retry
-          </button>
-        ),
-      });
-    }
-  }, [error, toast, retryAudio]);
   
   // Track reading time
   useEffect(() => {
@@ -1043,7 +1024,7 @@ export default function ChapterView({
                           <span className="text-sm text-foreground/80">Autoplay next surah</span>
                           <Switch 
                             checked={autoplay} 
-                            onCheckedChange={(v) => { onAutoplayChange(v); toast({ description: v ? "Autoplay enabled" : "Autoplay disabled", duration: 1500 }); }}
+                            onCheckedChange={(v) => { onAutoplayChange(v); }}
                             data-testid="switch-autoplay"
                           />
                         </div>
@@ -1061,7 +1042,7 @@ export default function ChapterView({
                           <div className="relative">
                             <Switch 
                               checked={darkMode} 
-                              onCheckedChange={(v) => { onDarkModeChange(v); toast({ description: v ? "Dark mode enabled" : "Light mode enabled", duration: 1500 }); }}
+                              onCheckedChange={(v) => { onDarkModeChange(v); }}
                               data-testid="switch-theme"
                               className="relative"
                             />
@@ -1076,7 +1057,7 @@ export default function ChapterView({
                           <span className="text-sm text-foreground/80">Transliteration</span>
                           <Switch 
                             checked={showTransliteration} 
-                            onCheckedChange={(v) => { onTransliterationChange(v); toast({ description: v ? "Transliteration shown" : "Transliteration hidden", duration: 1500 }); }}
+                            onCheckedChange={(v) => { onTransliterationChange(v); }}
                             data-testid="switch-transliteration"
                           />
                         </div>
@@ -1085,7 +1066,7 @@ export default function ChapterView({
                           <span className="text-sm text-foreground/80">Translation</span>
                           <Switch 
                             checked={showTranslation} 
-                            onCheckedChange={(v) => { onShowTranslationChange(v); toast({ description: v ? "Translation shown" : "Translation hidden", duration: 1500 }); }}
+                            onCheckedChange={(v) => { onShowTranslationChange(v); }}
                             data-testid="switch-translation"
                           />
                         </div>
@@ -1094,7 +1075,7 @@ export default function ChapterView({
                           <span className="text-sm text-foreground/80">Verse numbers</span>
                           <Switch 
                             checked={showVerseNumbers} 
-                            onCheckedChange={(v) => { onShowVerseNumbersChange?.(v); toast({ description: v ? "Verse numbers shown" : "Verse numbers hidden", duration: 1500 }); }}
+                            onCheckedChange={(v) => { onShowVerseNumbersChange?.(v); }}
                             data-testid="switch-verse-numbers"
                           />
                         </div>
@@ -1122,7 +1103,6 @@ export default function ChapterView({
                             onClick={() => {
                               onReciterChange(r.id);
                               setMenuView('main');
-                              toast({ description: `Reciter: ${r.name}`, duration: 1500 });
                             }}
                             className="flex-1 flex items-center gap-2 p-4 hover-elevate active-elevate-2 rounded-md min-w-0"
                             data-testid={`reciter-select-${r.id}`}
