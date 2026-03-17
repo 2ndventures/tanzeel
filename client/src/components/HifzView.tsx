@@ -239,7 +239,7 @@ export default function HifzView({
                       </span>
                     );
                   })}
-                  {arabicScript !== 'indopak' && (
+                  {arabicScript !== 'indopak' && verseNumber > 0 && (
                     <span className={`inline-block mx-1 select-none text-[0.7em] align-middle ${
                       isTajweed ? 'verse-end-ornament-tajweed' : 'verse-end-ornament'
                     }`}>
