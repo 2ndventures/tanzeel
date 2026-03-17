@@ -160,8 +160,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30 pointer-events-none" />
 
       <div className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
-        <div className={`header-safe-padding overflow-hidden transition-all duration-300 ${
-          hasActiveSearch ? 'max-h-0 opacity-0' : 'max-h-[200px] opacity-100'
+        <div className={`overflow-hidden transition-all duration-300 ${
+          hasActiveSearch ? 'max-h-0 opacity-0 p-0' : 'header-safe-padding max-h-[200px] opacity-100'
         }`}>
           <div className="px-6 pt-4 pb-5">
             <div className="flex items-center justify-between">
@@ -173,7 +173,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
         </div>
 
         <div className="border-b border-border">
-          <div className={`px-6 ${hasActiveSearch ? 'header-safe-padding pt-4 pb-4' : 'pt-2 pb-6'} space-y-6`}>
+          <div className={`px-6 ${hasActiveSearch ? 'header-safe-padding pt-2 pb-3' : 'pt-2 pb-6'} space-y-6`}>
             <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
               <div className="relative">
@@ -241,8 +241,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
       >
         <div className="px-6 space-y-3 py-4 pb-[120px]">
           {showTopicResults && (
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2.5">
                 <BookOpen className="w-5 h-5 text-primary" />
                 <h2 className="text-lg font-bold text-foreground">Verse Results</h2>
               </div>
