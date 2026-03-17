@@ -10,9 +10,12 @@ if (isIOS) {
     document.body.scrollTop = 0;
   };
 
+  let usingNativeKeyboard = false;
+
   import('@capacitor/core').then(({ Capacitor }) => {
     if (Capacitor.isNativePlatform()) {
       import('@capacitor/keyboard').then(({ Keyboard }) => {
+        usingNativeKeyboard = true;
         Keyboard.addListener('keyboardDidHide', () => {
           resetViewportScroll();
           setTimeout(resetViewportScroll, 50);
@@ -22,6 +25,20 @@ if (isIOS) {
       }).catch(() => {});
     }
   }).catch(() => {});
+
+  const vv = window.visualViewport;
+  if (vv) {
+    vv.addEventListener('resize', () => {
+      if (usingNativeKeyboard) return;
+      const heightDiff = window.innerHeight - vv.height;
+      const keyboardOpen = heightDiff > 100;
+      if (!keyboardOpen) {
+        resetViewportScroll();
+        setTimeout(resetViewportScroll, 50);
+        requestAnimationFrame(resetViewportScroll);
+      }
+    });
+  }
 
   document.addEventListener('focusout', (e) => {
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
