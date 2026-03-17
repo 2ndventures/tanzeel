@@ -166,8 +166,19 @@ export function useWordTimingAudio(
     return { verseKey: null, wordIndex: null };
   }, []);
 
+  const retryCountRef = useRef(0);
+  const MAX_AUTO_RETRIES = 2;
+  const cleanupRef = useRef<(() => void) | null>(null);
+  const loadIdRef = useRef(0);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const loadAudio = useCallback(async () => {
     try {
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      }
+
       setState(prev => ({ ...prev, isLoading: true, error: null }));
 
       syncSpeed();
@@ -254,12 +265,13 @@ export function useWordTimingAudio(
       };
 
       const handleCanPlay = () => {
+        retryCountRef.current = 0;
         audio.playbackRate = speedRef.current;
         
         if (autoplayRef.current) {
           setState(prev => ({ ...prev, isLoading: false }));
           audio.play().catch(() => {
-            setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+            setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
           });
         } else {
           setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
@@ -267,7 +279,7 @@ export function useWordTimingAudio(
       };
 
       const handlePlay = () => {
-        setState(prev => ({ ...prev, isPlaying: true }));
+        setState(prev => ({ ...prev, isPlaying: true, error: null }));
       };
 
       const handlePause = () => {
@@ -289,17 +301,29 @@ export function useWordTimingAudio(
 
       const handleError = (e: Event) => {
         const target = e.target as HTMLAudioElement;
-        const error = target.error;
+        const mediaError = target.error;
         
-        if (error) {
-          console.error('Audio load error:', error.code, error.message);
+        if (mediaError) {
+          console.error('Audio error:', mediaError.code, mediaError.message);
+        }
+        
+        if (retryCountRef.current < MAX_AUTO_RETRIES) {
+          retryCountRef.current++;
+          const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
+          const currentLoadId = loadIdRef.current;
+          retryTimerRef.current = setTimeout(() => {
+            if (loadIdRef.current === currentLoadId) {
+              loadAudio();
+            }
+          }, delay);
+          return;
         }
         
         setState(prev => ({
           ...prev,
           isLoading: false,
           isPlaying: false,
-          error: `Failed to load chapter ${chapterId}`,
+          error: 'Audio failed to load. Tap retry to try again.',
         }));
       };
 
@@ -317,7 +341,7 @@ export function useWordTimingAudio(
 
       audioRef.current = audio;
 
-      return () => {
+      const cleanup = () => {
         audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
         audio.removeEventListener('timeupdate', handleTimeUpdate);
         audio.removeEventListener('canplay', handleCanPlay);
@@ -331,22 +355,57 @@ export function useWordTimingAudio(
         }
         audio.src = '';
         audio.remove();
+        audioRef.current = null;
       };
+      cleanupRef.current = cleanup;
+      return cleanup;
     } catch (error) {
       console.error('Failed to load audio:', error instanceof Error ? error.message : error);
+
+      if (retryCountRef.current < MAX_AUTO_RETRIES) {
+        retryCountRef.current++;
+        const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
+        const currentLoadId = loadIdRef.current;
+        await new Promise(resolve => {
+          retryTimerRef.current = setTimeout(resolve, delay);
+        });
+        if (loadIdRef.current !== currentLoadId) return;
+        return loadAudio();
+      }
+
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: 'Failed to load audio',
+        error: 'Audio failed to load. Tap retry to try again.',
       }));
     }
   }, [chapterId, reciterId, syncSpeed, findCurrentSegment]);
 
   useEffect(() => {
+    loadIdRef.current++;
+    retryCountRef.current = 0;
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
     const cleanup = loadAudio();
     return () => {
+      loadIdRef.current++;
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
       cleanup?.then(cleanupFn => cleanupFn?.());
     };
+  }, [loadAudio]);
+
+  const retry = useCallback(() => {
+    retryCountRef.current = 0;
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    loadAudio();
   }, [loadAudio]);
 
   useEffect(() => {
@@ -375,7 +434,7 @@ export function useWordTimingAudio(
     if (!state.isPlaying) {
       audioRef.current.play().catch(err => {
         console.error('Playback failed:', err);
-        setState(prev => ({ ...prev, error: 'Playback failed' }));
+        setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
   }, [state.isPlaying]);
@@ -388,7 +447,7 @@ export function useWordTimingAudio(
     } else {
       audioRef.current.play().catch(err => {
         console.error('Playback failed:', err);
-        setState(prev => ({ ...prev, error: 'Playback failed' }));
+        setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
   }, [state.isPlaying]);
@@ -443,5 +502,6 @@ export function useWordTimingAudio(
     seekToVerse,
     setSpeed,
     getTimingData,
+    retry,
   };
 }

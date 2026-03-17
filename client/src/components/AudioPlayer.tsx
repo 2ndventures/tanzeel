@@ -53,6 +53,8 @@ interface AudioPlayerProps {
   onLayoutModeChange?: (mode: LayoutMode) => void;
   compact?: boolean;
   verseTimings?: VerseTimingInfo[];
+  error?: string | null;
+  onRetry?: () => void;
 }
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
@@ -138,6 +140,8 @@ export default function AudioPlayer({
   onLayoutModeChange,
   compact = false,
   verseTimings,
+  error = null,
+  onRetry,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
@@ -293,17 +297,19 @@ export default function AudioPlayer({
           <LayoutDrawerContent layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} />
         </Drawer>
         <button
-          className="size-14 rounded-full bg-card/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 ring-border/40 disabled:opacity-50 relative"
-          onClick={() => { triggerHaptic('light'); onPlayPause?.(); }}
+          className={`size-14 rounded-full bg-card/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 disabled:opacity-50 relative ${error ? 'ring-destructive/60' : 'ring-border/40'}`}
+          onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
           disabled={isLoading}
-          aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
+          aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
           data-testid="compact-play-button"
         >
           <svg className="absolute inset-0 -rotate-90" viewBox="0 0 56 56">
             <circle cx="28" cy="28" r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.3" />
-            <circle cx="28" cy="28" r={radius} fill="none" stroke="hsl(var(--primary))" strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className="transition-all duration-200" />
+            <circle cx="28" cy="28" r={radius} fill="none" stroke={error ? "hsl(var(--destructive))" : "hsl(var(--primary))"} strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className="transition-all duration-200" />
           </svg>
-          {isLoading ? (
+          {error ? (
+            <Icon icon="solar:refresh-bold" className="size-5 text-destructive relative z-10" />
+          ) : isLoading ? (
             <div className="size-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
           ) : isPlaying ? (
             <Icon icon="solar:pause-bold" className="size-5 text-foreground relative z-10" />
@@ -412,6 +418,12 @@ export default function AudioPlayer({
           </div>
         )}
 
+        {error && (
+          <p className="text-center text-xs font-medium text-destructive dark:text-red-400 mt-2 mb-0 animate-in fade-in duration-200" data-testid="text-audio-error">
+            {error}
+          </p>
+        )}
+
         {/* ── Controls row ── */}
         <div className="flex items-center justify-between mt-4 px-2">
 
@@ -446,13 +458,15 @@ export default function AudioPlayer({
             </button>
 
             <button
-              className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 bg-[#f8c630] text-[#ffffff]"
-              onClick={() => { triggerHaptic('light'); onPlayPause?.(); }}
+              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 ${error ? 'bg-destructive/90 text-destructive-foreground' : 'bg-[#f8c630] text-[#ffffff]'}`}
+              onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
               disabled={isLoading}
-              aria-label={isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
+              aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
               data-testid="button-play-pause"
             >
-              {isLoading ? (
+              {error ? (
+                <Icon icon="solar:refresh-bold" className="size-7" aria-hidden="true" />
+              ) : isLoading ? (
                 <div className="size-6 border-[2.5px] border-black/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
               ) : isPlaying ? (
                 <Icon icon="solar:pause-bold" className="size-7 text-black/85" aria-hidden="true" />

@@ -357,6 +357,7 @@ export default function ChapterView({
     setSpeed,
     seekToVerse,
     getTimingData,
+    retry: retryAudio,
   } = useWordTimingAudio(
     chapterId,
     quranComReciterId,
@@ -430,12 +431,23 @@ export default function ChapterView({
     onSeek: seek,
   });
 
-  // Show audio error as alert (for debugging mobile)
   useEffect(() => {
-    if (error) {
-      alert(`AUDIO ERROR: ${error}\n\nChapter: ${chapterId}\nReciter ID: ${quranComReciterId}\nReciter: ${reciter}`);
+    if (error && error.includes('retry')) {
+      toast({
+        description: error,
+        duration: 8000,
+        action: (
+          <button
+            onClick={() => retryAudio()}
+            className="shrink-0 text-xs font-semibold text-primary px-3 py-1.5 rounded-md bg-primary/10 hover-elevate"
+            data-testid="button-audio-retry"
+          >
+            Retry
+          </button>
+        ),
+      });
     }
-  }, [error, chapterId, quranComReciterId, reciter]);
+  }, [error, toast, retryAudio]);
   
   // Track reading time
   useEffect(() => {
@@ -1326,6 +1338,8 @@ export default function ChapterView({
         speed={speed}
         isLoading={isLoading}
         repeat={repeat}
+        error={error}
+        onRetry={retryAudio}
         onPlayPause={togglePlayPause}
         onSeek={(time) => { didSeekRef.current = true; seek(time); }}
         onSpeedChange={setSpeed}
