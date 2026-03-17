@@ -432,8 +432,7 @@ export function useWordTimingAudio(
     if (!audioRef.current) return;
     
     if (!state.isPlaying) {
-      audioRef.current.play().catch(err => {
-        console.error('Playback failed:', err);
+      audioRef.current.play().catch(() => {
         setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
@@ -445,8 +444,7 @@ export function useWordTimingAudio(
     if (state.isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(err => {
-        console.error('Playback failed:', err);
+      audioRef.current.play().catch(() => {
         setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
