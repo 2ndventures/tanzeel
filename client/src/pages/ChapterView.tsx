@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, Check, Sun, Moon, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2 } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
@@ -1039,18 +1040,7 @@ export default function ChapterView({
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
                         <div className="flex items-center justify-between py-3" data-testid="menu-item-theme">
                           <span className="text-sm text-foreground/80">Theme</span>
-                          <div className="relative">
-                            <Switch 
-                              checked={darkMode} 
-                              onCheckedChange={(v) => { onDarkModeChange(v); }}
-                              data-testid="switch-theme"
-                              className="relative"
-                            />
-                            <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-                              <Sun className="w-3.5 h-3.5 text-yellow-500" />
-                              <Moon className="w-3.5 h-3.5 text-blue-400" />
-                            </div>
-                          </div>
+                          <ThemeToggle isDark={darkMode} onToggle={(v) => { onDarkModeChange(v); }} />
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
                         <div className="flex items-center justify-between py-3" data-testid="menu-item-transliteration">

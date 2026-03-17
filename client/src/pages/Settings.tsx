@@ -7,7 +7,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronRight, ChevronLeft, Check, Sun, Moon } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SettingsProps {
   onBack: () => void;
@@ -89,13 +90,7 @@ function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeT
         {sublabel && <p className="text-xs text-muted-foreground mt-0.5">{sublabel}</p>}
       </div>
       {isThemeToggle ? (
-        <div className="relative">
-          <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} className="relative" />
-          <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-            <Sun className="w-3.5 h-3.5 text-yellow-500" aria-hidden="true" />
-            <Moon className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
-          </div>
-        </div>
+        <ThemeToggle isDark={checked} onToggle={onCheckedChange} />
       ) : (
         <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} />
       )}

@@ -1,6 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sun, Moon } from "lucide-react";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface SettingItemProps {
   label: string;
@@ -37,19 +37,7 @@ export default function SettingItem({
           )}
         </div>
         {isThemeToggle ? (
-          <div className="relative">
-            <Switch
-              checked={value as boolean}
-              onCheckedChange={onToggle}
-              aria-label={label}
-              data-testid={testId}
-              className="relative"
-            />
-            <div className="absolute inset-0 flex items-center justify-between px-1 pointer-events-none">
-              <Sun className="w-3.5 h-3.5 text-yellow-500" aria-hidden="true" />
-              <Moon className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />
-            </div>
-          </div>
+          <ThemeToggle isDark={value as boolean} onToggle={onToggle!} />
         ) : (
           <Switch
             checked={value as boolean}
