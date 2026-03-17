@@ -4,11 +4,11 @@ import "./index.css";
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (isIOS) {
-  function resetViewportScroll() {
+  const resetViewportScroll = () => {
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
-  }
+  };
 
   const vv = window.visualViewport;
   if (vv) {
