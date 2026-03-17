@@ -2,6 +2,8 @@ import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 
 const MIGRATION_FLAG = '__storage_migrated_v1';
+const MIGRATION_V2_FLAG = '__storage_migrated_v2';
+const V2_NEW_KEYS = ['translation'];
 
 const KNOWN_KEYS: string[] = [
   'onboardingCompleted',
@@ -53,11 +55,33 @@ async function migrateFromLocalStorage(): Promise<void> {
   await Preferences.set({ key: MIGRATION_FLAG, value: '1' });
 }
 
+async function migrateV2Keys(): Promise<void> {
+  if (!isNative()) return;
+
+  const { value: migrated } = await Preferences.get({ key: MIGRATION_V2_FLAG });
+  if (migrated) return;
+
+  for (const key of V2_NEW_KEYS) {
+    try {
+      const { value: existing } = await Preferences.get({ key });
+      if (existing !== null) continue;
+      const value = localStorage.getItem(key);
+      if (value !== null) {
+        await Preferences.set({ key, value });
+      }
+    } catch {
+    }
+  }
+
+  await Preferences.set({ key: MIGRATION_V2_FLAG, value: '1' });
+}
+
 export async function initStorage(): Promise<void> {
   if (initialized) return;
 
   if (isNative()) {
     await migrateFromLocalStorage();
+    await migrateV2Keys();
 
     for (const key of KNOWN_KEYS) {
       try {
