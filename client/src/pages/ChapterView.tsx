@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Play, Pause, Loader2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -176,6 +176,7 @@ export default function ChapterView({
 
   // State for managing menu navigation
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
+  const [previewCollapsed, setPreviewCollapsed] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Ref to hold pauseAudio so startPreview can access it regardless of hook ordering
@@ -802,7 +803,7 @@ export default function ChapterView({
                   <ChevronLeft className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </button>
               )}
-              <SheetHeader className="mb-4 shrink-0 relative z-10">
+              <SheetHeader className="mb-2 shrink-0 relative z-10">
                 <SheetTitle className="text-xl text-foreground">
                   {menuView === 'main' && 'Options'}
                   {menuView === 'reciter' && 'Select Reciter'}
@@ -810,66 +811,83 @@ export default function ChapterView({
               </SheetHeader>
 
               {menuView === 'main' && (
-                <div className="shrink-0 px-4 pb-3 relative z-10" data-testid="options-live-preview">
-                  <div className="rounded-xl px-4 py-3" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.5)', borderBottom: '1px solid hsl(var(--sheet-muted))' }}>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mb-2">Preview</p>
-                    <div className={`transition-all duration-200 ${
-                      lineSpacing === "Compact" ? "space-y-1" :
-                      lineSpacing === "Normal" ? "space-y-2" :
-                      lineSpacing === "Relaxed" ? "space-y-3" :
-                      "space-y-4"
-                    }`}>
-                      {showVerseNumbers && (
-                        <span
-                          className="inline-block text-xs font-semibold tabular-nums text-muted-foreground/70 transition-all duration-200"
-                          data-testid="preview-verse-number"
-                        >
-                          1:1
-                        </span>
+                <div className="shrink-0 px-4 pb-2 relative z-10" data-testid="options-live-preview">
+                  <div className="rounded-xl px-4 py-2.5" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.5)', borderBottom: '1px solid hsl(var(--sheet-muted))' }}>
+                    <button
+                      className="flex items-center justify-between w-full"
+                      onClick={() => setPreviewCollapsed(!previewCollapsed)}
+                      data-testid="button-toggle-preview"
+                    >
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50">Preview</p>
+                      {previewCollapsed ? (
+                        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50" />
+                      ) : (
+                        <ChevronUp className="w-3.5 h-3.5 text-muted-foreground/50" />
                       )}
-                      <p
-                        dir="rtl"
-                        className={`${
-                          arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic'
-                        } text-foreground transition-all duration-200 ${
-                          arabicFontSize === "Small" ? "text-xl md:text-2xl" :
-                          arabicFontSize === "Medium" ? "text-2xl md:text-3xl" :
-                          arabicFontSize === "Large" ? "text-3xl md:text-4xl" :
-                          "text-4xl md:text-5xl"
-                        } ${
-                          lineSpacing === "Compact" ? "leading-[2]" :
-                          lineSpacing === "Normal" ? "leading-[2.4]" :
-                          lineSpacing === "Relaxed" ? "leading-[2.8]" :
-                          "leading-[3.2]"
-                        }`}
-                        data-testid="preview-arabic"
-                      >
-                        بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-                      </p>
-                      {showTransliteration && (
+                    </button>
+                    <div
+                      className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                        previewCollapsed ? 'max-h-0 opacity-0 mt-0' : 'max-h-80 opacity-100 mt-2'
+                      }`}
+                    >
+                      <div className={`transition-all duration-200 ${
+                        lineSpacing === "Compact" ? "space-y-1" :
+                        lineSpacing === "Normal" ? "space-y-2" :
+                        lineSpacing === "Relaxed" ? "space-y-3" :
+                        "space-y-4"
+                      }`}>
+                        {showVerseNumbers && (
+                          <span
+                            className="inline-block text-xs font-semibold tabular-nums text-muted-foreground/70 transition-all duration-200"
+                            data-testid="preview-verse-number"
+                          >
+                            1:1
+                          </span>
+                        )}
                         <p
-                          className={`italic text-muted-foreground transition-all duration-200 ${
-                            transliterationFontSize === "Small" ? "text-xs" :
-                            transliterationFontSize === "Medium" ? "text-sm" :
-                            "text-base"
+                          dir="rtl"
+                          className={`${
+                            arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic'
+                          } text-foreground transition-all duration-200 ${
+                            arabicFontSize === "Small" ? "text-xl md:text-2xl" :
+                            arabicFontSize === "Medium" ? "text-2xl md:text-3xl" :
+                            arabicFontSize === "Large" ? "text-3xl md:text-4xl" :
+                            "text-4xl md:text-5xl"
+                          } ${
+                            lineSpacing === "Compact" ? "leading-[2]" :
+                            lineSpacing === "Normal" ? "leading-[2.4]" :
+                            lineSpacing === "Relaxed" ? "leading-[2.8]" :
+                            "leading-[3.2]"
                           }`}
-                          data-testid="preview-transliteration"
+                          data-testid="preview-arabic"
                         >
-                          Bismi l-lāhi r-raḥmāni r-raḥīm
+                          بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
                         </p>
-                      )}
-                      {showTranslation && (
-                        <p
-                          className={`text-muted-foreground transition-all duration-200 ${
-                            translationFontSize === "Small" ? "text-sm" :
-                            translationFontSize === "Medium" ? "text-base" :
-                            "text-lg"
-                          }`}
-                          data-testid="preview-translation"
-                        >
-                          In the name of Allah, the Entirely Merciful, the Especially Merciful.
-                        </p>
-                      )}
+                        {showTransliteration && (
+                          <p
+                            className={`italic text-muted-foreground transition-all duration-200 ${
+                              transliterationFontSize === "Small" ? "text-xs" :
+                              transliterationFontSize === "Medium" ? "text-sm" :
+                              "text-base"
+                            }`}
+                            data-testid="preview-transliteration"
+                          >
+                            Bismi l-lāhi r-raḥmāni r-raḥīm
+                          </p>
+                        )}
+                        {showTranslation && (
+                          <p
+                            className={`text-muted-foreground transition-all duration-200 ${
+                              translationFontSize === "Small" ? "text-sm" :
+                              translationFontSize === "Medium" ? "text-base" :
+                              "text-lg"
+                            }`}
+                            data-testid="preview-translation"
+                          >
+                            In the name of Allah, the Entirely Merciful, the Especially Merciful.
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -877,14 +895,14 @@ export default function ChapterView({
 
               <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16 relative z-10 px-4">
                 {menuView === 'main' && (
-                  <div className="space-y-7">
+                  <div className="space-y-4">
                     {/* Text Size Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-text-size">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-text-size">
                         Text Size
                       </h3>
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-                        <div className="flex items-center justify-between gap-3 py-3">
+                        <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Arabic</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map((s) => (
@@ -905,7 +923,7 @@ export default function ChapterView({
                           </div>
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between gap-3 py-3">
+                        <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Translation</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
@@ -926,7 +944,7 @@ export default function ChapterView({
                           </div>
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between gap-3 py-3">
+                        <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Transliteration</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
@@ -951,11 +969,11 @@ export default function ChapterView({
 
                     {/* Appearance Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-appearance">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-appearance">
                         Appearance
                       </h3>
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-                        <div className="flex items-center justify-between gap-3 py-3">
+                        <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Arabic Script</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {([
@@ -980,7 +998,7 @@ export default function ChapterView({
                           </div>
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between gap-3 py-3">
+                        <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Line Spacing</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
                             {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
@@ -1005,13 +1023,13 @@ export default function ChapterView({
 
                     {/* Audio Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-audio">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-audio">
                         Audio
                       </h3>
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
                         <button
                           onClick={() => setMenuView('reciter')}
-                          className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
+                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
                           data-testid="menu-item-reciter"
                         >
                           <span className="text-sm text-foreground/80">Reciter</span>
@@ -1021,7 +1039,7 @@ export default function ChapterView({
                           </div>
                         </button>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-3" data-testid="menu-item-autoplay">
+                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-autoplay">
                           <span className="text-sm text-foreground/80">Autoplay next surah</span>
                           <Switch 
                             checked={autoplay} 
@@ -1034,16 +1052,16 @@ export default function ChapterView({
 
                     {/* Display Section */}
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-display">
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-display">
                         Display
                       </h3>
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-                        <div className="flex items-center justify-between py-3" data-testid="menu-item-theme">
+                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-theme">
                           <span className="text-sm text-foreground/80">Theme</span>
                           <ThemeToggle isDark={darkMode} onToggle={(v) => { onDarkModeChange(v); }} />
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-3" data-testid="menu-item-transliteration">
+                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-transliteration">
                           <span className="text-sm text-foreground/80">Transliteration</span>
                           <Switch 
                             checked={showTransliteration} 
@@ -1052,7 +1070,7 @@ export default function ChapterView({
                           />
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-3" data-testid="menu-item-translation">
+                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-translation">
                           <span className="text-sm text-foreground/80">Translation</span>
                           <Switch 
                             checked={showTranslation} 
@@ -1061,7 +1079,7 @@ export default function ChapterView({
                           />
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-3" data-testid="menu-item-verse-numbers">
+                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-verse-numbers">
                           <span className="text-sm text-foreground/80">Verse numbers</span>
                           <Switch 
                             checked={showVerseNumbers} 
