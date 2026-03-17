@@ -116,6 +116,9 @@ function App() {
       const savedVerseNums = await getItem('showVerseNumbers');
       if (savedVerseNums !== null) setShowVerseNumbers(JSON.parse(savedVerseNums));
 
+      const savedTranslationLang = await getItem('translation');
+      if (savedTranslationLang) setTranslation(savedTranslationLang);
+
       setStorageReady(true);
     });
   }, []);
@@ -200,6 +203,11 @@ function App() {
     if (!storageReady) return;
     setItem('layoutMode', layoutMode);
   }, [layoutMode, storageReady]);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    setItem('translation', translation);
+  }, [translation, storageReady]);
 
   const settingsBackHandlerRef = useRef<(() => boolean) | null>(null);
 

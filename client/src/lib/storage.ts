@@ -19,6 +19,7 @@ const KNOWN_KEYS: string[] = [
   'transliterationFontSize',
   'lineSpacing',
   'showVerseNumbers',
+  'translation',
   'quran_bookmarks',
   'quran_bookmark_folders',
   'quran-reading-stats',
