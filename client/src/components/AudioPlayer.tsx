@@ -91,9 +91,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                   <img
                     src={opt.preview}
                     alt={`${opt.label} layout preview`}
-                    className={`w-full h-full object-cover transition-opacity ${
-                      isSelected ? 'opacity-100' : 'opacity-60'
-                    }`}
+                    className="w-full h-full object-cover"
                     data-testid={`img-layout-preview-${opt.mode}`}
                   />
                   {isSelected && (
