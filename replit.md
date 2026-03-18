@@ -88,4 +88,4 @@ Quran data (chapters, verses, Arabic text, English translations, transliteration
 - **External APIs & Data Sources**:
     - **Quran.com Audio API**: Provides continuous chapter audio files and word-level timing data via a backend proxy.
     - **Al-Quran Cloud API**: Used for pre-fetching static Quran text data (Arabic, Sahih International English translation, transliteration).
-- **Mobile Deployment**: Capacitor for native iOS and Android app deployment, @capacitor/haptics for native haptic feedback.
+- **Mobile Deployment**: Capacitor for native iOS and Android app deployment, @capacitor/haptics for native haptic feedback, @capacitor/filesystem for local file storage, @capacitor/network for network status detection.
