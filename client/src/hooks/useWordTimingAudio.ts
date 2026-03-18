@@ -377,11 +377,18 @@ export function useWordTimingAudio(
   }, [chapterId, findVbvWordIndex]);
 
   const tryVerseByVerseFallback = useCallback(async (): Promise<boolean> => {
+    if (verseByVerseRef.current) return false;
+
     const reciterString = quranComIdToReciterString(reciterId);
     if (!reciterString) return false;
 
     const downloadedVerses = getDownloadedVerseNumbers(reciterString, chapterId);
     if (downloadedVerses.length === 0) return false;
+
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = null;
+    }
 
     const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;
     if (offlineTiming?.audio_files?.[0]?.verse_timings) {
