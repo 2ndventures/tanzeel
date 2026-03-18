@@ -66,6 +66,16 @@ The legacy browser Cache API store (`client/src/lib/audioCache.ts`) still exists
 - `getDownloadStatus(reciterId, surahNum, totalVerses)`: Returns `'none' | 'partial' | 'complete'`.
 - Audio URLs constructed directly from EveryAyah.com pattern: `https://everyayah.com/data/{everyAyahFolder}/{SSS}{VVV}.mp3`.
 
+### Audio Manager Page
+
+`client/src/pages/AudioManager.tsx` — full-screen page accessible from Settings > Offline Storage > "Audio Manager":
+- **Storage Summary**: Total audio storage, breakdown (auto-cached vs downloaded), cache limit pill selector.
+- **Reciter Section**: Shows current reciter name, "Download All Surahs" button with estimated size (~2.2 GB), and list of all 114 surahs with download status icons (not downloaded / downloading spinner / complete / partial).
+- **Download Progress**: Sticky progress bar at top with percentage and cancel button (shows "Cancelling..." state for immediate feedback).
+- **Apple Compliance**: Confirmation dialogs before any download starts showing estimated size. "Download All" dialog warns about ~15-30 minute duration.
+- **Delete Flow**: Tapping a downloaded surah shows delete confirmation dialog.
+- Registered as page type `"audio-manager"` in App.tsx, Android back button returns to Settings.
+
 ## Haptic Feedback
 
 A haptics utility (`client/src/lib/haptics.ts`) provides tactile feedback using Capacitor's Haptics plugin on native platforms and `navigator.vibrate()` as a web fallback. Two intensities: light (15ms / ImpactStyle.Light) for play/pause, bookmark, tab switch, speed change, and layout change; medium (40ms / ImpactStyle.Medium) for swipe navigation between surahs.

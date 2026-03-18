@@ -10,6 +10,7 @@ import Settings from "@/pages/Settings";
 import Bookmarks from "@/pages/Bookmarks";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
+import AudioManager from "@/pages/AudioManager";
 import OnboardingScreen from "@/components/OnboardingScreen";
 import SplashScreen from "@/components/SplashScreen";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
@@ -23,7 +24,7 @@ const CapApp = registerPlugin<{
   addListener: (eventName: string, callback: () => void) => Promise<{ remove: () => void }>;
 }>('App');
 
-type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service";
+type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service" | "audio-manager";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
@@ -223,6 +224,7 @@ function App() {
     switch (currentPage) {
       case "privacy-policy":
       case "terms-of-service":
+      case "audio-manager":
         setCurrentPage("settings");
         setActiveTab("settings");
         break;
@@ -405,6 +407,15 @@ function App() {
                   setCurrentPage("settings");
                   setActiveTab("settings");
                 }}
+              />
+            )}
+            {currentPage === "audio-manager" && (
+              <AudioManager
+                onBack={() => {
+                  setCurrentPage("settings");
+                  setActiveTab("settings");
+                }}
+                reciter={reciter}
               />
             )}
           </div>

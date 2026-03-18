@@ -10,7 +10,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ChevronRight, ChevronLeft, Check, Trash2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { getCacheStats, setMaxCacheSize, clearCache } from "@/services/audioCache";
+import { getCacheStats, setMaxCacheSize, clearCache, getManifest } from "@/services/audioCache";
+
+function getDownloadedSize(): number {
+  const manifest = getManifest();
+  if (!manifest) return 0;
+  let total = 0;
+  for (const entry of Object.values(manifest.files)) {
+    if (entry.source === 'download') {
+      total += entry.sizeBytes;
+    }
+  }
+  return total;
+}
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 MB';
@@ -388,6 +400,20 @@ export default function Settings({
               Offline Storage
             </h3>
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
+              <button
+                onClick={() => onNavigate?.("audio-manager")}
+                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md text-left"
+                data-testid="menu-item-audio-manager"
+              >
+                <div>
+                  <p className="text-sm text-foreground/80">Audio Manager</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {formatBytes(getDownloadedSize())} downloaded
+                  </p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </button>
+              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <div className="flex items-center justify-between py-3">
                 <div>
                   <p className="text-sm text-foreground/80">Audio Cache</p>
