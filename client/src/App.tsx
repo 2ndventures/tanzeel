@@ -16,6 +16,7 @@ import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_M
 import type { LayoutMode } from "@/lib/quranMetadata";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { initStorage, getItem, setItem, removeItem } from "@/lib/storage";
+import { initAudioCache } from "@/services/audioCache";
 
 const CapApp = registerPlugin<{
   exitApp: () => Promise<void>;
@@ -46,6 +47,7 @@ function App() {
   const [showTranslation, setShowTranslation] = useState(true);
   const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>('uthmani');
   const [reciter, setReciter] = useState(DEFAULT_RECITER);
+  const [audioCacheReady, setAudioCacheReady] = useState(false);
   const [autoScroll, setAutoScroll] = useState(true);
   const [repeat, setRepeat] = useState(false);
   const [autoplay, setAutoplay] = useState(true);
@@ -119,6 +121,13 @@ function App() {
       if (savedTranslationLang) setTranslation(savedTranslationLang);
 
       setStorageReady(true);
+
+      initAudioCache()
+        .then(() => setAudioCacheReady(true))
+        .catch((err) => {
+          console.error('[App] Failed to initialize audio cache:', err);
+          setAudioCacheReady(true);
+        });
     });
   }, []);
 
@@ -300,7 +309,7 @@ function App() {
               <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
             )}
             {currentPage === "surah-juz" && (
-              <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} />
+              <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} currentReciterId={reciter} audioCacheReady={audioCacheReady} />
             )}
             {currentPage === "chapter" && (
               <ChapterView

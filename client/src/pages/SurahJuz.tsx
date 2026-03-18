@@ -17,9 +17,11 @@ interface TopicResult {
 interface SurahJuzProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => void;
   activeTab?: "home" | "surah" | "settings" | "bookmarks";
+  currentReciterId?: string;
+  audioCacheReady?: boolean;
 }
 
-export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzProps) {
+export default function SurahJuz({ onNavigate, activeTab = "surah", currentReciterId, audioCacheReady }: SurahJuzProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<"surah" | "juz">("surah");
@@ -380,6 +382,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah" }: SurahJuzPr
                 onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", chapter.id); }}
                 style={{ animationDelay: `${index * 30}ms` }}
                 isFirst={index === 0}
+                currentReciterId={currentReciterId}
+                audioCacheReady={audioCacheReady}
               />
             ))
           ) : !showTopicResults ? (
