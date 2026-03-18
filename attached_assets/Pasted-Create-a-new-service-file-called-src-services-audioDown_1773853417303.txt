@@ -1,0 +1,29 @@
+Create a new service file called `src/services/audioDownloadManager.ts` that handles explicit (user-initiated) audio downloads. This builds on top of the audioCache service. Export the following functions:
+
+- `downloadSurah(reciterId: string, surahNum: number, totalVerses: number, onProgress?: (percent: number) => void): Promise<void>`:
+  Download ALL verse audio files for a given surah and reciter. For each verse:
+    - Skip if already cached (check manifest)
+    - Construct the audio URL using the same pattern the streaming player uses (from Quran.com API audio file URLs)
+    - Download using `@capacitor/file-transfer` with progress tracking
+    - Save to Directory.Data (NOT Directory.Cache) at path `audio-downloads/{reciterId}/{surahNum}_{verseNum}.mp3` — this ensures explicitly downloaded files persist and are NOT purged by iOS
+    - Update the manifest with source: "download"
+    - Report aggregate progress via the onProgress callback (0-100 based on verses completed / total verses)
+  
+  If a download fails for a specific verse, retry once, then skip and continue with remaining verses. Log the failure.
+
+- `downloadAllSurahs(reciterId: string, onProgress?: (surahNum: number, percent: number) => void): Promise<void>`:
+  Download all 114 surahs sequentially for the given reciter. Call `downloadSurah` for each. Report progress per-surah.
+
+- `cancelDownload(): void`:
+  Set a cancellation flag that the active download loop checks between verses. Stop downloading but keep what's already been saved.
+
+- `deleteSurahDownload(reciterId: string, surahNum: number, totalVerses: number): Promise<void>`:
+  Delete all downloaded audio files for a surah/reciter combo. Update manifest. Only delete files with source: "download" — don't touch cached files.
+
+- `deleteReciterDownloads(reciterId: string): Promise<void>`:
+  Delete ALL downloaded files for a specific reciter. Update manifest.
+
+- `getDownloadStatus(reciterId: string, surahNum: number, totalVerses: number): "none" | "partial" | "complete"`:
+  Check how much of a surah is explicitly downloaded (source: "download" entries in manifest).
+
+Important: the audioCache service from Phase 1 should already check both Directory.Cache (auto-cached) and Directory.Data (explicitly downloaded) paths when looking up a file. Update `getCachedAudioUri` in audioCache.ts if needed to check both locations, prioritizing the explicitly downloaded file (Directory.Data) over the auto-cached version (Directory.Cache) since it won't be purged by iOS.

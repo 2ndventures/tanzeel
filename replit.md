@@ -44,9 +44,27 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 The system provides continuous chapter audio playback with word-level synchronized highlighting using a `useWordTimingAudio` hook. It loads single audio files per chapter with timing data from Quran.com, supporting seamless playback. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling. The backend normalizes inconsistent Quran.com API responses for audio timing.
 
-### Audio Caching
+### Audio Caching (Capacitor Filesystem)
 
-Audio timing data and chapter audio files are cached locally using the browser Cache API (`client/src/lib/audioCache.ts`). Cache keys use deterministic `reciterId-chapterId` patterns for reliable eviction. An LRU strategy (tracked via localStorage) caps cached chapters at 50, evicting least-recently-used entries. Previously played chapters load instantly on repeat visits and work offline when cached.
+A Capacitor Filesystem-based audio cache (`client/src/services/audioCache.ts`) stores verse-level MP3s with a dual-directory strategy:
+- **Auto-cached files** (source `'cache'`): stored in `Directory.Cache` (`audio-cache/` folder), subject to LRU eviction when total size exceeds the configurable limit (default 2 GB).
+- **Explicitly downloaded files** (source `'download'`): stored in `Directory.Data` (`audio-downloads/` folder), exempt from LRU eviction, only removed by explicit user action.
+- A shared manifest (`audio-cache/manifest.json` in `Directory.Data`) tracks all entries with reciter/surah/verse keys, sizes, timestamps, and source type. Legacy manifest entries without a `source` field are normalized to `'cache'` on init.
+- `cacheAudioFile()` returns `boolean` success status for callers to implement retry logic.
+- `getCachedAudioUri()` resolves the correct directory based on entry source.
+
+The legacy browser Cache API store (`client/src/lib/audioCache.ts`) still exists for backward compatibility but playback integration with the new Capacitor store is deferred.
+
+### Audio Download Manager
+
+`client/src/services/audioDownloadManager.ts` orchestrates bulk offline downloads:
+- `downloadSurah(reciterId, surahNum, totalVerses, onProgress?)`: Downloads all verses for a surah sequentially with per-verse retry (2 attempts, 500ms delay) and cancellation support. Skips already-downloaded verses. Reports aggregate percent progress.
+- `downloadAllSurahs(reciterId, onProgress?)`: Iterates all 114 surahs.
+- `cancelDownload()`: Sets a flag checked between verse downloads.
+- `deleteSurahDownload(reciterId, surahNum, totalVerses)`: Removes downloaded files for one surah.
+- `deleteReciterDownloads(reciterId)`: Removes all downloaded files for a reciter.
+- `getDownloadStatus(reciterId, surahNum, totalVerses)`: Returns `'none' | 'partial' | 'complete'`.
+- Audio URLs constructed directly from EveryAyah.com pattern: `https://everyayah.com/data/{everyAyahFolder}/{SSS}{VVV}.mp3`.
 
 ## Haptic Feedback
 

@@ -1,7 +1,7 @@
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 
-interface CachedFileEntry {
+export interface CachedFileEntry {
   reciterId: string;
   surahNumber: number;
   verseNumber: number;
@@ -12,7 +12,7 @@ interface CachedFileEntry {
   source: 'cache' | 'download';
 }
 
-interface CacheManifest {
+export interface CacheManifest {
   version: number;
   totalSizeBytes: number;
   maxSizeBytes: number;
@@ -22,11 +22,12 @@ interface CacheManifest {
 const MANIFEST_DIR = 'audio-cache';
 const MANIFEST_PATH = 'audio-cache/manifest.json';
 const AUDIO_CACHE_DIR = 'audio-cache';
+const AUDIO_DOWNLOAD_DIR = 'audio-downloads';
 const DEFAULT_MAX_SIZE = 2147483648;
 
 let manifest: CacheManifest | null = null;
 
-function fileKey(reciterId: string, surahNum: number, verseNum: number): string {
+export function fileKey(reciterId: string, surahNum: number, verseNum: number): string {
   return `${reciterId}_${surahNum}_${verseNum}`;
 }
 
@@ -50,7 +51,7 @@ async function ensureCacheDirectory(path: string): Promise<void> {
   }
 }
 
-async function ensureDataDirectory(path: string): Promise<void> {
+export async function ensureDataDirectory(path: string): Promise<void> {
   try {
     await Filesystem.mkdir({
       path,
@@ -61,7 +62,7 @@ async function ensureDataDirectory(path: string): Promise<void> {
   }
 }
 
-async function saveManifest(): Promise<void> {
+export async function saveManifest(): Promise<void> {
   if (!manifest) return;
   try {
     await ensureDataDirectory(MANIFEST_DIR);
@@ -81,9 +82,11 @@ async function evictLRU(): Promise<void> {
   if (manifest.totalSizeBytes <= manifest.maxSizeBytes) return;
 
   const targetSize = Math.floor(manifest.maxSizeBytes * 0.9);
-  const entries = Object.entries(manifest.files).sort(
-    ([, a], [, b]) => new Date(a.lastAccessedAt).getTime() - new Date(b.lastAccessedAt).getTime()
-  );
+  const entries = Object.entries(manifest.files)
+    .filter(([, e]) => e.source === 'cache')
+    .sort(
+      ([, a], [, b]) => new Date(a.lastAccessedAt).getTime() - new Date(b.lastAccessedAt).getTime()
+    );
 
   for (const [key, entry] of entries) {
     if (manifest.totalSizeBytes <= targetSize) break;
@@ -102,6 +105,10 @@ async function evictLRU(): Promise<void> {
   await saveManifest();
 }
 
+function getDirectoryForEntry(entry: CachedFileEntry): Directory {
+  return entry.source === 'download' ? Directory.Data : Directory.Cache;
+}
+
 export async function initAudioCache(): Promise<void> {
   try {
     const result = await Filesystem.readFile({
@@ -110,6 +117,11 @@ export async function initAudioCache(): Promise<void> {
       encoding: Encoding.UTF8,
     });
     manifest = JSON.parse(result.data as string) as CacheManifest;
+    for (const entry of Object.values(manifest.files)) {
+      if (!entry.source) {
+        entry.source = 'cache';
+      }
+    }
   } catch {
     manifest = createDefaultManifest();
     await saveManifest();
@@ -126,10 +138,12 @@ export async function getCachedAudioUri(
   const entry = manifest.files[key];
   if (!entry) return null;
 
+  const dir = getDirectoryForEntry(entry);
+
   try {
     await Filesystem.stat({
       path: entry.filePath,
-      directory: Directory.Cache,
+      directory: dir,
     });
 
     entry.lastAccessedAt = new Date().toISOString();
@@ -138,14 +152,14 @@ export async function getCachedAudioUri(
     if (Capacitor.isNativePlatform()) {
       const uriResult = await Filesystem.getUri({
         path: entry.filePath,
-        directory: Directory.Cache,
+        directory: dir,
       });
       return Capacitor.convertFileSrc(uriResult.uri);
     }
 
     const fileResult = await Filesystem.readFile({
       path: entry.filePath,
-      directory: Directory.Cache,
+      directory: dir,
     });
     const base64String = fileResult.data as string;
     return `data:audio/mpeg;base64,${base64String}`;
@@ -164,33 +178,43 @@ export async function cacheAudioFile(
   verseNum: number,
   remoteUrl: string,
   source: 'cache' | 'download' = 'cache'
-): Promise<void> {
-  if (!manifest) return;
+): Promise<boolean> {
+  if (!manifest) return false;
   const key = fileKey(reciterId, surahNum, verseNum);
-  if (manifest.files[key]) return;
+  const existing = manifest.files[key];
+  if (existing) {
+    if (existing.source === 'download' || source === 'cache') return true;
+  }
 
-  const dirPath = `${AUDIO_CACHE_DIR}/${reciterId}`;
+  const isDownload = source === 'download';
+  const baseDir = isDownload ? AUDIO_DOWNLOAD_DIR : AUDIO_CACHE_DIR;
+  const dir = isDownload ? Directory.Data : Directory.Cache;
+  const dirPath = `${baseDir}/${reciterId}`;
   const filePath = `${dirPath}/${surahNum}_${verseNum}.mp3`;
 
   try {
-    await ensureCacheDirectory(dirPath);
+    if (isDownload) {
+      await ensureDataDirectory(dirPath);
+    } else {
+      await ensureCacheDirectory(dirPath);
+    }
 
     if (Capacitor.isNativePlatform()) {
       const downloadResult = await Filesystem.downloadFile({
         url: remoteUrl,
         path: filePath,
-        directory: Directory.Cache,
+        directory: dir,
       });
 
       if (!downloadResult.path) {
         console.error('[AudioCache] Download returned no path');
-        return;
+        return false;
       }
     } else {
       const response = await fetch(remoteUrl);
       if (!response.ok) {
         console.error('[AudioCache] Failed to fetch audio:', response.status);
-        return;
+        return false;
       }
       const arrayBuffer = await response.arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
@@ -202,7 +226,7 @@ export async function cacheAudioFile(
       await Filesystem.writeFile({
         path: filePath,
         data: base64,
-        directory: Directory.Cache,
+        directory: dir,
       });
     }
 
@@ -210,11 +234,15 @@ export async function cacheAudioFile(
     try {
       const stat = await Filesystem.stat({
         path: filePath,
-        directory: Directory.Cache,
+        directory: dir,
       });
       sizeBytes = stat.size;
     } catch {
       sizeBytes = 0;
+    }
+
+    if (existing) {
+      manifest.totalSizeBytes -= existing.sizeBytes;
     }
 
     const now = new Date().toISOString();
@@ -231,9 +259,13 @@ export async function cacheAudioFile(
     manifest.totalSizeBytes += sizeBytes;
 
     await saveManifest();
-    await evictLRU();
+    if (source === 'cache') {
+      await evictLRU();
+    }
+    return true;
   } catch (err) {
     console.error('[AudioCache] Failed to cache audio file:', err);
+    return false;
   }
 }
 
@@ -272,6 +304,14 @@ export async function clearCache(): Promise<void> {
       });
     } catch {
     }
+    try {
+      await Filesystem.rmdir({
+        path: AUDIO_DOWNLOAD_DIR,
+        directory: Directory.Data,
+        recursive: true,
+      });
+    } catch {
+    }
 
     manifest = createDefaultManifest();
     await saveManifest();
@@ -285,4 +325,17 @@ export async function setMaxCacheSize(bytes: number): Promise<void> {
   manifest.maxSizeBytes = bytes;
   await saveManifest();
   await evictLRU();
+}
+
+export function getManifest(): CacheManifest | null {
+  return manifest;
+}
+
+export function removeManifestEntry(key: string): void {
+  if (!manifest) return;
+  const entry = manifest.files[key];
+  if (entry) {
+    manifest.totalSizeBytes -= entry.sizeBytes;
+    delete manifest.files[key];
+  }
 }
