@@ -1,0 +1,43 @@
+Create a new service file called `src/services/audioCache.ts` that manages progressive audio caching. This service will:
+
+1. Maintain a local manifest stored in Capacitor's Filesystem (Directory.Data) at path `audio-cache/manifest.json`. The manifest is a JSON object with this structure:
+
+{
+  "version": 1,
+  "totalSizeBytes": 0,
+  "maxSizeBytes": 2147483648,  // 2 GB default cap
+  "files": {
+    "{reciterId}_{surahNum}_{verseNum}": {
+      "reciterId": string,
+      "surahNumber": number,
+      "verseNumber": number,
+      "filePath": string,
+      "sizeBytes": number,
+      "cachedAt": ISO timestamp,
+      "lastAccessedAt": ISO timestamp,
+      "source": "cache" | "download"  // "cache" = auto-saved while streaming, "download" = explicitly downloaded
+    }
+  }
+}
+
+2. Export the following functions:
+
+- `initAudioCache()`: Load the manifest from disk into memory. If no manifest exists, create a default one. Call this on app startup.
+
+- `getCachedAudioUri(reciterId: string, surahNum: number, verseNum: number): Promise<string | null>`: Check if a cached file exists for this verse. If yes, update `lastAccessedAt` in the manifest, convert the native file path to a web-accessible URI using `Capacitor.convertFileSrc()`, and return it. If no, return null.
+
+- `cacheAudioFile(reciterId: string, surahNum: number, verseNum: number, remoteUrl: string): Promise<void>`: Download the audio file from `remoteUrl` and save it to Directory.Cache at path `audio-cache/{reciterId}/{surahNum}_{verseNum}.mp3`. Update the manifest with the new file entry. After saving, check if total cache size exceeds `maxSizeBytes` — if so, run LRU eviction (delete the files with the oldest `lastAccessedAt` until total is under 90% of max).
+
+- `isVerseCached(reciterId: string, surahNum: number, verseNum: number): boolean`: Synchronous check against the in-memory manifest.
+
+- `isSurahFullyCached(reciterId: string, surahNum: number, totalVerses: number): boolean`: Check if ALL verses of a surah are cached for this reciter.
+
+- `getCacheStats(): { totalSizeBytes: number, maxSizeBytes: number, fileCount: number }`: Return current cache statistics.
+
+- `clearCache(): Promise<void>`: Delete all cached audio files and reset the manifest.
+
+- `setMaxCacheSize(bytes: number): Promise<void>`: Update the max cache size in the manifest.
+
+Use `@capacitor/filesystem` for file existence checks and deletion. Use `@capacitor/file-transfer` for downloading files (NOT the deprecated Filesystem.downloadFile). Wrap all file operations in try-catch blocks. If a cache operation fails, log the error but do NOT break audio playback — always allow fallback to streaming.
+
+Do NOT use localStorage or sessionStorage. Store everything via Capacitor Filesystem.
