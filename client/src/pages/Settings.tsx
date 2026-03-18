@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
 import BottomNav from "@/components/BottomNav";
@@ -7,8 +7,17 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { ChevronRight, ChevronLeft, Check, Trash2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { getCacheStats, setMaxCacheSize, clearCache } from "@/services/audioCache";
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 MB';
+  if (bytes < 1048576) return `${(bytes / 1024).toFixed(0)} KB`;
+  if (bytes < 1073741824) return `${(bytes / 1048576).toFixed(0)} MB`;
+  return `${(bytes / 1073741824).toFixed(1)} GB`;
+}
 
 interface SettingsProps {
   onBack: () => void;
@@ -137,6 +146,16 @@ export default function Settings({
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reciterView, setReciterView] = useState(false);
+  const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, maxSizeBytes: 2147483648, fileCount: 0 });
+  const [isClearing, setIsClearing] = useState(false);
+
+  const refreshCacheStats = useCallback(() => {
+    setCacheStats(getCacheStats());
+  }, []);
+
+  useEffect(() => {
+    refreshCacheStats();
+  }, [refreshCacheStats]);
   useEffect(() => {
     if (onRegisterBackHandler) {
       onRegisterBackHandler(() => {
@@ -361,6 +380,84 @@ export default function Settings({
               <ToggleRow label="Autoplay next surah" checked={autoplay} onCheckedChange={onAutoplayChange} testId="toggle-autoplay" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Repeat" checked={repeat} onCheckedChange={onRepeatChange} testId="toggle-repeat" />
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-storage">
+              Offline Storage
+            </h3>
+            <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
+              <div className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm text-foreground/80">Audio Cache</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {cacheStats.fileCount} {cacheStats.fileCount === 1 ? 'file' : 'files'} cached
+                  </p>
+                </div>
+                <span className="text-sm font-medium text-foreground/70" data-testid="text-cache-usage">
+                  {formatBytes(cacheStats.totalSizeBytes)} used
+                </span>
+              </div>
+              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+              <PillRow
+                label="Cache Limit"
+                value={String(cacheStats.maxSizeBytes)}
+                options={[
+                  { label: "500 MB", value: "524288000" },
+                  { label: "1 GB", value: "1073741824" },
+                  { label: "2 GB", value: "2147483648" },
+                  { label: "5 GB", value: "5368709120" },
+                ]}
+                onChange={async (v) => {
+                  const bytes = parseInt(v);
+                  await setMaxCacheSize(bytes);
+                  refreshCacheStats();
+                }}
+                testIdPrefix="button-cache-limit"
+              />
+              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+              <div className="py-3">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      className="w-full flex items-center justify-between hover-elevate active-elevate-2 rounded-md"
+                      disabled={isClearing || cacheStats.fileCount === 0}
+                      data-testid="button-clear-cache"
+                    >
+                      <span className={`text-sm ${cacheStats.fileCount === 0 ? 'text-muted-foreground/50' : 'text-destructive'}`}>
+                        Clear Audio Cache
+                      </span>
+                      <Trash2 className={`w-4 h-4 shrink-0 ${cacheStats.fileCount === 0 ? 'text-muted-foreground/50' : 'text-destructive/70'}`} />
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Clear Audio Cache</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Clear all cached audio? You'll need an internet connection to listen again.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel data-testid="button-cancel-clear-cache">Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={async () => {
+                          setIsClearing(true);
+                          try {
+                            await clearCache();
+                            refreshCacheStats();
+                          } finally {
+                            setIsClearing(false);
+                          }
+                        }}
+                        data-testid="button-confirm-clear-cache"
+                      >
+                        {isClearing ? "Clearing..." : "Clear Cache"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           </div>
 
