@@ -208,6 +208,7 @@ export function useWordTimingAudio(
   const cleanupRef = useRef<(() => void) | null>(null);
   const loadIdRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadVerseByVerseAudio = useCallback(async (
     verseNum: number,
@@ -222,8 +223,12 @@ export function useWordTimingAudio(
           ...prev,
           error: `Verse ${verseNum} not available offline, skipping...`,
         }));
-        setTimeout(() => {
-          loadVerseByVerseAudio(nextAvailable, shouldPlay, reciterString);
+        if (vbvSkipTimerRef.current) clearTimeout(vbvSkipTimerRef.current);
+        const currentLoadId = loadIdRef.current;
+        vbvSkipTimerRef.current = setTimeout(() => {
+          if (loadIdRef.current === currentLoadId) {
+            loadVerseByVerseAudio(nextAvailable, shouldPlay, reciterString);
+          }
         }, 1500);
         return;
       }
@@ -641,6 +646,10 @@ export function useWordTimingAudio(
 
   useEffect(() => {
     return () => {
+      if (vbvSkipTimerRef.current) {
+        clearTimeout(vbvSkipTimerRef.current);
+        vbvSkipTimerRef.current = null;
+      }
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = '';
