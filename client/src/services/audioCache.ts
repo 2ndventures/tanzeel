@@ -339,3 +339,60 @@ export function removeManifestEntry(key: string): void {
     delete manifest.files[key];
   }
 }
+
+const TIMING_DATA_DIR = 'audio-downloads';
+
+export async function saveOfflineTimingData(
+  reciterId: string,
+  surahNum: number,
+  data: unknown
+): Promise<void> {
+  const dirPath = `${TIMING_DATA_DIR}/${reciterId}`;
+  const filePath = `${dirPath}/timing_${surahNum}.json`;
+  try {
+    await ensureDataDirectory(dirPath);
+    await Filesystem.writeFile({
+      path: filePath,
+      data: JSON.stringify(data),
+      directory: Directory.Data,
+      encoding: Encoding.UTF8,
+    });
+  } catch (err) {
+    console.error('[AudioCache] Failed to save offline timing data:', err);
+  }
+}
+
+export async function getOfflineTimingData(
+  reciterId: string,
+  surahNum: number
+): Promise<unknown | null> {
+  const filePath = `${TIMING_DATA_DIR}/${reciterId}/timing_${surahNum}.json`;
+  try {
+    const result = await Filesystem.readFile({
+      path: filePath,
+      directory: Directory.Data,
+      encoding: Encoding.UTF8,
+    });
+    return JSON.parse(result.data as string);
+  } catch {
+    return null;
+  }
+}
+
+export function getDownloadedVerseNumbers(
+  reciterId: string,
+  surahNum: number
+): number[] {
+  if (!manifest) return [];
+  const verses: number[] = [];
+  for (const entry of Object.values(manifest.files)) {
+    if (
+      entry.reciterId === reciterId &&
+      entry.surahNumber === surahNum &&
+      entry.source === 'download'
+    ) {
+      verses.push(entry.verseNumber);
+    }
+  }
+  return verses.sort((a, b) => a - b);
+}

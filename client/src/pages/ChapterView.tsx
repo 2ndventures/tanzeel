@@ -11,7 +11,7 @@ import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
 import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
-import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
+import { getFeaturedReciters, getReciterById, getQuranComReciterId } from "@/lib/reciters";
 import { useMediaSession } from "@/hooks/useMediaSession";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
@@ -284,19 +284,7 @@ export default function ChapterView({
     };
   }, []);
   
-  // Map our reciter IDs to Quran.com reciter IDs
-  // https://api.qurancdn.com/api/qdc/audio/reciters
-  const reciterToQuranComId: { [key: string]: number } = {
-    'alafasy': 7,           // Mishary Rashid Alafasy
-    'abdul_basit': 1,       // Abdul Basit Abdul Samad (Murattal)
-    'abdul_basit_mujawwad': 2, // Abdul Basit (Mujawwad)
-    'sudais': 12,           // Abdurrahmaan As-Sudais
-    'ash_shaatree': 5,      // Abu Bakr Ash-Shaatree
-    'hudhaify': 3,          // Ali Al-Hudhaify
-    'hani_rifai': 9,        // Hani Rifai
-    'akram_alalaqimy': 11,  // Akram Al-Alaqimy
-  };
-  const quranComReciterId = reciterToQuranComId[reciter] || 7;
+  const quranComReciterId = getQuranComReciterId(reciter);
 
   // Load verses when chapter changes
   useEffect(() => {

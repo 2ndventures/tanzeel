@@ -1,5 +1,5 @@
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { getReciterById } from '@/lib/reciters';
+import { getReciterById, getQuranComReciterId } from '@/lib/reciters';
 import {
   fileKey,
   getManifest,
@@ -7,8 +7,10 @@ import {
   saveManifest,
   cacheAudioFile,
   isVerseCached,
+  saveOfflineTimingData,
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
+import { API_BASE_URL } from '@/config';
 
 let cancelFlag = false;
 
@@ -69,6 +71,18 @@ export async function downloadSurah(
     completed++;
     onProgress?.(Math.round((completed / totalVerses) * 100));
   }
+
+  try {
+    const quranComId = getQuranComReciterId(reciterId);
+    const timingUrl = `${API_BASE_URL}/api/audio-timing/${quranComId}/${surahNum}`;
+    const timingResponse = await fetch(timingUrl);
+    if (timingResponse.ok) {
+      const timingData = await timingResponse.json();
+      await saveOfflineTimingData(reciterId, surahNum, timingData);
+    }
+  } catch (err) {
+    console.warn('[DownloadManager] Failed to cache timing data:', err);
+  }
 }
 
 export async function downloadAllSurahs(
@@ -120,6 +134,14 @@ export async function deleteSurahDownload(
     removeManifestEntry(key);
   }
 
+  try {
+    await Filesystem.deleteFile({
+      path: `audio-downloads/${reciterId}/timing_${surahNum}.json`,
+      directory: Directory.Data,
+    });
+  } catch {
+  }
+
   await saveManifest();
 }
 
@@ -131,9 +153,11 @@ export async function deleteReciterDownloads(reciterId: string): Promise<void> {
     .filter(([, entry]) => entry.reciterId === reciterId && entry.source === 'download')
     .map(([key]) => key);
 
+  const surahsToClean = new Set<number>();
   for (const key of keysToDelete) {
     const entry = manifest.files[key];
     if (!entry) continue;
+    surahsToClean.add(entry.surahNumber);
     try {
       await Filesystem.deleteFile({
         path: entry.filePath,
@@ -143,6 +167,16 @@ export async function deleteReciterDownloads(reciterId: string): Promise<void> {
       console.error(`[DownloadManager] Failed to delete ${entry.filePath}:`, err);
     }
     removeManifestEntry(key);
+  }
+
+  for (const surahNum of surahsToClean) {
+    try {
+      await Filesystem.deleteFile({
+        path: `audio-downloads/${reciterId}/timing_${surahNum}.json`,
+        directory: Directory.Data,
+      });
+    } catch {
+    }
   }
 
   await saveManifest();

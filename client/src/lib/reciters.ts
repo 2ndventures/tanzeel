@@ -111,6 +111,21 @@ export const getReciterDisplayName = (id: string): string => {
 // Default reciter
 export const DEFAULT_RECITER = "alafasy";
 
+export const RECITER_TO_QURAN_COM_ID: Record<string, number> = {
+  'alafasy': 7,
+  'abdul_basit': 1,
+  'abdul_basit_mujawwad': 2,
+  'sudais': 12,
+  'ash_shaatree': 5,
+  'hudhaify': 3,
+  'hani_rifai': 9,
+  'akram_alalaqimy': 11,
+};
+
+export function getQuranComReciterId(reciterId: string): number {
+  return RECITER_TO_QURAN_COM_ID[reciterId] || 7;
+}
+
 // Legacy mapping for backward compatibility with old reciter IDs
 export const LEGACY_RECITER_MAP: Record<string, string> = {
   // Old string names
