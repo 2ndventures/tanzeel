@@ -895,7 +895,7 @@ export default function ChapterView({
                                 onClick={() => onArabicFontSizeChange?.(s.value)}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                                   arabicFontSize === s.value
-                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={arabicFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
@@ -919,8 +919,8 @@ export default function ChapterView({
                                 } ${
                                   translationFontSize === s.value
                                     ? s.value === 'Off'
-                                      ? 'bg-destructive/20 ring-1 ring-destructive text-destructive'
-                                      : 'bg-primary/20 ring-1 ring-primary text-primary'
+                                      ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                                      : 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={translationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
@@ -944,8 +944,8 @@ export default function ChapterView({
                                 } ${
                                   transliterationFontSize === s.value
                                     ? s.value === 'Off'
-                                      ? 'bg-destructive/20 ring-1 ring-destructive text-destructive'
-                                      : 'bg-primary/20 ring-1 ring-primary text-primary'
+                                      ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                                      : 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={transliterationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
@@ -978,7 +978,7 @@ export default function ChapterView({
                                 onClick={() => onArabicScriptChange?.(option.value)}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   arabicScript === option.value
-                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={arabicScript !== option.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
@@ -999,7 +999,7 @@ export default function ChapterView({
                                 onClick={() => onLineSpacingChange?.(spacing)}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                                   lineSpacing === spacing
-                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={lineSpacing !== spacing ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
