@@ -219,15 +219,17 @@ export default function OnboardingScreen({
                     {exampleVerse.arabicText}
                   </p>
 
-                  {/* Transliteration */}
-                  <p className={`${getTransliterationFontSize(transliterationFontSize)} italic text-muted-foreground transition-all duration-300`}>
-                    {exampleVerse.transliteration}
-                  </p>
+                  {transliterationFontSize !== "Off" && (
+                    <p className={`${getTransliterationFontSize(transliterationFontSize)} italic text-muted-foreground transition-all duration-300`}>
+                      {exampleVerse.transliteration}
+                    </p>
+                  )}
 
-                  {/* Translation */}
-                  <p className={`${getTranslationFontSize(translationFontSize)} text-foreground/90 transition-all duration-300`}>
-                    {exampleVerse.translation}
-                  </p>
+                  {translationFontSize !== "Off" && (
+                    <p className={`${getTranslationFontSize(translationFontSize)} text-foreground/90 transition-all duration-300`}>
+                      {exampleVerse.translation}
+                    </p>
+                  )}
 
                   {/* Chapter Info */}
                   <div className="pt-2 border-t border-border/50">
@@ -261,45 +263,47 @@ export default function OnboardingScreen({
                 />
               </div>
 
-              {/* Translation Font Size */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">
-                    Translation Text Size
-                  </label>
-                  <span className="text-xs text-muted-foreground">
-                    {translationFontSize}
-                  </span>
+              {translationFontSize !== "Off" && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">
+                      Translation Text Size
+                    </label>
+                    <span className="text-xs text-muted-foreground">
+                      {translationFontSize}
+                    </span>
+                  </div>
+                  <Slider
+                    value={[translationSizeToSlider(translationFontSize)]}
+                    onValueChange={([value]) => onTranslationFontSizeChange(sliderToTranslationSize(value))}
+                    max={100}
+                    step={1}
+                    className="w-full"
+                    data-testid="slider-translation-font-size"
+                  />
                 </div>
-                <Slider
-                  value={[translationSizeToSlider(translationFontSize)]}
-                  onValueChange={([value]) => onTranslationFontSizeChange(sliderToTranslationSize(value))}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-translation-font-size"
-                />
-              </div>
+              )}
 
-              {/* Transliteration Font Size */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">
-                    Transliteration Text Size
-                  </label>
-                  <span className="text-xs text-muted-foreground">
-                    {transliterationFontSize}
-                  </span>
+              {transliterationFontSize !== "Off" && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">
+                      Transliteration Text Size
+                    </label>
+                    <span className="text-xs text-muted-foreground">
+                      {transliterationFontSize}
+                    </span>
+                  </div>
+                  <Slider
+                    value={[transliterationSizeToSlider(transliterationFontSize)]}
+                    onValueChange={([value]) => onTransliterationFontSizeChange(sliderToTransliterationSize(value))}
+                    max={100}
+                    step={1}
+                    className="w-full"
+                    data-testid="slider-transliteration-font-size"
+                  />
                 </div>
-                <Slider
-                  value={[transliterationSizeToSlider(transliterationFontSize)]}
-                  onValueChange={([value]) => onTransliterationFontSizeChange(sliderToTransliterationSize(value))}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-transliteration-font-size"
-                />
-              </div>
+              )}
             </div>
 
             {/* Action Buttons */}

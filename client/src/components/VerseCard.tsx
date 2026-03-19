@@ -41,7 +41,7 @@ export default function VerseCard({
   onClick,
   arabicFontSize = "Large",
   translationFontSize = "Medium",
-  transliterationFontSize = "Small",
+  transliterationFontSize = "Off",
   lineSpacing = "Normal",
   showVerseNumbers = true,
   arabicScript = "uthmani",
