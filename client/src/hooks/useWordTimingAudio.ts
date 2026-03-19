@@ -738,7 +738,10 @@ export function useWordTimingAudio(
         vbvPreloadRef.current.audio.remove();
         vbvPreloadRef.current = null;
       }
-      if (audioRef.current) {
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      } else if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.src = '';
         audioRef.current.remove();
