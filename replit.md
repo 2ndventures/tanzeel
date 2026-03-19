@@ -101,10 +101,6 @@ The SurahJuz page features a 3-layer search system triggered when users type 3+ 
 
 When searching, the page title and tab switcher collapse to maximize screen space for results. Topic results show verse references with translation previews loaded on demand. Translation search results show highlighted matching text with context.
 
-## Resume Listening
-
-`client/src/lib/readingStats.ts` tracks `lastPlayedChapter` and `lastPlayedVerse` (separate from `lastReadChapter`/`lastReadVerse`). Updated whenever audio playback reaches a verse in ChapterView. The HomePage shows a "Resume Listening" card below the Continue Reading card when a previous audio position exists, allowing quick navigation back to the last listened verse.
-
 ## Download Progress Badge
 
 `client/src/lib/downloadState.ts` provides a lightweight pub/sub system for download activity state. AudioManager broadcasts download start/stop/cancel events. BottomNav subscribes and shows an animated pulsing dot on the Settings tab when a download is active, visible from any page.

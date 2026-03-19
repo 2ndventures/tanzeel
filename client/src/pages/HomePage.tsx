@@ -36,7 +36,7 @@ function getDailySurah() {
 }
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
-  const [stats, setStats] = useState({ dayStreak: 0, lastReadDate: '', versesRead: 0, weeklyMinutes: 0, weekStart: '', lastReadChapter: 1, lastReadVerse: 0, lastPlayedChapter: undefined as number | undefined, lastPlayedVerse: undefined as number | undefined });
+  const [stats, setStats] = useState({ dayStreak: 0, lastReadDate: '', versesRead: 0, weeklyMinutes: 0, weekStart: '', lastReadChapter: 1, lastReadVerse: 0 });
   const [daily, setDaily] = useState(() => getDailySurah());
   const dailyChapter = chapters.find(ch => ch.id === daily.id) || chapters[0];
   const dailyMeaning = surahMeanings[daily.id] || "";
@@ -120,35 +120,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               <span>{stats.lastReadVerse > 0 ? `${versesLeft} Ayahs left` : `Ready to start`}</span>
             </div>
           </div>
-
-          {stats.lastPlayedChapter && stats.lastPlayedVerse && stats.lastPlayedVerse > 0 && (
-            <div
-              className="relative overflow-hidden rounded-2xl bg-card/60 dark:bg-slate-900/40 backdrop-blur-sm p-4 border border-border/30 cursor-pointer animate-fade-in-up"
-              style={{ opacity: 0, animationDelay: '50ms', animationFillMode: 'forwards' }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onNavigate("chapter", stats.lastPlayedChapter!, undefined, stats.lastPlayedVerse!);
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastPlayedChapter!, undefined, stats.lastPlayedVerse!); }}}
-              aria-label={`Resume listening to ${chapters.find(ch => ch.id === stats.lastPlayedChapter)?.englishName || 'Quran'} at ayah ${stats.lastPlayedVerse}`}
-              data-testid="card-resume-listening"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15">
-                  <Icon icon="solar:headphones-round-sound-bold" className="size-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-foreground/60">Resume Listening</p>
-                  <p className="text-sm font-semibold text-foreground truncate">
-                    {chapters.find(ch => ch.id === stats.lastPlayedChapter)?.englishName || 'Quran'} — Ayah {stats.lastPlayedVerse}
-                  </p>
-                </div>
-                <Icon icon="solar:play-bold" className="size-5 text-primary shrink-0" />
-              </div>
-            </div>
-          )}
 
           <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="grid grid-cols-3 gap-4">

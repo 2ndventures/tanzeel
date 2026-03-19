@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { incrementVersesRead, addReadingTime, updateLastPlayed } from "@/lib/readingStats";
+import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -352,9 +352,6 @@ export default function ChapterView({
         completedVersesRef.current.add(verseKey);
         incrementVersesRead(1, verseKey);
       }
-      const [chStr, vStr] = verseKey.split(':');
-      updateLastPlayed(parseInt(chStr), parseInt(vStr));
-
       if (autoScroll && scrollContainerRef.current) {
         // Parse verse key (e.g., "1:2" -> verse 2)
         const verseNumber = parseInt(verseKey.split(':')[1]);
@@ -505,7 +502,7 @@ export default function ChapterView({
 
     initialVerseHandledRef.current = true;
 
-    requestAnimationFrame(() => {
+    const scrollToVerse = () => {
       const verseElement = document.querySelector(`[data-testid="card-verse-${initialVerse}"]`);
       const container = scrollContainerRef.current;
       if (verseElement && container) {
@@ -519,6 +516,10 @@ export default function ChapterView({
       const verseKey = `${chapterId}:${initialVerse}`;
       seekToVerse(verseKey);
       playAudio();
+    };
+
+    requestAnimationFrame(() => {
+      setTimeout(scrollToVerse, 100);
     });
   }, [initialVerse, isLoadingVerses, verses, chapterId, seekToVerse, playAudio]);
 
