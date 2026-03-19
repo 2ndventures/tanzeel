@@ -8,9 +8,9 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ChevronRight, ChevronLeft, Check, Trash2, CircleOff } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { getCacheStats, setMaxCacheSize, clearCache, getManifest } from "@/services/audioCache";
+import { getCacheStats, clearCache, getManifest } from "@/services/audioCache";
 
 function getDownloadedSize(): number {
   const manifest = getManifest();
@@ -304,6 +304,22 @@ export default function Settings({
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
               <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+              <PillRow
+                label="Arabic Script"
+                value={arabicScript}
+                options={[{ label: "Uthmani", value: "uthmani" }, { label: "IndoPak", value: "indopak" }, { label: "Tajweed", value: "tajweed" }]}
+                onChange={(v) => onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed')}
+                testIdPrefix="button-script"
+              />
+              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+              <PillRow
+                label="Line Spacing"
+                value={lineSpacing}
+                options={[{ label: "Compact", value: "Compact" }, { label: "Normal", value: "Normal" }, { label: "Relaxed", value: "Relaxed" }, { label: "Loose", value: "Loose" }]}
+                onChange={onLineSpacingChange}
+                testIdPrefix="button-spacing"
+              />
+              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Verse numbers" checked={showVerseNumbers} onCheckedChange={onShowVerseNumbersChange} testId="toggle-verse-numbers" />
             </div>
           </div>
@@ -335,29 +351,6 @@ export default function Settings({
                 options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
                 onChange={onTransliterationFontSizeChange}
                 testIdPrefix="button-transliteration-size"
-              />
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-3" data-testid="section-appearance">
-              Appearance
-            </h3>
-            <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-              <PillRow
-                label="Arabic Script"
-                value={arabicScript}
-                options={[{ label: "Uthmani", value: "uthmani" }, { label: "IndoPak", value: "indopak" }, { label: "Tajweed", value: "tajweed" }]}
-                onChange={(v) => onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed')}
-                testIdPrefix="button-script"
-              />
-              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Line Spacing"
-                value={lineSpacing}
-                options={[{ label: "Compact", value: "Compact" }, { label: "Normal", value: "Normal" }, { label: "Relaxed", value: "Relaxed" }, { label: "Loose", value: "Loose" }]}
-                onChange={onLineSpacingChange}
-                testIdPrefix="button-spacing"
               />
             </div>
           </div>
@@ -410,71 +403,49 @@ export default function Settings({
                 <div>
                   <p className="text-sm text-foreground/80">Audio Cache</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {cacheStats.fileCount} {cacheStats.fileCount === 1 ? 'file' : 'files'} cached
+                    {formatBytes(cacheStats.totalSizeBytes)} used
                   </p>
                 </div>
-                <span className="text-sm font-medium text-foreground/70" data-testid="text-cache-usage">
-                  {formatBytes(cacheStats.totalSizeBytes)} used
-                </span>
-              </div>
-              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Cache Limit"
-                value={String(cacheStats.maxSizeBytes)}
-                options={[
-                  { label: "500 MB", value: "524288000" },
-                  { label: "1 GB", value: "1073741824" },
-                  { label: "2 GB", value: "2147483648" },
-                  { label: "5 GB", value: "5368709120" },
-                ]}
-                onChange={async (v) => {
-                  const bytes = parseInt(v);
-                  await setMaxCacheSize(bytes);
-                  refreshCacheStats();
-                }}
-                testIdPrefix="button-cache-limit"
-              />
-              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <div className="py-3">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <button
-                      className="w-full flex items-center justify-between hover-elevate active-elevate-2 rounded-md"
-                      disabled={isClearing || cacheStats.fileCount === 0}
-                      data-testid="button-clear-cache"
-                    >
-                      <span className={`text-sm ${cacheStats.fileCount === 0 ? 'text-muted-foreground/50' : 'text-destructive'}`}>
-                        Clear Audio Cache
-                      </span>
-                      <Trash2 className={`w-4 h-4 shrink-0 ${cacheStats.fileCount === 0 ? 'text-muted-foreground/50' : 'text-destructive/70'}`} />
-                    </button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Clear Audio Cache</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Clear all cached audio? You'll need an internet connection to listen again.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel data-testid="button-cancel-clear-cache">Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={async () => {
-                          setIsClearing(true);
-                          try {
-                            await clearCache();
-                            refreshCacheStats();
-                          } finally {
-                            setIsClearing(false);
-                          }
-                        }}
-                        data-testid="button-confirm-clear-cache"
+                {cacheStats.fileCount > 0 ? (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        className="text-xs text-destructive hover-elevate active-elevate-2 rounded-md px-2 py-1"
+                        disabled={isClearing}
+                        data-testid="button-clear-cache"
                       >
-                        {isClearing ? "Clearing..." : "Clear Cache"}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                        {isClearing ? "Clearing..." : "Clear"}
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Clear Audio Cache</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Clear all cached audio? You'll need an internet connection to listen again.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel data-testid="button-cancel-clear-cache">Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            setIsClearing(true);
+                            try {
+                              await clearCache();
+                              refreshCacheStats();
+                            } finally {
+                              setIsClearing(false);
+                            }
+                          }}
+                          data-testid="button-confirm-clear-cache"
+                        >
+                          Clear Cache
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                ) : (
+                  <span className="text-xs text-muted-foreground/50" data-testid="text-cache-usage">Empty</span>
+                )}
               </div>
             </div>
           </div>
