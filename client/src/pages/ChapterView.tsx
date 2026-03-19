@@ -918,7 +918,9 @@ export default function ChapterView({
                                   s.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
                                 } ${
                                   translationFontSize === s.value
-                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    ? s.value === 'Off'
+                                      ? 'bg-destructive/20 ring-1 ring-destructive text-destructive'
+                                      : 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={translationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
@@ -941,7 +943,9 @@ export default function ChapterView({
                                   s.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
                                 } ${
                                   transliterationFontSize === s.value
-                                    ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                                    ? s.value === 'Off'
+                                      ? 'bg-destructive/20 ring-1 ring-destructive text-destructive'
+                                      : 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
                                 style={transliterationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}

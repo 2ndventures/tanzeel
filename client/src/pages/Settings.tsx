@@ -80,7 +80,9 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
               opt.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
             } ${
               value === opt.value
-                ? 'bg-primary/20 ring-1 ring-primary text-primary'
+                ? opt.value === 'Off'
+                  ? 'bg-destructive/20 ring-1 ring-destructive text-destructive'
+                  : 'bg-primary/20 ring-1 ring-primary text-primary'
                 : 'text-muted-foreground'
             }`}
             style={value !== opt.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
