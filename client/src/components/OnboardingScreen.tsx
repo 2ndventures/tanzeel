@@ -81,16 +81,18 @@ export default function OnboardingScreen({
 
   const translationSizeToSlider = (size: string): number => {
     switch(size) {
-      case "Small": return 0;
-      case "Medium": return 50;
+      case "Off": return 0;
+      case "Small": return 33;
+      case "Medium": return 66;
       case "Large": return 100;
-      default: return 50;
+      default: return 66;
     }
   };
 
   const sliderToTranslationSize = (value: number): string => {
-    if (value <= 33) return "Small";
-    if (value <= 66) return "Medium";
+    if (value <= 12) return "Off";
+    if (value <= 45) return "Small";
+    if (value <= 78) return "Medium";
     return "Large";
   };
 
@@ -105,15 +107,17 @@ export default function OnboardingScreen({
 
   const transliterationSizeToSlider = (size: string): number => {
     switch(size) {
-      case "Small": return 0;
-      case "Medium": return 50;
+      case "Off": return 0;
+      case "Small": return 33;
+      case "Medium": return 66;
       case "Large": return 100;
       default: return 0;
     }
   };
 
   const sliderToTransliterationSize = (value: number): string => {
-    if (value <= 33) return "Small";
+    if (value <= 12) return "Off";
+    if (value <= 45) return "Small";
     if (value <= 66) return "Medium";
     return "Large";
   };
@@ -263,47 +267,43 @@ export default function OnboardingScreen({
                 />
               </div>
 
-              {translationFontSize !== "Off" && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-foreground">
-                      Translation Text Size
-                    </label>
-                    <span className="text-xs text-muted-foreground">
-                      {translationFontSize}
-                    </span>
-                  </div>
-                  <Slider
-                    value={[translationSizeToSlider(translationFontSize)]}
-                    onValueChange={([value]) => onTranslationFontSizeChange(sliderToTranslationSize(value))}
-                    max={100}
-                    step={1}
-                    className="w-full"
-                    data-testid="slider-translation-font-size"
-                  />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-foreground">
+                    Translation
+                  </label>
+                  <span className={`text-xs ${translationFontSize === "Off" ? "text-destructive" : "text-muted-foreground"}`}>
+                    {translationFontSize}
+                  </span>
                 </div>
-              )}
+                <Slider
+                  value={[translationSizeToSlider(translationFontSize)]}
+                  onValueChange={([value]) => onTranslationFontSizeChange(sliderToTranslationSize(value))}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                  data-testid="slider-translation-font-size"
+                />
+              </div>
 
-              {transliterationFontSize !== "Off" && (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium text-foreground">
-                      Transliteration Text Size
-                    </label>
-                    <span className="text-xs text-muted-foreground">
-                      {transliterationFontSize}
-                    </span>
-                  </div>
-                  <Slider
-                    value={[transliterationSizeToSlider(transliterationFontSize)]}
-                    onValueChange={([value]) => onTransliterationFontSizeChange(sliderToTransliterationSize(value))}
-                    max={100}
-                    step={1}
-                    className="w-full"
-                    data-testid="slider-transliteration-font-size"
-                  />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-foreground">
+                    Transliteration
+                  </label>
+                  <span className={`text-xs ${transliterationFontSize === "Off" ? "text-destructive" : "text-muted-foreground"}`}>
+                    {transliterationFontSize}
+                  </span>
                 </div>
-              )}
+                <Slider
+                  value={[transliterationSizeToSlider(transliterationFontSize)]}
+                  onValueChange={([value]) => onTransliterationFontSizeChange(sliderToTransliterationSize(value))}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                  data-testid="slider-transliteration-font-size"
+                />
+              </div>
             </div>
 
             {/* Action Buttons */}
