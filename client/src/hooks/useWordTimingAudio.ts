@@ -9,6 +9,7 @@ import {
   getOfflineTimingData,
 } from '@/services/audioCache';
 import { RECITER_TO_QURAN_COM_ID } from '@/lib/reciters';
+import { chapters } from '@/lib/quranMetadata';
 
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
 const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
@@ -493,6 +494,20 @@ export function useWordTimingAudio(
       setState(prev => ({ ...prev, isLoading: true, error: null }));
 
       syncSpeed();
+
+      const reciterString = quranComIdToReciterString(reciterId);
+      if (reciterString) {
+        const downloadedVerses = getDownloadedVerseNumbers(reciterString, chapterId);
+        const chapterMeta = chapters.find(ch => ch.id === chapterId);
+        const totalVerses = chapterMeta?.verseCount ?? 0;
+        if (totalVerses > 0 && downloadedVerses.length >= totalVerses) {
+          try {
+            const fellBack = await tryVerseByVerseFallback();
+            if (fellBack) return;
+          } catch {
+          }
+        }
+      }
 
       const timingUrl = `${API_BASE_URL}/api/audio-timing/${reciterId}/${chapterId}`;
 
