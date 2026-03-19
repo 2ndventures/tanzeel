@@ -110,6 +110,7 @@ export function useWordTimingAudio(
   const vbvCurrentVerseRef = useRef(0);
   const vbvAvailableVersesRef = useRef<number[]>([]);
   const vbvTimingsRef = useRef<WordSegment[]>([]);
+  const vbvPreloadRef = useRef<{ verseNum: number; audio: HTMLAudioElement; uri: string } | null>(null);
 
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
@@ -210,78 +211,42 @@ export function useWordTimingAudio(
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const loadVerseByVerseAudio = useCallback(async (
-    verseNum: number,
-    shouldPlay: boolean,
+  const preloadNextVerse = useCallback(async (
+    currentVerseNum: number,
     reciterString: string
   ) => {
     const available = vbvAvailableVersesRef.current;
-    if (!available.includes(verseNum)) {
-      const nextAvailable = available.find(v => v > verseNum);
-      if (nextAvailable) {
-        setState(prev => ({
-          ...prev,
-          error: `Verse ${verseNum} not available offline, skipping...`,
-        }));
-        if (vbvSkipTimerRef.current) clearTimeout(vbvSkipTimerRef.current);
-        const currentLoadId = loadIdRef.current;
-        vbvSkipTimerRef.current = setTimeout(() => {
-          if (loadIdRef.current === currentLoadId) {
-            loadVerseByVerseAudio(nextAvailable, shouldPlay, reciterString);
-          }
-        }, 1500);
-        return;
-      }
-      setState(prev => ({
-        ...prev,
-        isPlaying: false,
-        isLoading: false,
-        error: 'No more downloaded verses available',
-      }));
-      onEndedRef.current?.();
-      return;
+    const idx = available.indexOf(currentVerseNum);
+    if (idx < 0 || idx >= available.length - 1) return;
+    const nextVerse = available[idx + 1];
+
+    if (vbvPreloadRef.current?.verseNum === nextVerse) return;
+
+    if (vbvPreloadRef.current) {
+      vbvPreloadRef.current.audio.pause();
+      vbvPreloadRef.current.audio.src = '';
+      vbvPreloadRef.current.audio.remove();
+      vbvPreloadRef.current = null;
     }
 
-    setState(prev => ({ ...prev, isLoading: true, error: null }));
-    vbvCurrentVerseRef.current = verseNum;
+    const uri = await getCachedAudioUri(reciterString, chapterId, nextVerse);
+    if (!uri) return;
 
+    const preloadAudio = document.createElement('audio');
+    preloadAudio.preload = 'auto';
+    preloadAudio.src = uri;
+    preloadAudio.load();
+    vbvPreloadRef.current = { verseNum: nextVerse, audio: preloadAudio, uri };
+  }, [chapterId]);
+
+  const attachVerseListeners = useCallback((
+    audio: HTMLAudioElement,
+    verseNum: number,
+    reciterString: string,
+    shouldPlay: boolean
+  ) => {
+    const available = vbvAvailableVersesRef.current;
     const verseKey = `${chapterId}:${verseNum}`;
-    setState(prev => ({
-      ...prev,
-      currentVerseKey: verseKey,
-      currentWordIndex: null,
-    }));
-    onVerseChangeRef.current?.(verseKey);
-
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-      audioRef.current.remove();
-      audioRef.current = null;
-    }
-
-    const uri = await getCachedAudioUri(reciterString, chapterId, verseNum);
-    if (!uri) {
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: `Verse ${verseNum} file missing from storage`,
-      }));
-      return;
-    }
-
-    if (!audioContainerRef.current) {
-      const container = document.createElement('div');
-      container.style.display = 'none';
-      container.id = `quran-audio-player-${chapterId}`;
-      document.body.appendChild(container);
-      audioContainerRef.current = container;
-    }
-
-    const audio = document.createElement('audio');
-    audio.preload = 'auto';
-    audioContainerRef.current.appendChild(audio);
-
     const verseTiming = vbvTimingsRef.current.find(t => t.verse_key === verseKey);
 
     const handleLoadedMetadata = () => {
@@ -317,6 +282,7 @@ export function useWordTimingAudio(
 
     const handlePlay = () => {
       setState(prev => ({ ...prev, isPlaying: true, error: null }));
+      preloadNextVerse(verseNum, reciterString);
     };
 
     const handlePause = () => {
@@ -356,11 +322,6 @@ export function useWordTimingAudio(
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
-    audio.src = uri;
-    audio.playbackRate = speedRef.current;
-    audio.load();
-    audioRef.current = audio;
-
     cleanupRef.current = () => {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
@@ -374,7 +335,114 @@ export function useWordTimingAudio(
       audio.remove();
       audioRef.current = null;
     };
-  }, [chapterId, findVbvWordIndex]);
+  }, [chapterId, findVbvWordIndex, preloadNextVerse]);
+
+  const loadVerseByVerseAudio = useCallback(async (
+    verseNum: number,
+    shouldPlay: boolean,
+    reciterString: string
+  ) => {
+    const available = vbvAvailableVersesRef.current;
+    if (!available.includes(verseNum)) {
+      const nextAvailable = available.find(v => v > verseNum);
+      if (nextAvailable) {
+        setState(prev => ({
+          ...prev,
+          error: `Verse ${verseNum} not available offline, skipping...`,
+        }));
+        if (vbvSkipTimerRef.current) clearTimeout(vbvSkipTimerRef.current);
+        const currentLoadId = loadIdRef.current;
+        vbvSkipTimerRef.current = setTimeout(() => {
+          if (loadIdRef.current === currentLoadId) {
+            loadVerseByVerseAudio(nextAvailable, shouldPlay, reciterString);
+          }
+        }, 1500);
+        return;
+      }
+      setState(prev => ({
+        ...prev,
+        isPlaying: false,
+        isLoading: false,
+        error: 'No more downloaded verses available',
+      }));
+      onEndedRef.current?.();
+      return;
+    }
+
+    vbvCurrentVerseRef.current = verseNum;
+    const verseKey = `${chapterId}:${verseNum}`;
+    setState(prev => ({
+      ...prev,
+      currentVerseKey: verseKey,
+      currentWordIndex: null,
+      error: null,
+    }));
+    onVerseChangeRef.current?.(verseKey);
+
+    if (cleanupRef.current) {
+      cleanupRef.current();
+      cleanupRef.current = null;
+    }
+
+    if (!audioContainerRef.current) {
+      const container = document.createElement('div');
+      container.style.display = 'none';
+      container.id = `quran-audio-player-${chapterId}`;
+      document.body.appendChild(container);
+      audioContainerRef.current = container;
+    }
+
+    const preloaded = vbvPreloadRef.current;
+    if (preloaded && preloaded.verseNum === verseNum) {
+      vbvPreloadRef.current = null;
+      const audio = preloaded.audio;
+      audioContainerRef.current.appendChild(audio);
+      audioRef.current = audio;
+      attachVerseListeners(audio, verseNum, reciterString, shouldPlay);
+
+      if (audio.readyState >= 3) {
+        audio.playbackRate = speedRef.current;
+        setState(prev => ({ ...prev, isLoading: false, duration: audio.duration || 0, currentTime: 0 }));
+        if (shouldPlay) {
+          audio.play().catch(() => {
+            setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
+          });
+        }
+        preloadNextVerse(verseNum, reciterString);
+      } else {
+        setState(prev => ({ ...prev, isLoading: true }));
+      }
+      return;
+    }
+
+    setState(prev => ({ ...prev, isLoading: true }));
+
+    if (preloaded) {
+      preloaded.audio.pause();
+      preloaded.audio.src = '';
+      preloaded.audio.remove();
+      vbvPreloadRef.current = null;
+    }
+
+    const uri = await getCachedAudioUri(reciterString, chapterId, verseNum);
+    if (!uri) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: `Verse ${verseNum} file missing from storage`,
+      }));
+      return;
+    }
+
+    const audio = document.createElement('audio');
+    audio.preload = 'auto';
+    audioContainerRef.current.appendChild(audio);
+    audioRef.current = audio;
+    attachVerseListeners(audio, verseNum, reciterString, shouldPlay);
+    audio.src = uri;
+    audio.playbackRate = speedRef.current;
+    audio.load();
+  }, [chapterId, attachVerseListeners, preloadNextVerse]);
 
   const tryVerseByVerseFallback = useCallback(async (): Promise<boolean> => {
     if (verseByVerseRef.current) return false;
@@ -411,6 +479,13 @@ export function useWordTimingAudio(
       if (cleanupRef.current) {
         cleanupRef.current();
         cleanupRef.current = null;
+      }
+
+      if (vbvPreloadRef.current) {
+        vbvPreloadRef.current.audio.pause();
+        vbvPreloadRef.current.audio.src = '';
+        vbvPreloadRef.current.audio.remove();
+        vbvPreloadRef.current = null;
       }
 
       verseByVerseRef.current = false;
@@ -656,6 +731,12 @@ export function useWordTimingAudio(
       if (vbvSkipTimerRef.current) {
         clearTimeout(vbvSkipTimerRef.current);
         vbvSkipTimerRef.current = null;
+      }
+      if (vbvPreloadRef.current) {
+        vbvPreloadRef.current.audio.pause();
+        vbvPreloadRef.current.audio.src = '';
+        vbvPreloadRef.current.audio.remove();
+        vbvPreloadRef.current = null;
       }
       if (audioRef.current) {
         audioRef.current.pause();
