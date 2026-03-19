@@ -11,6 +11,33 @@ import {
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
 import { API_BASE_URL } from '@/config';
+import { setItem, getItem, removeItem } from '@/lib/storage';
+
+const PENDING_DOWNLOAD_KEY = 'pendingDownload';
+
+export interface PendingDownload {
+  type: 'surah' | 'all';
+  reciterId: string;
+  surahNum?: number;
+}
+
+export async function savePendingDownload(pending: PendingDownload): Promise<void> {
+  await setItem(PENDING_DOWNLOAD_KEY, JSON.stringify(pending));
+}
+
+export async function getPendingDownload(): Promise<PendingDownload | null> {
+  const raw = await getItem(PENDING_DOWNLOAD_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as PendingDownload;
+  } catch {
+    return null;
+  }
+}
+
+export async function clearPendingDownload(): Promise<void> {
+  await removeItem(PENDING_DOWNLOAD_KEY);
+}
 
 let cancelFlag = false;
 

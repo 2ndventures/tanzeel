@@ -12,6 +12,10 @@ import {
   cancelDownload,
   deleteSurahDownload,
   getDownloadStatus,
+  savePendingDownload,
+  getPendingDownload,
+  clearPendingDownload,
+  type PendingDownload,
 } from "@/services/audioDownloadManager";
 
 function formatBytes(bytes: number): string {
@@ -72,6 +76,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
   const [confirmSurah, setConfirmSurah] = useState<number | null>(null);
   const [confirmAll, setConfirmAll] = useState(false);
   const [deleteSurahNum, setDeleteSurahNum] = useState<number | null>(null);
+  const [resumePrompt, setResumePrompt] = useState<PendingDownload | null>(null);
   const downloadingRef = useRef(false);
 
   const refreshAll = useCallback(() => {
@@ -86,7 +91,23 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
 
   useEffect(() => {
     refreshAll();
-  }, [refreshAll]);
+    getPendingDownload().then((pending) => {
+      if (pending && pending.reciterId === reciter) {
+        const isComplete = pending.type === 'all'
+          ? chapters.every(ch => getDownloadStatus(reciter, ch.id, ch.verseCount) === 'complete')
+          : pending.surahNum
+            ? getDownloadStatus(reciter, pending.surahNum, chapters.find(c => c.id === pending.surahNum)?.verseCount || 0) === 'complete'
+            : false;
+        if (isComplete) {
+          clearPendingDownload();
+        } else {
+          setResumePrompt(pending);
+        }
+      } else if (pending) {
+        clearPendingDownload();
+      }
+    });
+  }, [refreshAll, reciter]);
 
   const handleDownloadSurah = useCallback(async (surahNum: number) => {
     const ch = chapters.find((c) => c.id === surahNum);
@@ -94,6 +115,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
 
     downloadingRef.current = true;
     setActiveDownload({ type: "surah", surahNum, percent: 0 });
+    await savePendingDownload({ type: "surah", reciterId: reciter, surahNum });
 
     await downloadSurah(reciter, surahNum, ch.verseCount, (percent) => {
       setActiveDownload((prev) => (prev ? { ...prev, percent } : null));
@@ -102,6 +124,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
     downloadingRef.current = false;
     setActiveDownload(null);
     setCancelling(false);
+    await clearPendingDownload();
     refreshAll();
   }, [reciter, refreshAll]);
 
@@ -110,6 +133,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
 
     downloadingRef.current = true;
     setActiveDownload({ type: "all", percent: 0 });
+    await savePendingDownload({ type: "all", reciterId: reciter });
 
     let completedSurahs = 0;
     await downloadAllSurahs(reciter, (surahNum, percent) => {
@@ -124,6 +148,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
     downloadingRef.current = false;
     setActiveDownload(null);
     setCancelling(false);
+    await clearPendingDownload();
     refreshAll();
   }, [reciter, refreshAll]);
 
@@ -132,6 +157,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
   const handleCancel = useCallback(() => {
     setCancelling(true);
     cancelDownload();
+    clearPendingDownload();
   }, []);
 
   const handleDeleteSurah = useCallback(async (surahNum: number) => {
@@ -329,13 +355,47 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
         </div>
       </div>
 
+      <AlertDialog open={resumePrompt !== null} onOpenChange={(open) => { if (!open) { setResumePrompt(null); clearPendingDownload(); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Resume Download</AlertDialogTitle>
+            <AlertDialogDescription>
+              {resumePrompt?.type === 'all'
+                ? 'A full Quran download was interrupted. Would you like to resume? Already downloaded surahs will be skipped.'
+                : `A download for ${chapters.find(c => c.id === resumePrompt?.surahNum)?.englishName || 'a surah'} was interrupted. Would you like to resume?`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => { setResumePrompt(null); clearPendingDownload(); }}
+              data-testid="button-dismiss-resume"
+            >
+              Dismiss
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (resumePrompt?.type === 'all') {
+                  handleDownloadAll();
+                } else if (resumePrompt?.surahNum) {
+                  handleDownloadSurah(resumePrompt.surahNum);
+                }
+                setResumePrompt(null);
+              }}
+              data-testid="button-confirm-resume"
+            >
+              Resume
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={confirmSurah !== null} onOpenChange={(open) => { if (!open) setConfirmSurah(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Download Audio</AlertDialogTitle>
             <AlertDialogDescription>
               Download {chapters.find((c) => c.id === confirmSurah)?.englishName} audio (~{ESTIMATED_MB_PER_SURAH} MB)?
-              This will be stored on your device for offline listening.
+              This will be stored on your device for offline listening. Please keep the app open while downloading.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -361,7 +421,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
             <AlertDialogTitle>Download Full Quran</AlertDialogTitle>
             <AlertDialogDescription>
               Download full Quran audio for {reciterName} ({totalEstimatedSize})?
-              This may take 15–30 minutes on a typical connection.
+              This may take 15–30 minutes on a typical connection. Please keep the app open while downloading. If interrupted, you can resume from where it left off.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
