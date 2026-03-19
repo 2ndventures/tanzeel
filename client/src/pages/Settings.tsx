@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { ChevronRight, ChevronLeft, Check, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { getCacheStats, clearCache, getManifest } from "@/services/audioCache";
+import { getCacheOnlyStats, clearCache, getManifest } from "@/services/audioCache";
 
 function getDownloadedSize(): number {
   const manifest = getManifest();
@@ -154,11 +154,11 @@ export default function Settings({
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reciterView, setReciterView] = useState(false);
-  const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, maxSizeBytes: 2147483648, fileCount: 0 });
+  const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, fileCount: 0 });
   const [isClearing, setIsClearing] = useState(false);
 
   const refreshCacheStats = useCallback(() => {
-    setCacheStats(getCacheStats());
+    setCacheStats(getCacheOnlyStats());
   }, []);
 
   useEffect(() => {

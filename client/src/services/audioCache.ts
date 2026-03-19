@@ -293,6 +293,21 @@ export function getCacheStats(): { totalSizeBytes: number; maxSizeBytes: number;
   };
 }
 
+export function getCacheOnlyStats(): { totalSizeBytes: number; fileCount: number } {
+  if (!manifest) {
+    return { totalSizeBytes: 0, fileCount: 0 };
+  }
+  let totalSizeBytes = 0;
+  let fileCount = 0;
+  for (const entry of Object.values(manifest.files)) {
+    if (entry.source === 'cache') {
+      totalSizeBytes += entry.sizeBytes;
+      fileCount++;
+    }
+  }
+  return { totalSizeBytes, fileCount };
+}
+
 export async function clearCache(): Promise<void> {
   if (!manifest) return;
   try {
@@ -304,16 +319,21 @@ export async function clearCache(): Promise<void> {
       });
     } catch {
     }
-    try {
-      await Filesystem.rmdir({
-        path: AUDIO_DOWNLOAD_DIR,
-        directory: Directory.Data,
-        recursive: true,
-      });
-    } catch {
-    }
 
-    manifest = createDefaultManifest();
+    const keysToRemove: string[] = [];
+    let removedBytes = 0;
+    for (const [key, entry] of Object.entries(manifest.files)) {
+      if (entry.source === 'cache') {
+        keysToRemove.push(key);
+        removedBytes += entry.sizeBytes;
+      }
+    }
+    for (const key of keysToRemove) {
+      delete manifest.files[key];
+    }
+    manifest.totalSizeBytes -= removedBytes;
+    if (manifest.totalSizeBytes < 0) manifest.totalSizeBytes = 0;
+
     await saveManifest();
   } catch (err) {
     console.error('[AudioCache] Failed to clear cache:', err);
