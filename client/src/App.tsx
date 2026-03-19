@@ -106,19 +106,31 @@ function App() {
       if (savedArabicFont) setArabicFontSize(savedArabicFont);
 
       const savedTransFont = await getItem('translationFontSize');
-      if (savedTransFont) {
-        setTranslationFontSize(savedTransFont);
-      } else if (savedTranslation !== null && !JSON.parse(savedTranslation)) {
-        setTranslationFontSize("Off");
-      }
-
       const savedTranslitFont = await getItem('transliterationFontSize');
-      if (savedTranslitFont) {
-        setTransliterationFontSize(savedTranslitFont);
-      } else if (savedTranslit !== null && !JSON.parse(savedTranslit)) {
-        setTransliterationFontSize("Off");
-      } else if (savedTranslit !== null && JSON.parse(savedTranslit)) {
-        setTransliterationFontSize("Small");
+      const toggleMigrated = await getItem('toggleMigrationDone');
+
+      if (!toggleMigrated) {
+        if (savedTranslation !== null && !JSON.parse(savedTranslation)) {
+          setTranslationFontSize("Off");
+          await setItem('translationFontSize', "Off");
+        } else if (savedTransFont) {
+          setTranslationFontSize(savedTransFont);
+        }
+
+        if (savedTranslit !== null && !JSON.parse(savedTranslit)) {
+          setTransliterationFontSize("Off");
+          await setItem('transliterationFontSize', "Off");
+        } else if (savedTranslitFont) {
+          setTransliterationFontSize(savedTranslitFont);
+        } else if (savedTranslit !== null && JSON.parse(savedTranslit)) {
+          setTransliterationFontSize("Small");
+          await setItem('transliterationFontSize', "Small");
+        }
+
+        await setItem('toggleMigrationDone', 'true');
+      } else {
+        if (savedTransFont) setTranslationFontSize(savedTransFont);
+        if (savedTranslitFont) setTransliterationFontSize(savedTranslitFont);
       }
 
       const savedSpacing = await getItem('lineSpacing');
