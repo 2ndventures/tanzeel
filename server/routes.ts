@@ -2,7 +2,52 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Readable, pipeline } from "stream";
 
+let searchIndex: Array<{ chapterId: number; verseNumber: number; translation: string }> | null = null;
+
+async function getSearchIndex() {
+  if (searchIndex) return searchIndex;
+  const fs = await import('fs/promises');
+  const path = await import('path');
+  const entries: Array<{ chapterId: number; verseNumber: number; translation: string }> = [];
+  for (let i = 1; i <= 114; i++) {
+    try {
+      const filePath = path.default.join(process.cwd(), 'public', 'data', 'chapters', `${i}.json`);
+      const raw = await fs.readFile(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+      for (const verse of data.verses || []) {
+        entries.push({ chapterId: i, verseNumber: verse.number, translation: verse.translation || '' });
+      }
+    } catch {}
+  }
+  searchIndex = entries;
+  return searchIndex;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.get("/api/search", async (req, res) => {
+    try {
+      const q = (req.query.q as string || '').trim().toLowerCase();
+      if (q.length < 2) return res.json({ results: [] });
+
+      const index = await getSearchIndex();
+      const results: Array<{ chapterId: number; verseNumber: number; translation: string }> = [];
+      const limit = 30;
+
+      for (const entry of index) {
+        if (entry.translation.toLowerCase().includes(q)) {
+          results.push(entry);
+          if (results.length >= limit) break;
+        }
+      }
+
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.json({ results });
+    } catch (error) {
+      console.error('Search error:', error);
+      res.status(500).json({ error: 'Search failed' });
+    }
+  });
+
   // Verse-by-verse audio proxy for EveryAyah.com
   app.get("/api/verse-audio/:reciterFolder/:surah/:ayah", async (req, res) => {
     try {

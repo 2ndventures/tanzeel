@@ -5,13 +5,19 @@ import ChapterCard from "@/components/ChapterCard";
 import BottomNav from "@/components/BottomNav";
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
-import { Search, BookOpen, ArrowRight } from "lucide-react";
+import { Search, BookOpen, ArrowRight, Loader } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
 
 interface TopicResult {
   chapterId: number;
   verseNumber: number;
   topic: string;
+}
+
+interface VerseSearchResult {
+  chapterId: number;
+  verseNumber: number;
+  translation: string;
 }
 
 interface SurahJuzProps {
@@ -28,7 +34,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
   const hasActiveSearch = searchQuery.trim().length >= 3;
 
   const [translationCache, setTranslationCache] = useState<Record<string, string>>({});
+  const [verseSearchResults, setVerseSearchResults] = useState<VerseSearchResult[]>([]);
+  const [isSearchingVerses, setIsSearchingVerses] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const verseSearchRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchAbortRef = useRef<AbortController | null>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -109,6 +119,40 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
   }, [searchQuery]);
 
   useEffect(() => {
+    if (verseSearchRef.current) clearTimeout(verseSearchRef.current);
+    if (searchAbortRef.current) searchAbortRef.current.abort();
+    const q = searchQuery.trim();
+    if (q.length < 3) {
+      setVerseSearchResults([]);
+      setIsSearchingVerses(false);
+      return;
+    }
+    setIsSearchingVerses(true);
+    verseSearchRef.current = setTimeout(() => {
+      const controller = new AbortController();
+      searchAbortRef.current = controller;
+      fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: controller.signal })
+        .then(r => {
+          if (!r.ok) throw new Error('Search failed');
+          return r.json();
+        })
+        .then(data => {
+          if (!controller.signal.aborted) {
+            setVerseSearchResults(data.results || []);
+            setIsSearchingVerses(false);
+          }
+        })
+        .catch((err) => {
+          if (err.name !== 'AbortError') {
+            setVerseSearchResults([]);
+            setIsSearchingVerses(false);
+          }
+        });
+    }, 400);
+    return () => { if (verseSearchRef.current) clearTimeout(verseSearchRef.current); };
+  }, [searchQuery]);
+
+  useEffect(() => {
     if (topicResults.length === 0) return;
 
     const chapterIds = Array.from(new Set(topicResults.map(r => r.chapterId)));
@@ -133,6 +177,23 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
 
   const hasSearchQuery = hasActiveSearch;
   const showTopicResults = hasSearchQuery && topicResults.length > 0;
+  const showVerseSearch = hasSearchQuery && verseSearchResults.length > 0;
+
+  function highlightMatch(text: string, query: string) {
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) return text;
+    const start = Math.max(0, idx - 60);
+    const end = Math.min(text.length, idx + query.length + 60);
+    const snippet = (start > 0 ? '...' : '') + text.slice(start, end) + (end < text.length ? '...' : '');
+    const snipIdx = snippet.toLowerCase().indexOf(query.toLowerCase());
+    return (
+      <span>
+        {snippet.slice(0, snipIdx)}
+        <span className="bg-primary/20 text-primary font-medium rounded-sm px-0.5">{snippet.slice(snipIdx, snipIdx + query.length)}</span>
+        {snippet.slice(snipIdx + query.length)}
+      </span>
+    );
+  }
 
   const filteredJuz = juzData.filter((juz) => {
     const query = searchQuery.toLowerCase().trim();
@@ -290,6 +351,58 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                 })}
               </div>
 
+              {(filteredChapters.length > 0 || showVerseSearch) && (
+                <div className="flex items-center gap-2 mt-6 mb-2">
+                  <Search className="w-4 h-4 text-muted-foreground" />
+                  <h2 className="text-sm font-semibold text-muted-foreground">Matching Surahs</h2>
+                </div>
+              )}
+            </div>
+          )}
+
+          {showVerseSearch && !showTopicResults && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2.5">
+                <Search className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Translation Results</h2>
+                <span className="text-xs text-muted-foreground ml-auto">{verseSearchResults.length} found</span>
+              </div>
+              <div className="space-y-2">
+                {verseSearchResults.map((result, idx) => {
+                  const chapter = chapters.find((c) => c.id === result.chapterId);
+                  if (!chapter) return null;
+                  return (
+                    <button
+                      key={`vs-${result.chapterId}-${result.verseNumber}-${idx}`}
+                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
+                      onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
+                      data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 mt-0.5">
+                          <BookOpen className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-wrap min-w-0">
+                              <span className="text-sm font-semibold text-foreground">
+                                {chapter.englishName} {result.verseNumber}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                ({result.chapterId}:{result.verseNumber})
+                              </span>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                          </div>
+                          <p className="text-xs text-muted-foreground/70 mt-1.5 line-clamp-3 leading-relaxed">
+                            {highlightMatch(result.translation, searchQuery.trim())}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
               {filteredChapters.length > 0 && (
                 <div className="flex items-center gap-2 mt-6 mb-2">
                   <Search className="w-4 h-4 text-muted-foreground" />
@@ -299,7 +412,60 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
             </div>
           )}
 
-          {hasActiveSearch && !showTopicResults && filteredChapters.length === 0 ? (
+          {showVerseSearch && showTopicResults && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 mb-2.5">
+                <Search className="w-5 h-5 text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Translation Results</h2>
+                <span className="text-xs text-muted-foreground ml-auto">{verseSearchResults.length} found</span>
+              </div>
+              <div className="space-y-2">
+                {verseSearchResults.map((result, idx) => {
+                  const chapter = chapters.find((c) => c.id === result.chapterId);
+                  if (!chapter) return null;
+                  return (
+                    <button
+                      key={`vs2-${result.chapterId}-${result.verseNumber}-${idx}`}
+                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
+                      onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
+                      data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 mt-0.5">
+                          <BookOpen className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-wrap min-w-0">
+                              <span className="text-sm font-semibold text-foreground">
+                                {chapter.englishName} {result.verseNumber}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                ({result.chapterId}:{result.verseNumber})
+                              </span>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                          </div>
+                          <p className="text-xs text-muted-foreground/70 mt-1.5 line-clamp-3 leading-relaxed">
+                            {highlightMatch(result.translation, searchQuery.trim())}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {isSearchingVerses && !showTopicResults && !showVerseSearch && filteredChapters.length === 0 && (
+            <div className="text-center py-12">
+              <Loader className="w-5 h-5 animate-spin mx-auto text-muted-foreground mb-3" />
+              <p className="text-sm text-muted-foreground">Searching translations...</p>
+            </div>
+          )}
+
+          {hasActiveSearch && !showTopicResults && !showVerseSearch && !isSearchingVerses && filteredChapters.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">No results found</p>
               <p className="text-sm text-muted-foreground mt-2">

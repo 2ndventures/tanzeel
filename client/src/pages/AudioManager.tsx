@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, Download, Loader2, X, Trash2 } from "lucide-react";
+import { setDownloadActive } from "@/lib/downloadState";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -115,17 +116,21 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
 
     downloadingRef.current = true;
     setActiveDownload({ type: "surah", surahNum, percent: 0 });
+    setDownloadActive(true);
     await savePendingDownload({ type: "surah", reciterId: reciter, surahNum });
 
-    await downloadSurah(reciter, surahNum, ch.verseCount, (percent) => {
-      setActiveDownload((prev) => (prev ? { ...prev, percent } : null));
-    });
-
-    downloadingRef.current = false;
-    setActiveDownload(null);
-    setCancelling(false);
-    await clearPendingDownload();
-    refreshAll();
+    try {
+      await downloadSurah(reciter, surahNum, ch.verseCount, (percent) => {
+        setActiveDownload((prev) => (prev ? { ...prev, percent } : null));
+      });
+    } finally {
+      downloadingRef.current = false;
+      setActiveDownload(null);
+      setDownloadActive(false);
+      setCancelling(false);
+      await clearPendingDownload();
+      refreshAll();
+    }
   }, [reciter, refreshAll]);
 
   const handleDownloadAll = useCallback(async () => {
@@ -133,23 +138,27 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
 
     downloadingRef.current = true;
     setActiveDownload({ type: "all", percent: 0 });
+    setDownloadActive(true);
     await savePendingDownload({ type: "all", reciterId: reciter });
 
-    let completedSurahs = 0;
-    await downloadAllSurahs(reciter, (surahNum, percent) => {
-      if (percent === 100) completedSurahs++;
-      const overallPercent = Math.round(((completedSurahs + (percent < 100 ? percent / 100 : 0)) / 114) * 100);
-      setActiveDownload({ type: "all", surahNum, percent: overallPercent });
-      if (percent === 100) {
-        refreshAll();
-      }
-    });
-
-    downloadingRef.current = false;
-    setActiveDownload(null);
-    setCancelling(false);
-    await clearPendingDownload();
-    refreshAll();
+    try {
+      let completedSurahs = 0;
+      await downloadAllSurahs(reciter, (surahNum, percent) => {
+        if (percent === 100) completedSurahs++;
+        const overallPercent = Math.round(((completedSurahs + (percent < 100 ? percent / 100 : 0)) / 114) * 100);
+        setActiveDownload({ type: "all", surahNum, percent: overallPercent });
+        if (percent === 100) {
+          refreshAll();
+        }
+      });
+    } finally {
+      downloadingRef.current = false;
+      setActiveDownload(null);
+      setDownloadActive(false);
+      setCancelling(false);
+      await clearPendingDownload();
+      refreshAll();
+    }
   }, [reciter, refreshAll]);
 
   const [cancelling, setCancelling] = useState(false);
@@ -158,6 +167,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
     setCancelling(true);
     cancelDownload();
     clearPendingDownload();
+    setDownloadActive(false);
   }, []);
 
   const handleDeleteSurah = useCallback(async (surahNum: number) => {

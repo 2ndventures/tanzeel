@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
+import { incrementVersesRead, addReadingTime, updateLastPlayed } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -352,6 +352,8 @@ export default function ChapterView({
         completedVersesRef.current.add(verseKey);
         incrementVersesRead(1, verseKey);
       }
+      const [chStr, vStr] = verseKey.split(':');
+      updateLastPlayed(parseInt(chStr), parseInt(vStr));
 
       if (autoScroll && scrollContainerRef.current) {
         // Parse verse key (e.g., "1:2" -> verse 2)
@@ -416,6 +418,27 @@ export default function ChapterView({
   });
 
   
+  useEffect(() => {
+    if (!isPlaying) return;
+    let wakeLock: WakeLockSentinel | null = null;
+    const requestLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch {}
+    };
+    requestLock();
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible' && isPlaying) requestLock();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      wakeLock?.release().catch(() => {});
+    };
+  }, [isPlaying]);
+
   // Track reading time
   useEffect(() => {
     if (isPlaying) {

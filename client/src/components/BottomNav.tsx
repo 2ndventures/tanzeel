@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
 import { triggerHaptic } from "@/lib/haptics";
+import { subscribeDownloadState, getDownloadActive } from "@/lib/downloadState";
 
 interface BottomNavProps {
   activeTab: "home" | "surah" | "settings" | "bookmarks";
@@ -10,6 +11,11 @@ interface BottomNavProps {
 
 export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(getDownloadActive);
+
+  useEffect(() => {
+    return subscribeDownloadState(setIsDownloading);
+  }, []);
 
   useEffect(() => {
     const vv = window.visualViewport;
@@ -46,9 +52,15 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             <button
               key={tab.id}
               onClick={() => { triggerHaptic('light'); onTabChange(tab.id); }}
-              className="flex flex-col items-center gap-1.5 min-h-[48px] min-w-[48px] justify-center hover-elevate active-elevate-2 rounded-lg px-2"
+              className="relative flex flex-col items-center gap-1.5 min-h-[48px] min-w-[48px] justify-center hover-elevate active-elevate-2 rounded-lg px-2"
               data-testid={`button-nav-${tab.id}`}
             >
+              {tab.id === "settings" && isDownloading && (
+                <span className="absolute top-1 right-1 flex size-2.5" data-testid="badge-downloading">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-primary" />
+                </span>
+              )}
               <Icon 
                 icon={tab.icon} 
                 className={cn(

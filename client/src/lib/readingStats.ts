@@ -9,6 +9,8 @@ interface ReadingStats {
   weekStart: string;
   lastReadChapter: number;
   lastReadVerse: number;
+  lastPlayedChapter?: number;
+  lastPlayedVerse?: number;
 }
 
 const STATS_KEY = 'quran-reading-stats';
@@ -81,6 +83,27 @@ export async function getReadingStats(): Promise<ReadingStats> {
       stats.lastReadChapter = 1;
       stats.lastReadVerse = 0;
       needsSave = true;
+    }
+
+    if (stats.lastPlayedChapter !== undefined) {
+      const numPlayedCh = Number(stats.lastPlayedChapter);
+      const numPlayedV = Number(stats.lastPlayedVerse);
+      if (isNaN(numPlayedCh) || numPlayedCh < 1 || numPlayedCh > 114 || isNaN(numPlayedV)) {
+        stats.lastPlayedChapter = undefined;
+        stats.lastPlayedVerse = undefined;
+        needsSave = true;
+      } else {
+        const playedChapter = chapters.find(ch => ch.id === numPlayedCh);
+        if (playedChapter && numPlayedV > playedChapter.verseCount) {
+          stats.lastPlayedVerse = playedChapter.verseCount;
+          needsSave = true;
+        }
+        if (numPlayedCh !== stats.lastPlayedChapter || numPlayedV !== stats.lastPlayedVerse) {
+          stats.lastPlayedChapter = numPlayedCh;
+          stats.lastPlayedVerse = numPlayedV;
+          needsSave = true;
+        }
+      }
     }
     
     const currentChapter = chapters.find(ch => ch.id === stats.lastReadChapter);
@@ -175,6 +198,15 @@ export async function addReadingTime(seconds: number): Promise<void> {
   stats.weeklyMinutes += seconds / 60;
   await saveReadingStats(stats);
   await updateDayStreak();
+}
+
+export async function updateLastPlayed(chapterId: number, verseNumber: number): Promise<void> {
+  const stats = await getReadingStats();
+  if (!isNaN(chapterId) && !isNaN(verseNumber) && chapterId >= 1 && chapterId <= 114) {
+    stats.lastPlayedChapter = chapterId;
+    stats.lastPlayedVerse = verseNumber;
+    await saveReadingStats(stats);
+  }
 }
 
 export function formatReadingTime(minutes: number): string {

@@ -94,11 +94,24 @@ A customizable verse bookmarking system is implemented, stored in `localStorage`
 
 ## Search System
 
-The SurahJuz page features a 2-layer local search system triggered when users type 3+ characters:
+The SurahJuz page features a 3-layer search system triggered when users type 3+ characters:
 1. **Surah Name Filtering**: Instant client-side filtering of chapter names (and meanings) with transliteration normalization
 2. **Topic Index Matching**: Client-side keyword matching against 50+ curated Quranic themes (`client/src/lib/topicIndex.ts`)
+3. **Full-Text Translation Search**: Server-side search across all 6,236 verse translations via `GET /api/search?q=<query>`. Results show highlighted matching text snippets. Search index is lazily loaded and cached in memory on first request. Returns up to 30 results.
 
-All search is performed locally with no server calls. When searching, the page title and tab switcher collapse to maximize screen space for results. Topic results show verse references with translation previews loaded on demand.
+When searching, the page title and tab switcher collapse to maximize screen space for results. Topic results show verse references with translation previews loaded on demand. Translation search results show highlighted matching text with context.
+
+## Resume Listening
+
+`client/src/lib/readingStats.ts` tracks `lastPlayedChapter` and `lastPlayedVerse` (separate from `lastReadChapter`/`lastReadVerse`). Updated whenever audio playback reaches a verse in ChapterView. The HomePage shows a "Resume Listening" card below the Continue Reading card when a previous audio position exists, allowing quick navigation back to the last listened verse.
+
+## Download Progress Badge
+
+`client/src/lib/downloadState.ts` provides a lightweight pub/sub system for download activity state. AudioManager broadcasts download start/stop/cancel events. BottomNav subscribes and shows an animated pulsing dot on the Settings tab when a download is active, visible from any page.
+
+## Screen Wake Lock
+
+ChapterView uses the Web `Screen Wake Lock` API (`navigator.wakeLock`) to prevent the screen from dimming/locking during audio playback. The lock is acquired when playback starts and released when paused/stopped. It handles visibility changes to re-acquire the lock when the app returns to foreground.
 
 ## Data Management
 
