@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Play, Pause, Loader2 } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Play, Pause, Loader2, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -37,8 +37,6 @@ interface ChapterViewProps {
   onRepeatChange: (enabled: boolean) => void;
   onAutoplayChange: (enabled: boolean) => void;
   onDarkModeChange: (enabled: boolean) => void;
-  onTransliterationChange: (enabled: boolean) => void;
-  onShowTranslationChange: (enabled: boolean) => void;
   onReciterChange: (reciter: string) => void;
   arabicFontSize: string;
   translationFontSize: string;
@@ -72,8 +70,6 @@ export default function ChapterView({
   onRepeatChange,
   onAutoplayChange,
   onDarkModeChange,
-  onTransliterationChange,
-  onShowTranslationChange,
   onReciterChange,
   arabicFontSize,
   translationFontSize,
@@ -914,11 +910,13 @@ export default function ChapterView({
                         <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Translation</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                            {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
+                            {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onTranslationFontSizeChange?.(s.value)}
-                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                className={`shrink-0 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
+                                  s.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
+                                } ${
                                   translationFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
@@ -926,7 +924,7 @@ export default function ChapterView({
                                 style={translationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                                 data-testid={`button-translation-size-${s.value.toLowerCase()}`}
                               >
-                                {s.label}
+                                {s.icon ? <CircleOff className="w-3.5 h-3.5" /> : s.label}
                               </button>
                             ))}
                           </div>
@@ -935,11 +933,13 @@ export default function ChapterView({
                         <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Transliteration</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                            {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map((s) => (
+                            {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onTransliterationFontSizeChange?.(s.value)}
-                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                className={`shrink-0 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
+                                  s.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
+                                } ${
                                   transliterationFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-primary text-primary'
                                     : 'text-muted-foreground'
@@ -947,7 +947,7 @@ export default function ChapterView({
                                 style={transliterationFontSize !== s.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
                                 data-testid={`button-transliteration-size-${s.value.toLowerCase()}`}
                               >
-                                {s.label}
+                                {s.icon ? <CircleOff className="w-3.5 h-3.5" /> : s.label}
                               </button>
                             ))}
                           </div>
@@ -1047,24 +1047,6 @@ export default function ChapterView({
                         <div className="flex items-center justify-between py-2.5" data-testid="menu-item-theme">
                           <span className="text-sm text-foreground/80">Theme</span>
                           <ThemeToggle isDark={darkMode} onToggle={(v) => { onDarkModeChange(v); }} />
-                        </div>
-                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-transliteration">
-                          <span className="text-sm text-foreground/80">Transliteration</span>
-                          <Switch 
-                            checked={showTransliteration} 
-                            onCheckedChange={(v) => { onTransliterationChange(v); }}
-                            data-testid="switch-transliteration"
-                          />
-                        </div>
-                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-translation">
-                          <span className="text-sm text-foreground/80">Translation</span>
-                          <Switch 
-                            checked={showTranslation} 
-                            onCheckedChange={(v) => { onShowTranslationChange(v); }}
-                            data-testid="switch-translation"
-                          />
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
                         <div className="flex items-center justify-between py-2.5" data-testid="menu-item-verse-numbers">

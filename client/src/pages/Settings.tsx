@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ChevronRight, ChevronLeft, Check, Trash2 } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, Trash2, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getCacheStats, setMaxCacheSize, clearCache, getManifest } from "@/services/audioCache";
 
@@ -37,10 +37,6 @@ interface SettingsProps {
   onRegisterBackHandler?: (handler: () => boolean) => void;
   darkMode: boolean;
   onDarkModeChange: (value: boolean) => void;
-  transliteration: boolean;
-  onTransliterationChange: (value: boolean) => void;
-  showTranslation: boolean;
-  onShowTranslationChange: (value: boolean) => void;
   arabicScript: 'uthmani' | 'indopak' | 'tajweed';
   onArabicScriptChange: (value: 'uthmani' | 'indopak' | 'tajweed') => void;
   reciter: string;
@@ -68,7 +64,7 @@ interface SettingsProps {
 function PillRow({ label, value, options, onChange, testIdPrefix }: {
   label: string;
   value: string;
-  options: { label: string; value: string }[];
+  options: { label?: string; icon?: React.ReactNode; value: string }[];
   onChange: (value: string) => void;
   testIdPrefix: string;
 }) {
@@ -80,7 +76,9 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
           <button
             key={opt.value}
             onClick={() => onChange(opt.value)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+            className={`shrink-0 rounded-full text-xs font-semibold transition-all whitespace-nowrap flex items-center justify-center ${
+              opt.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
+            } ${
               value === opt.value
                 ? 'bg-primary/20 ring-1 ring-primary text-primary'
                 : 'text-muted-foreground'
@@ -88,7 +86,7 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
             style={value !== opt.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
             data-testid={`${testIdPrefix}-${opt.value.toLowerCase().replace(' ', '-')}`}
           >
-            {opt.label}
+            {opt.icon || opt.label}
           </button>
         ))}
       </div>
@@ -125,10 +123,6 @@ export default function Settings({
   onRegisterBackHandler,
   darkMode,
   onDarkModeChange,
-  transliteration,
-  onTransliterationChange,
-  showTranslation,
-  onShowTranslationChange,
   arabicScript,
   onArabicScriptChange,
   reciter,
@@ -308,10 +302,6 @@ export default function Settings({
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
               <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <ToggleRow label="Translation" checked={showTranslation} onCheckedChange={onShowTranslationChange} testId="toggle-translation" />
-              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <ToggleRow label="Transliteration" checked={transliteration} onCheckedChange={onTransliterationChange} testId="toggle-transliteration" />
-              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Verse numbers" checked={showVerseNumbers} onCheckedChange={onShowVerseNumbersChange} testId="toggle-verse-numbers" />
             </div>
           </div>
@@ -332,7 +322,7 @@ export default function Settings({
               <PillRow
                 label="Translation"
                 value={translationFontSize}
-                options={[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
+                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
                 onChange={onTranslationFontSizeChange}
                 testIdPrefix="button-translation-size"
               />
@@ -340,7 +330,7 @@ export default function Settings({
               <PillRow
                 label="Transliteration"
                 value={transliterationFontSize}
-                options={[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
+                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
                 onChange={onTransliterationFontSizeChange}
                 testIdPrefix="button-transliteration-size"
               />

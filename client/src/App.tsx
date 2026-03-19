@@ -44,8 +44,7 @@ function App() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
-  const [transliteration, setTransliteration] = useState(false);
-  const [showTranslation, setShowTranslation] = useState(true);
+  
   const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>('uthmani');
   const [reciter, setReciter] = useState(DEFAULT_RECITER);
   const [audioCacheReady, setAudioCacheReady] = useState(false);
@@ -56,7 +55,10 @@ function App() {
   const [translation, setTranslation] = useState("English");
   const [arabicFontSize, setArabicFontSize] = useState("Large");
   const [translationFontSize, setTranslationFontSize] = useState("Medium");
-  const [transliterationFontSize, setTransliterationFontSize] = useState("Small");
+  const [transliterationFontSize, setTransliterationFontSize] = useState("Off");
+
+  const showTranslation = translationFontSize !== "Off";
+  const transliteration = transliterationFontSize !== "Off";
   const [lineSpacing, setLineSpacing] = useState("Normal");
   const [showVerseNumbers, setShowVerseNumbers] = useState(true);
 
@@ -69,10 +71,7 @@ function App() {
       if (savedDark !== null) setDarkMode(JSON.parse(savedDark));
 
       const savedTranslit = await getItem('transliteration');
-      if (savedTranslit !== null) setTransliteration(JSON.parse(savedTranslit));
-
       const savedTranslation = await getItem('showTranslation');
-      if (savedTranslation !== null) setShowTranslation(JSON.parse(savedTranslation));
 
       const savedScript = await getItem('arabicScript');
       if (savedScript === 'indopak' || savedScript === 'tajweed') setArabicScript(savedScript);
@@ -107,10 +106,20 @@ function App() {
       if (savedArabicFont) setArabicFontSize(savedArabicFont);
 
       const savedTransFont = await getItem('translationFontSize');
-      if (savedTransFont) setTranslationFontSize(savedTransFont);
+      if (savedTransFont) {
+        setTranslationFontSize(savedTransFont);
+      } else if (savedTranslation !== null && !JSON.parse(savedTranslation)) {
+        setTranslationFontSize("Off");
+      }
 
       const savedTranslitFont = await getItem('transliterationFontSize');
-      if (savedTranslitFont) setTransliterationFontSize(savedTranslitFont);
+      if (savedTranslitFont) {
+        setTransliterationFontSize(savedTranslitFont);
+      } else if (savedTranslit !== null && !JSON.parse(savedTranslit)) {
+        setTransliterationFontSize("Off");
+      } else if (savedTranslit !== null && JSON.parse(savedTranslit)) {
+        setTransliterationFontSize("Small");
+      }
 
       const savedSpacing = await getItem('lineSpacing');
       if (savedSpacing) setLineSpacing(savedSpacing);
@@ -148,16 +157,6 @@ function App() {
     meta.setAttribute('content', themeColor);
     if (storageReady) setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode, storageReady]);
-
-  useEffect(() => {
-    if (!storageReady) return;
-    setItem('transliteration', JSON.stringify(transliteration));
-  }, [transliteration, storageReady]);
-
-  useEffect(() => {
-    if (!storageReady) return;
-    setItem('showTranslation', JSON.stringify(showTranslation));
-  }, [showTranslation, storageReady]);
 
   useEffect(() => {
     if (!storageReady) return;
@@ -333,8 +332,6 @@ function App() {
                 onRepeatChange={setRepeat}
                 onAutoplayChange={setAutoplay}
                 onDarkModeChange={setDarkMode}
-                onTransliterationChange={setTransliteration}
-                onShowTranslationChange={setShowTranslation}
                 onReciterChange={setReciter}
                 arabicFontSize={arabicFontSize}
                 translationFontSize={translationFontSize}
@@ -365,10 +362,6 @@ function App() {
                 onRegisterBackHandler={(handler) => { settingsBackHandlerRef.current = handler; }}
                 darkMode={darkMode}
                 onDarkModeChange={setDarkMode}
-                transliteration={transliteration}
-                onTransliterationChange={setTransliteration}
-                showTranslation={showTranslation}
-                onShowTranslationChange={setShowTranslation}
                 arabicScript={arabicScript}
                 onArabicScriptChange={setArabicScript}
                 reciter={reciter}
