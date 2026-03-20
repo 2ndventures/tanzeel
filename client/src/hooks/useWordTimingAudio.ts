@@ -158,7 +158,7 @@ export function useWordTimingAudio(
     const currentTimeMs = currentTime * 1000;
     
     for (const timing of timings) {
-      if (currentTimeMs >= timing.timestamp_from && currentTimeMs <= timing.timestamp_to) {
+      if (currentTimeMs >= timing.timestamp_from && currentTimeMs < timing.timestamp_to) {
         const verseSegments = timing.segments;
         
         if (verseSegments.length === 0) {
@@ -501,7 +501,10 @@ export function useWordTimingAudio(
         const downloadedVerses = getDownloadedVerseNumbers(reciterString, chapterId);
         const chapterMeta = chapters.find(ch => ch.id === chapterId);
         const totalVerses = chapterMeta?.verseCount ?? 0;
-        if (totalVerses > 0 && downloadedVerses.length >= totalVerses) {
+        const isContiguous = totalVerses > 0
+          && downloadedVerses.length >= totalVerses
+          && [...downloadedVerses].sort((a, b) => a - b).every((v, i) => v === i + 1);
+        if (isContiguous) {
           try {
             const merged = await mergeDownloadedAudio(reciterString, chapterId, downloadedVerses);
             if (merged) {
