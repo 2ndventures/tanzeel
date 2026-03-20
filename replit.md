@@ -44,6 +44,10 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 The system provides continuous chapter audio playback with word-level synchronized highlighting using a `useWordTimingAudio` hook. It loads single audio files per chapter with timing data from Quran.com, supporting seamless playback. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling. The backend normalizes inconsistent Quran.com API responses for audio timing.
 
+### Gapless Offline Playback
+
+When a surah is fully downloaded, `client/src/lib/audioMerger.ts` merges all individual verse MP3 files into a single continuous audio blob in memory. It uses `AudioContext.decodeAudioData` to determine each verse's exact duration, concatenates the raw MP3 bytes, and builds remapped timing data (verse boundaries + word-level segments scaled to actual decoded durations). The merged blob URL is then fed into the same continuous playback code path as streaming, so offline playback sounds identical to online — no gaps between ayahs. Falls back to verse-by-verse mode if merging fails.
+
 ### Audio Caching (Capacitor Filesystem)
 
 A Capacitor Filesystem-based audio cache (`client/src/services/audioCache.ts`) stores verse-level MP3s with a dual-directory strategy:

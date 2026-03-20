@@ -10,6 +10,7 @@ import {
 } from '@/services/audioCache';
 import { RECITER_TO_QURAN_COM_ID } from '@/lib/reciters';
 import { chapters } from '@/lib/quranMetadata';
+import { mergeDownloadedAudio } from '@/lib/audioMerger';
 
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
 const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
@@ -502,8 +503,116 @@ export function useWordTimingAudio(
         const totalVerses = chapterMeta?.verseCount ?? 0;
         if (totalVerses > 0 && downloadedVerses.length >= totalVerses) {
           try {
-            const fellBack = await tryVerseByVerseFallback();
-            if (fellBack) return;
+            const merged = await mergeDownloadedAudio(reciterString, chapterId, downloadedVerses);
+            if (merged) {
+              timingDataRef.current = merged.audioFile;
+              verseByVerseRef.current = false;
+
+              if (!audioContainerRef.current) {
+                const container = document.createElement('div');
+                container.style.display = 'none';
+                container.id = `quran-audio-player-${chapterId}`;
+                document.body.appendChild(container);
+                audioContainerRef.current = container;
+              }
+
+              const audio = document.createElement('audio');
+              audio.preload = 'auto';
+              audioContainerRef.current.appendChild(audio);
+
+              const handleLoadedMetadata = () => {
+                setState(prev => ({ ...prev, duration: audio.duration || 0, currentTime: 0 }));
+              };
+
+              const handleTimeUpdate = () => {
+                const currentTime = audio.currentTime;
+                const { verseKey, wordIndex } = findCurrentSegment(currentTime);
+                setState(prev => {
+                  if (verseKey && verseKey !== prev.currentVerseKey) {
+                    onVerseChangeRef.current?.(verseKey);
+                  }
+                  return { ...prev, currentTime, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+                });
+              };
+
+              const handleCanPlay = () => {
+                retryCountRef.current = 0;
+                audio.playbackRate = speedRef.current;
+                if (autoplayRef.current) {
+                  setState(prev => ({ ...prev, isLoading: false }));
+                  audio.play().catch(() => {
+                    setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
+                  });
+                } else {
+                  setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+                }
+              };
+
+              const handlePlay = () => {
+                setState(prev => ({ ...prev, isPlaying: true, error: null }));
+              };
+
+              const handlePause = () => {
+                setState(prev => ({ ...prev, isPlaying: false }));
+              };
+
+              const handleEnded = () => {
+                if (repeatRef.current) {
+                  audio.currentTime = 0;
+                  audio.play();
+                } else {
+                  setState(prev => ({ ...prev, isPlaying: false }));
+                  onEndedRef.current?.();
+                }
+              };
+
+              const handleError = () => {
+                if (cleanupRef.current) {
+                  cleanupRef.current();
+                  cleanupRef.current = null;
+                }
+                tryVerseByVerseFallback().then(fellBack => {
+                  if (!fellBack) {
+                    setState(prev => ({
+                      ...prev,
+                      isLoading: false,
+                      isPlaying: false,
+                      error: 'Offline audio failed to load. Tap retry.',
+                    }));
+                  }
+                });
+              };
+
+              audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+              audio.addEventListener('timeupdate', handleTimeUpdate);
+              audio.addEventListener('canplay', handleCanPlay);
+              audio.addEventListener('play', handlePlay);
+              audio.addEventListener('pause', handlePause);
+              audio.addEventListener('ended', handleEnded);
+              audio.addEventListener('error', handleError);
+
+              audio.src = merged.blobUrl;
+              audio.playbackRate = speedRef.current;
+              audio.load();
+              audioRef.current = audio;
+
+              const mergedBlobUrl = merged.blobUrl;
+              cleanupRef.current = () => {
+                audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+                audio.removeEventListener('timeupdate', handleTimeUpdate);
+                audio.removeEventListener('canplay', handleCanPlay);
+                audio.removeEventListener('play', handlePlay);
+                audio.removeEventListener('pause', handlePause);
+                audio.removeEventListener('ended', handleEnded);
+                audio.removeEventListener('error', handleError);
+                audio.pause();
+                URL.revokeObjectURL(mergedBlobUrl);
+                audio.src = '';
+                audio.remove();
+                audioRef.current = null;
+              };
+              return;
+            }
           } catch {
           }
         }
