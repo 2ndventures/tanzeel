@@ -115,12 +115,10 @@ export async function mergeDownloadedAudio(
     const offlineTiming = await getOfflineTimingData(reciterId, chapterId) as TimingData | null;
     const originalTimings = offlineTiming?.audio_files?.[0]?.verse_timings ?? [];
 
-    const wavParts: ArrayBuffer[] = [];
-    const verseTimings: WordSegment[] = [];
+    const decodedVerses: { verseNum: number; decoded: AudioBuffer }[] = [];
     let totalSamples = 0;
     let sampleRate = 0;
     let numChannels = 0;
-    let sampleOffset = 0;
 
     for (const verseNum of sortedVerses) {
       const arrayBuffer = await readVerseAsArrayBuffer(reciterId, chapterId, verseNum);
@@ -137,13 +135,19 @@ export async function mergeDownloadedAudio(
 
       if (sampleRate === 0) {
         sampleRate = decoded.sampleRate;
-        numChannels = decoded.numberOfChannels;
-      } else {
-        numChannels = Math.max(numChannels, decoded.numberOfChannels);
       }
-
+      numChannels = Math.max(numChannels, decoded.numberOfChannels);
       totalSamples += decoded.length;
+      decodedVerses.push({ verseNum, decoded });
+    }
 
+    if (decodedVerses.length === 0 || sampleRate === 0) return null;
+
+    const wavParts: ArrayBuffer[] = [];
+    const verseTimings: WordSegment[] = [];
+    let sampleOffset = 0;
+
+    for (const { verseNum, decoded } of decodedVerses) {
       const pcmChunk = encodePcmChunk(decoded, numChannels);
       wavParts.push(pcmChunk);
 
@@ -177,8 +181,6 @@ export async function mergeDownloadedAudio(
 
       sampleOffset += decoded.length;
     }
-
-    if (wavParts.length === 0 || sampleRate === 0) return null;
 
     const headerBuffer = new ArrayBuffer(44);
     writeWavHeader(new DataView(headerBuffer), sampleRate, numChannels, totalSamples);

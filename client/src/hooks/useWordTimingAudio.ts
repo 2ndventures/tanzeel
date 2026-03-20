@@ -616,7 +616,8 @@ export function useWordTimingAudio(
               };
               return;
             }
-          } catch {
+          } catch (mergeErr) {
+            console.warn('[Audio] Merge attempt failed, trying VBV fallback:', mergeErr);
           }
 
           const fellBackToVBV = await tryVerseByVerseFallback();
