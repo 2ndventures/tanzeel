@@ -6,11 +6,18 @@ import {
 } from '@/services/audioCache';
 import { fileKey, getManifest } from '@/services/audioCache';
 
-const MAX_MERGE_VERSES = 200;
+const MAX_WAV_BYTES = 150 * 1024 * 1024;
 
 export interface MergedAudioResult {
   blobUrl: string;
   audioFile: AudioFile;
+}
+
+function createAudioContext(): AudioContext {
+  const Ctor = window.AudioContext
+    ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Ctor) throw new Error('AudioContext not supported');
+  return new Ctor();
 }
 
 async function readVerseAsArrayBuffer(
@@ -53,68 +60,111 @@ async function readVerseAsArrayBuffer(
   }
 }
 
+function encodeWav(sampleRate: number, numChannels: number, totalSamples: number, channelData: Float32Array[]): Blob {
+  const bytesPerSample = 2;
+  const dataSize = totalSamples * numChannels * bytesPerSample;
+  const headerSize = 44;
+  const arrayBuffer = new ArrayBuffer(headerSize + dataSize);
+  const view = new DataView(arrayBuffer);
+
+  function writeStr(offset: number, str: string) {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset + i, str.charCodeAt(i));
+    }
+  }
+
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * bytesPerSample, true);
+  view.setUint16(32, numChannels * bytesPerSample, true);
+  view.setUint16(34, bytesPerSample * 8, true);
+  writeStr(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  let offset = headerSize;
+  for (let i = 0; i < totalSamples; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      const sample = Math.max(-1, Math.min(1, channelData[ch][i]));
+      view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+      offset += 2;
+    }
+  }
+
+  return new Blob([arrayBuffer], { type: 'audio/wav' });
+}
+
 export async function mergeDownloadedAudio(
   reciterId: string,
   chapterId: number,
   verseNumbers: number[]
 ): Promise<MergedAudioResult | null> {
   const sortedVerses = [...verseNumbers].sort((a, b) => a - b);
-
-  if (sortedVerses.length > MAX_MERGE_VERSES) {
-    return null;
-  }
-
-  const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const audioCtx = createAudioContext();
 
   try {
-    const verseParts: { verseNum: number; buffer: ArrayBuffer; durationMs: number }[] = [];
+    const decodedVerses: { verseNum: number; buffer: AudioBuffer }[] = [];
+    let totalSamples = 0;
 
     for (const verseNum of sortedVerses) {
       const arrayBuffer = await readVerseAsArrayBuffer(reciterId, chapterId, verseNum);
       if (!arrayBuffer || arrayBuffer.byteLength === 0) {
         return null;
       }
-      let durationSec: number;
+      let decoded: AudioBuffer;
       try {
-        const decoded = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
-        durationSec = decoded.duration;
+        decoded = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
       } catch {
         return null;
       }
-      if (durationSec <= 0) {
-        return null;
-      }
-      verseParts.push({
-        verseNum,
-        buffer: arrayBuffer,
-        durationMs: durationSec * 1000,
-      });
+      decodedVerses.push({ verseNum, buffer: decoded });
+      totalSamples += decoded.length;
     }
 
-    if (verseParts.length === 0) return null;
+    if (decodedVerses.length === 0) return null;
 
-    const blobParts = verseParts.map(v => new Uint8Array(v.buffer));
-    const mergedBlob = new Blob(blobParts, { type: 'audio/mpeg' });
-    const blobUrl = URL.createObjectURL(mergedBlob);
+    const sampleRate = decodedVerses[0].buffer.sampleRate;
+    const numChannels = Math.max(...decodedVerses.map(d => d.buffer.numberOfChannels));
+    const estimatedWavSize = 44 + totalSamples * numChannels * 2;
+
+    if (estimatedWavSize > MAX_WAV_BYTES) {
+      return null;
+    }
+
+    const channelData: Float32Array[] = [];
+    for (let ch = 0; ch < numChannels; ch++) {
+      channelData.push(new Float32Array(totalSamples));
+    }
 
     const offlineTiming = await getOfflineTimingData(reciterId, chapterId) as TimingData | null;
     const originalTimings = offlineTiming?.audio_files?.[0]?.verse_timings ?? [];
 
     const verseTimings: WordSegment[] = [];
-    let cumulativeMs = 0;
+    let sampleOffset = 0;
 
-    for (const { verseNum, durationMs } of verseParts) {
-      const timestampFromMs = cumulativeMs;
-      const timestampToMs = cumulativeMs + durationMs;
+    for (const { verseNum, buffer } of decodedVerses) {
+      for (let ch = 0; ch < numChannels; ch++) {
+        const src = buffer.getChannelData(Math.min(ch, buffer.numberOfChannels - 1));
+        channelData[ch].set(src, sampleOffset);
+      }
+
+      const timestampFromMs = (sampleOffset / sampleRate) * 1000;
+      const verseDurationMs = (buffer.length / sampleRate) * 1000;
+      const timestampToMs = timestampFromMs + verseDurationMs;
+
       const verseKey = `${chapterId}:${verseNum}`;
-
       const originalTiming = originalTimings.find(t => t.verse_key === verseKey);
       let segments: [number, number, number][] = [];
 
       if (originalTiming?.segments && originalTiming.segments.length > 0) {
         const origStart = originalTiming.timestamp_from;
         const origDuration = originalTiming.timestamp_to - origStart;
-        const scale = origDuration > 0 ? durationMs / origDuration : 1;
+        const scale = origDuration > 0 ? verseDurationMs / origDuration : 1;
 
         segments = originalTiming.segments.map(seg => {
           const wordIdx = seg[0];
@@ -131,14 +181,17 @@ export async function mergeDownloadedAudio(
         segments,
       });
 
-      cumulativeMs += durationMs;
+      sampleOffset += buffer.length;
     }
+
+    const wavBlob = encodeWav(sampleRate, numChannels, totalSamples, channelData);
+    const blobUrl = URL.createObjectURL(wavBlob);
 
     const audioFile: AudioFile = {
       id: 0,
       chapter_id: chapterId,
-      file_size: mergedBlob.size,
-      format: 'mp3',
+      file_size: wavBlob.size,
+      format: 'wav',
       audio_url: blobUrl,
       verse_timings: verseTimings,
     };
