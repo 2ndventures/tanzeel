@@ -807,7 +807,7 @@ export default function ChapterView({
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent dark:from-amber-500/8" />
               </div>
               {menuView !== 'main' && (
-                <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 dark:bg-slate-800/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
+                <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
                   <ChevronLeft className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </button>
               )}

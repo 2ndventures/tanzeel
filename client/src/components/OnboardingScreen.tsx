@@ -214,7 +214,7 @@ export default function OnboardingScreen({
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
                 
                 {/* Inner glass panel */}
-                <div className="relative rounded-3xl backdrop-blur-xl bg-white/95 dark:bg-slate-900/70 p-6 space-y-4">
+                <div className="relative rounded-3xl backdrop-blur-xl bg-card/95 p-6 space-y-4">
                   {/* Arabic Text */}
                   <p
                     className={`${getArabicFontSize(arabicFontSize)} font-arabic text-right text-foreground transition-all duration-300`}

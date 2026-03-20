@@ -142,7 +142,7 @@ export default function VerseCard({
     <div
       className={`relative cursor-pointer transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-2xl ${
         highlighted
-          ? 'bg-primary/[0.06] dark:bg-primary/[0.08]'
+          ? 'bg-primary/[0.07]'
           : ''
       }`}
       data-testid={`card-verse-${verseNumber}`}

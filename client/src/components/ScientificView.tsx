@@ -108,7 +108,7 @@ export default function ScientificView({
 
   if (isLoadingVerses) {
     return (
-      <div className={`relative flex-1 overflow-y-auto px-4 pb-[120px] transition-[padding] duration-300 ${
+      <div className={`relative flex-1 overflow-y-auto px-4 pb-nav-clearance transition-[padding] duration-300 ${
         isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
         <div className="max-w-4xl mx-auto space-y-4">
@@ -121,7 +121,7 @@ export default function ScientificView({
 
   if (versesError) {
     return (
-      <div className={`relative flex-1 overflow-y-auto px-4 pb-[120px] transition-[padding] duration-300 ${
+      <div className={`relative flex-1 overflow-y-auto px-4 pb-nav-clearance transition-[padding] duration-300 ${
         isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
         <div className="text-center py-12 space-y-4">
@@ -157,7 +157,7 @@ export default function ScientificView({
   };
 
   return (
-    <div className={`relative flex-1 overflow-y-auto px-4 pb-[120px] transition-[padding] duration-300 ${
+    <div className={`relative flex-1 overflow-y-auto px-4 pb-nav-clearance transition-[padding] duration-300 ${
       isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
     }`}>
       <div className="max-w-4xl mx-auto space-y-4">

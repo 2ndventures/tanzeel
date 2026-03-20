@@ -16,7 +16,7 @@ export default function TajweedLegend() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="w-full bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl border-t border-border/50">
+    <div className="w-full bg-card/90 backdrop-blur-xl border-t border-border/50">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-center gap-1.5 py-2 px-4 text-xs font-medium text-muted-foreground"

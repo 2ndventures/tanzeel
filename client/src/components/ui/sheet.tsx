@@ -31,7 +31,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-card/95 dark:bg-slate-900/95 backdrop-blur-2xl p-6 shadow-xl transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  "fixed z-50 gap-4 bg-card/95 backdrop-blur-2xl p-6 shadow-xl transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
   {
     variants: {
       side: {
@@ -64,7 +64,7 @@ const SheetContent = React.forwardRef<
       className={cn(sheetVariants({ side }), className)}
       {...props}
     >
-      <SheetPrimitive.Close className="z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 dark:bg-slate-800/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
+      <SheetPrimitive.Close className="z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
         <X className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>

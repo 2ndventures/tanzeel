@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background via-background/95 to-background p-6">
           <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-2xl max-w-md w-full">
             <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
-            <div className="relative bg-card/80 dark:bg-slate-900/60 backdrop-blur-2xl p-8 rounded-3xl">
+            <div className="relative bg-card/80 backdrop-blur-2xl p-8 rounded-3xl">
               <div className="text-center space-y-6">
                 <div className="flex justify-center">
                   <div className="size-16 rounded-full bg-destructive/20 flex items-center justify-center">

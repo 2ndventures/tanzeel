@@ -65,7 +65,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-amber-500/5 via-transparent to-transparent dark:from-amber-500/8" />
       </div>
-      <DrawerClose className="z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 dark:bg-slate-800/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
+      <DrawerClose className="z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
         <X className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
         <span className="sr-only">Close</span>
       </DrawerClose>
@@ -87,7 +87,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                 }`}
                 data-testid={`layout-option-${opt.mode}`}
               >
-                <div className="aspect-square w-full overflow-hidden bg-muted/20 dark:bg-slate-900/60">
+                <div className="aspect-square w-full overflow-hidden bg-muted/20">
                   <img
                     src={opt.preview}
                     alt={`${opt.label} layout preview`}
@@ -101,7 +101,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                 <div className={`px-3 py-2.5 text-left ${
                   isSelected
                     ? 'bg-primary/10 dark:bg-primary/15'
-                    : 'bg-muted/30 dark:bg-slate-900/70'
+                    : 'bg-muted/30'
                 }`}>
                   <p className={`text-sm font-semibold truncate ${
                     isSelected ? 'text-primary' : 'text-foreground dark:text-white/90'
@@ -285,7 +285,7 @@ export default function AudioPlayer({
         <Drawer>
           <DrawerTrigger asChild>
             <button
-              className="size-10 rounded-full bg-card/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 ring-border/40 text-primary"
+              className="size-10 rounded-full bg-card/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 ring-border/40 text-primary"
               aria-label="Select layout mode"
               data-testid="compact-layout-button"
             >
@@ -295,7 +295,7 @@ export default function AudioPlayer({
           <LayoutDrawerContent layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} />
         </Drawer>
         <button
-          className={`size-14 rounded-full bg-card/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 disabled:opacity-50 relative ${error ? 'ring-destructive/60' : 'ring-border/40'}`}
+          className={`size-14 rounded-full bg-card/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 disabled:opacity-50 relative ${error ? 'ring-destructive/60' : 'ring-border/40'}`}
           onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
           disabled={isLoading}
           aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}

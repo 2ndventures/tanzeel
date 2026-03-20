@@ -18,7 +18,7 @@ export default function NotFound() {
           <div className="absolute inset-0 bg-gradient-to-br from-border via-border/50 to-border rounded-3xl" />
           
           {/* Inner glass panel */}
-          <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/60 p-8 backdrop-blur-2xl">
+          <div className="relative overflow-hidden rounded-3xl bg-card/80 p-8 backdrop-blur-2xl">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-3xl" />
             
             <div className="relative flex flex-col items-center text-center">

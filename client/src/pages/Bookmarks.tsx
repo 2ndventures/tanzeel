@@ -139,7 +139,7 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 pb-[120px] min-h-0">
+        <div className="flex-1 overflow-y-auto px-5 pb-nav-clearance min-h-0">
           <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
             <button
               onClick={() => setSelectedFolder(null)}

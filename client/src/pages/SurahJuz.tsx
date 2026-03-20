@@ -246,7 +246,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   autoComplete="off"
                   autoCorrect="off"
                   placeholder="Search surahs, topics, or keywords..."
-                  className="h-14 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
+                  className="h-14 bg-card/80 backdrop-blur-xl border-0 rounded-3xl text-foreground placeholder:text-muted-foreground px-6 pr-12"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onBlur={handleSearchBlur}
@@ -262,7 +262,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
             {!hasActiveSearch && (
               <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
                 <div className="absolute inset-0 bg-gradient-to-br from-border to-transparent rounded-3xl" />
-                <div className="relative flex gap-2 p-1 bg-card/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-3xl">
+                <div className="relative flex gap-2 p-1 bg-card/80 backdrop-blur-xl rounded-3xl">
                   <button
                     onClick={() => setMode("surah")}
                     className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
@@ -298,7 +298,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
         ref={scrollContainerRef}
         className="relative flex-1 overflow-y-auto min-h-0"
       >
-        <div className="px-6 space-y-3 py-4 pb-[120px]">
+        <div className="px-6 space-y-3 py-4 pb-nav-clearance">
           {showTopicResults && (
             <div className="mb-4">
               <div className="flex items-center gap-2 mb-2.5">
@@ -313,7 +313,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   return (
                     <button
                       key={`${result.chapterId}-${result.verseNumber}-${idx}`}
-                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
+                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
                       onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
                       data-testid={`search-result-${result.chapterId}-${result.verseNumber}`}
                     >
@@ -374,7 +374,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   return (
                     <button
                       key={`vs-${result.chapterId}-${result.verseNumber}-${idx}`}
-                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
+                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
                       onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
                       data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
                     >
@@ -426,7 +426,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   return (
                     <button
                       key={`vs2-${result.chapterId}-${result.verseNumber}-${idx}`}
-                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 dark:bg-slate-900/50 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
+                      className="w-full text-left rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
                       onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
                       data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
                     >
@@ -503,7 +503,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                     onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", juz.startChapter); }}
                     data-testid={`juz-card-${juz.id}`}
                   >
-                    <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 h-full flex items-center">
+                    <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">
                       <div className="flex items-center gap-4 w-full">
                         <div className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}>
                           <span className={`${badge.text} text-lg font-bold`}>{juz.id}</span>

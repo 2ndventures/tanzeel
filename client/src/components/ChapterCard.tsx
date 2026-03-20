@@ -47,7 +47,7 @@ export default function ChapterCard({
       style={style}
       data-testid={`card-chapter-${number}`}
     >
-      <div className="relative overflow-hidden rounded-3xl bg-card/80 dark:bg-slate-900/70 backdrop-blur-xl px-5 h-full flex items-center">
+      <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">
         <div className="flex items-center gap-4 w-full">
           <div
             className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}
