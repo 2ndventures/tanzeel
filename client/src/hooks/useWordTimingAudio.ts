@@ -615,6 +615,9 @@ export function useWordTimingAudio(
             }
           } catch {
           }
+
+          const fellBackToVBV = await tryVerseByVerseFallback();
+          if (fellBackToVBV) return;
         }
       }
 
