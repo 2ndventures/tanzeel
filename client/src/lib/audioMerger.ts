@@ -6,8 +6,6 @@ import {
 } from '@/services/audioCache';
 import { fileKey, getManifest } from '@/services/audioCache';
 
-const MAX_WAV_BYTES = 150 * 1024 * 1024;
-
 export interface MergedAudioResult {
   blobUrl: string;
   audioFile: AudioFile;
@@ -60,12 +58,9 @@ async function readVerseAsArrayBuffer(
   }
 }
 
-function encodeWav(sampleRate: number, numChannels: number, totalSamples: number, channelData: Float32Array[]): Blob {
+function writeWavHeader(view: DataView, sampleRate: number, numChannels: number, totalSamples: number): void {
   const bytesPerSample = 2;
   const dataSize = totalSamples * numChannels * bytesPerSample;
-  const headerSize = 44;
-  const arrayBuffer = new ArrayBuffer(headerSize + dataSize);
-  const view = new DataView(arrayBuffer);
 
   function writeStr(offset: number, str: string) {
     for (let i = 0; i < str.length; i++) {
@@ -86,17 +81,26 @@ function encodeWav(sampleRate: number, numChannels: number, totalSamples: number
   view.setUint16(34, bytesPerSample * 8, true);
   writeStr(36, 'data');
   view.setUint32(40, dataSize, true);
+}
 
-  let offset = headerSize;
-  for (let i = 0; i < totalSamples; i++) {
+function encodePcmChunk(decoded: AudioBuffer, numChannels: number): ArrayBuffer {
+  const bytesPerSample = 2;
+  const samples = decoded.length;
+  const chunkSize = samples * numChannels * bytesPerSample;
+  const buffer = new ArrayBuffer(chunkSize);
+  const view = new DataView(buffer);
+  let offset = 0;
+
+  for (let i = 0; i < samples; i++) {
     for (let ch = 0; ch < numChannels; ch++) {
-      const sample = Math.max(-1, Math.min(1, channelData[ch][i]));
+      const src = decoded.getChannelData(Math.min(ch, decoded.numberOfChannels - 1));
+      const sample = Math.max(-1, Math.min(1, src[i]));
       view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
       offset += 2;
     }
   }
 
-  return new Blob([arrayBuffer], { type: 'audio/wav' });
+  return buffer;
 }
 
 export async function mergeDownloadedAudio(
@@ -108,56 +112,46 @@ export async function mergeDownloadedAudio(
   const audioCtx = createAudioContext();
 
   try {
-    const decodedVerses: { verseNum: number; buffer: AudioBuffer }[] = [];
+    const offlineTiming = await getOfflineTimingData(reciterId, chapterId) as TimingData | null;
+    const originalTimings = offlineTiming?.audio_files?.[0]?.verse_timings ?? [];
+
+    const wavParts: ArrayBuffer[] = [];
+    const verseTimings: WordSegment[] = [];
     let totalSamples = 0;
+    let sampleRate = 0;
+    let numChannels = 0;
+    let sampleOffset = 0;
 
     for (const verseNum of sortedVerses) {
       const arrayBuffer = await readVerseAsArrayBuffer(reciterId, chapterId, verseNum);
       if (!arrayBuffer || arrayBuffer.byteLength === 0) {
         return null;
       }
+
       let decoded: AudioBuffer;
       try {
         decoded = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
       } catch {
         return null;
       }
-      decodedVerses.push({ verseNum, buffer: decoded });
-      totalSamples += decoded.length;
-    }
 
-    if (decodedVerses.length === 0) return null;
-
-    const sampleRate = decodedVerses[0].buffer.sampleRate;
-    const numChannels = Math.max(...decodedVerses.map(d => d.buffer.numberOfChannels));
-    const estimatedWavSize = 44 + totalSamples * numChannels * 2;
-
-    if (estimatedWavSize > MAX_WAV_BYTES) {
-      return null;
-    }
-
-    const channelData: Float32Array[] = [];
-    for (let ch = 0; ch < numChannels; ch++) {
-      channelData.push(new Float32Array(totalSamples));
-    }
-
-    const offlineTiming = await getOfflineTimingData(reciterId, chapterId) as TimingData | null;
-    const originalTimings = offlineTiming?.audio_files?.[0]?.verse_timings ?? [];
-
-    const verseTimings: WordSegment[] = [];
-    let sampleOffset = 0;
-
-    for (const { verseNum, buffer } of decodedVerses) {
-      for (let ch = 0; ch < numChannels; ch++) {
-        const src = buffer.getChannelData(Math.min(ch, buffer.numberOfChannels - 1));
-        channelData[ch].set(src, sampleOffset);
+      if (sampleRate === 0) {
+        sampleRate = decoded.sampleRate;
+        numChannels = decoded.numberOfChannels;
+      } else {
+        numChannels = Math.max(numChannels, decoded.numberOfChannels);
       }
 
-      const timestampFromMs = (sampleOffset / sampleRate) * 1000;
-      const verseDurationMs = (buffer.length / sampleRate) * 1000;
-      const timestampToMs = timestampFromMs + verseDurationMs;
+      totalSamples += decoded.length;
 
+      const pcmChunk = encodePcmChunk(decoded, numChannels);
+      wavParts.push(pcmChunk);
+
+      const timestampFromMs = (sampleOffset / sampleRate) * 1000;
+      const verseDurationMs = (decoded.length / sampleRate) * 1000;
+      const timestampToMs = timestampFromMs + verseDurationMs;
       const verseKey = `${chapterId}:${verseNum}`;
+
       const originalTiming = originalTimings.find(t => t.verse_key === verseKey);
       let segments: [number, number, number][] = [];
 
@@ -181,10 +175,16 @@ export async function mergeDownloadedAudio(
         segments,
       });
 
-      sampleOffset += buffer.length;
+      sampleOffset += decoded.length;
     }
 
-    const wavBlob = encodeWav(sampleRate, numChannels, totalSamples, channelData);
+    if (wavParts.length === 0 || sampleRate === 0) return null;
+
+    const headerBuffer = new ArrayBuffer(44);
+    writeWavHeader(new DataView(headerBuffer), sampleRate, numChannels, totalSamples);
+
+    const blobParts: BlobPart[] = [headerBuffer, ...wavParts];
+    const wavBlob = new Blob(blobParts, { type: 'audio/wav' });
     const blobUrl = URL.createObjectURL(wavBlob);
 
     const audioFile: AudioFile = {
