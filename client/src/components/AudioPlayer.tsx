@@ -18,12 +18,16 @@ import layoutStandardImg from "@/assets/images/layout-standard.png";
 import layoutFocusedImg from "@/assets/images/layout-focused.png";
 import layoutMushafImg from "@/assets/images/layout-mushaf.png";
 import layoutHifzImg from "@/assets/images/layout-hifz.png";
+import layoutStandardLightImg from "@/assets/images/layout-standard-light.png";
+import layoutFocusedLightImg from "@/assets/images/layout-focused-light.png";
+import layoutMushafLightImg from "@/assets/images/layout-mushaf-light.png";
+import layoutHifzLightImg from "@/assets/images/layout-hifz-light.png";
 
-const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: string; preview: string }[] = [
-  { mode: 'standard', icon: 'solar:align-vertical-spacing-bold', label: 'Standard', desc: 'Vertical scrolling', preview: layoutStandardImg },
-  { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Vertical reading', preview: layoutFocusedImg },
-  { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Medinan page view', preview: layoutMushafImg },
-  { mode: 'hifz', icon: 'solar:square-academic-cap-bold', label: 'Hifz', desc: 'Memorization mode', preview: layoutHifzImg },
+const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: string; previewDark: string; previewLight: string }[] = [
+  { mode: 'standard', icon: 'solar:align-vertical-spacing-bold', label: 'Standard', desc: 'Vertical scrolling', previewDark: layoutStandardImg, previewLight: layoutStandardLightImg },
+  { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Vertical reading', previewDark: layoutFocusedImg, previewLight: layoutFocusedLightImg },
+  { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Medinan page view', previewDark: layoutMushafImg, previewLight: layoutMushafLightImg },
+  { mode: 'hifz', icon: 'solar:square-academic-cap-bold', label: 'Hifz', desc: 'Memorization mode', previewDark: layoutHifzImg, previewLight: layoutHifzLightImg },
 ];
 
 interface VerseTimingInfo {
@@ -58,6 +62,7 @@ interface AudioPlayerProps {
 }
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
+  const isDark = document.documentElement.classList.contains('dark');
   return (
     <DrawerContent className="overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
       <div className="absolute inset-0 pointer-events-none">
@@ -89,7 +94,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
               >
                 <div className="aspect-square w-full overflow-hidden bg-muted/20">
                   <img
-                    src={opt.preview}
+                    src={isDark ? opt.previewDark : opt.previewLight}
                     alt={`${opt.label} layout preview`}
                     className="w-full h-full object-cover"
                     data-testid={`img-layout-preview-${opt.mode}`}
