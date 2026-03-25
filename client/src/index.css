@@ -14,46 +14,46 @@
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
 
-  --header-gradient-start: rgba(248, 250, 252, 0.95);
-  --header-gradient-mid: rgba(248, 250, 252, 0.6);
-  --player-gradient-rgb: 248, 250, 252;
+  --header-gradient-start: rgba(252, 249, 244, 0.95);
+  --header-gradient-mid: rgba(252, 249, 244, 0.6);
+  --player-gradient-rgb: 252, 249, 244;
 
-  --sheet-bg: 0 0% 97%;
-  --sheet-muted: 0 0% 92%;
+  --sheet-bg: 38 30% 95%;
+  --sheet-muted: 36 20% 89%;
 
-  --background: 0 0% 100%;
+  --background: 40 33% 98%;
 
-  --foreground: 222 47% 11%;
+  --foreground: 30 30% 12%;
 
-  --border: 220 13% 91%;
+  --border: 36 18% 88%;
 
-  --card: 0 0% 98%;
+  --card: 38 30% 96%;
 
-  --card-foreground: 222 47% 11%;
+  --card-foreground: 30 30% 12%;
 
-  --card-border: 220 13% 91%;
+  --card-border: 36 18% 88%;
 
-  --sidebar: 220 13% 95%;
+  --sidebar: 38 25% 94%;
 
-  --sidebar-foreground: 222 47% 11%;
+  --sidebar-foreground: 30 30% 12%;
 
-  --sidebar-border: 220 13% 88%;
+  --sidebar-border: 36 18% 86%;
 
   --sidebar-primary: 43 96% 50%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 220 13% 92%;
+  --sidebar-accent: 36 20% 90%;
 
-  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-accent-foreground: 30 30% 12%;
 
   --sidebar-ring: 43 96% 50%;
 
-  --popover: 0 0% 96%;
+  --popover: 38 28% 94%;
 
-  --popover-foreground: 222 47% 11%;
+  --popover-foreground: 30 30% 12%;
 
-  --popover-border: 220 13% 88%;
+  --popover-border: 36 18% 86%;
 
   --primary: 43 96% 50%;
 
@@ -63,9 +63,9 @@
 
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 220 13% 92%;
+  --muted: 36 18% 90%;
 
-  --muted-foreground: 220 9% 46%;
+  --muted-foreground: 35 12% 45%;
 
   --accent: 28 80% 52%;
 
@@ -75,7 +75,7 @@
 
   --destructive-foreground: 0 0% 100%;
 
-  --input: 220 13% 75%;
+  --input: 36 15% 73%;
   --ring: 43 96% 50%;
   --chart-1: 43 96% 56%;
   --chart-2: 32 95% 44%;
