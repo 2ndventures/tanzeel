@@ -26,11 +26,25 @@ const CapApp = registerPlugin<{
 
 type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service" | "audio-manager";
 
+const PAGE_DEPTH: Record<Page, number> = {
+  "home": 0,
+  "surah-juz": 0,
+  "bookmarks": 0,
+  "settings": 0,
+  "chapter": 1,
+  "audio-manager": 1,
+  "privacy-policy": 1,
+  "terms-of-service": 1,
+};
+
+type NavDirection = "forward" | "back" | "tab";
+
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [initialVerse, setInitialVerse] = useState<number | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings" | "bookmarks">("home");
+  const [navDirection, setNavDirection] = useState<NavDirection>("tab");
   
   const [showSplash, setShowSplash] = useState(true);
   const [storageReady, setStorageReady] = useState(false);
@@ -231,28 +245,33 @@ function App() {
 
   const settingsBackHandlerRef = useRef<(() => boolean) | null>(null);
 
+  const navigateTo = useCallback((page: Page, direction: NavDirection) => {
+    setNavDirection(direction);
+    setCurrentPage(page);
+  }, []);
+
   const handleBackButton = useCallback(() => {
     switch (currentPage) {
       case "privacy-policy":
       case "terms-of-service":
       case "audio-manager":
-        setCurrentPage("settings");
+        navigateTo("settings", "back");
         setActiveTab("settings");
         break;
       case "chapter":
-        setCurrentPage("surah-juz");
+        navigateTo("surah-juz", "back");
         setActiveTab("surah");
         break;
       case "settings":
         if (settingsBackHandlerRef.current && settingsBackHandlerRef.current()) {
           break;
         }
-        setCurrentPage("home");
+        navigateTo("home", "back");
         setActiveTab("home");
         break;
       case "surah-juz":
       case "bookmarks":
-        setCurrentPage("home");
+        navigateTo("home", "back");
         setActiveTab("home");
         break;
       case "home":
@@ -260,7 +279,7 @@ function App() {
         CapApp.exitApp();
         break;
     }
-  }, [currentPage]);
+  }, [currentPage, navigateTo]);
 
   useEffect(() => {
     if (Capacitor.getPlatform() !== 'android') return;
@@ -272,7 +291,18 @@ function App() {
 
   const handleNavigate = (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => {
     (document.activeElement as HTMLElement)?.blur();
-    setCurrentPage(page as Page);
+    const targetPage = page as Page;
+    const fromDepth = PAGE_DEPTH[currentPage] ?? 0;
+    const toDepth = PAGE_DEPTH[targetPage] ?? 0;
+    let direction: NavDirection;
+    if (toDepth > fromDepth) {
+      direction = "forward";
+    } else if (toDepth < fromDepth) {
+      direction = "back";
+    } else {
+      direction = "tab";
+    }
+    navigateTo(targetPage, direction);
     if (tab) {
       setActiveTab(tab);
     } else if (page === "settings") {
@@ -317,7 +347,11 @@ function App() {
           )}
 
           {storageReady && (<div className="h-full">
-            <div key={currentPage} className="animate-fade-in h-full">
+            <div key={currentPage} className={`h-full ${
+              navDirection === "forward" ? "animate-slide-in-right" :
+              navDirection === "back" ? "animate-slide-in-left" :
+              "animate-fade-in"
+            }`}>
             {currentPage === "home" && (
               <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
             )}
@@ -329,7 +363,7 @@ function App() {
                 chapterId={selectedChapter}
                 initialVerse={initialVerse}
                 onBack={() => {
-                  setCurrentPage("surah-juz");
+                  navigateTo("surah-juz", "back");
                   setActiveTab("surah");
                 }}
                 showTransliteration={transliteration}
@@ -367,7 +401,7 @@ function App() {
             {currentPage === "settings" && (
               <Settings
                 onBack={() => {
-                  setCurrentPage("home");
+                  navigateTo("home", "back");
                   setActiveTab("home");
                 }}
                 onNavigate={handleNavigate}
@@ -401,7 +435,7 @@ function App() {
             {currentPage === "privacy-policy" && (
               <PrivacyPolicy
                 onBack={() => {
-                  setCurrentPage("settings");
+                  navigateTo("settings", "back");
                   setActiveTab("settings");
                 }}
               />
@@ -409,7 +443,7 @@ function App() {
             {currentPage === "terms-of-service" && (
               <TermsOfService
                 onBack={() => {
-                  setCurrentPage("settings");
+                  navigateTo("settings", "back");
                   setActiveTab("settings");
                 }}
               />
@@ -417,7 +451,7 @@ function App() {
             {currentPage === "audio-manager" && (
               <AudioManager
                 onBack={() => {
-                  setCurrentPage("settings");
+                  navigateTo("settings", "back");
                   setActiveTab("settings");
                 }}
                 reciter={reciter}
