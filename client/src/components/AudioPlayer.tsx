@@ -437,7 +437,7 @@ export default function AudioPlayer({
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerCancel}
             onContextMenu={(e) => e.preventDefault()}
-            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-black/10 dark:active:bg-white/15 ${
+            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-black/[.13] dark:active:bg-white/[.15] ${
               speedIsModified ? 'text-[#f8c630]' : 'text-muted-foreground dark:text-white/50'
             }`}
             aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
@@ -453,7 +453,7 @@ export default function AudioPlayer({
           <div className="flex items-center gap-8">
             <button
               onClick={() => onSeek?.(Math.max(0, currentTime - 15))}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/10 dark:active:bg-white/15 active:scale-95 transition-all"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all"
               aria-label="Skip back 15 seconds"
               data-testid="button-skip-back"
             >
@@ -480,7 +480,7 @@ export default function AudioPlayer({
 
             <button
               onClick={() => onSeek?.(Math.min(duration, currentTime + 15))}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/10 dark:active:bg-white/15 active:scale-95 transition-all"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all"
               aria-label="Skip forward 15 seconds"
               data-testid="button-skip-forward"
             >
@@ -492,7 +492,7 @@ export default function AudioPlayer({
           <Drawer>
             <DrawerTrigger asChild>
               <button
-                className={`min-h-[44px] w-10 flex items-center justify-center rounded-xl transition-colors active:bg-black/10 dark:active:bg-white/15 ${
+                className={`min-h-[44px] w-10 flex items-center justify-center rounded-xl transition-colors active:bg-black/[.13] dark:active:bg-white/[.15] ${
                   layoutMode !== 'standard' ? 'text-foreground/90 dark:text-white/90' : 'text-muted-foreground dark:text-white/50'
                 }`}
                 aria-label="Select layout mode"

@@ -11,8 +11,8 @@
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
+  --elevate-1: rgba(0,0,0, .05);
+  --elevate-2: rgba(0,0,0, .13);
 
   --header-gradient-start: rgba(252, 249, 244, 0.95);
   --header-gradient-mid: rgba(252, 249, 244, 0.6);
@@ -147,8 +147,8 @@
   --opaque-button-border-intensity: 9;  /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
+  --elevate-1: rgba(255,255,255, .06);
+  --elevate-2: rgba(255,255,255, .15);
 
   --header-gradient-start: rgba(16, 24, 42, 0.95);
   --header-gradient-mid: rgba(16, 24, 42, 0.7);
