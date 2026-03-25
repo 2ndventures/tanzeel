@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { API_BASE_URL } from '@/config';
-import { getCachedTimingData, cacheTimingData, getCachedAudioUrl, cacheAudioFile } from '@/lib/audioCache';
+import { getCachedTimingData, cacheTimingData, getCachedAudioUrl, cacheAudioFile, getTimingDataFromMemory, storeTimingDataInMemory } from '@/lib/audioCache';
 import { getItem, setItem, removeItem } from '@/lib/storage';
 import {
   getCachedAudioUri,
@@ -477,6 +477,7 @@ export function useWordTimingAudio(
   }, [reciterId, chapterId, loadVerseByVerseAudio]);
 
   const loadAudio = useCallback(async () => {
+    let audioCachePromise: Promise<string | null> | null = null;
     try {
       if (cleanupRef.current) {
         cleanupRef.current();
@@ -627,21 +628,29 @@ export function useWordTimingAudio(
 
       const timingUrl = `${API_BASE_URL}/api/audio-timing/${reciterId}/${chapterId}`;
 
-      let timingData: TimingData;
-      const cachedTiming = await getCachedTimingData(reciterId, chapterId);
-      if (cachedTiming) {
-        timingData = await cachedTiming.json();
-      } else {
-        const timingResponse = await fetch(timingUrl);
-        
-        if (!timingResponse.ok) {
-          const errorText = await timingResponse.text().catch(() => 'Unable to read error');
-          throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
-        }
+      audioCachePromise = getCachedAudioUrl(reciterId, chapterId);
 
-        const cloned = timingResponse.clone();
-        timingData = await timingResponse.json();
-        await cacheTimingData(reciterId, chapterId, cloned);
+      let timingData: TimingData;
+      const memCached = getTimingDataFromMemory(reciterId, chapterId);
+      if (memCached) {
+        timingData = memCached;
+      } else {
+        const cachedTiming = await getCachedTimingData(reciterId, chapterId);
+        if (cachedTiming) {
+          timingData = await cachedTiming.json();
+        } else {
+          const timingResponse = await fetch(timingUrl);
+          
+          if (!timingResponse.ok) {
+            const errorText = await timingResponse.text().catch(() => 'Unable to read error');
+            throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
+          }
+
+          const cloned = timingResponse.clone();
+          timingData = await timingResponse.json();
+          cacheTimingData(reciterId, chapterId, cloned).catch(() => {});
+        }
+        storeTimingDataInMemory(reciterId, chapterId, timingData);
       }
       if (!timingData.audio_files || !Array.isArray(timingData.audio_files) || timingData.audio_files.length === 0) {
         throw new Error('No audio files found in timing data');
@@ -664,7 +673,7 @@ export function useWordTimingAudio(
       }
 
       const audio = document.createElement('audio');
-      audio.preload = 'metadata';
+      audio.preload = 'auto';
       audioContainerRef.current.appendChild(audio);
 
       let audioUrl = audioFile.audio_url || (audioFile as any).audio_file?.audio_url;
@@ -673,7 +682,7 @@ export function useWordTimingAudio(
         throw new Error('No audio URL found in timing data');
       }
 
-      const cachedBlobUrl = await getCachedAudioUrl(reciterId, chapterId);
+      const cachedBlobUrl = await audioCachePromise;
       const effectiveAudioUrl = cachedBlobUrl || audioUrl;
 
       if (!cachedBlobUrl) {
@@ -807,6 +816,10 @@ export function useWordTimingAudio(
       return cleanup;
     } catch (error) {
       console.error('Failed to load audio:', error instanceof Error ? error.message : error);
+
+      if (audioCachePromise) {
+        audioCachePromise.then(url => { if (url) URL.revokeObjectURL(url); }).catch(() => {});
+      }
 
       if (retryCountRef.current < MAX_AUTO_RETRIES) {
         retryCountRef.current++;
