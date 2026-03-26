@@ -1,6 +1,6 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
-import BottomNav from "@/components/BottomNav";
+
 import { chapters, surahMeanings } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 
@@ -196,20 +196,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         </div>
       </div>
 
-      <BottomNav
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          if (tab === "settings") {
-            onNavigate("settings", undefined, "settings");
-          } else if (tab === "surah") {
-            onNavigate("surah-juz", undefined, "surah");
-          } else if (tab === "bookmarks") {
-            onNavigate("bookmarks", undefined, "bookmarks");
-          } else {
-            onNavigate("home", undefined, "home");
-          }
-        }}
-      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
-import BottomNav from "@/components/BottomNav";
+
 import { getAllReciters, getReciterById } from "@/lib/reciters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
@@ -261,18 +261,6 @@ export default function Settings({
           </div>
         </div>
 
-        <BottomNav
-          activeTab="settings"
-          onTabChange={(tab) => {
-            if (onNavigate) {
-              if (tab === "home") onNavigate("home", undefined, "home");
-              else if (tab === "surah") onNavigate("surah-juz", undefined, "surah");
-              else if (tab === "bookmarks") onNavigate("bookmarks", undefined, "bookmarks");
-            } else {
-              if (tab === "home" || tab === "surah") onBack();
-            }
-          }}
-        />
       </div>
     );
   }
@@ -562,18 +550,6 @@ export default function Settings({
         </div>
       </div>
 
-      <BottomNav
-        activeTab="settings"
-        onTabChange={(tab) => {
-          if (onNavigate) {
-            if (tab === "home") onNavigate("home", undefined, "home");
-            else if (tab === "surah") onNavigate("surah-juz", undefined, "surah");
-            else if (tab === "bookmarks") onNavigate("bookmarks", undefined, "bookmarks");
-          } else {
-            if (tab === "home" || tab === "surah") onBack();
-          }
-        }}
-      />
     </div>
   );
 }

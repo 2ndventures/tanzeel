@@ -14,6 +14,7 @@ import AudioManager from "@/pages/AudioManager";
 import OnboardingScreen from "@/components/OnboardingScreen";
 import SplashScreen from "@/components/SplashScreen";
 import MiniPlayer from "@/components/MiniPlayer";
+import BottomNav from "@/components/BottomNav";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
@@ -460,6 +461,20 @@ function App() {
                   reciter={reciter}
                 />
               )}
+            </div>
+            <div className={["chapter", "privacy-policy", "terms-of-service", "audio-manager"].includes(currentPage) ? "hidden" : ""}>
+              <BottomNav
+                activeTab={activeTab}
+                onTabChange={(tab) => {
+                  const pageMap: Record<string, string> = {
+                    home: "home",
+                    surah: "surah-juz",
+                    bookmarks: "bookmarks",
+                    settings: "settings",
+                  };
+                  handleNavigate(pageMap[tab], undefined, tab);
+                }}
+              />
             </div>
             <MiniPlayer
               visible={currentPage !== "chapter"}

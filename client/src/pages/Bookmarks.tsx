@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import BottomNav from "@/components/BottomNav";
+
 import { chapters } from "@/lib/quranMetadata";
 import {
   getBookmarks,
@@ -426,12 +426,6 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
         </div>
       )}
 
-      <BottomNav activeTab={activeTab} onTabChange={(tab) => {
-        if (tab === "home") onNavigate("home", undefined, "home");
-        else if (tab === "surah") onNavigate("surah-juz", undefined, "surah");
-        else if (tab === "bookmarks") onNavigate("bookmarks", undefined, "bookmarks");
-        else if (tab === "settings") onNavigate("settings", undefined, "settings");
-      }} />
     </div>
   );
 }

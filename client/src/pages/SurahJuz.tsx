@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
-import BottomNav from "@/components/BottomNav";
+
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
 import { Search, BookOpen, ArrowRight, Loader } from "lucide-react";
@@ -565,20 +565,6 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
         </div>
       </div>
 
-      <BottomNav
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          if (tab === "settings") {
-            onNavigate("settings", undefined, "settings");
-          } else if (tab === "surah") {
-            onNavigate("surah-juz", undefined, "surah");
-          } else if (tab === "bookmarks") {
-            onNavigate("bookmarks", undefined, "bookmarks");
-          } else {
-            onNavigate("home", undefined, "home");
-          }
-        }}
-      />
     </div>
   );
 }
