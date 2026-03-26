@@ -141,10 +141,9 @@ export async function getCachedAudioUri(
   const dir = getDirectoryForEntry(entry);
 
   try {
-    await Filesystem.stat({
-      path: entry.filePath,
-      directory: dir,
-    });
+    if (Capacitor.isNativePlatform()) {
+      await Filesystem.stat({ path: entry.filePath, directory: dir });
+    }
 
     entry.lastAccessedAt = new Date().toISOString();
     saveManifest().catch(() => {});
