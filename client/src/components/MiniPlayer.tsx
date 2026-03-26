@@ -65,10 +65,10 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
 
   return (
     <div
-      className={`fixed left-0 right-0 z-30 transition-all duration-300 ease-out ${
+      className={`fixed left-0 right-0 z-50 transition-all duration-300 ease-out ${
         animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
-      style={{ bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
+      style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
       data-testid="mini-player"
     >
       <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
