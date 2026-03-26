@@ -34,17 +34,14 @@ interface AudioProviderProps {
   reciter: string;
   repeat: boolean;
   autoplay: boolean;
-  onNavigateToChapter?: (chapterId: number) => void;
 }
 
-export function AudioProvider({ children, reciter, repeat, autoplay, onNavigateToChapter }: AudioProviderProps) {
+export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProviderProps) {
   const [activeChapterId, setActiveChapterId] = useState<number | null>(null);
 
   const verseChangeCallbackRef = useRef<((verseKey: string) => void) | null>(null);
   const endedCallbackRef = useRef<(() => void) | null>(null);
   const activeChapterIdRef = useRef<number | null>(null);
-  const onNavigateRef = useRef(onNavigateToChapter);
-  onNavigateRef.current = onNavigateToChapter;
 
   activeChapterIdRef.current = activeChapterId;
 
@@ -58,9 +55,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay, onNavigateT
     } else {
       const currentId = activeChapterIdRef.current;
       if (currentId && currentId < 114) {
-        const nextId = currentId + 1;
-        setActiveChapterId(nextId);
-        onNavigateRef.current?.(nextId);
+        setActiveChapterId(currentId + 1);
       }
     }
   }, []);

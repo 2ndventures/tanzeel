@@ -21,7 +21,8 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
     retry,
   } = useAudio();
 
-  const showMiniPlayer = !!activeChapterId && visible;
+  const hasAudioActivity = !!activeChapterId && (isPlaying || currentTime > 0 || isLoading);
+  const showMiniPlayer = hasAudioActivity && visible;
 
   useEffect(() => {
     if (showMiniPlayer) {

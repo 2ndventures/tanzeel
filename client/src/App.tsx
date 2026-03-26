@@ -348,8 +348,7 @@ function App() {
             />
           )}
 
-          {storageReady && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay} onNavigateToChapter={(chId) => handleNavigate("chapter", chId)}>
-
+          {storageReady && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay}>
             <div className="h-full">
               <div key={currentPage} className={`h-full ${
                 navDirection === "forward" ? "animate-slide-in-right" :
