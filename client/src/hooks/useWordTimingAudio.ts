@@ -96,7 +96,8 @@ export function useWordTimingAudio(
   onVerseChange?: (verseKey: string) => void,
   onEnded?: () => void,
   initialSpeed: number = 1.0,
-  autoplay: boolean = false
+  autoplay: boolean = false,
+  enabled: boolean = true
 ) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContainerRef = useRef<HTMLDivElement | null>(null);
@@ -493,7 +494,7 @@ export function useWordTimingAudio(
 
       verseByVerseRef.current = false;
 
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
+      setState(prev => ({ ...prev, isLoading: true, error: null, currentVerseKey: null, currentWordIndex: null, currentTime: 0, duration: 0 }));
 
       syncSpeed();
 
@@ -844,6 +845,7 @@ export function useWordTimingAudio(
   }, [chapterId, reciterId, syncSpeed, findCurrentSegment, tryVerseByVerseFallback]);
 
   useEffect(() => {
+    if (!enabled) return;
     loadIdRef.current++;
     retryCountRef.current = 0;
     if (retryTimerRef.current) {
@@ -859,7 +861,7 @@ export function useWordTimingAudio(
       }
       cleanup?.then(cleanupFn => cleanupFn?.());
     };
-  }, [loadAudio]);
+  }, [loadAudio, enabled]);
 
   const retry = useCallback(() => {
     retryCountRef.current = 0;

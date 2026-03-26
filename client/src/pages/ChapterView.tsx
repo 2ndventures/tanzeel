@@ -10,8 +10,8 @@ import HifzView from "@/components/HifzView";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
-import { useWordTimingAudio } from "@/hooks/useWordTimingAudio";
-import { getFeaturedReciters, getReciterById, getQuranComReciterId } from "@/lib/reciters";
+import { useAudio } from "@/contexts/AudioContext";
+import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import { useMediaSession } from "@/hooks/useMediaSession";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
@@ -280,8 +280,6 @@ export default function ChapterView({
     };
   }, []);
   
-  const quranComReciterId = getQuranComReciterId(reciter);
-
   // Load verses when chapter changes
   useEffect(() => {
     let isMounted = true;
@@ -324,8 +322,8 @@ export default function ChapterView({
   const completedVersesRef = useRef(new Set<string>());
   const lastTimeRef = useRef(0);
 
-  // Use word-timing audio with continuous playback
   const {
+    activeChapterId,
     isPlaying,
     speed,
     currentVerseKey,
@@ -342,61 +340,55 @@ export default function ChapterView({
     seekToVerse,
     getTimingData,
     retry: retryAudio,
-  } = useWordTimingAudio(
-    chapterId,
-    quranComReciterId,
-    repeat,
-    (verseKey) => {
-      // Track verse completion for stats
+    loadChapter,
+    registerVerseChangeCallback,
+    registerEndedCallback,
+  } = useAudio();
+
+  useEffect(() => {
+    loadChapter(chapterId);
+  }, [chapterId, loadChapter]);
+
+  const goToNextSurahRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    const handleVerseChange = (verseKey: string) => {
       if (!completedVersesRef.current.has(verseKey)) {
         completedVersesRef.current.add(verseKey);
         incrementVersesRead(1, verseKey);
       }
       if (autoScroll && scrollContainerRef.current) {
-        // Parse verse key (e.g., "1:2" -> verse 2)
         const verseNumber = parseInt(verseKey.split(':')[1]);
-        
-        // Use requestAnimationFrame to ensure DOM is ready
         requestAnimationFrame(() => {
           const verseElement = document.querySelector(`[data-testid="card-verse-${verseNumber}"]`);
           const container = scrollContainerRef.current;
-          
           if (verseElement && container) {
-            // Get the header element to measure its actual height
             const headerElement = document.querySelector('.header-safe-padding');
             const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : (isCollapsed ? 60 : 80);
-            
-            // Get the verse's and container's bounding rectangles
             const verseRect = (verseElement as HTMLElement).getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
-            
-            // The verse's position relative to the container's current scroll position
             const verseRelativeTop = verseRect.top - containerRect.top + container.scrollTop;
-            
-            // We want the verse to appear below the fixed header with some breathing room
-            // The container's top edge is at y=0, but the header overlays the first headerHeight pixels
-            // So we need to scroll less to keep the verse visible below the header
             const breathingRoom = 20;
             const targetScroll = verseRelativeTop - headerHeight - breathingRoom;
-            
             const scrollBehavior = didSeekRef.current ? 'instant' : 'smooth';
             didSeekRef.current = false;
             markProgrammaticScroll();
-            container.scrollTo({ 
+            container.scrollTo({
               top: Math.max(0, targetScroll),
               behavior: scrollBehavior as ScrollBehavior,
             });
           }
         });
       }
-    },
-    () => {
-      // Navigate to next surah when current one ends (autoplay will be handled by hook)
-      goToNextSurah();
-    },
-    1.0,
-    autoplay
-  );
+    };
+    registerVerseChangeCallback(handleVerseChange);
+    return () => registerVerseChangeCallback(null);
+  }, [autoScroll, isCollapsed, markProgrammaticScroll, registerVerseChangeCallback]);
+
+  useEffect(() => {
+    registerEndedCallback(() => goToNextSurahRef.current());
+    return () => registerEndedCallback(null);
+  }, [registerEndedCallback]);
 
   pauseAudioRef.current = pauseAudio;
 
@@ -524,7 +516,9 @@ export default function ChapterView({
   }, [initialVerse, isLoadingVerses, verses, chapterId, seekToVerse, playAudio]);
 
   // Extract current verse number from verse key
-  const currentVerse = currentVerseKey ? parseInt(currentVerseKey.split(':')[1]) : 1;
+  const currentVerse = currentVerseKey && currentVerseKey.startsWith(`${chapterId}:`)
+    ? parseInt(currentVerseKey.split(':')[1])
+    : 1;
 
   useEffect(() => {
     const handleUserScroll = () => {
@@ -597,6 +591,8 @@ export default function ChapterView({
       onNavigate('chapter', nextChapterId);
     }
   }, [chapterId, onNavigate]);
+
+  goToNextSurahRef.current = goToNextSurah;
 
   const handleVerseClick = useCallback((verseNumber: number) => {
     const verseKey = `${chapterId}:${verseNumber}`;
