@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { chapters, Verse } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
 
@@ -14,6 +15,7 @@ interface OnboardingScreenProps {
   transliterationFontSize: string;
   onTransliterationFontSizeChange: (value: string) => void;
   darkMode: boolean;
+  onDarkModeChange: (isDark: boolean) => void;
 }
 
 export default function OnboardingScreen({
@@ -25,6 +27,7 @@ export default function OnboardingScreen({
   transliterationFontSize,
   onTransliterationFontSizeChange,
   darkMode,
+  onDarkModeChange,
 }: OnboardingScreenProps) {
   const [step, setStep] = useState(0);
   const [exampleVerses, setExampleVerses] = useState<Verse[]>([]);
@@ -181,7 +184,14 @@ export default function OnboardingScreen({
               </div>
             </div>
 
-            {/* Continue Button */}
+            <div className="flex items-center justify-between gap-3 bg-card/60 backdrop-blur-sm rounded-2xl px-5 py-4 border border-border/30">
+              <div>
+                <p className="text-sm font-medium text-foreground">Appearance</p>
+                <p className="text-xs text-muted-foreground">{darkMode ? "Dark mode" : "Light mode"}</p>
+              </div>
+              <ThemeToggle isDark={darkMode} onToggle={onDarkModeChange} />
+            </div>
+
             <div className="pt-4">
               <Button
                 size="lg"

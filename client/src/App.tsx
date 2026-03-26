@@ -60,7 +60,12 @@ function App() {
   }, [storageReady, splashAnimDone]);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return true;
+  });
   
   const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>('uthmani');
   const [reciter, setReciter] = useState(DEFAULT_RECITER);
@@ -346,6 +351,7 @@ function App() {
               transliterationFontSize={transliterationFontSize}
               onTransliterationFontSizeChange={setTransliterationFontSize}
               darkMode={darkMode}
+              onDarkModeChange={setDarkMode}
             />
           )}
 
