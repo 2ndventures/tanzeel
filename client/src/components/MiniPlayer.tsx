@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { useAudio } from "@/contexts/AudioContext";
 import { chapters, getDisplayArabicName } from "@/lib/quranMetadata";
@@ -22,29 +22,51 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
   } = useAudio();
 
   const hasAudioActivity = !!activeChapterId && (isPlaying || currentTime > 0 || isLoading);
-  const showMiniPlayer = hasAudioActivity && visible;
+  const shouldShow = hasAudioActivity && visible;
+
+  const [mounted, setMounted] = useState(false);
+  const [animateIn, setAnimateIn] = useState(false);
+  const lastChapterRef = useRef<{ id: number; englishName: string; arabicName: string } | null>(null);
+
+  if (activeChapterId) {
+    const ch = chapters.find(c => c.id === activeChapterId);
+    if (ch) {
+      lastChapterRef.current = { id: ch.id, englishName: ch.englishName, arabicName: ch.arabicName };
+    }
+  }
 
   useEffect(() => {
-    if (showMiniPlayer) {
+    if (shouldShow) {
+      setMounted(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setAnimateIn(true));
+      });
+    } else {
+      setAnimateIn(false);
+      const timer = setTimeout(() => setMounted(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldShow]);
+
+  useEffect(() => {
+    if (shouldShow) {
       document.body.setAttribute('data-mini-player-visible', '');
     } else {
       document.body.removeAttribute('data-mini-player-visible');
     }
     return () => document.body.removeAttribute('data-mini-player-visible');
-  }, [showMiniPlayer]);
+  }, [shouldShow]);
 
-  if (!showMiniPlayer) return null;
+  if (!mounted || !lastChapterRef.current) return null;
 
-  const chapter = chapters.find(c => c.id === activeChapterId);
-  if (!chapter) return null;
-
+  const chapter = lastChapterRef.current;
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const arabicName = getDisplayArabicName(chapter.arabicName);
 
   return (
     <div
       className={`fixed left-0 right-0 z-30 transition-all duration-300 ease-out ${
-        visible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+        animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
       style={{ bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))' }}
       data-testid="mini-player"
@@ -63,7 +85,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
             className="flex-1 min-w-0 flex items-center gap-3"
             onClick={() => {
               triggerHaptic('light');
-              onNavigateToChapter(activeChapterId);
+              onNavigateToChapter(chapter.id);
             }}
             data-testid="mini-player-navigate"
           >
