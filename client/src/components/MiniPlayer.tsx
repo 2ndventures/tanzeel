@@ -38,7 +38,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
   if (!chapter) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-  const arabicName = getDisplayArabicName(chapter);
+  const arabicName = getDisplayArabicName(chapter.arabicName);
 
   return (
     <div
