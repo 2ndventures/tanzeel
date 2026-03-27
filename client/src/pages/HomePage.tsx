@@ -6,16 +6,23 @@ import { getReadingStats } from "@/lib/readingStats";
 
 const DAILY_VERSES = [
   { id: 1, ayah: 6, verse: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", translation: "Guide us to the straight path." },
+  { id: 2, ayah: 152, verse: "فَٱذْكُرُونِىٓ أَذْكُرْكُمْ وَٱشْكُرُوا لِى وَلَا تَكْفُرُونِ", translation: "So remember Me; I will remember you. And be grateful to Me and do not deny Me." },
   { id: 2, ayah: 255, verse: "ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ", translation: "God — there is no deity except Him, the Ever-Living, the Sustainer of existence." },
   { id: 2, ayah: 286, verse: "لَا يُكَلِّفُ ٱللَّهُ نَفْسًا إِلَّا وُسْعَهَا", translation: "God does not burden a soul beyond that it can bear." },
   { id: 3, ayah: 139, verse: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ ٱلْأَعْلَوْنَ", translation: "Do not weaken and do not grieve, for you will be superior." },
+  { id: 3, ayah: 173, verse: "حَسْبُنَا ٱللَّهُ وَنِعْمَ ٱلْوَكِيلُ", translation: "Sufficient for us is God, and He is the best Disposer of affairs." },
+  { id: 9, ayah: 51, verse: "قُل لَّن يُصِيبَنَآ إِلَّا مَا كَتَبَ ٱللَّهُ لَنَا هُوَ مَوْلَىٰنَا", translation: "Say, 'Never will we be struck except by what God has decreed for us; He is our protector.'" },
   { id: 13, ayah: 28, verse: "أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ", translation: "Verily, in the remembrance of God do hearts find rest." },
+  { id: 14, ayah: 7, verse: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ", translation: "If you are grateful, I will surely increase you." },
   { id: 18, ayah: 13, verse: "إِنَّهُمْ فِتْيَةٌ آمَنُوا بِرَبِّهِمْ وَزِدْنَاهُمْ هُدًى", translation: "They were youths who believed in their Lord, and We increased them in guidance." },
   { id: 21, ayah: 87, verse: "لَّآ إِلَٰهَ إِلَّآ أَنتَ سُبْحَٰنَكَ إِنِّى كُنتُ مِنَ ٱلظَّٰلِمِينَ", translation: "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers." },
   { id: 24, ayah: 35, verse: "ٱللَّهُ نُورُ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ", translation: "God is the Light of the heavens and the earth." },
+  { id: 29, ayah: 69, verse: "وَٱلَّذِينَ جَٰهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا", translation: "And those who strive for Us — We will surely guide them to Our ways." },
   { id: 36, ayah: 82, verse: "إِنَّمَآ أَمْرُهُۥٓ إِذَآ أَرَادَ شَيْـًٔا أَن يَقُولَ لَهُۥ كُن فَيَكُونُ", translation: "His command is only when He intends a thing that He says to it, 'Be,' and it is." },
   { id: 39, ayah: 53, verse: "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ ٱللَّهِ", translation: "Say, 'O My servants who have transgressed against themselves, do not despair of the mercy of God.'" },
+  { id: 40, ayah: 60, verse: "ٱدْعُونِىٓ أَسْتَجِبْ لَكُمْ", translation: "Call upon Me; I will respond to you." },
   { id: 55, ayah: 13, verse: "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ", translation: "Then which of the favors of your Lord will you deny?" },
+  { id: 65, ayah: 3, verse: "وَمَن يَتَوَكَّلْ عَلَى ٱللَّهِ فَهُوَ حَسْبُهُۥٓ", translation: "And whoever relies upon God — then He is sufficient for him." },
   { id: 67, ayah: 1, verse: "تَبَٰرَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", translation: "Blessed is He in whose hand is dominion, and He is over all things competent." },
   { id: 93, ayah: 5, verse: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ", translation: "And your Lord is going to give you, and you will be satisfied." },
   { id: 94, ayah: 5, verse: "فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا", translation: "For indeed, with hardship will be ease." },
@@ -180,31 +187,31 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               <div className="verse-of-day-bg absolute inset-0" />
               <div className="relative px-6 py-6 flex flex-col items-center text-center">
                 <p
-                  className="verse-of-day-label text-xs font-bold tracking-[0.2em] uppercase text-primary/80 mb-4"
-                  style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.3s forwards' }}
-                >
-                  Verse of the Day
-                </p>
-                <div className="w-10 h-px bg-primary/30 mb-5" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.4s forwards' }} />
-                <p
                   className="font-arabic text-[1.7rem] leading-[2.4] text-foreground mb-4"
                   dir="rtl"
-                  style={{ opacity: 0, animation: 'verseReveal 0.7s ease-out 0.5s forwards' }}
+                  style={{ opacity: 0, animation: 'verseReveal 0.7s ease-out 0.3s forwards' }}
                 >
                   {daily.verse}
                 </p>
-                <div className="w-10 h-px bg-primary/30 mb-4" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.8s forwards' }} />
+                <div className="w-10 h-px bg-primary/30 mb-4" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
                 <p
                   className="text-sm leading-relaxed text-muted-foreground italic max-w-[280px] mb-4"
-                  style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.9s forwards' }}
+                  style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.8s forwards' }}
                 >
                   &ldquo;{daily.translation}&rdquo;
                 </p>
+                <div className="w-10 h-px bg-primary/30 mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.0s forwards' }} />
                 <p
-                  className="text-xs font-medium text-primary/70"
+                  className="text-xs font-medium text-primary/70 mb-1"
                   style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.1s forwards' }}
                 >
                   {dailyChapter.englishName} {daily.id}:{daily.ayah}
+                </p>
+                <p
+                  className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-muted-foreground/50"
+                  style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.2s forwards' }}
+                >
+                  Verse of the Day
                 </p>
               </div>
             </div>
