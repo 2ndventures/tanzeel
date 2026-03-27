@@ -7,6 +7,7 @@ import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
 import { Search, BookOpen, ArrowRight, Loader } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
+import PullToRefresh from "@/components/PullToRefresh";
 
 interface TopicResult {
   chapterId: number;
@@ -298,6 +299,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
         ref={scrollContainerRef}
         className="relative flex-1 overflow-y-auto min-h-0"
       >
+        <PullToRefresh onRefresh={async () => { setSearchQuery(''); setIsLoading(true); setTimeout(() => setIsLoading(false), 400); }} scrollRef={scrollContainerRef}>
         <div className="px-6 space-y-3 py-4 pb-nav-clearance">
           {showTopicResults && (
             <div className="mb-4">
@@ -563,6 +565,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
             </div>
           ) : null}
         </div>
+        </PullToRefresh>
       </div>
 
     </div>

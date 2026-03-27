@@ -1,8 +1,9 @@
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import { chapters } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
+import PullToRefresh from "@/components/PullToRefresh";
 
 const DAILY_VERSES = [
   { id: 1, ayah: 6, verse: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", translation: "Guide us to the straight path." },
@@ -46,6 +47,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const [stats, setStats] = useState({ dayStreak: 0, lastReadDate: '', versesRead: 0, weeklyMinutes: 0, weekStart: '', lastReadChapter: 1, lastReadVerse: 0 });
   const [daily, setDaily] = useState(() => getDailyVerse());
   const dailyChapter = chapters.find(ch => ch.id === daily.id) || chapters[0];
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleRefresh = useCallback(async () => {
+    const newStats = await getReadingStats();
+    setStats(newStats);
+    setDaily(getDailyVerse());
+  }, []);
 
   useEffect(() => {
     getReadingStats().then(setStats);
@@ -91,7 +99,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           </div>
         </div>
 
-        <div className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
+        <div ref={scrollRef} className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
+        <PullToRefresh onRefresh={handleRefresh} scrollRef={scrollRef}>
           <div
             className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(255,214,10,0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
@@ -216,6 +225,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               </div>
             </div>
           </div>
+        </PullToRefresh>
         </div>
       </div>
 

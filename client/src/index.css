@@ -704,6 +704,38 @@ body[data-mini-player-visible] .pb-nav-clearance {
     filter: drop-shadow(0 0 3px hsl(var(--primary) / 0.4));
   }
 
+  /* Pull-to-refresh */
+  .ptr-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: height 0.3s cubic-bezier(0.2, 0, 0, 1);
+    will-change: height;
+  }
+
+  .ptr-indicator {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    will-change: transform, opacity;
+  }
+
+  .ptr-spinning {
+    animation: ptrSpin 1.2s linear infinite;
+  }
+
+  .ptr-star-path {
+    transition: stroke-dashoffset 0.15s ease, fill 0.3s ease;
+  }
+
+  .ptr-center-dot {
+    transition: fill 0.2s ease;
+  }
+
+  @keyframes ptrSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
   /* Smooth transitions for all interactive elements */
   .transition-smooth {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);

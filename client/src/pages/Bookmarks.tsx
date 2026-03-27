@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
 
 import { chapters } from "@/lib/quranMetadata";
@@ -8,6 +8,7 @@ import {
   updateBookmark,
   type Bookmark,
 } from "@/lib/bookmarkService";
+import PullToRefresh from "@/components/PullToRefresh";
 
 interface BookmarksProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => void;
@@ -18,6 +19,7 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [editingNote, setEditingNote] = useState<Bookmark | null>(null);
   const [noteText, setNoteText] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async () => {
     const bm = await getBookmarks();
@@ -73,7 +75,8 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 pb-nav-clearance min-h-0">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 pb-nav-clearance min-h-0">
+          <PullToRefresh onRefresh={refresh} scrollRef={scrollRef}>
           {bookmarks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-16 h-16 rounded-full bg-muted/30 flex items-center justify-center mb-4">
@@ -153,6 +156,7 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
               ))}
             </div>
           )}
+          </PullToRefresh>
         </div>
       </div>
 
