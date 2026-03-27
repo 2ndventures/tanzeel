@@ -176,14 +176,22 @@ export default function PullToRefresh({
       }
     };
 
+    const onTouchCancel = () => {
+      isPulling.current = false;
+      pullDistanceRef.current = 0;
+      setPullDistance(0);
+    };
+
     el.addEventListener('touchstart', onTouchStart, { passive: true });
     el.addEventListener('touchmove', onTouchMove, { passive: false });
     el.addEventListener('touchend', onTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', onTouchCancel, { passive: true });
 
     return () => {
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
+      el.removeEventListener('touchcancel', onTouchCancel);
     };
   }, [getScrollElement, phase, onRefresh]);
 
