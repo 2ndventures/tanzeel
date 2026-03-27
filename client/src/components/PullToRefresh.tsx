@@ -104,6 +104,7 @@ export default function PullToRefresh({
   const isPulling = useRef(false);
   const hapticTriggered = useRef(false);
   const pullDistanceRef = useRef(0);
+  const startedAtTop = useRef(false);
 
   const getScrollElement = useCallback(() => {
     return scrollRef?.current || containerRef.current;
@@ -115,27 +116,41 @@ export default function PullToRefresh({
 
     const onTouchStart = (e: TouchEvent) => {
       if (phase !== "idle") return;
-      if (el.scrollTop <= 0) {
-        touchStartY.current = e.touches[0].clientY;
-        isPulling.current = true;
-        hapticTriggered.current = false;
-      }
+      touchStartY.current = e.touches[0].clientY;
+      isPulling.current = false;
+      hapticTriggered.current = false;
+      startedAtTop.current = el.scrollTop <= 0;
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!isPulling.current || phase !== "idle") return;
+      if (phase !== "idle" || !startedAtTop.current) return;
+
       if (el.scrollTop > 0) {
-        isPulling.current = false;
-        pullDistanceRef.current = 0;
-        setPullDistance(0);
+        if (isPulling.current) {
+          isPulling.current = false;
+          pullDistanceRef.current = 0;
+          setPullDistance(0);
+        }
         return;
       }
 
       const dy = e.touches[0].clientY - touchStartY.current;
-      if (dy < 0) {
-        pullDistanceRef.current = 0;
-        setPullDistance(0);
+
+      if (dy <= 0) {
+        if (isPulling.current) {
+          isPulling.current = false;
+          pullDistanceRef.current = 0;
+          setPullDistance(0);
+        }
         return;
+      }
+
+      if (!isPulling.current) {
+        if (dy > 10 && el.scrollTop <= 0) {
+          isPulling.current = true;
+        } else {
+          return;
+        }
       }
 
       const distance = Math.min(dy * RESISTANCE, MAX_PULL);
@@ -147,9 +162,7 @@ export default function PullToRefresh({
         triggerHaptic('medium');
       }
 
-      if (distance > 5) {
-        e.preventDefault();
-      }
+      e.preventDefault();
     };
 
     const onTouchEnd = async () => {
