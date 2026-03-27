@@ -13,7 +13,7 @@ const MAX_PULL = 130;
 const RESISTANCE = 0.45;
 const COMPLETION_DURATION = 400;
 
-type PtrPhase = "idle" | "pulling" | "refreshing" | "completing";
+type PtrPhase = "idle" | "refreshing" | "completing";
 
 function IslamicStar({ progress, phase }: { progress: number; phase: PtrPhase }) {
   const size = 48;

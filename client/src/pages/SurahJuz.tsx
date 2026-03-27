@@ -299,7 +299,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
         ref={scrollContainerRef}
         className="relative flex-1 overflow-y-auto min-h-0"
       >
-        <PullToRefresh onRefresh={async () => { setSearchQuery(''); setMode('surah'); setIsLoading(true); await new Promise(r => setTimeout(r, 500)); setIsLoading(false); }} scrollRef={scrollContainerRef}>
+        <PullToRefresh onRefresh={async () => { scrollContainerRef.current?.scrollTo({ top: 0 }); await new Promise(r => setTimeout(r, 300)); }} scrollRef={scrollContainerRef}>
         <div className="px-6 space-y-3 py-4 pb-nav-clearance">
           {showTopicResults && (
             <div className="mb-4">
