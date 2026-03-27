@@ -495,7 +495,7 @@ function App() {
 
           {storageReady && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay}>
             <div className="h-full">
-              <div className={isTransitioning ? "page-transition-container" : ""}>
+              <div className={isTransitioning ? "page-transition-container" : "h-full"}>
                 {isTransitioning && prevPage && (
                   <div key={`exit-${prevPage}`} className={`page-layer page-exit-${navDirection}`}>
                     {renderPage(prevPage)}
