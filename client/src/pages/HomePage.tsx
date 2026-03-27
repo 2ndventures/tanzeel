@@ -1,25 +1,25 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
 
-import { chapters, surahMeanings } from "@/lib/quranMetadata";
+import { chapters } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 
-const DAILY_SURAHS = [
-  { id: 1, verse: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", translation: "Guide us to the straight path." },
-  { id: 2, verse: "ذَٰلِكَ ٱلْكِتَٰبُ لَا رَيْبَ فِيهِ هُدًى لِّلْمُتَّقِينَ", translation: "This is the Book about which there is no doubt, a guidance for those conscious of God." },
-  { id: 18, verse: "إِنَّهُمْ فِتْيَةٌ آمَنُوا بِرَبِّهِمْ وَزِدْنَاهُمْ هُدًى", translation: "They were youths who believed in their Lord, and We increased them in guidance." },
-  { id: 19, verse: "وَهُزِّىٓ إِلَيْكِ بِجِذْعِ ٱلنَّخْلَةِ تُسَٰقِطْ عَلَيْكِ رُطَبًا جَنِيًّا", translation: "Shake toward you the trunk of the palm tree; it will drop upon you ripe, fresh dates." },
-  { id: 31, verse: "يَٰبُنَىَّ إِنَّهَآ إِن تَكُ مِثْقَالَ حَبَّةٍ مِّنْ خَرْدَلٍ", translation: "O my son, indeed if wrong be the weight of a mustard seed..." },
-  { id: 36, verse: "إِنَّمَآ أَمْرُهُۥٓ إِذَآ أَرَادَ شَيْـًٔا أَن يَقُولَ لَهُۥ كُن فَيَكُونُ", translation: "His command is only when He intends a thing that He says to it, 'Be,' and it is." },
-  { id: 39, verse: "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ ٱللَّهِ", translation: "Say, 'O My servants who have transgressed against themselves, do not despair of the mercy of God.'" },
-  { id: 55, verse: "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ", translation: "Then which of the favors of your Lord will you deny?" },
-  { id: 56, verse: "فَسَبِّحْ بِٱسْمِ رَبِّكَ ٱلْعَظِيمِ", translation: "So exalt the name of your Lord, the Most Great." },
-  { id: 67, verse: "تَبَٰرَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", translation: "Blessed is He in whose hand is dominion, and He is over all things competent." },
-  { id: 93, verse: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ", translation: "And your Lord is going to give you, and you will be satisfied." },
-  { id: 94, verse: "فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا", translation: "For indeed, with hardship will be ease." },
-  { id: 112, verse: "قُلْ هُوَ ٱللَّهُ أَحَدٌ", translation: "Say, 'He is God, the One.'" },
-  { id: 113, verse: "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ", translation: "Say, 'I seek refuge in the Lord of daybreak.'" },
-  { id: 114, verse: "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ", translation: "Say, 'I seek refuge in the Lord of mankind.'" },
+const DAILY_VERSES = [
+  { id: 1, ayah: 6, verse: "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", translation: "Guide us to the straight path." },
+  { id: 2, ayah: 255, verse: "ٱللَّهُ لَآ إِلَٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ", translation: "God — there is no deity except Him, the Ever-Living, the Sustainer of existence." },
+  { id: 2, ayah: 286, verse: "لَا يُكَلِّفُ ٱللَّهُ نَفْسًا إِلَّا وُسْعَهَا", translation: "God does not burden a soul beyond that it can bear." },
+  { id: 3, ayah: 139, verse: "وَلَا تَهِنُوا وَلَا تَحْزَنُوا وَأَنتُمُ ٱلْأَعْلَوْنَ", translation: "Do not weaken and do not grieve, for you will be superior." },
+  { id: 13, ayah: 28, verse: "أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ", translation: "Verily, in the remembrance of God do hearts find rest." },
+  { id: 18, ayah: 13, verse: "إِنَّهُمْ فِتْيَةٌ آمَنُوا بِرَبِّهِمْ وَزِدْنَاهُمْ هُدًى", translation: "They were youths who believed in their Lord, and We increased them in guidance." },
+  { id: 21, ayah: 87, verse: "لَّآ إِلَٰهَ إِلَّآ أَنتَ سُبْحَٰنَكَ إِنِّى كُنتُ مِنَ ٱلظَّٰلِمِينَ", translation: "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers." },
+  { id: 24, ayah: 35, verse: "ٱللَّهُ نُورُ ٱلسَّمَٰوَٰتِ وَٱلْأَرْضِ", translation: "God is the Light of the heavens and the earth." },
+  { id: 36, ayah: 82, verse: "إِنَّمَآ أَمْرُهُۥٓ إِذَآ أَرَادَ شَيْـًٔا أَن يَقُولَ لَهُۥ كُن فَيَكُونُ", translation: "His command is only when He intends a thing that He says to it, 'Be,' and it is." },
+  { id: 39, ayah: 53, verse: "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ ٱللَّهِ", translation: "Say, 'O My servants who have transgressed against themselves, do not despair of the mercy of God.'" },
+  { id: 55, ayah: 13, verse: "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ", translation: "Then which of the favors of your Lord will you deny?" },
+  { id: 67, ayah: 1, verse: "تَبَٰرَكَ ٱلَّذِى بِيَدِهِ ٱلْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ", translation: "Blessed is He in whose hand is dominion, and He is over all things competent." },
+  { id: 93, ayah: 5, verse: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰٓ", translation: "And your Lord is going to give you, and you will be satisfied." },
+  { id: 94, ayah: 5, verse: "فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا", translation: "For indeed, with hardship will be ease." },
+  { id: 112, ayah: 1, verse: "قُلْ هُوَ ٱللَّهُ أَحَدٌ", translation: "Say, 'He is God, the One.'" },
 ];
 
 interface HomePageProps {
@@ -27,19 +27,18 @@ interface HomePageProps {
   activeTab?: "home" | "surah" | "settings" | "bookmarks";
 }
 
-function getDailySurah() {
+function getDailyVerse() {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const diff = now.getTime() - start.getTime();
   const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
-  return DAILY_SURAHS[dayOfYear % DAILY_SURAHS.length];
+  return DAILY_VERSES[dayOfYear % DAILY_VERSES.length];
 }
 
 export default function HomePage({ onNavigate, activeTab = "home" }: HomePageProps) {
   const [stats, setStats] = useState({ dayStreak: 0, lastReadDate: '', versesRead: 0, weeklyMinutes: 0, weekStart: '', lastReadChapter: 1, lastReadVerse: 0 });
-  const [daily, setDaily] = useState(() => getDailySurah());
+  const [daily, setDaily] = useState(() => getDailyVerse());
   const dailyChapter = chapters.find(ch => ch.id === daily.id) || chapters[0];
-  const dailyMeaning = surahMeanings[daily.id] || "";
 
   useEffect(() => {
     getReadingStats().then(setStats);
@@ -49,7 +48,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         getReadingStats().then(setStats);
-        setDaily(getDailySurah());
+        setDaily(getDailyVerse());
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -168,28 +167,45 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col min-h-0 animate-fade-in-up pb-4" style={{ opacity: 0, animationDelay: '200ms', animationFillMode: 'forwards' }}>
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
-                TODAY'S READING
-              </h3>
-              <Icon icon="solar:alt-arrow-right-bold" className="size-5 text-primary" />
-            </div>
+          <div className="flex-1 flex flex-col min-h-0 pb-4">
             <div
-              className="rounded-3xl border border-border/50 bg-card/80 px-5 py-4 shadow-lg backdrop-blur-sm cursor-pointer"
-              onClick={() => onNavigate("chapter", daily.id)}
-              data-testid="card-todays-reading"
+              className="verse-of-day-card relative overflow-hidden rounded-3xl cursor-pointer"
+              onClick={() => onNavigate("chapter", daily.id, undefined, daily.ayah)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", daily.id, undefined, daily.ayah); }}}
+              role="button"
+              tabIndex={0}
+              aria-label={`Verse of the day: ${daily.translation} — ${dailyChapter.englishName} ${daily.id}:${daily.ayah}`}
+              data-testid="card-verse-of-day"
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-heading text-xl font-bold tracking-tighter text-foreground">
-                    Surah {dailyChapter.englishName}
-                  </h4>
-                  <p className="mt-2 text-sm text-muted-foreground">{dailyMeaning} • {dailyChapter.verseCount} Ayahs</p>
-                </div>
-                <div className="rounded-2xl bg-primary/20 px-4 py-2 shadow-inner">
-                  <span className="text-sm font-bold text-primary">{daily.id}</span>
-                </div>
+              <div className="verse-of-day-bg absolute inset-0" />
+              <div className="relative px-6 py-6 flex flex-col items-center text-center">
+                <p
+                  className="verse-of-day-label text-xs font-bold tracking-[0.2em] uppercase text-primary/80 mb-4"
+                  style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.3s forwards' }}
+                >
+                  Verse of the Day
+                </p>
+                <div className="w-10 h-px bg-primary/30 mb-5" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.4s forwards' }} />
+                <p
+                  className="font-arabic text-[1.7rem] leading-[2.4] text-foreground mb-4"
+                  dir="rtl"
+                  style={{ opacity: 0, animation: 'verseReveal 0.7s ease-out 0.5s forwards' }}
+                >
+                  {daily.verse}
+                </p>
+                <div className="w-10 h-px bg-primary/30 mb-4" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.8s forwards' }} />
+                <p
+                  className="text-sm leading-relaxed text-muted-foreground italic max-w-[280px] mb-4"
+                  style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.9s forwards' }}
+                >
+                  &ldquo;{daily.translation}&rdquo;
+                </p>
+                <p
+                  className="text-xs font-medium text-primary/70"
+                  style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.1s forwards' }}
+                >
+                  {dailyChapter.englishName} {daily.id}:{daily.ayah}
+                </p>
               </div>
             </div>
           </div>
