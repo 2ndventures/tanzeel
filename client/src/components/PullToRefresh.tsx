@@ -4,8 +4,7 @@ import { triggerHaptic } from "@/lib/haptics";
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
   children: ReactNode;
-  className?: string;
-  scrollRef?: React.RefObject<HTMLDivElement>;
+  scrollRef: React.RefObject<HTMLDivElement>;
 }
 
 const THRESHOLD = 80;
@@ -94,10 +93,8 @@ function IslamicStar({ progress, phase }: { progress: number; phase: PtrPhase })
 export default function PullToRefresh({
   onRefresh,
   children,
-  className = "",
   scrollRef,
 }: PullToRefreshProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [pullDistance, setPullDistance] = useState(0);
   const [phase, setPhase] = useState<PtrPhase>("idle");
   const touchStartY = useRef(0);
@@ -106,12 +103,8 @@ export default function PullToRefresh({
   const pullDistanceRef = useRef(0);
   const startedAtTop = useRef(false);
 
-  const getScrollElement = useCallback(() => {
-    return scrollRef?.current || containerRef.current;
-  }, [scrollRef]);
-
   useEffect(() => {
-    const el = getScrollElement();
+    const el = scrollRef.current;
     if (!el) return;
 
     const onTouchStart = (e: TouchEvent) => {
@@ -206,13 +199,13 @@ export default function PullToRefresh({
       el.removeEventListener('touchend', onTouchEnd);
       el.removeEventListener('touchcancel', onTouchCancel);
     };
-  }, [getScrollElement, phase, onRefresh]);
+  }, [scrollRef, phase, onRefresh]);
 
   const progress = pullDistance / THRESHOLD;
   const showIndicator = pullDistance > 5 || phase === "refreshing" || phase === "completing";
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <>
       {showIndicator && (
         <div
           className="ptr-container"
@@ -226,6 +219,6 @@ export default function PullToRefresh({
         </div>
       )}
       {children}
-    </div>
+    </>
   );
 }
