@@ -723,6 +723,10 @@ body[data-mini-player-visible] .pb-nav-clearance {
     animation: ptrSpin 1.2s linear infinite;
   }
 
+  .ptr-completing {
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+  }
+
   .ptr-star-path {
     transition: stroke-dashoffset 0.15s ease, fill 0.3s ease;
   }

@@ -11,8 +11,11 @@ interface PullToRefreshProps {
 const THRESHOLD = 80;
 const MAX_PULL = 130;
 const RESISTANCE = 0.45;
+const COMPLETION_DURATION = 400;
 
-function IslamicStar({ progress, refreshing }: { progress: number; refreshing: boolean }) {
+type PtrPhase = "idle" | "pulling" | "refreshing" | "completing";
+
+function IslamicStar({ progress, phase }: { progress: number; phase: PtrPhase }) {
   const size = 48;
   const cx = size / 2;
   const cy = size / 2;
@@ -35,15 +38,20 @@ function IslamicStar({ progress, refreshing }: { progress: number; refreshing: b
   const starPath = pathParts.join(" ");
 
   const totalLength = 320;
-  const visibleLength = totalLength * Math.min(progress, 1);
+  const drawProgress = phase === "refreshing" || phase === "completing" ? 1 : Math.min(progress, 1);
+  const visibleLength = totalLength * drawProgress;
   const dashOffset = totalLength - visibleLength;
+
+  const isCompleting = phase === "completing";
 
   return (
     <div
-      className={`ptr-indicator ${refreshing ? 'ptr-spinning' : ''}`}
+      className={`ptr-indicator ${phase === 'refreshing' ? 'ptr-spinning' : ''} ${isCompleting ? 'ptr-completing' : ''}`}
       style={{
-        transform: `scale(${0.5 + progress * 0.5})`,
-        opacity: Math.min(progress * 1.5, 1),
+        transform: phase === "refreshing" || phase === "completing"
+          ? `scale(${isCompleting ? 1.15 : 1})`
+          : `scale(${0.5 + progress * 0.5})`,
+        opacity: isCompleting ? 0 : Math.min(progress * 1.5, 1),
       }}
       data-testid="pull-to-refresh-indicator"
     >
@@ -66,7 +74,7 @@ function IslamicStar({ progress, refreshing }: { progress: number; refreshing: b
           stroke="hsl(var(--primary))"
           strokeWidth="1.5"
           strokeLinejoin="round"
-          fill={progress >= 1 ? "hsl(var(--primary) / 0.1)" : "none"}
+          fill={drawProgress >= 1 ? "hsl(var(--primary) / 0.1)" : "none"}
           strokeDasharray={totalLength}
           strokeDashoffset={dashOffset}
           className="ptr-star-path"
@@ -75,7 +83,7 @@ function IslamicStar({ progress, refreshing }: { progress: number; refreshing: b
           cx={cx}
           cy={cy}
           r={3}
-          fill={`hsl(var(--primary) / ${Math.min(progress, 1)})`}
+          fill={`hsl(var(--primary) / ${Math.min(drawProgress, 1)})`}
           className="ptr-center-dot"
         />
       </svg>
@@ -91,88 +99,96 @@ export default function PullToRefresh({
 }: PullToRefreshProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pullDistance, setPullDistance] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
+  const [phase, setPhase] = useState<PtrPhase>("idle");
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
   const hapticTriggered = useRef(false);
+  const pullDistanceRef = useRef(0);
 
   const getScrollElement = useCallback(() => {
     return scrollRef?.current || containerRef.current;
   }, [scrollRef]);
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    const scrollEl = getScrollElement();
-    if (!scrollEl || refreshing) return;
-    if (scrollEl.scrollTop <= 0) {
-      touchStartY.current = e.touches[0].clientY;
-      isPulling.current = true;
-      hapticTriggered.current = false;
-    }
-  }, [getScrollElement, refreshing]);
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!isPulling.current || refreshing) return;
-    const scrollEl = getScrollElement();
-    if (!scrollEl || scrollEl.scrollTop > 0) {
-      isPulling.current = false;
-      setPullDistance(0);
-      return;
-    }
-
-    const dy = e.touches[0].clientY - touchStartY.current;
-    if (dy < 0) {
-      setPullDistance(0);
-      return;
-    }
-
-    const distance = Math.min(dy * RESISTANCE, MAX_PULL);
-    setPullDistance(distance);
-
-    if (distance >= THRESHOLD && !hapticTriggered.current) {
-      hapticTriggered.current = true;
-      triggerHaptic('medium');
-    }
-
-    if (distance > 5) {
-      e.preventDefault();
-    }
-  }, [getScrollElement, refreshing]);
-
-  const handleTouchEnd = useCallback(async () => {
-    if (!isPulling.current) return;
-    isPulling.current = false;
-
-    if (pullDistance >= THRESHOLD && !refreshing) {
-      setRefreshing(true);
-      triggerHaptic('light');
-      try {
-        await onRefresh();
-      } finally {
-        setRefreshing(false);
-        setPullDistance(0);
-      }
-    } else {
-      setPullDistance(0);
-    }
-  }, [pullDistance, refreshing, onRefresh]);
-
   useEffect(() => {
     const el = getScrollElement();
     if (!el) return;
 
-    el.addEventListener('touchstart', handleTouchStart, { passive: true });
-    el.addEventListener('touchmove', handleTouchMove, { passive: false });
-    el.addEventListener('touchend', handleTouchEnd, { passive: true });
+    const onTouchStart = (e: TouchEvent) => {
+      if (phase !== "idle") return;
+      if (el.scrollTop <= 0) {
+        touchStartY.current = e.touches[0].clientY;
+        isPulling.current = true;
+        hapticTriggered.current = false;
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isPulling.current || phase !== "idle") return;
+      if (el.scrollTop > 0) {
+        isPulling.current = false;
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+        return;
+      }
+
+      const dy = e.touches[0].clientY - touchStartY.current;
+      if (dy < 0) {
+        pullDistanceRef.current = 0;
+        setPullDistance(0);
+        return;
+      }
+
+      const distance = Math.min(dy * RESISTANCE, MAX_PULL);
+      pullDistanceRef.current = distance;
+      setPullDistance(distance);
+
+      if (distance >= THRESHOLD && !hapticTriggered.current) {
+        hapticTriggered.current = true;
+        triggerHaptic('medium');
+      }
+
+      if (distance > 5) {
+        e.preventDefault();
+      }
+    };
+
+    const onTouchEnd = async () => {
+      if (!isPulling.current) return;
+      isPulling.current = false;
+
+      const currentPull = pullDistanceRef.current;
+
+      if (currentPull >= THRESHOLD && phase === "idle") {
+        setPhase("refreshing");
+        triggerHaptic('light');
+        try {
+          await onRefresh();
+        } finally {
+          setPhase("completing");
+          await new Promise(resolve => setTimeout(resolve, COMPLETION_DURATION));
+          setPhase("idle");
+          setPullDistance(0);
+          pullDistanceRef.current = 0;
+        }
+      } else {
+        setPullDistance(0);
+        pullDistanceRef.current = 0;
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: true });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: true });
 
     return () => {
-      el.removeEventListener('touchstart', handleTouchStart);
-      el.removeEventListener('touchmove', handleTouchMove);
-      el.removeEventListener('touchend', handleTouchEnd);
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
     };
-  }, [getScrollElement, handleTouchStart, handleTouchMove, handleTouchEnd]);
+  }, [getScrollElement, phase, onRefresh]);
 
   const progress = pullDistance / THRESHOLD;
-  const showIndicator = pullDistance > 5 || refreshing;
+  const showIndicator = pullDistance > 5 || phase === "refreshing" || phase === "completing";
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -180,10 +196,12 @@ export default function PullToRefresh({
         <div
           className="ptr-container"
           style={{
-            height: refreshing ? `${THRESHOLD}px` : `${pullDistance}px`,
+            height: phase === "refreshing" ? `${THRESHOLD}px`
+              : phase === "completing" ? '0px'
+              : `${pullDistance}px`,
           }}
         >
-          <IslamicStar progress={progress} refreshing={refreshing} />
+          <IslamicStar progress={progress} phase={phase} />
         </div>
       )}
       {children}
