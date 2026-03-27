@@ -196,6 +196,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
     );
   }
 
+  const handlePullRefresh = useCallback(async () => {
+    scrollContainerRef.current?.scrollTo({ top: 0 });
+    await new Promise(r => setTimeout(r, 300));
+  }, []);
+
   const filteredJuz = juzData.filter((juz) => {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return true;
@@ -299,7 +304,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
         ref={scrollContainerRef}
         className="relative flex-1 overflow-y-auto min-h-0"
       >
-        <PullToRefresh onRefresh={async () => { scrollContainerRef.current?.scrollTo({ top: 0 }); await new Promise(r => setTimeout(r, 300)); }} scrollRef={scrollContainerRef}>
+        <PullToRefresh onRefresh={handlePullRefresh} scrollRef={scrollContainerRef}>
         <div className="px-6 space-y-3 py-4 pb-nav-clearance">
           {showTopicResults && (
             <div className="mb-4">
