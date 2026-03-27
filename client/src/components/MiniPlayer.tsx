@@ -102,6 +102,28 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
             </div>
           </button>
 
+          <div className="waveform-bars shrink-0" data-testid="mini-player-waveform">
+            {[
+              { delay: '0s', duration: '0.7s', min: 0.2, max: 0.75 },
+              { delay: '0.15s', duration: '0.55s', min: 0.3, max: 1.0 },
+              { delay: '0.05s', duration: '0.8s', min: 0.15, max: 0.6 },
+              { delay: '0.25s', duration: '0.6s', min: 0.25, max: 0.85 },
+            ].map((bar, i) => (
+              <div
+                key={i}
+                className={`waveform-bar ${isPlaying ? 'waveform-playing' : ''}`}
+                style={{
+                  '--wave-delay': bar.delay,
+                  '--wave-duration': bar.duration,
+                  '--wave-min': bar.min,
+                  '--wave-max': bar.max,
+                  transform: isPlaying ? undefined : 'scaleY(0.12)',
+                  opacity: isPlaying ? 1 : 0.5,
+                } as React.CSSProperties}
+              />
+            ))}
+          </div>
+
           <button
             className="flex size-10 shrink-0 items-center justify-center rounded-full active:scale-95 transition-transform disabled:opacity-50"
             onClick={(e) => {

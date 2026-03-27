@@ -306,9 +306,9 @@ export default function AudioPlayer({
           aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
           data-testid="compact-play-button"
         >
-          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 56 56">
+          <svg className={`absolute inset-0 -rotate-90 ${!error && strokeDashoffset < circumference ? 'progress-ring-glow' : ''}`} viewBox="0 0 56 56">
             <circle cx="28" cy="28" r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.3" />
-            <circle cx="28" cy="28" r={radius} fill="none" stroke={error ? "hsl(var(--destructive))" : "hsl(var(--primary))"} strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className="transition-all duration-200" />
+            <circle cx="28" cy="28" r={radius} fill="none" stroke={error ? "hsl(var(--destructive))" : "hsl(var(--primary))"} strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className="progress-ring-arc" />
           </svg>
           {error ? (
             <Icon icon="solar:refresh-bold" className="size-5 text-destructive relative z-10" />

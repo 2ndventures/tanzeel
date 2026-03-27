@@ -667,6 +667,44 @@ body[data-mini-player-visible] .pb-nav-clearance {
     }
   }
 
+  /* Audio waveform equalizer bars */
+  .waveform-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 16px;
+  }
+
+  .waveform-bar {
+    width: 2.5px;
+    height: 16px;
+    border-radius: 1px;
+    background-color: hsl(var(--primary) / 0.6);
+    transform-origin: bottom;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform, opacity;
+  }
+
+  .waveform-bar.waveform-playing {
+    animation: waveformPulse var(--wave-duration, 0.8s) ease-in-out infinite alternate;
+    animation-delay: var(--wave-delay, 0s);
+  }
+
+  @keyframes waveformPulse {
+    0% { transform: scaleY(var(--wave-min, 0.2)); }
+    100% { transform: scaleY(var(--wave-max, 0.9)); }
+  }
+
+  /* Compact progress ring glow */
+  .progress-ring-glow {
+    filter: drop-shadow(0 0 3px hsl(var(--primary) / 0.4));
+    transition: filter 0.3s ease;
+  }
+
+  .progress-ring-arc {
+    transition: stroke-dashoffset 0.3s ease;
+  }
+
   /* Smooth transitions for all interactive elements */
   .transition-smooth {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
