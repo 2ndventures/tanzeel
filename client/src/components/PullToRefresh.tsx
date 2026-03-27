@@ -65,7 +65,7 @@ function IslamicStar({ progress, phase }: { progress: number; phase: PtrPhase })
           cx={cx}
           cy={cy}
           r={outerR + 2}
-          stroke="hsl(var(--primary) / 0.15)"
+          stroke="hsl(var(--accent) / 0.2)"
           strokeWidth="1"
           fill="none"
         />
@@ -74,7 +74,7 @@ function IslamicStar({ progress, phase }: { progress: number; phase: PtrPhase })
           stroke="hsl(var(--primary))"
           strokeWidth="1.5"
           strokeLinejoin="round"
-          fill={drawProgress >= 1 ? "hsl(var(--primary) / 0.1)" : "none"}
+          fill={drawProgress >= 1 ? "hsl(var(--accent) / 0.08)" : "none"}
           strokeDasharray={totalLength}
           strokeDashoffset={dashOffset}
           className="ptr-star-path"
@@ -83,7 +83,7 @@ function IslamicStar({ progress, phase }: { progress: number; phase: PtrPhase })
           cx={cx}
           cy={cy}
           r={3}
-          fill={`hsl(var(--primary) / ${Math.min(drawProgress, 1)})`}
+          fill={`hsl(var(--accent) / ${Math.min(drawProgress, 1)})`}
           className="ptr-center-dot"
         />
       </svg>
