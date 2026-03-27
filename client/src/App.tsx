@@ -44,6 +44,9 @@ type NavDirection = "forward" | "back" | "tab";
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
+  const [prevPage, setPrevPage] = useState<Page | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
   const [initialVerse, setInitialVerse] = useState<number | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<"home" | "surah" | "settings" | "bookmarks">("home");
@@ -253,10 +256,30 @@ function App() {
 
   const settingsBackHandlerRef = useRef<(() => boolean) | null>(null);
 
-  const navigateTo = useCallback((page: Page, direction: NavDirection) => {
-    setNavDirection(direction);
-    setCurrentPage(page);
+  const TRANSITION_DURATION = 300;
+
+  useEffect(() => {
+    return () => {
+      if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    };
   }, []);
+
+  const navigateTo = useCallback((page: Page, direction: NavDirection) => {
+    if (page === currentPage) return;
+    if (transitionTimerRef.current) {
+      clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+    }
+    setNavDirection(direction);
+    setPrevPage(currentPage);
+    setCurrentPage(page);
+    setIsTransitioning(true);
+    transitionTimerRef.current = setTimeout(() => {
+      setPrevPage(null);
+      setIsTransitioning(false);
+      transitionTimerRef.current = null;
+    }, direction === "tab" ? 200 : TRANSITION_DURATION);
+  }, [currentPage]);
 
   const handleBackButton = useCallback(() => {
     switch (currentPage) {
@@ -331,16 +354,131 @@ function App() {
     setShowOnboarding(false);
   };
 
+  const renderPage = useCallback((page: Page) => {
+    switch (page) {
+      case "home":
+        return <HomePage onNavigate={handleNavigate} activeTab={activeTab} />;
+      case "surah-juz":
+        return <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} currentReciterId={reciter} audioCacheReady={audioCacheReady} />;
+      case "chapter":
+        return (
+          <ChapterView
+            chapterId={selectedChapter}
+            initialVerse={initialVerse}
+            onBack={() => {
+              navigateTo("surah-juz", "back");
+              setActiveTab("surah");
+            }}
+            showTransliteration={transliteration}
+            showTranslation={showTranslation}
+            onNavigate={handleNavigate}
+            reciter={reciter}
+            autoScroll={autoScroll}
+            repeat={repeat}
+            autoplay={autoplay}
+            darkMode={darkMode}
+            onAutoScrollChange={setAutoScroll}
+            onRepeatChange={setRepeat}
+            onAutoplayChange={setAutoplay}
+            onDarkModeChange={setDarkMode}
+            onReciterChange={setReciter}
+            arabicFontSize={arabicFontSize}
+            translationFontSize={translationFontSize}
+            transliterationFontSize={transliterationFontSize}
+            lineSpacing={lineSpacing}
+            showVerseNumbers={showVerseNumbers}
+            onArabicFontSizeChange={setArabicFontSize}
+            onTranslationFontSizeChange={setTranslationFontSize}
+            onTransliterationFontSizeChange={setTransliterationFontSize}
+            onLineSpacingChange={setLineSpacing}
+            onShowVerseNumbersChange={setShowVerseNumbers}
+            arabicScript={arabicScript}
+            onArabicScriptChange={setArabicScript}
+            layoutMode={layoutMode}
+            onLayoutModeChange={setLayoutMode}
+          />
+        );
+      case "bookmarks":
+        return <Bookmarks onNavigate={handleNavigate} activeTab={activeTab} />;
+      case "settings":
+        return (
+          <Settings
+            onBack={() => {
+              navigateTo("home", "back");
+              setActiveTab("home");
+            }}
+            onNavigate={handleNavigate}
+            onRegisterBackHandler={(handler) => { settingsBackHandlerRef.current = handler; }}
+            darkMode={darkMode}
+            onDarkModeChange={setDarkMode}
+            arabicScript={arabicScript}
+            onArabicScriptChange={setArabicScript}
+            reciter={reciter}
+            onReciterChange={setReciter}
+            autoScroll={autoScroll}
+            onAutoScrollChange={setAutoScroll}
+            repeat={repeat}
+            onRepeatChange={setRepeat}
+            autoplay={autoplay}
+            onAutoplayChange={setAutoplay}
+            translation={translation}
+            onTranslationChange={setTranslation}
+            arabicFontSize={arabicFontSize}
+            onArabicFontSizeChange={setArabicFontSize}
+            translationFontSize={translationFontSize}
+            onTranslationFontSizeChange={setTranslationFontSize}
+            transliterationFontSize={transliterationFontSize}
+            onTransliterationFontSizeChange={setTransliterationFontSize}
+            lineSpacing={lineSpacing}
+            onLineSpacingChange={setLineSpacing}
+            showVerseNumbers={showVerseNumbers}
+            onShowVerseNumbersChange={setShowVerseNumbers}
+          />
+        );
+      case "privacy-policy":
+        return (
+          <PrivacyPolicy
+            onBack={() => {
+              navigateTo("settings", "back");
+              setActiveTab("settings");
+            }}
+          />
+        );
+      case "terms-of-service":
+        return (
+          <TermsOfService
+            onBack={() => {
+              navigateTo("settings", "back");
+              setActiveTab("settings");
+            }}
+          />
+        );
+      case "audio-manager":
+        return (
+          <AudioManager
+            onBack={() => {
+              navigateTo("settings", "back");
+              setActiveTab("settings");
+            }}
+            reciter={reciter}
+          />
+        );
+      default:
+        return null;
+    }
+  }, [handleNavigate, activeTab, reciter, audioCacheReady, selectedChapter, initialVerse,
+      transliteration, showTranslation, autoScroll, repeat, autoplay, darkMode,
+      arabicFontSize, translationFontSize, transliterationFontSize, lineSpacing,
+      showVerseNumbers, arabicScript, layoutMode, translation, navigateTo]);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          {/* Splash screen on every launch */}
           {showSplash && (
             <SplashScreen onFinish={() => setSplashAnimDone(true)} />
           )}
 
-          {/* Show onboarding on first launch */}
           {!showSplash && showOnboarding && (
             <OnboardingScreen
               onComplete={handleOnboardingComplete}
@@ -357,117 +495,19 @@ function App() {
 
           {storageReady && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay}>
             <div className="h-full">
-              <div key={currentPage} className={`h-full ${
-                navDirection === "forward" ? "animate-slide-in-right" :
-                navDirection === "back" ? "animate-slide-in-left" :
-                "animate-fade-in"
-              }`}>
-              {currentPage === "home" && (
-                <HomePage onNavigate={handleNavigate} activeTab={activeTab} />
-              )}
-              {currentPage === "surah-juz" && (
-                <SurahJuz onNavigate={handleNavigate} activeTab={activeTab} currentReciterId={reciter} audioCacheReady={audioCacheReady} />
-              )}
-              {currentPage === "chapter" && (
-                <ChapterView
-                  chapterId={selectedChapter}
-                  initialVerse={initialVerse}
-                  onBack={() => {
-                    navigateTo("surah-juz", "back");
-                    setActiveTab("surah");
-                  }}
-                  showTransliteration={transliteration}
-                  showTranslation={showTranslation}
-                  onNavigate={handleNavigate}
-                  reciter={reciter}
-                  autoScroll={autoScroll}
-                  repeat={repeat}
-                  autoplay={autoplay}
-                  darkMode={darkMode}
-                  onAutoScrollChange={setAutoScroll}
-                  onRepeatChange={setRepeat}
-                  onAutoplayChange={setAutoplay}
-                  onDarkModeChange={setDarkMode}
-                  onReciterChange={setReciter}
-                  arabicFontSize={arabicFontSize}
-                  translationFontSize={translationFontSize}
-                  transliterationFontSize={transliterationFontSize}
-                  lineSpacing={lineSpacing}
-                  showVerseNumbers={showVerseNumbers}
-                  onArabicFontSizeChange={setArabicFontSize}
-                  onTranslationFontSizeChange={setTranslationFontSize}
-                  onTransliterationFontSizeChange={setTransliterationFontSize}
-                  onLineSpacingChange={setLineSpacing}
-                  onShowVerseNumbersChange={setShowVerseNumbers}
-                  arabicScript={arabicScript}
-                  onArabicScriptChange={setArabicScript}
-                  layoutMode={layoutMode}
-                  onLayoutModeChange={setLayoutMode}
-                />
-              )}
-              {currentPage === "bookmarks" && (
-                <Bookmarks onNavigate={handleNavigate} activeTab={activeTab} />
-              )}
-              {currentPage === "settings" && (
-                <Settings
-                  onBack={() => {
-                    navigateTo("home", "back");
-                    setActiveTab("home");
-                  }}
-                  onNavigate={handleNavigate}
-                  onRegisterBackHandler={(handler) => { settingsBackHandlerRef.current = handler; }}
-                  darkMode={darkMode}
-                  onDarkModeChange={setDarkMode}
-                  arabicScript={arabicScript}
-                  onArabicScriptChange={setArabicScript}
-                  reciter={reciter}
-                  onReciterChange={setReciter}
-                  autoScroll={autoScroll}
-                  onAutoScrollChange={setAutoScroll}
-                  repeat={repeat}
-                  onRepeatChange={setRepeat}
-                  autoplay={autoplay}
-                  onAutoplayChange={setAutoplay}
-                  translation={translation}
-                  onTranslationChange={setTranslation}
-                  arabicFontSize={arabicFontSize}
-                  onArabicFontSizeChange={setArabicFontSize}
-                  translationFontSize={translationFontSize}
-                  onTranslationFontSizeChange={setTranslationFontSize}
-                  transliterationFontSize={transliterationFontSize}
-                  onTransliterationFontSizeChange={setTransliterationFontSize}
-                  lineSpacing={lineSpacing}
-                  onLineSpacingChange={setLineSpacing}
-                  showVerseNumbers={showVerseNumbers}
-                  onShowVerseNumbersChange={setShowVerseNumbers}
-                />
-              )}
-              {currentPage === "privacy-policy" && (
-                <PrivacyPolicy
-                  onBack={() => {
-                    navigateTo("settings", "back");
-                    setActiveTab("settings");
-                  }}
-                />
-              )}
-              {currentPage === "terms-of-service" && (
-                <TermsOfService
-                  onBack={() => {
-                    navigateTo("settings", "back");
-                    setActiveTab("settings");
-                  }}
-                />
-              )}
-              {currentPage === "audio-manager" && (
-                <AudioManager
-                  onBack={() => {
-                    navigateTo("settings", "back");
-                    setActiveTab("settings");
-                  }}
-                  reciter={reciter}
-                />
-              )}
-            </div>
+              <div className={isTransitioning ? "page-transition-container" : ""}>
+                {isTransitioning && prevPage && (
+                  <div key={`exit-${prevPage}`} className={`page-layer page-exit-${navDirection}`}>
+                    {renderPage(prevPage)}
+                  </div>
+                )}
+                <div
+                  key={currentPage}
+                  className={isTransitioning ? `page-layer page-enter-${navDirection}` : "page-layer-static"}
+                >
+                  {renderPage(currentPage)}
+                </div>
+              </div>
             <div className={["chapter", "privacy-policy", "terms-of-service", "audio-manager"].includes(currentPage) ? "hidden" : ""}>
               <BottomNav
                 activeTab={activeTab}

@@ -495,10 +495,6 @@ body[data-mini-player-visible] .pb-nav-clearance {
     animation: fadeInUp 0.4s ease-out;
   }
 
-  .animate-slide-in-right {
-    animation: slideInRight 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out;
   }
@@ -523,32 +519,6 @@ body[data-mini-player-visible] .pb-nav-clearance {
     }
   }
 
-  .animate-slide-in-left {
-    animation: slideInLeft 0.28s cubic-bezier(0.32, 0.72, 0, 1);
-  }
-
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(60px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-60px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
   @keyframes scaleIn {
     from {
       opacity: 0;
@@ -558,6 +528,110 @@ body[data-mini-player-visible] .pb-nav-clearance {
       opacity: 1;
       transform: scale(1);
     }
+  }
+
+  /* Page transition system — simultaneous exit + entry */
+  .page-transition-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .page-layer {
+    position: absolute;
+    inset: 0;
+    will-change: transform, opacity;
+  }
+
+  .page-layer-static {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Forward: incoming slides from right, outgoing shifts left + dims */
+  .page-enter-forward {
+    animation: pageEnterForward 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    z-index: 2;
+  }
+  .page-exit-forward {
+    animation: pageExitForward 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes pageEnterForward {
+    from {
+      transform: translateX(100%);
+      opacity: 0.6;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes pageExitForward {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-30%);
+      opacity: 0.4;
+    }
+  }
+
+  /* Back: incoming slides from left, outgoing shifts right + dims */
+  .page-enter-back {
+    animation: pageEnterBack 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    z-index: 1;
+  }
+  .page-exit-back {
+    animation: pageExitBack 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  @keyframes pageEnterBack {
+    from {
+      transform: translateX(-30%);
+      opacity: 0.4;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes pageExitBack {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0.6;
+    }
+  }
+
+  /* Tab crossfade */
+  .page-enter-tab {
+    animation: pageFadeIn 0.2s ease-out both;
+    z-index: 2;
+  }
+  .page-exit-tab {
+    animation: pageFadeOut 0.2s ease-out both;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @keyframes pageFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes pageFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   /* Smooth transitions for all interactive elements */

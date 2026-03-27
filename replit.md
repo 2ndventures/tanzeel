@@ -80,6 +80,10 @@ The legacy browser Cache API store (`client/src/lib/audioCache.ts`) still exists
 - **Delete Flow**: Tapping a downloaded surah shows delete confirmation dialog.
 - Registered as page type `"audio-manager"` in App.tsx, Android back button returns to Settings.
 
+## Page Transitions
+
+The app uses a fluid page transition system with simultaneous exit and entry animations. Navigation direction is determined by `PAGE_DEPTH` in App.tsx — deeper pages trigger forward/back parallax slides, same-depth pages use crossfade. During transitions, both the outgoing and incoming pages render simultaneously for 300ms (200ms for tab crossfades). The outgoing page has `pointer-events: none` to prevent interaction. Forward transitions slide the new page in from the right while the old page shifts 30% left and dims. Back transitions reverse this. Tab switches use a simple opacity crossfade. CSS animations use `cubic-bezier(0.32, 0.72, 0, 1)` for natural deceleration. Same-page navigation is short-circuited to avoid duplicate renders.
+
 ## Haptic Feedback
 
 A haptics utility (`client/src/lib/haptics.ts`) provides tactile feedback using Capacitor's Haptics plugin on native platforms and `navigator.vibrate()` as a web fallback. Two intensities: light (15ms / ImpactStyle.Light) for play/pause, bookmark, tab switch, speed change, and layout change; medium (40ms / ImpactStyle.Medium) for swipe navigation between surahs.
