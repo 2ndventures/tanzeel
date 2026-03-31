@@ -235,7 +235,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
         </div>
       )}
 
-      <div className="relative flex-1 overflow-y-auto min-h-0 pb-[40px]">
+      <div className="relative flex-1 overflow-y-auto min-h-0 pb-nav-clearance">
         <div className="px-6 space-y-6 py-6">
 
           <div>

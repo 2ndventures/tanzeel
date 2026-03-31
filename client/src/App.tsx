@@ -524,6 +524,7 @@ function App() {
             </div>
             <MiniPlayer
               visible={currentPage !== "chapter"}
+              hasBottomNav={!["chapter", "privacy-policy", "terms-of-service", "audio-manager"].includes(currentPage)}
               onNavigateToChapter={(chapterId) => {
                 handleNavigate("chapter", chapterId);
               }}

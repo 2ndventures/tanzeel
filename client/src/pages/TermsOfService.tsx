@@ -30,7 +30,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
         </div>
       </div>
 
-      <div className="relative flex-1 overflow-y-auto min-h-0">
+      <div className="relative flex-1 overflow-y-auto min-h-0 pb-nav-clearance">
         <div className="px-8 max-w-3xl mx-auto pt-6">
           <div className="prose prose-slate dark:prose-invert max-w-none">
             <p className="text-sm text-muted-foreground mb-8">

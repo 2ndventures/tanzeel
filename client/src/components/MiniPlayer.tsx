@@ -7,9 +7,10 @@ import { triggerHaptic } from "@/lib/haptics";
 interface MiniPlayerProps {
   onNavigateToChapter: (chapterId: number) => void;
   visible: boolean;
+  hasBottomNav?: boolean;
 }
 
-export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerProps) {
+export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav = true }: MiniPlayerProps) {
   const {
     activeChapterId,
     isPlaying,
@@ -57,6 +58,15 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
     return () => document.body.removeAttribute('data-mini-player-visible');
   }, [shouldShow]);
 
+  useEffect(() => {
+    if (!hasBottomNav) {
+      document.body.setAttribute('data-no-bottom-nav', '');
+    } else {
+      document.body.removeAttribute('data-no-bottom-nav');
+    }
+    return () => document.body.removeAttribute('data-no-bottom-nav');
+  }, [hasBottomNav]);
+
   if (!mounted || !lastChapterRef.current) return null;
 
   const chapter = lastChapterRef.current;
@@ -68,7 +78,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible }: MiniPlayerP
       className={`fixed left-0 right-0 z-50 transition-all duration-300 ease-out ${
         animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
-      style={{ bottom: 'calc(72px + env(safe-area-inset-bottom, 0px))' }}
+      style={{ bottom: hasBottomNav ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 'env(safe-area-inset-bottom, 0px)' }}
       data-testid="mini-player"
     >
       <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
