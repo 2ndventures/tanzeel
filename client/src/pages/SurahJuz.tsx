@@ -219,10 +219,10 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/8 via-transparent to-transparent dark:from-amber-500/10 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.12)] via-background/50 to-background/90 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.15)] via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[hsl(var(--glow-secondary)/0.10)] via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 pointer-events-none" />
 
       <div ref={headerRef} className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
         <div className={`overflow-hidden transition-all duration-300 ${
@@ -325,7 +325,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                       data-testid={`search-result-${result.chapterId}-${result.verseNumber}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 mt-0.5">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--glow-primary)/0.15)] mt-0.5">
                           <BookOpen className="w-4 h-4 text-primary" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -386,7 +386,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                       data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 mt-0.5">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--glow-primary)/0.15)] mt-0.5">
                           <BookOpen className="w-4 h-4 text-primary" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -438,7 +438,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                       data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 mt-0.5">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--glow-primary)/0.15)] mt-0.5">
                           <BookOpen className="w-4 h-4 text-primary" />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -497,9 +497,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                 const startChapter = chapters.find(ch => ch.id === juz.startChapter);
                 const endChapter = chapters.find(ch => ch.id === juz.endChapter);
                 const juzBadgeStyles = [
-                  { bg: "bg-primary/20", text: "text-primary" },
-                  { bg: "bg-secondary/20", text: "text-secondary" },
-                  { bg: "bg-accent/20", text: "text-accent" },
+                  { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
+                  { bg: "bg-[hsl(var(--glow-secondary)/0.18)]", text: "text-secondary" },
+                  { bg: "bg-[hsl(var(--glow-accent)/0.18)]", text: "text-accent" },
                 ];
                 const badge = juzBadgeStyles[(juz.id - 1) % juzBadgeStyles.length];
                 return (

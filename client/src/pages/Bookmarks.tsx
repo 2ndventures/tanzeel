@@ -61,7 +61,7 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background to-card">
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.06)] via-transparent to-[hsl(var(--glow-accent)/0.05)] opacity-50 pointer-events-none" />
 
       <div className="relative flex flex-col flex-1 min-h-0">
         <div className="header-safe-padding shrink-0">

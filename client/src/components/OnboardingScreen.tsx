@@ -134,9 +134,9 @@ export default function OnboardingScreen({
       {/* Multi-layer gradient background - adapts to theme */}
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(var(--glow-secondary)/0.05)] rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-lg px-8 py-6">
@@ -144,7 +144,7 @@ export default function OnboardingScreen({
           <div className="text-center space-y-8 animate-fade-in">
             {/* Logo/Icon */}
             <div className="flex justify-center">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/20 flex items-center justify-center backdrop-blur-xl border border-border/50">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[hsl(var(--glow-primary)/0.20)] to-[hsl(var(--glow-accent)/0.15)] flex items-center justify-center backdrop-blur-xl border border-border/50">
                 <Icon 
                   icon="mdi:book-open-page-variant" 
                   className="w-12 h-12 text-primary"
@@ -165,19 +165,19 @@ export default function OnboardingScreen({
             {/* Features List */}
             <div className="space-y-3 text-left max-w-sm mx-auto">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[hsl(var(--glow-primary)/0.12)] flex items-center justify-center flex-shrink-0">
                   <Icon icon="mdi:text" className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-sm text-foreground">Multiple translations & transliterations</p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[hsl(var(--glow-secondary)/0.12)] flex items-center justify-center flex-shrink-0">
                   <Icon icon="mdi:volume-high" className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-sm text-foreground">Beautiful audio recitation</p>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[hsl(var(--glow-accent)/0.12)] flex items-center justify-center flex-shrink-0">
                   <Icon icon="mdi:format-size" className="w-4 h-4 text-primary" />
                 </div>
                 <p className="text-sm text-foreground">Customizable text & display</p>

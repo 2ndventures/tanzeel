@@ -80,7 +80,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background to-card">
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-50 pointer-events-none" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.12)] via-transparent to-[hsl(var(--glow-accent)/0.08)] pointer-events-none" />
 
       <div className="relative flex flex-col flex-1 min-h-0">
         <div className="header-safe-padding shrink-0">
@@ -92,7 +92,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                   Tanzeel
                 </h2>
               </div>
-              <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_rgba(28,31,57,0.25)]">
+              <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary shadow-[0_0_20px_hsl(var(--glow-primary)/0.35)]">
                 <Icon icon="solar:book-bold" className="size-8 text-primary-foreground" />
               </div>
             </div>
@@ -102,7 +102,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <div ref={scrollRef} className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
         <PullToRefresh onRefresh={handleRefresh} scrollRef={scrollRef}>
           <div
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/20 via-secondary/10 to-accent/5 p-8 shadow-lg shadow-[0_0_30px_rgba(28,31,57,0.15)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(var(--glow-primary)/0.18)] via-[hsl(var(--glow-secondary)/0.10)] to-[hsl(var(--glow-accent)/0.06)] p-8 shadow-lg shadow-[0_0_30px_hsl(var(--glow-primary)/0.2)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
             onClick={() => onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined); }}}
@@ -111,7 +111,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}
             data-testid="card-continue-reading"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.08)] to-[hsl(var(--glow-secondary)/0.08)] rounded-3xl" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-foreground/70">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
@@ -147,8 +147,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Browse all surahs"
                 data-testid="button-bookmarks"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/20 shadow-inner">
-                  <Icon icon="solar:bookmark-bold" className="size-7 text-primary" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary)/0.15)] shadow-inner">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-secondary" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
@@ -161,8 +161,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="View favorites"
                 data-testid="button-favorites"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-secondary/20 shadow-inner">
-                  <Icon icon="solar:star-bold" className="size-7 text-secondary" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-secondary)/0.15)] shadow-inner">
+                  <Icon icon="solar:star-bold" className="size-7 text-accent" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Favorites</span>
               </div>
@@ -175,8 +175,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Open settings"
                 data-testid="button-settings"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-accent/20 shadow-inner">
-                  <Icon icon="solar:settings-bold" className="size-7 text-accent" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.15)] shadow-inner">
+                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Settings</span>
               </div>
@@ -202,16 +202,16 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 >
                   {daily.verse}
                 </p>
-                <div className="w-10 h-px bg-primary/30 mb-4" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
+                <div className="w-10 h-px bg-[hsl(var(--glow-primary)/0.35)] mb-4" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
                 <p
                   className="text-sm leading-relaxed text-muted-foreground italic max-w-[280px] mb-4"
                   style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.8s forwards' }}
                 >
                   &ldquo;{daily.translation}&rdquo;
                 </p>
-                <div className="w-10 h-px bg-primary/30 mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.0s forwards' }} />
+                <div className="w-10 h-px bg-[hsl(var(--glow-primary)/0.35)] mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.0s forwards' }} />
                 <p
-                  className="text-xs font-medium text-primary/70 mb-1"
+                  className="text-xs font-medium text-secondary mb-1"
                   style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.1s forwards' }}
                 >
                   {dailyChapter.englishName} {daily.id}:{daily.ayah}

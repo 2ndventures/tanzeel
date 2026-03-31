@@ -14,60 +14,60 @@
   --elevate-1: rgba(0,0,0, .05);
   --elevate-2: rgba(0,0,0, .13);
 
-  --header-gradient-start: rgba(245, 247, 252, 0.95);
-  --header-gradient-mid: rgba(245, 247, 252, 0.6);
-  --player-gradient-rgb: 245, 247, 252;
+  --header-gradient-start: rgba(243, 245, 252, 0.95);
+  --header-gradient-mid: rgba(243, 245, 252, 0.6);
+  --player-gradient-rgb: 243, 245, 252;
 
-  --sheet-bg: 228 25% 95%;
-  --sheet-muted: 225 18% 89%;
+  --sheet-bg: 230 30% 96%;
+  --sheet-muted: 228 20% 90%;
 
-  --background: 225 25% 97%;
+  --background: 228 30% 97%;
 
   --foreground: 234 34% 12%;
 
-  --border: 225 15% 88%;
+  --border: 228 18% 87%;
 
-  --card: 228 22% 95%;
+  --card: 230 28% 95%;
 
   --card-foreground: 234 34% 12%;
 
-  --card-border: 225 15% 88%;
+  --card-border: 228 18% 87%;
 
-  --sidebar: 228 20% 93%;
+  --sidebar: 230 24% 93%;
 
   --sidebar-foreground: 234 34% 12%;
 
-  --sidebar-border: 225 15% 86%;
+  --sidebar-border: 228 18% 85%;
 
   --sidebar-primary: 234 34% 17%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
-  --sidebar-accent: 225 18% 90%;
+  --sidebar-accent: 228 20% 89%;
 
   --sidebar-accent-foreground: 234 34% 12%;
 
   --sidebar-ring: 234 34% 17%;
 
-  --popover: 228 22% 94%;
+  --popover: 230 25% 94%;
 
   --popover-foreground: 234 34% 12%;
 
-  --popover-border: 225 15% 86%;
+  --popover-border: 228 18% 85%;
 
   --primary: 234 34% 17%;
 
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 220 45% 50%;
+  --secondary: 220 55% 52%;
 
   --secondary-foreground: 0 0% 100%;
 
-  --muted: 225 15% 90%;
+  --muted: 228 16% 89%;
 
-  --muted-foreground: 225 10% 45%;
+  --muted-foreground: 228 12% 42%;
 
-  --accent: 200 60% 45%;
+  --accent: 195 70% 42%;
 
   --accent-foreground: 0 0% 100%;
 
@@ -75,13 +75,17 @@
 
   --destructive-foreground: 0 0% 100%;
 
-  --input: 225 12% 73%;
+  --input: 228 14% 72%;
   --ring: 234 34% 17%;
-  --chart-1: 220 45% 50%;
-  --chart-2: 200 60% 45%;
+  --chart-1: 220 55% 52%;
+  --chart-2: 195 70% 42%;
   --chart-3: 173 58% 39%;
   --chart-4: 234 34% 30%;
-  --chart-5: 250 40% 55%;
+  --chart-5: 255 45% 55%;
+
+  --glow-primary: 220 55% 52%;
+  --glow-secondary: 195 70% 42%;
+  --glow-accent: 255 45% 55%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: Georgia, serif;
@@ -218,6 +222,10 @@
   --chart-3: 173 58% 49%;
   --chart-4: 43 96% 66%;
   --chart-5: 27 87% 77%;
+
+  --glow-primary: 45 93% 58%;
+  --glow-secondary: 32 95% 52%;
+  --glow-accent: 28 80% 45%;
 
   --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
   --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.35);
@@ -646,22 +654,22 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
 
   /* Verse of the Day card */
   .verse-of-day-card {
-    border: 1px solid hsl(var(--primary) / 0.15);
+    border: 1px solid hsl(var(--glow-primary) / 0.15);
     background: linear-gradient(
       145deg,
       hsl(var(--card)) 0%,
-      hsl(var(--card)) 60%,
-      hsl(var(--primary) / 0.06) 100%
+      hsl(var(--card)) 50%,
+      hsl(var(--glow-primary) / 0.08) 100%
     );
     box-shadow:
-      0 2px 12px hsl(var(--primary) / 0.08),
-      inset 0 1px 0 hsl(var(--primary) / 0.08);
+      0 2px 16px hsl(var(--glow-primary) / 0.10),
+      inset 0 1px 0 hsl(var(--glow-primary) / 0.10);
   }
 
   .verse-of-day-bg {
     background: radial-gradient(
       ellipse at 50% 0%,
-      hsl(var(--primary) / 0.06) 0%,
+      hsl(var(--glow-primary) / 0.08) 0%,
       transparent 70%
     );
   }
@@ -898,19 +906,19 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
     justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem 1.5rem;
-    border: 1px solid hsl(var(--primary) / 0.25);
+    border: 1px solid hsl(var(--glow-primary) / 0.25);
     border-radius: 9999px;
     margin: 0 auto 1rem;
     width: fit-content;
   }
   .mushaf-surah-header::before {
     content: "❊";
-    color: hsl(var(--primary) / 0.4);
+    color: hsl(var(--glow-primary) / 0.4);
     font-size: 0.75rem;
   }
   .mushaf-surah-header::after {
     content: "❊";
-    color: hsl(var(--primary) / 0.4);
+    color: hsl(var(--glow-primary) / 0.4);
     font-size: 0.75rem;
   }
 
@@ -1034,8 +1042,8 @@ span.end {
   width: 1.6em;
   height: 1.6em;
   border-radius: 50%;
-  border: 1.5px solid hsl(var(--primary) / 0.5);
-  color: hsl(var(--primary) / 0.8);
+  border: 1.5px solid hsl(var(--glow-primary) / 0.5);
+  color: hsl(var(--glow-primary) / 0.8);
   font-size: 0.45em;
   font-family: system-ui, sans-serif;
   line-height: 1;

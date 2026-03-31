@@ -675,11 +675,11 @@ export default function ChapterView({
       onTouchEnd={handleSwipeTouchEnd}
     >
       {/* Rich layered gradients for depth - adapts to theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/8 via-transparent to-transparent dark:from-amber-500/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.12)] via-background/50 to-background/90" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.15)] via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[hsl(var(--glow-secondary)/0.10)] via-transparent to-transparent" />
       {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20" />
       {/* Screen reader announcements for verse changes */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
@@ -739,8 +739,8 @@ export default function ChapterView({
                   style={{ backgroundColor: 'hsl(var(--sheet-bg) / 0.97)', backdropFilter: 'blur(40px) saturate(180%)' }}
                 >
                   <div className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-900/30 dark:to-transparent" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.10)] via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.12)] via-transparent to-transparent" />
                   </div>
                   <div ref={surahListRef} className="overflow-y-auto max-h-[320px] py-1.5 relative z-10">
                     {chapters.map((ch) => {
@@ -798,9 +798,9 @@ export default function ChapterView({
               </SheetTrigger>
             <SheetContent side="bottom" className="h-[73vh] flex flex-col overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
               <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-transparent dark:from-indigo-900/20 dark:via-slate-900/30 dark:to-transparent" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent dark:from-primary/8" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.10)] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.12)] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(var(--glow-accent)/0.08)] via-transparent to-transparent" />
               </div>
               {menuView !== 'main' && (
                 <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">

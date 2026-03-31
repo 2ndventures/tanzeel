@@ -4,11 +4,11 @@ export default function NotFound() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background via-background/95 to-background flex items-center justify-center">
       {/* Rich layered gradients for depth - adapts to theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/8 via-transparent to-transparent dark:from-amber-500/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.12)] via-background/50 to-background/90" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.15)] via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[hsl(var(--glow-secondary)/0.10)] via-transparent to-transparent" />
       {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20" />
 
       {/* Content */}
       <div className="relative mx-4 w-full max-w-md">
@@ -19,7 +19,7 @@ export default function NotFound() {
           
           {/* Inner glass panel */}
           <div className="relative overflow-hidden rounded-3xl bg-card/80 p-8 backdrop-blur-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.08)] via-transparent to-[hsl(var(--glow-accent)/0.06)] rounded-3xl" />
             
             <div className="relative flex flex-col items-center text-center">
               {/* Icon */}

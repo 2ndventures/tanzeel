@@ -99,7 +99,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
             }}
             data-testid="mini-player-navigate"
           >
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--glow-primary)/0.15)]">
               <Icon icon="solar:book-2-bold" className="size-4 text-primary" />
             </div>
             <div className="min-w-0 flex-1 text-left">

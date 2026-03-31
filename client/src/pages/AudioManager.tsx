@@ -183,8 +183,8 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
     <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
       </div>
 
       <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
@@ -203,7 +203,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
       </div>
 
       {activeDownload && (
-        <div className="px-6 py-3 border-b border-border bg-primary/5 shrink-0">
+        <div className="px-6 py-3 border-b border-border bg-[hsl(var(--glow-primary)/0.06)] shrink-0">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground/90 truncate" data-testid="text-download-status">

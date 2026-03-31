@@ -32,6 +32,11 @@ A first-time user onboarding flow guides users through initial setup. It include
 
 A comprehensive light and dark theme system is implemented using CSS variables. Themes adapt automatically across all UI components using semantic tokens, maintaining a consistent premium glassmorphism aesthetic with responsive background gradients, card styling, text colors, borders, and shadows.
 
+The color system uses three layers:
+- **`--primary`** (navy `234 34% 17%` in light / indigo in dark): Used exclusively for interactive elements — buttons, focus rings, selected states, toggles, and text that indicates interactivity.
+- **`--secondary`** / **`--accent`**: Supporting semantic colors for UI controls and badges.
+- **`--glow-primary`**, **`--glow-secondary`**, **`--glow-accent`**: Decorative gradient/glow variables defined in both `:root` and `.dark`. Used for all ambient background gradients, decorative blobs, icon containers, verse ornaments, and sheet overlays. Light mode uses royal blue / teal / purple; dark mode uses amber / orange / warm brown. This separation ensures decorative elements feel vibrant and warm in both themes without conflicting with interactive primary navy.
+
 ## Backend Architecture
 
 The backend is an Express.js server in Node.js with TypeScript, providing a RESTful API, serving the production frontend, and proxying audio to resolve CORS issues. It uses an in-memory `IStorage` interface, designed for future database migration.

@@ -16,9 +16,9 @@ interface ChapterCardProps {
 }
 
 const badgeStyles = [
-  { bg: "bg-primary/20", text: "text-primary" },
-  { bg: "bg-secondary/20", text: "text-secondary" },
-  { bg: "bg-accent/20", text: "text-accent" },
+  { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
+  { bg: "bg-[hsl(var(--glow-secondary)/0.18)]", text: "text-secondary" },
+  { bg: "bg-[hsl(var(--glow-accent)/0.18)]", text: "text-accent" },
 ];
 
 export default function ChapterCard({
