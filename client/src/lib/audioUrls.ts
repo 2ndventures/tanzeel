@@ -5,8 +5,20 @@ const QURAN_CDN_API = 'https://api.qurancdn.com';
 const QURAN_AUDIO_CDN = 'https://download.quranicaudio.com';
 const EVERYAYAH_CDN = 'https://everyayah.com';
 
-const QURAN_COM_ID_TO_CDN_SLUG: Record<number, string> = {
-  7: 'mishari_al_afasy',
+interface CdnReciterInfo {
+  path: string;
+  zeroPadChapter: boolean;
+}
+
+const QURAN_COM_ID_TO_CDN: Record<number, CdnReciterInfo> = {
+  1: { path: 'qdc/abdul_baset/mujawwad', zeroPadChapter: false },
+  2: { path: 'qdc/abdul_baset/murattal', zeroPadChapter: false },
+  3: { path: 'qdc/khalil_al_husary/muallim', zeroPadChapter: false },
+  5: { path: 'quran/abdul_muhsin_alqasim', zeroPadChapter: true },
+  7: { path: 'qdc/mishari_al_afasy/murattal', zeroPadChapter: false },
+  9: { path: 'qdc/siddiq_minshawi/murattal', zeroPadChapter: false },
+  11: { path: 'qdc/abdurrahmaan_as_sudais/murattal', zeroPadChapter: false },
+  12: { path: 'qdc/abdul_baset/murattal', zeroPadChapter: false },
 };
 
 export function getTimingUrl(reciterId: number, chapterId: number): string {
@@ -17,9 +29,12 @@ export function getTimingUrl(reciterId: number, chapterId: number): string {
 }
 
 export function getChapterAudioUrl(reciterId: number, chapterId: number): string | null {
-  const slug = QURAN_COM_ID_TO_CDN_SLUG[reciterId];
-  if (!slug) return null;
-  return `${QURAN_AUDIO_CDN}/qdc/${slug}/murattal/${chapterId}.mp3`;
+  const info = QURAN_COM_ID_TO_CDN[reciterId];
+  if (!info) return null;
+  const chapter = info.zeroPadChapter
+    ? String(chapterId).padStart(3, '0')
+    : String(chapterId);
+  return `${QURAN_AUDIO_CDN}/${info.path}/${chapter}.mp3`;
 }
 
 export function getVerseAudioUrl(everyAyahFolder: string, surahNum: number, verseNum: number): string {
