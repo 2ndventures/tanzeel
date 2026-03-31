@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
-import { useAudioActions, useAudioStatus, useAudioProgress } from "@/contexts/AudioContext";
+import { useAudio } from "@/contexts/AudioContext";
 import { chapters, getDisplayArabicName } from "@/lib/quranMetadata";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -11,9 +11,16 @@ interface MiniPlayerProps {
 }
 
 export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav = true }: MiniPlayerProps) {
-  const { togglePlayPause, retry } = useAudioActions();
-  const { activeChapterId, isPlaying, isLoading, error, duration } = useAudioStatus();
-  const { currentTime } = useAudioProgress();
+  const {
+    activeChapterId,
+    isPlaying,
+    isLoading,
+    currentTime,
+    duration,
+    error,
+    togglePlayPause,
+    retry,
+  } = useAudio();
 
   const hasAudioActivity = !!activeChapterId && (isPlaying || currentTime > 0 || isLoading);
   const shouldShow = hasAudioActivity && visible;

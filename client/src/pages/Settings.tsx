@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
-import { triggerHaptic } from "@/lib/haptics";
 
 import { getAllReciters, getReciterById } from "@/lib/reciters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -76,7 +75,7 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
         {options.map((opt) => (
           <button
             key={opt.value}
-            onClick={() => { triggerHaptic('light'); onChange(opt.value); }}
+            onClick={() => onChange(opt.value)}
             className={`shrink-0 rounded-full text-xs font-semibold transition-all whitespace-nowrap flex items-center justify-center ${
               opt.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
             } ${
@@ -114,7 +113,7 @@ function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeT
       {isThemeToggle ? (
         <ThemeToggle isDark={checked} onToggle={onCheckedChange} />
       ) : (
-        <Switch checked={checked} onCheckedChange={(v) => { triggerHaptic('light'); onCheckedChange(v); }} aria-label={label} data-testid={testId} />
+        <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} />
       )}
     </div>
   );
