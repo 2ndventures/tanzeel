@@ -17,7 +17,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
-import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
+import { incrementVersesRead, addReadingTime, saveChapterPosition, getChapterPosition } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -470,6 +470,7 @@ export default function ChapterView({
           lastTrackedVerseRef.current = closestVerse;
           const verseKey = `${chapterId}:${closestVerse}`;
           incrementVersesRead(0, verseKey);
+          saveChapterPosition(chapterId, closestVerse);
         }
       }, 500);
     };
@@ -481,18 +482,21 @@ export default function ChapterView({
     };
   }, [chapterId, isLoadingVerses, verses.length]);
 
-  // Reset completed verses when chapter changes
+  const initialVerseHandledRef = useRef(false);
+  const restoredPositionRef = useRef(false);
+
   useEffect(() => {
     completedVersesRef.current.clear();
+    initialVerseHandledRef.current = false;
+    restoredPositionRef.current = false;
   }, [chapterId]);
-
-  const initialVerseHandledRef = useRef(false);
 
   useEffect(() => {
     if (!initialVerse || initialVerse <= 1 || initialVerseHandledRef.current) return;
     if (isLoadingVerses || verses.length === 0) return;
 
     initialVerseHandledRef.current = true;
+    restoredPositionRef.current = true;
 
     const scrollToVerse = () => {
       const verseElement = document.querySelector(`[data-testid="card-verse-${initialVerse}"]`);
@@ -514,6 +518,30 @@ export default function ChapterView({
       setTimeout(scrollToVerse, 100);
     });
   }, [initialVerse, isLoadingVerses, verses, chapterId, seekToVerse, playAudio]);
+
+  useEffect(() => {
+    if (initialVerse || restoredPositionRef.current) return;
+    if (isLoadingVerses || verses.length === 0) return;
+
+    restoredPositionRef.current = true;
+
+    getChapterPosition(chapterId).then((savedVerse) => {
+      if (!savedVerse || savedVerse <= 1) return;
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const verseElement = document.querySelector(`[data-testid="card-verse-${savedVerse}"]`);
+          const container = scrollContainerRef.current;
+          if (verseElement && container) {
+            const headerHeight = 60;
+            const verseRect = verseElement.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            const scrollOffset = verseRect.top - containerRect.top + container.scrollTop - headerHeight;
+            container.scrollTo({ top: scrollOffset, behavior: 'instant' });
+          }
+        }, 100);
+      });
+    });
+  }, [initialVerse, isLoadingVerses, verses, chapterId]);
 
   // Extract current verse number from verse key
   const currentVerse = currentVerseKey && currentVerseKey.startsWith(`${chapterId}:`)
@@ -912,7 +940,7 @@ export default function ChapterView({
                             {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map((s) => (
                               <button
                                 key={s.value}
-                                onClick={() => onArabicFontSizeChange?.(s.value)}
+                                onClick={() => { triggerHaptic('light'); onArabicFontSizeChange?.(s.value); }}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                                   arabicFontSize === s.value
                                     ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
@@ -933,7 +961,7 @@ export default function ChapterView({
                             {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
                               <button
                                 key={s.value}
-                                onClick={() => onTranslationFontSizeChange?.(s.value)}
+                                onClick={() => { triggerHaptic('light'); onTranslationFontSizeChange?.(s.value); }}
                                 className={`shrink-0 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
                                   s.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
                                 } ${
@@ -958,7 +986,7 @@ export default function ChapterView({
                             {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
                               <button
                                 key={s.value}
-                                onClick={() => onTransliterationFontSizeChange?.(s.value)}
+                                onClick={() => { triggerHaptic('light'); onTransliterationFontSizeChange?.(s.value); }}
                                 className={`shrink-0 rounded-full text-xs font-semibold transition-all flex items-center justify-center ${
                                   s.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
                                 } ${
@@ -995,7 +1023,7 @@ export default function ChapterView({
                             ] as const).map((option) => (
                               <button
                                 key={option.value}
-                                onClick={() => onArabicScriptChange?.(option.value)}
+                                onClick={() => { triggerHaptic('light'); onArabicScriptChange?.(option.value); }}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
                                   arabicScript === option.value
                                     ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
@@ -1016,7 +1044,7 @@ export default function ChapterView({
                             {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
                               <button
                                 key={spacing}
-                                onClick={() => onLineSpacingChange?.(spacing)}
+                                onClick={() => { triggerHaptic('light'); onLineSpacingChange?.(spacing); }}
                                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
                                   lineSpacing === spacing
                                     ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
@@ -1055,7 +1083,7 @@ export default function ChapterView({
                           <span className="text-sm text-foreground/80">Autoplay next surah</span>
                           <Switch 
                             checked={autoplay} 
-                            onCheckedChange={(v) => { onAutoplayChange(v); }}
+                            onCheckedChange={(v) => { triggerHaptic('light'); onAutoplayChange(v); }}
                             data-testid="switch-autoplay"
                           />
                         </div>
@@ -1077,7 +1105,7 @@ export default function ChapterView({
                           <span className="text-sm text-foreground/80">Verse numbers</span>
                           <Switch 
                             checked={showVerseNumbers} 
-                            onCheckedChange={(v) => { onShowVerseNumbersChange?.(v); }}
+                            onCheckedChange={(v) => { triggerHaptic('light'); onShowVerseNumbersChange?.(v); }}
                             data-testid="switch-verse-numbers"
                           />
                         </div>

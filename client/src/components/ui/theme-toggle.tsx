@@ -1,5 +1,6 @@
 import { Moon, Sun } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { triggerHaptic } from "@/lib/haptics"
 
 interface ThemeToggleProps {
   isDark: boolean
@@ -17,7 +18,7 @@ export function ThemeToggle({ isDark, onToggle, className }: ThemeToggleProps) {
           : "bg-white border border-zinc-200",
         className
       )}
-      onClick={() => onToggle(!isDark)}
+      onClick={() => { triggerHaptic('light'); onToggle(!isDark); }}
       role="button"
       tabIndex={0}
       data-testid="button-theme-toggle"

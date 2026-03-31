@@ -177,6 +177,38 @@ export async function addReadingTime(seconds: number): Promise<void> {
   await updateDayStreak();
 }
 
+const CHAPTER_POSITIONS_KEY = 'quran-chapter-positions';
+
+async function getChapterPositions(): Promise<Record<string, number>> {
+  try {
+    const stored = await getItem(CHAPTER_POSITIONS_KEY);
+    if (!stored) return {};
+    return JSON.parse(stored);
+  } catch {
+    return {};
+  }
+}
+
+export async function saveChapterPosition(chapterId: number, verseNumber: number): Promise<void> {
+  try {
+    const positions = await getChapterPositions();
+    positions[String(chapterId)] = verseNumber;
+    await setItem(CHAPTER_POSITIONS_KEY, JSON.stringify(positions));
+  } catch (error) {
+    console.error('Failed to save chapter position:', error);
+  }
+}
+
+export async function getChapterPosition(chapterId: number): Promise<number | null> {
+  try {
+    const positions = await getChapterPositions();
+    const verse = positions[String(chapterId)];
+    return verse && verse > 1 ? verse : null;
+  } catch {
+    return null;
+  }
+}
+
 export function formatReadingTime(minutes: number): string {
   if (minutes < 60) {
     return `${Math.round(minutes)}m`;
