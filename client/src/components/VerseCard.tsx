@@ -248,3 +248,34 @@ export default function VerseCard({
     </div>
   );
 }
+
+function VerseCardSkeleton({ index }: { index: number }) {
+  const delayClass = `animation-delay-${(index % 5) * 100}`;
+
+  return (
+    <div className="relative rounded-2xl" data-testid={`skeleton-verse-${index}`}>
+      <div className="px-5 py-3">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className={`skeleton h-4 w-10 rounded ${delayClass}`} />
+            <div className={`skeleton h-6 w-6 rounded-full ${delayClass}`} />
+          </div>
+          <div className="flex flex-col items-end gap-2" dir="rtl">
+            <div className={`skeleton h-7 rounded ${delayClass}`} style={{ width: `${85 - (index % 3) * 10}%` }} />
+            <div className={`skeleton h-7 rounded ${delayClass}`} style={{ width: `${75 - (index % 4) * 8}%` }} />
+            {index % 3 !== 2 && (
+              <div className={`skeleton h-7 rounded ${delayClass}`} style={{ width: `${50 + (index % 2) * 15}%` }} />
+            )}
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <div className={`skeleton h-4 rounded ${delayClass}`} style={{ width: `${95 - (index % 3) * 5}%` }} />
+            <div className={`skeleton h-4 rounded ${delayClass}`} style={{ width: `${70 + (index % 4) * 7}%` }} />
+          </div>
+        </div>
+      </div>
+      <div className="mx-5 h-px bg-border/30" />
+    </div>
+  );
+}
+
+export { VerseCardSkeleton };

@@ -232,8 +232,23 @@ export default function FocusedFlowView({
 
   if (isLoadingVerses) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="size-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex flex-col items-center justify-center px-8 gap-6">
+        <div className="w-full max-w-md space-y-4">
+          <div className="flex flex-col items-end gap-3" dir="rtl">
+            <div className="skeleton h-8 w-4/5 rounded animation-delay-0" />
+            <div className="skeleton h-8 w-3/4 rounded animation-delay-100" />
+            <div className="skeleton h-8 w-2/3 rounded animation-delay-200" />
+          </div>
+          <div className="flex flex-col gap-2 pt-2">
+            <div className="skeleton h-4 w-full rounded animation-delay-300" />
+            <div className="skeleton h-4 w-4/5 rounded animation-delay-400" />
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="skeleton h-3 w-3 rounded-full" />
+          <div className="skeleton h-3 w-3 rounded-full animation-delay-100" />
+          <div className="skeleton h-3 w-3 rounded-full animation-delay-200" />
+        </div>
       </div>
     );
   }

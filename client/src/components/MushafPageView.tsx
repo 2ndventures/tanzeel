@@ -157,8 +157,24 @@ export default function MushafPageView({
   // ── Loading / Error states ──
   if (isLoadingVerses) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="size-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="flex-1 flex items-center justify-center px-8">
+        <div className="w-full max-w-lg space-y-6">
+          <div className="flex flex-col items-center gap-3">
+            <div className="skeleton h-8 w-48 rounded" />
+            <div className="skeleton h-px w-32 rounded" />
+          </div>
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex justify-center">
+              <div
+                className={`skeleton h-6 rounded animation-delay-${(i % 5) * 100}`}
+                style={{ width: `${90 - (i % 3) * 12}%` }}
+              />
+            </div>
+          ))}
+          <div className="flex justify-center pt-2">
+            <div className="skeleton h-4 w-16 rounded" />
+          </div>
+        </div>
       </div>
     );
   }

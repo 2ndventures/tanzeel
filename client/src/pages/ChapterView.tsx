@@ -16,7 +16,7 @@ import { useMediaSession } from "@/hooks/useMediaSession";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
@@ -1179,17 +1179,10 @@ export default function ChapterView({
           style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}
         >
           <div className="max-w-2xl mx-auto space-y-4">
-            {/* Loading state */}
             {isLoadingVerses && (
               <>
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="space-y-3 p-6 rounded-2xl bg-card/80 backdrop-blur-xl">
-                    <Skeleton className="h-8 w-3/4" />
-                    <Skeleton className="h-6 w-full" />
-                    <Skeleton className="h-6 w-5/6" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-4/5" />
-                  </div>
+                {[...Array(6)].map((_, i) => (
+                  <VerseCardSkeleton key={i} index={i} />
                 ))}
               </>
             )}

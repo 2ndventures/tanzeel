@@ -5,6 +5,7 @@ import { Verse } from "@/lib/quranMetadata";
 import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
 import { tafsirService, DEFAULT_TAFSIR_ID, TafsirEntry } from "@/services/tafsirService";
 import { Skeleton } from "@/components/ui/skeleton";
+import { VerseCardSkeleton } from "@/components/VerseCard";
 import { Button } from "@/components/ui/button";
 
 interface ScientificViewProps {
@@ -111,9 +112,20 @@ export default function ScientificView({
       <div className={`relative flex-1 overflow-y-auto px-4 pb-nav-clearance transition-[padding] duration-300 ${
         isCollapsed ? 'pt-[80px]' : 'pt-[100px]'
       }`}>
-        <div className="max-w-4xl mx-auto space-y-4">
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-48 w-full" />
+        <div className="max-w-4xl mx-auto space-y-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-2xl border border-border/30 overflow-hidden">
+              <div className="p-4">
+                <VerseCardSkeleton index={i} />
+              </div>
+              <div className="border-t border-border/20 p-4 space-y-2">
+                <div className={`skeleton h-3 w-24 rounded animation-delay-${(i % 5) * 100}`} />
+                <div className={`skeleton h-4 w-full rounded animation-delay-${((i + 1) % 5) * 100}`} />
+                <div className={`skeleton h-4 w-5/6 rounded animation-delay-${((i + 2) % 5) * 100}`} />
+                <div className={`skeleton h-4 w-3/4 rounded animation-delay-${((i + 3) % 5) * 100}`} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

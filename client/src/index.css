@@ -789,6 +789,12 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
     }
   }
 
+  .animation-delay-0 { animation-delay: 0ms; }
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+
   /* Page transition animations */
   .page-enter {
     opacity: 0;

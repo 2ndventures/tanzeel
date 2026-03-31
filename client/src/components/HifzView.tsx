@@ -2,7 +2,7 @@ import { useState, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
 import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
-import { Skeleton } from "@/components/ui/skeleton";
+import { VerseCardSkeleton } from "@/components/VerseCard";
 import { Button } from "@/components/ui/button";
 
 interface HifzViewProps {
@@ -112,12 +112,8 @@ export default function HifzView({
       <div className="relative flex-1 overflow-y-auto px-6 pb-[240px] transition-[padding] duration-300"
         style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}>
         <div className="max-w-2xl mx-auto space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="space-y-3 p-6 rounded-2xl bg-card/80 backdrop-blur-xl">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-4 w-4/5" />
-            </div>
+          {[...Array(6)].map((_, i) => (
+            <VerseCardSkeleton key={i} index={i} />
           ))}
         </div>
       </div>
