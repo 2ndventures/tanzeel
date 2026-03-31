@@ -601,8 +601,8 @@ export function useWordTimingAudio(
         cacheAudioFile(audioUrl, reciterId, chapterId).catch(() => {});
       }
 
-      const currentSrc = audio.src;
-      if (currentSrc !== effectiveAudioUrl) {
+      const alreadyPreloading = audio.src && audio.src === effectiveAudioUrl;
+      if (!alreadyPreloading) {
         audio.src = effectiveAudioUrl;
         audio.load();
       }
@@ -708,9 +708,7 @@ export function useWordTimingAudio(
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('error', handleError);
 
-      audio.src = effectiveAudioUrl;
       audio.playbackRate = speedRef.current;
-      audio.load();
 
       audioRef.current = audio;
 
