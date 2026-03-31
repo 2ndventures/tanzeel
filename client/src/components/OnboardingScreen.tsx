@@ -135,7 +135,7 @@ export default function OnboardingScreen({
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
       <div className="fixed inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl" />
       </div>
 
@@ -144,7 +144,7 @@ export default function OnboardingScreen({
           <div className="text-center space-y-8 animate-fade-in">
             {/* Logo/Icon */}
             <div className="flex justify-center">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-amber-500/20 flex items-center justify-center backdrop-blur-xl border border-border/50">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/20 flex items-center justify-center backdrop-blur-xl border border-border/50">
                 <Icon 
                   icon="mdi:book-open-page-variant" 
                   className="w-12 h-12 text-primary"

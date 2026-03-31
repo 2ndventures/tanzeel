@@ -39,7 +39,7 @@
 
   --sidebar-border: 36 18% 86%;
 
-  --sidebar-primary: 43 96% 50%;
+  --sidebar-primary: 234 34% 17%;
 
   --sidebar-primary-foreground: 0 0% 100%;
 
@@ -47,7 +47,7 @@
 
   --sidebar-accent-foreground: 30 30% 12%;
 
-  --sidebar-ring: 43 96% 50%;
+  --sidebar-ring: 234 34% 17%;
 
   --popover: 38 28% 94%;
 
@@ -55,11 +55,11 @@
 
   --popover-border: 36 18% 86%;
 
-  --primary: 43 96% 50%;
+  --primary: 234 34% 17%;
 
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 32 95% 44%;
+  --secondary: 234 28% 28%;
 
   --secondary-foreground: 0 0% 100%;
 
@@ -67,7 +67,7 @@
 
   --muted-foreground: 35 12% 45%;
 
-  --accent: 28 80% 52%;
+  --accent: 234 22% 38%;
 
   --accent-foreground: 0 0% 100%;
 
@@ -76,12 +76,12 @@
   --destructive-foreground: 0 0% 100%;
 
   --input: 36 15% 73%;
-  --ring: 43 96% 50%;
-  --chart-1: 43 96% 56%;
-  --chart-2: 32 95% 44%;
+  --ring: 234 34% 17%;
+  --chart-1: 234 34% 22%;
+  --chart-2: 234 28% 28%;
   --chart-3: 173 58% 39%;
-  --chart-4: 43 96% 56%;
-  --chart-5: 27 87% 67%;
+  --chart-4: 234 34% 35%;
+  --chart-5: 234 22% 45%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: Georgia, serif;

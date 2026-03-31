@@ -221,7 +221,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
     <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background/50 to-background/90 dark:from-indigo-900/30 dark:via-slate-900/50 dark:to-black/70 pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-amber-500/8 via-transparent to-transparent dark:from-amber-500/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary/8 via-transparent to-transparent dark:from-amber-500/10 pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 dark:to-black/30 pointer-events-none" />
 
       <div ref={headerRef} className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
