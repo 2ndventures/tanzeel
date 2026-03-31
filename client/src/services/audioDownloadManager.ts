@@ -11,7 +11,7 @@ import {
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
 import { setItem, getItem, removeItem } from '@/lib/storage';
-import { getTimingUrl, normalizeTimingResponse } from '@/lib/audioUrls';
+import { getTimingUrl, getVerseAudioUrl, normalizeTimingResponse } from '@/lib/audioUrls';
 
 const PENDING_DOWNLOAD_KEY = 'pendingDownload';
 
@@ -42,9 +42,7 @@ export async function clearPendingDownload(): Promise<void> {
 let cancelFlag = false;
 
 function buildAudioUrl(everyAyahFolder: string, surahNum: number, verseNum: number): string {
-  const surah = String(surahNum).padStart(3, '0');
-  const ayah = String(verseNum).padStart(3, '0');
-  return `https://everyayah.com/data/${everyAyahFolder}/${surah}${ayah}.mp3`;
+  return getVerseAudioUrl(everyAyahFolder, surahNum, verseNum);
 }
 
 export async function downloadSurah(
