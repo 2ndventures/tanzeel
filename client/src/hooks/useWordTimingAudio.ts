@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { API_BASE_URL } from '@/config';
 import { getCachedTimingData, cacheTimingData, getCachedAudioUrl, cacheAudioFile, getTimingDataFromMemory, storeTimingDataInMemory } from '@/lib/audioCache';
 import { getItem, setItem, removeItem } from '@/lib/storage';
 import {
@@ -8,6 +7,7 @@ import {
   getOfflineTimingData,
 } from '@/services/audioCache';
 import { RECITER_TO_QURAN_COM_ID } from '@/lib/reciters';
+import { getTimingUrl, normalizeTimingResponse } from '@/lib/audioUrls';
 
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
 const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
@@ -521,7 +521,7 @@ export function useWordTimingAudio(
         }
       }
 
-      const timingUrl = `${API_BASE_URL}/api/audio-timing/${reciterId}/${chapterId}`;
+      const timingUrl = getTimingUrl(reciterId, chapterId);
 
       audioCachePromise = getCachedAudioUrl(reciterId, chapterId);
 
@@ -541,9 +541,13 @@ export function useWordTimingAudio(
             throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
           }
 
-          const cloned = timingResponse.clone();
-          timingData = await timingResponse.json();
-          cacheTimingData(reciterId, chapterId, cloned).catch(() => {});
+          const rawData = await timingResponse.json();
+          const normalized = normalizeTimingResponse(rawData);
+          timingData = normalized as TimingData;
+          const cacheResponse = new Response(JSON.stringify(timingData), {
+            headers: { 'Content-Type': 'application/json' },
+          });
+          cacheTimingData(reciterId, chapterId, cacheResponse).catch(() => {});
         }
         storeTimingDataInMemory(reciterId, chapterId, timingData);
       }

@@ -20,6 +20,7 @@ import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
+import { getVerseAudioUrl } from "@/lib/audioUrls";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -218,7 +219,7 @@ export default function ChapterView({
     setPreviewingReciter(reciterId);
     setPreviewLoading(true);
 
-    const audio = new Audio(`/api/verse-audio/${reciterData.everyAyahFolder}/001/002`);
+    const audio = new Audio(getVerseAudioUrl(reciterData.everyAyahFolder, 1, 2));
     previewAudioRef.current = audio;
 
     const showError = () => {

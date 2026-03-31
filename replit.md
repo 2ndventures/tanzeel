@@ -47,7 +47,15 @@ The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabas
 
 ## Audio Playback System
 
-The system provides continuous chapter audio playback with word-level synchronized highlighting. Audio state is managed centrally via `AudioProvider` (`client/src/contexts/AudioContext.tsx`), which wraps `useWordTimingAudio` at the app level and exposes playback controls through the `useAudio()` hook. This enables persistent audio across navigation — a `MiniPlayer` component (`client/src/components/MiniPlayer.tsx`) shows a compact bar above the bottom nav when audio is playing and the user navigates away from ChapterView. The mini player displays the chapter name, progress bar, and play/pause control; tapping it navigates back to the playing chapter. ChapterView registers verse-change and ended callbacks via ref-based registration to handle auto-scroll and chapter-end navigation. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling. The backend normalizes inconsistent Quran.com API responses for audio timing.
+The system provides continuous chapter audio playback with word-level synchronized highlighting. Audio state is managed centrally via `AudioProvider` (`client/src/contexts/AudioContext.tsx`), which wraps `useWordTimingAudio` at the app level and exposes playback controls through the `useAudio()` hook. This enables persistent audio across navigation — a `MiniPlayer` component (`client/src/components/MiniPlayer.tsx`) shows a compact bar above the bottom nav when audio is playing and the user navigates away from ChapterView. The mini player displays the chapter name, progress bar, and play/pause control; tapping it navigates back to the playing chapter. ChapterView registers verse-change and ended callbacks via ref-based registration to handle auto-scroll and chapter-end navigation. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling.
+
+### Platform-Aware Audio URL Routing
+
+`client/src/lib/audioUrls.ts` centralizes platform-aware URL construction for audio resources:
+- **Timing API**: On native (Capacitor), calls `api.qurancdn.com` directly; on web, routes through `/api/audio-timing/` proxy.
+- **Verse audio (VBV preview)**: On native, calls `everyayah.com` directly; on web, routes through `/api/verse-audio/` proxy.
+- **API normalization**: `normalizeTimingResponse()` handles Quran.com API inconsistency (`audio_file` object vs `audio_files` array) client-side, enabling direct CDN calls on native without server-side normalization. The server proxy still normalizes for web compatibility.
+- This eliminates the double-hop (native → Replit proxy → CDN → Replit proxy → native) that caused ~8s startup delays on mobile apps.
 
 ### Offline Playback (Verse-by-Verse)
 

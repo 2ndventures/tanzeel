@@ -10,8 +10,8 @@ import {
   saveOfflineTimingData,
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
-import { API_BASE_URL } from '@/config';
 import { setItem, getItem, removeItem } from '@/lib/storage';
+import { getTimingUrl, normalizeTimingResponse } from '@/lib/audioUrls';
 
 const PENDING_DOWNLOAD_KEY = 'pendingDownload';
 
@@ -101,10 +101,11 @@ export async function downloadSurah(
 
   try {
     const quranComId = getQuranComReciterId(reciterId);
-    const timingUrl = `${API_BASE_URL}/api/audio-timing/${quranComId}/${surahNum}`;
+    const timingUrl = getTimingUrl(quranComId, surahNum);
     const timingResponse = await fetch(timingUrl);
     if (timingResponse.ok) {
-      const timingData = await timingResponse.json();
+      const rawData = await timingResponse.json();
+      const timingData = normalizeTimingResponse(rawData);
       await saveOfflineTimingData(reciterId, surahNum, timingData);
     }
   } catch (err) {
