@@ -84,8 +84,8 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
       <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
         <div className="h-[3px] bg-muted/30">
           <div
-            className="h-full bg-primary transition-all duration-200"
-            style={{ width: `${progress}%` }}
+            className="h-full transition-all duration-200"
+            style={{ backgroundColor: 'hsl(var(--glow-primary))', width: `${progress}%` }}
             data-testid="mini-player-progress"
           />
         </div>
@@ -100,7 +100,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
             data-testid="mini-player-navigate"
           >
             <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--glow-primary)/0.15)]">
-              <Icon icon="solar:book-2-bold" className="size-4 text-primary" />
+              <Icon icon="solar:book-2-bold" className="size-4" style={{ color: 'hsl(var(--glow-primary))' }} />
             </div>
             <div className="min-w-0 flex-1 text-left">
               <p className="text-sm font-semibold text-foreground truncate" data-testid="mini-player-title">

@@ -308,7 +308,7 @@ export default function AudioPlayer({
         >
           <svg className="absolute inset-0 -rotate-90" viewBox="0 0 56 56">
             <circle cx="28" cy="28" r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.3" />
-            <circle cx="28" cy="28" r={radius} fill="none" stroke={error ? "hsl(var(--destructive))" : "hsl(var(--primary))"} strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className={`progress-ring-arc ${!error && strokeDashoffset < circumference ? 'progress-ring-glow-arc' : ''}`} />
+            <circle cx="28" cy="28" r={radius} fill="none" stroke={error ? "hsl(var(--destructive))" : "hsl(var(--glow-primary))"} strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className={`progress-ring-arc ${!error && strokeDashoffset < circumference ? 'progress-ring-glow-arc' : ''}`} />
           </svg>
           {error ? (
             <Icon icon="solar:refresh-bold" className="size-5 text-destructive relative z-10" />
@@ -438,7 +438,7 @@ export default function AudioPlayer({
             onPointerCancel={handlePointerCancel}
             onContextMenu={(e) => e.preventDefault()}
             className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-black/[.13] dark:active:bg-white/[.15] ${
-              speedIsModified ? 'text-[#f8c630]' : 'text-muted-foreground dark:text-white/50'
+              speedIsModified ? 'text-[hsl(var(--glow-primary))]' : 'text-muted-foreground dark:text-white/50'
             }`}
             aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
             data-testid="button-speed"
@@ -461,7 +461,7 @@ export default function AudioPlayer({
             </button>
 
             <button
-              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 ${error ? 'bg-destructive/90 text-destructive-foreground' : 'bg-[#f8c630] text-[#ffffff]'}`}
+              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 ${error ? 'bg-destructive/90 text-destructive-foreground' : 'bg-[hsl(var(--glow-primary))] text-white'}`}
               onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
               disabled={isLoading}
               aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
@@ -470,11 +470,11 @@ export default function AudioPlayer({
               {error ? (
                 <Icon icon="solar:refresh-bold" className="size-7" aria-hidden="true" />
               ) : isLoading ? (
-                <div className="size-6 border-[2.5px] border-black/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
+                <div className="size-6 border-[2.5px] border-white/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
               ) : isPlaying ? (
-                <Icon icon="solar:pause-bold" className="size-7 text-black/85" aria-hidden="true" />
+                <Icon icon="solar:pause-bold" className="size-7 text-white" aria-hidden="true" />
               ) : (
-                <Icon icon="solar:play-bold" className="size-7 text-black/85 ml-0.5" aria-hidden="true" />
+                <Icon icon="solar:play-bold" className="size-7 text-white ml-0.5" aria-hidden="true" />
               )}
             </button>
 
