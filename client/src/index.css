@@ -1035,6 +1035,16 @@ span.end {
   color: hsl(var(--muted-foreground));
   font-size: 0.75em;
 }
+.active-word {
+  color: hsl(var(--glow-primary));
+  background: hsl(var(--glow-primary) / 0.12);
+  border-radius: 4px;
+  padding: 2px 1px;
+  font-weight: 700;
+}
+.dark .active-word {
+  background: hsl(var(--glow-primary) / 0.18);
+}
 .verse-end-ornament {
   display: inline-flex;
   align-items: center;

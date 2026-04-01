@@ -328,7 +328,7 @@ export default function FocusedFlowView({
                         key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
                         id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
                         className={`transition-all duration-150 ${
-                          isCurrentWord ? 'text-primary font-bold' : ''
+                          isCurrentWord ? 'active-word' : ''
                         }`}
                         dangerouslySetInnerHTML={{ __html: word + (wIdx < page.words.length - 1 ? ' ' : '') }}
                       />
@@ -337,7 +337,7 @@ export default function FocusedFlowView({
                         key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
                         id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
                         className={`transition-all duration-150 ${
-                          isCurrentWord ? 'text-primary font-bold' : ''
+                          isCurrentWord ? 'active-word' : ''
                         }`}
                       >
                         {word}{wIdx < page.words.length - 1 ? ' ' : ''}

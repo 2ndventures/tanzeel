@@ -220,7 +220,7 @@ export default function ScientificView({
                     onClick={() => handleWordClick(wIdx)}
                     className={`cursor-pointer transition-all duration-150 inline-block px-0.5 rounded ${
                       isSelected || isAudioWord
-                        ? 'text-primary font-bold bg-primary/10'
+                        ? 'active-word'
                         : 'hover:text-primary/70'
                     }`}
                   >

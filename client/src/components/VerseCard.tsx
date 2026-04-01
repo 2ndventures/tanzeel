@@ -200,7 +200,7 @@ export default function VerseCard({
                   key={`word-${chapterId}-${verseNumber}-${index}`}
                   id={`word-${chapterId}-${verseNumber}-${index}`}
                   className={`transition-all duration-150 ${
-                    isCurrentWord ? 'text-primary font-bold' : ''
+                    isCurrentWord ? 'active-word' : ''
                   }`}
                   dangerouslySetInnerHTML={{ __html: word + (index < words.length - 1 ? ' ' : '') }}
                 />
@@ -209,7 +209,7 @@ export default function VerseCard({
                   key={`word-${chapterId}-${verseNumber}-${index}`}
                   id={`word-${chapterId}-${verseNumber}-${index}`}
                   className={`transition-all duration-150 ${
-                    isCurrentWord ? 'text-primary font-bold' : ''
+                    isCurrentWord ? 'active-word' : ''
                   }`}
                 >
                   {word}{index < words.length - 1 ? ' ' : ''}

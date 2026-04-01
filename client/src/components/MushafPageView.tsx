@@ -249,7 +249,7 @@ export default function MushafPageView({
                                 id={`word-${chapterId}-${verse.number}-${wIdx}`}
                                 className={`transition-colors duration-150 ${
                                   isCurrentWord
-                                    ? "text-primary font-bold"
+                                    ? "active-word"
                                     : ""
                                 }`}
                                 dangerouslySetInnerHTML={{
@@ -262,7 +262,7 @@ export default function MushafPageView({
                                 id={`word-${chapterId}-${verse.number}-${wIdx}`}
                                 className={`transition-colors duration-150 ${
                                   isCurrentWord
-                                    ? "text-primary font-bold"
+                                    ? "active-word"
                                     : ""
                                 }`}
                               >

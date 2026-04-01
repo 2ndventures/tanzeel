@@ -219,7 +219,7 @@ export default function HifzView({
                         key={`hifz-${chapterId}-${verseNumber}-${wIdx}`}
                         id={`word-${chapterId}-${verseNumber}-${wIdx}`}
                         className={`transition-all duration-150 ${
-                          isCurrentWord ? 'text-primary font-bold' : ''
+                          isCurrentWord ? 'active-word' : ''
                         }`}
                         dangerouslySetInnerHTML={{ __html: word + (wIdx < words.length - 1 ? ' ' : '') }}
                       />
@@ -228,7 +228,7 @@ export default function HifzView({
                         key={`hifz-${chapterId}-${verseNumber}-${wIdx}`}
                         id={`word-${chapterId}-${verseNumber}-${wIdx}`}
                         className={`transition-all duration-150 ${
-                          isCurrentWord ? 'text-primary font-bold' : ''
+                          isCurrentWord ? 'active-word' : ''
                         }`}
                       >
                         {word}{wIdx < words.length - 1 ? ' ' : ''}
