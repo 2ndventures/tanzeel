@@ -429,7 +429,9 @@ export function useWordTimingAudio(
 
     setState(prev => ({ ...prev, isLoading: true }));
 
+    const preLoadId = loadIdRef.current;
     const uri = await getCachedAudioUri(reciterString, chapterId, verseNum);
+    if (loadIdRef.current !== preLoadId) return;
     if (!uri) {
       setState(prev => ({
         ...prev,
@@ -463,7 +465,9 @@ export function useWordTimingAudio(
       cleanupRef.current = null;
     }
 
+    const preLoadId = loadIdRef.current;
     const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;
+    if (loadIdRef.current !== preLoadId) return false;
     if (offlineTiming?.audio_files?.[0]?.verse_timings) {
       vbvTimingsRef.current = offlineTiming.audio_files[0].verse_timings;
       timingDataRef.current = offlineTiming.audio_files[0];
@@ -476,10 +480,12 @@ export function useWordTimingAudio(
 
     const firstVerse = downloadedVerses[0];
     await loadVerseByVerseAudio(firstVerse, autoplayRef.current, reciterString);
+    if (loadIdRef.current !== preLoadId) return false;
     return true;
   }, [reciterId, chapterId, loadVerseByVerseAudio]);
 
   const loadAudio = useCallback(async () => {
+    const myLoadId = loadIdRef.current;
     let audioCachePromise: Promise<string | null> | null = null;
     try {
       if (cleanupRef.current) {
@@ -494,6 +500,11 @@ export function useWordTimingAudio(
       }
       vbvPreloadRef.current.clear();
 
+      if (audioContainerRef.current) {
+        audioContainerRef.current.remove();
+        audioContainerRef.current = null;
+      }
+
       verseByVerseRef.current = false;
 
       setState(prev => ({ ...prev, isLoading: true, error: null, currentVerseKey: null, currentWordIndex: null, currentTime: 0, duration: 0 }));
@@ -505,6 +516,7 @@ export function useWordTimingAudio(
         const downloadedVerses = getDownloadedVerseNumbers(reciterString, chapterId);
         if (downloadedVerses.length > 0) {
           const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;
+          if (loadIdRef.current !== myLoadId) return;
           if (offlineTiming?.audio_files?.[0]?.verse_timings) {
             vbvTimingsRef.current = offlineTiming.audio_files[0].verse_timings;
             timingDataRef.current = offlineTiming.audio_files[0];
@@ -517,21 +529,20 @@ export function useWordTimingAudio(
 
           const firstVerse = downloadedVerses[0];
           await loadVerseByVerseAudio(firstVerse, autoplayRef.current, reciterString);
+          if (loadIdRef.current !== myLoadId) return;
           return;
         }
       }
 
-      if (!audioContainerRef.current) {
-        const container = document.createElement('div');
-        container.style.display = 'none';
-        container.id = `quran-audio-player-${chapterId}`;
-        document.body.appendChild(container);
-        audioContainerRef.current = container;
-      }
+      const container = document.createElement('div');
+      container.style.display = 'none';
+      container.id = `quran-audio-player-${chapterId}`;
+      document.body.appendChild(container);
+      audioContainerRef.current = container;
 
       const audio = document.createElement('audio');
       audio.preload = 'auto';
-      audioContainerRef.current.appendChild(audio);
+      container.appendChild(audio);
 
       audioCachePromise = getCachedAudioUrl(reciterId, chapterId);
 
@@ -576,6 +587,15 @@ export function useWordTimingAudio(
         audioCachePromise,
       ]);
 
+      if (loadIdRef.current !== myLoadId) {
+        audio.pause();
+        audio.src = '';
+        audio.remove();
+        if (cachedBlobUrl) URL.revokeObjectURL(cachedBlobUrl);
+        container.remove();
+        return;
+      }
+
       if (!timingData.audio_files || !Array.isArray(timingData.audio_files) || timingData.audio_files.length === 0) {
         throw new Error('No audio files found in timing data');
       }
@@ -608,6 +628,7 @@ export function useWordTimingAudio(
       }
 
       const handleLoadedMetadata = () => {
+        if (loadIdRef.current !== myLoadId) return;
         setState(prev => ({ 
           ...prev, 
           duration: audio.duration || 0,
@@ -616,6 +637,7 @@ export function useWordTimingAudio(
       };
 
       const handleTimeUpdate = () => {
+        if (loadIdRef.current !== myLoadId) return;
         const currentTime = audio.currentTime;
         const { verseKey, wordIndex } = findCurrentSegment(currentTime);
         
@@ -634,6 +656,7 @@ export function useWordTimingAudio(
       };
 
       const handleCanPlay = () => {
+        if (loadIdRef.current !== myLoadId) return;
         retryCountRef.current = 0;
         audio.playbackRate = speedRef.current;
         
@@ -648,10 +671,12 @@ export function useWordTimingAudio(
       };
 
       const handlePlay = () => {
+        if (loadIdRef.current !== myLoadId) return;
         setState(prev => ({ ...prev, isPlaying: true, error: null }));
       };
 
       const handlePause = () => {
+        if (loadIdRef.current !== myLoadId) return;
         setState(prev => ({ 
           ...prev, 
           isPlaying: false
@@ -659,6 +684,7 @@ export function useWordTimingAudio(
       };
 
       const handleEnded = () => {
+        if (loadIdRef.current !== myLoadId) return;
         if (repeatRef.current) {
           audio.currentTime = 0;
           audio.play();
@@ -669,6 +695,7 @@ export function useWordTimingAudio(
       };
 
       const handleError = (e: Event) => {
+        if (loadIdRef.current !== myLoadId) return;
         const target = e.target as HTMLAudioElement;
         const mediaError = target.error;
         
@@ -679,9 +706,8 @@ export function useWordTimingAudio(
         if (retryCountRef.current < MAX_AUTO_RETRIES) {
           retryCountRef.current++;
           const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
-          const currentLoadId = loadIdRef.current;
           retryTimerRef.current = setTimeout(() => {
-            if (loadIdRef.current === currentLoadId) {
+            if (loadIdRef.current === myLoadId) {
               loadAudio();
             }
           }, delay);
@@ -689,6 +715,7 @@ export function useWordTimingAudio(
         }
         
         tryVerseByVerseFallback().then(fellBack => {
+          if (loadIdRef.current !== myLoadId) return;
           if (!fellBack) {
             setState(prev => ({
               ...prev,
@@ -729,8 +756,8 @@ export function useWordTimingAudio(
         audioRef.current = null;
       };
       cleanupRef.current = cleanup;
-      return cleanup;
     } catch (error) {
+      if (loadIdRef.current !== myLoadId) return;
       console.error('Failed to load audio:', error instanceof Error ? error.message : error);
 
       if (audioCachePromise) {
@@ -740,15 +767,15 @@ export function useWordTimingAudio(
       if (retryCountRef.current < MAX_AUTO_RETRIES) {
         retryCountRef.current++;
         const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
-        const currentLoadId = loadIdRef.current;
         await new Promise(resolve => {
           retryTimerRef.current = setTimeout(resolve, delay);
         });
-        if (loadIdRef.current !== currentLoadId) return;
+        if (loadIdRef.current !== myLoadId) return;
         return loadAudio();
       }
 
       const fellBack = await tryVerseByVerseFallback();
+      if (loadIdRef.current !== myLoadId) return;
       if (!fellBack) {
         setState(prev => ({
           ...prev,
@@ -767,14 +794,21 @@ export function useWordTimingAudio(
       clearTimeout(retryTimerRef.current);
       retryTimerRef.current = null;
     }
-    const cleanup = loadAudio();
+    loadAudio();
     return () => {
       loadIdRef.current++;
       if (retryTimerRef.current) {
         clearTimeout(retryTimerRef.current);
         retryTimerRef.current = null;
       }
-      cleanup?.then(cleanupFn => cleanupFn?.());
+      if (cleanupRef.current) {
+        cleanupRef.current();
+        cleanupRef.current = null;
+      }
+      if (audioContainerRef.current) {
+        audioContainerRef.current.remove();
+        audioContainerRef.current = null;
+      }
     };
   }, [loadAudio, enabled]);
 
