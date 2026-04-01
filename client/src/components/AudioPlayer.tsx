@@ -361,7 +361,7 @@ export default function AudioPlayer({
         <div className="mb-1">
           <Slider
             value={[isScrubbing ? scrubValue : currentTime]}
-            max={duration}
+            max={duration || 1}
             step={0.1}
             onValueChange={(value) => {
               if (!isScrubbing) setIsScrubbing(true);

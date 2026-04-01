@@ -739,6 +739,13 @@ export function useWordTimingAudio(
 
       audioRef.current = audio;
 
+      if (audio.readyState >= 2) {
+        handleLoadedMetadata();
+      }
+      if (audio.readyState >= 3) {
+        handleCanPlay();
+      }
+
       const cleanup = () => {
         audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
         audio.removeEventListener('timeupdate', handleTimeUpdate);
