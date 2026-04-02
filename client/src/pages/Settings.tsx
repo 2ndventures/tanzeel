@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ChevronRight, ChevronLeft, Check, CircleOff } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getCacheOnlyStats, clearCache, getManifest } from "@/services/audioCache";
 
@@ -61,37 +61,76 @@ interface SettingsProps {
   onShowVerseNumbersChange: (value: boolean) => void;
 }
 
-function PillRow({ label, value, options, onChange, testIdPrefix }: {
+type SubViewType = 'reciter' | 'script' | 'spacing' | 'arabic-size' | 'translation-size' | 'transliteration-size' | null;
+
+const subViewTitles: Record<string, string> = {
+  reciter: 'Select Reciter',
+  script: 'Arabic Script',
+  spacing: 'Line Spacing',
+  'arabic-size': 'Arabic Text Size',
+  'translation-size': 'Translation Size',
+  'transliteration-size': 'Transliteration Size',
+};
+
+function NavRow({ label, value, onClick, testId }: {
   label: string;
   value: string;
-  options: { label?: string; icon?: React.ReactNode; value: string }[];
-  onChange: (value: string) => void;
+  onClick: () => void;
+  testId: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
+      data-testid={testId}
+    >
+      <span className="text-sm text-foreground/80">{label}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted-foreground">{value}</span>
+        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+      </div>
+    </button>
+  );
+}
+
+function OptionList({ options, selectedValue, onSelect, testIdPrefix }: {
+  options: { label: string; value: string; sublabel?: string }[];
+  selectedValue: string;
+  onSelect: (value: string) => void;
   testIdPrefix: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-3">
-      <span className="text-sm text-foreground/80 shrink-0">{label}</span>
-      <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-        {options.map((opt) => (
+    <div className="px-6 py-4 space-y-1">
+      {options.map((opt) => {
+        const isSelected = selectedValue === opt.value;
+        const isOff = opt.value === 'Off';
+        return (
           <button
             key={opt.value}
-            onClick={() => onChange(opt.value)}
-            className={`shrink-0 rounded-full text-xs font-semibold transition-all whitespace-nowrap flex items-center justify-center ${
-              opt.icon ? 'w-[30px] h-[30px] p-0' : 'px-3 py-1.5'
-            } ${
-              value === opt.value
-                ? opt.value === 'Off'
-                  ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
-                  : 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
-                : 'text-muted-foreground'
+            onClick={() => onSelect(opt.value)}
+            className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
+              isSelected
+                ? isOff ? 'bg-destructive/15' : 'bg-primary/15'
+                : 'hover-elevate'
             }`}
-            style={value !== opt.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
             data-testid={`${testIdPrefix}-${opt.value.toLowerCase().replace(' ', '-')}`}
           >
-            {opt.icon || opt.label}
+            <div className="text-left">
+              <p className={`text-sm font-medium ${
+                isSelected
+                  ? isOff ? 'text-destructive' : 'text-primary'
+                  : 'text-foreground/90'
+              }`}>
+                {opt.label}
+              </p>
+              {opt.sublabel && (
+                <p className="text-xs text-muted-foreground mt-0.5">{opt.sublabel}</p>
+              )}
+            </div>
+            {isSelected && <Check className={`w-5 h-5 shrink-0 ${isOff ? 'text-destructive' : 'text-primary'}`} />}
           </button>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }
@@ -153,7 +192,7 @@ export default function Settings({
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [reciterView, setReciterView] = useState(false);
+  const [subView, setSubView] = useState<SubViewType>(null);
   const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, fileCount: 0 });
   const [isClearing, setIsClearing] = useState(false);
 
@@ -167,14 +206,14 @@ export default function Settings({
   useEffect(() => {
     if (onRegisterBackHandler) {
       onRegisterBackHandler(() => {
-        if (reciterView) {
-          setReciterView(false);
+        if (subView) {
+          setSubView(null);
           return true;
         }
         return false;
       });
     }
-  }, [onRegisterBackHandler, reciterView]);
+  }, [onRegisterBackHandler, subView]);
 
   const handleFeedbackSubmit = async () => {
     if (!feedback.trim()) {
@@ -206,7 +245,114 @@ export default function Settings({
     }
   };
 
-  if (reciterView) {
+  if (subView) {
+    const renderSubViewContent = () => {
+      switch (subView) {
+        case 'reciter':
+          return (
+            <div className="px-6 py-4 space-y-1">
+              {allReciters.map((r) => {
+                const isSelected = reciter === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => {
+                      onReciterChange(r.id);
+                      setSubView(null);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
+                      isSelected ? 'bg-primary/15' : 'hover-elevate'
+                    }`}
+                    data-testid={`reciter-option-${r.id}`}
+                  >
+                    <div className="text-left">
+                      <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
+                        {r.name}
+                      </p>
+                      {r.style && (
+                        <p className="text-xs text-muted-foreground mt-0.5">{r.style}</p>
+                      )}
+                    </div>
+                    {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          );
+        case 'script':
+          return (
+            <OptionList
+              options={[
+                { label: 'Uthmani', value: 'uthmani' },
+                { label: 'IndoPak', value: 'indopak' },
+                { label: 'Tajweed', value: 'tajweed' },
+              ]}
+              selectedValue={arabicScript}
+              onSelect={(v) => { onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed'); setSubView(null); }}
+              testIdPrefix="button-script"
+            />
+          );
+        case 'spacing':
+          return (
+            <OptionList
+              options={[
+                { label: 'Compact', value: 'Compact' },
+                { label: 'Normal', value: 'Normal' },
+                { label: 'Relaxed', value: 'Relaxed' },
+                { label: 'Loose', value: 'Loose' },
+              ]}
+              selectedValue={lineSpacing}
+              onSelect={(v) => { onLineSpacingChange(v); setSubView(null); }}
+              testIdPrefix="button-spacing"
+            />
+          );
+        case 'arabic-size':
+          return (
+            <OptionList
+              options={[
+                { label: 'Small', value: 'Small' },
+                { label: 'Medium', value: 'Medium' },
+                { label: 'Large', value: 'Large' },
+                { label: 'Extra Large', value: 'Extra Large' },
+              ]}
+              selectedValue={arabicFontSize}
+              onSelect={(v) => { onArabicFontSizeChange(v); setSubView(null); }}
+              testIdPrefix="button-arabic-size"
+            />
+          );
+        case 'translation-size':
+          return (
+            <OptionList
+              options={[
+                { label: 'Off', value: 'Off' },
+                { label: 'Small', value: 'Small' },
+                { label: 'Medium', value: 'Medium' },
+                { label: 'Large', value: 'Large' },
+              ]}
+              selectedValue={translationFontSize}
+              onSelect={(v) => { onTranslationFontSizeChange(v); setSubView(null); }}
+              testIdPrefix="button-translation-size"
+            />
+          );
+        case 'transliteration-size':
+          return (
+            <OptionList
+              options={[
+                { label: 'Off', value: 'Off' },
+                { label: 'Small', value: 'Small' },
+                { label: 'Medium', value: 'Medium' },
+                { label: 'Large', value: 'Large' },
+              ]}
+              selectedValue={transliterationFontSize}
+              onSelect={(v) => { onTransliterationFontSizeChange(v); setSubView(null); }}
+              testIdPrefix="button-transliteration-size"
+            />
+          );
+        default:
+          return null;
+      }
+    };
+
     return (
       <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
         <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
@@ -218,49 +364,21 @@ export default function Settings({
         <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
           <div className="px-6 pt-4 pb-4 flex items-center gap-3">
             <button
-              onClick={() => setReciterView(false)}
+              onClick={() => setSubView(null)}
               className="flex size-10 items-center justify-center transition-colors active:opacity-60 shrink-0"
-              data-testid="button-reciter-back"
+              data-testid="button-subview-back"
             >
               <ChevronLeft className="w-5 h-5 text-foreground/80" />
             </button>
-            <h1 className="text-xl font-semibold text-foreground" data-testid="text-reciter-title">
-              Select Reciter
+            <h1 className="text-xl font-semibold text-foreground" data-testid="text-subview-title">
+              {subViewTitles[subView] || ''}
             </h1>
           </div>
         </div>
 
         <div className="relative flex-1 overflow-y-auto min-h-0 pb-nav-clearance">
-          <div className="px-6 py-4 space-y-1">
-            {allReciters.map((r) => {
-              const isSelected = reciter === r.id;
-              return (
-                <button
-                  key={r.id}
-                  onClick={() => {
-                    onReciterChange(r.id);
-                    setReciterView(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
-                    isSelected ? 'bg-primary/15' : 'hover-elevate'
-                  }`}
-                  data-testid={`reciter-option-${r.id}`}
-                >
-                  <div className="text-left">
-                    <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
-                      {r.name}
-                    </p>
-                    {r.style && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{r.style}</p>
-                    )}
-                  </div>
-                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
+          {renderSubViewContent()}
         </div>
-
       </div>
     );
   }
@@ -292,21 +410,9 @@ export default function Settings({
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
               <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Arabic Script"
-                value={arabicScript}
-                options={[{ label: "Uthmani", value: "uthmani" }, { label: "IndoPak", value: "indopak" }, { label: "Tajweed", value: "tajweed" }]}
-                onChange={(v) => onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed')}
-                testIdPrefix="button-script"
-              />
+              <NavRow label="Arabic Script" value={arabicScript === 'uthmani' ? 'Uthmani' : arabicScript === 'indopak' ? 'IndoPak' : 'Tajweed'} onClick={() => setSubView('script')} testId="menu-item-script" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Line Spacing"
-                value={lineSpacing}
-                options={[{ label: "Compact", value: "Compact" }, { label: "Normal", value: "Normal" }, { label: "Relaxed", value: "Relaxed" }, { label: "Loose", value: "Loose" }]}
-                onChange={onLineSpacingChange}
-                testIdPrefix="button-spacing"
-              />
+              <NavRow label="Line Spacing" value={lineSpacing} onClick={() => setSubView('spacing')} testId="menu-item-spacing" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Verse numbers" checked={showVerseNumbers} onCheckedChange={onShowVerseNumbersChange} testId="toggle-verse-numbers" />
             </div>
@@ -317,29 +423,11 @@ export default function Settings({
               Text Size
             </h3>
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-              <PillRow
-                label="Arabic"
-                value={arabicFontSize}
-                options={[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }]}
-                onChange={onArabicFontSizeChange}
-                testIdPrefix="button-arabic-size"
-              />
+              <NavRow label="Arabic" value={arabicFontSize} onClick={() => setSubView('arabic-size')} testId="menu-item-arabic-size" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Translation"
-                value={translationFontSize}
-                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
-                onChange={onTranslationFontSizeChange}
-                testIdPrefix="button-translation-size"
-              />
+              <NavRow label="Translation" value={translationFontSize} onClick={() => setSubView('translation-size')} testId="menu-item-translation-size" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Transliteration"
-                value={transliterationFontSize}
-                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
-                onChange={onTransliterationFontSizeChange}
-                testIdPrefix="button-transliteration-size"
-              />
+              <NavRow label="Transliteration" value={transliterationFontSize} onClick={() => setSubView('transliteration-size')} testId="menu-item-transliteration-size" />
             </div>
           </div>
 
@@ -348,17 +436,7 @@ export default function Settings({
               Audio
             </h3>
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-              <button
-                onClick={() => setReciterView(true)}
-                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
-                data-testid="menu-item-reciter"
-              >
-                <span className="text-sm text-foreground/80">Reciter</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{getReciterById(reciter)?.name || 'Mishary Alafasy'}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </button>
+              <NavRow label="Reciter" value={getReciterById(reciter)?.name || 'Mishary Alafasy'} onClick={() => setSubView('reciter')} testId="menu-item-reciter" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Auto-scroll" checked={autoScroll} onCheckedChange={onAutoScrollChange} testId="toggle-autoscroll" />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
