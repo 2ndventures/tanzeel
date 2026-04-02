@@ -70,12 +70,12 @@ export async function downloadSurah(
 
   if (cancelFlag) return;
 
-  onProgress?.(5);
-
   let success = false;
   for (let attempt = 0; attempt < 2; attempt++) {
     if (cancelFlag) return;
-    success = await saveFullChapterAudio(reciterId, surahNum, chapterUrl);
+    success = await saveFullChapterAudio(reciterId, surahNum, chapterUrl, (p) => {
+      onProgress?.(Math.round(p * 0.9));
+    });
     if (success) break;
     if (attempt === 0) {
       console.warn(`[DownloadManager] Retry full chapter ${surahNum}`);
@@ -90,8 +90,9 @@ export async function downloadSurah(
 
   if (cancelFlag) return;
 
-  onProgress?.(90);
+  onProgress?.(92);
 
+  let timingSaved = false;
   try {
     const timingUrl = getTimingUrl(quranComId, surahNum);
     const timingResponse = await fetch(timingUrl);
@@ -99,9 +100,24 @@ export async function downloadSurah(
       const rawData = await timingResponse.json();
       const timingData = normalizeTimingResponse(rawData);
       await saveOfflineTimingData(reciterId, surahNum, timingData);
+      timingSaved = true;
     }
   } catch (err) {
     console.warn('[DownloadManager] Failed to cache timing data:', err);
+  }
+
+  if (!timingSaved) {
+    console.error(`[DownloadManager] Timing data missing for chapter ${surahNum}, removing audio`);
+    const key = chapterFileKey(reciterId, surahNum);
+    try {
+      await Filesystem.deleteFile({
+        path: `audio-downloads/${reciterId}/chapter_${surahNum}.mp3`,
+        directory: Directory.Data,
+      });
+    } catch {}
+    removeManifestEntry(key);
+    await saveManifest();
+    return;
   }
 
   onProgress?.(100);

@@ -431,7 +431,8 @@ export function isFullChapterDownloaded(reciterId: string, surahNum: number): bo
 export async function saveFullChapterAudio(
   reciterId: string,
   surahNum: number,
-  remoteUrl: string
+  remoteUrl: string,
+  onProgress?: (percent: number) => void
 ): Promise<boolean> {
   if (!manifest) return false;
 
@@ -445,35 +446,20 @@ export async function saveFullChapterAudio(
   try {
     await ensureDataDirectory(dirPath);
 
-    if (Capacitor.isNativePlatform()) {
-      const downloadResult = await Filesystem.downloadFile({
-        url: remoteUrl,
-        path: filePath,
-        directory: Directory.Data,
-      });
-      if (!downloadResult.path) {
-        console.error('[AudioCache] Full chapter download returned no path');
-        return false;
-      }
-    } else {
-      const response = await fetch(remoteUrl);
-      if (!response.ok) {
-        console.error('[AudioCache] Failed to fetch full chapter audio:', response.status);
-        return false;
-      }
-      const arrayBuffer = await response.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      for (let i = 0; i < bytes.length; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const base64 = btoa(binary);
-      await Filesystem.writeFile({
-        path: filePath,
-        data: base64,
-        directory: Directory.Data,
-      });
+    const arrayBuffer = await downloadWithProgress(remoteUrl, onProgress);
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode(...slice);
     }
+    const base64 = btoa(binary);
+    await Filesystem.writeFile({
+      path: filePath,
+      data: base64,
+      directory: Directory.Data,
+    });
 
     let sizeBytes = 0;
     try {
@@ -505,6 +491,35 @@ export async function saveFullChapterAudio(
     console.error('[AudioCache] Failed to save full chapter audio:', err);
     return false;
   }
+}
+
+function downloadWithProgress(
+  url: string,
+  onProgress?: (percent: number) => void
+): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+
+    xhr.onprogress = (event) => {
+      if (onProgress && event.lengthComputable && event.total > 0) {
+        onProgress(Math.round((event.loaded / event.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response as ArrayBuffer);
+      } else {
+        reject(new Error(`Download failed with status ${xhr.status}`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error('Network error during download'));
+    xhr.ontimeout = () => reject(new Error('Download timed out'));
+    xhr.send();
+  });
 }
 
 export async function getFullChapterAudioUri(
