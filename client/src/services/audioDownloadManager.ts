@@ -9,6 +9,7 @@ import {
   isFullChapterDownloaded,
   saveFullChapterAudio,
   saveOfflineTimingData,
+  abortActiveDownload,
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
 import { setItem, getItem, removeItem } from '@/lib/storage';
@@ -146,6 +147,7 @@ export async function downloadAllSurahs(
 
 export function cancelDownload(): void {
   cancelFlag = true;
+  abortActiveDownload();
 }
 
 export async function deleteSurahDownload(

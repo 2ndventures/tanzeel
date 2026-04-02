@@ -428,6 +428,15 @@ export function isFullChapterDownloaded(reciterId: string, surahNum: number): bo
   return !!entry && entry.source === 'download';
 }
 
+let activeDownloadXhr: XMLHttpRequest | null = null;
+
+export function abortActiveDownload(): void {
+  if (activeDownloadXhr) {
+    activeDownloadXhr.abort();
+    activeDownloadXhr = null;
+  }
+}
+
 export async function saveFullChapterAudio(
   reciterId: string,
   surahNum: number,
@@ -446,20 +455,33 @@ export async function saveFullChapterAudio(
   try {
     await ensureDataDirectory(dirPath);
 
-    const arrayBuffer = await downloadWithProgress(remoteUrl, onProgress);
-    const bytes = new Uint8Array(arrayBuffer);
-    let binary = '';
-    const chunkSize = 8192;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-      binary += String.fromCharCode(...slice);
+    if (Capacitor.isNativePlatform()) {
+      const downloadResult = await Filesystem.downloadFile({
+        url: remoteUrl,
+        path: filePath,
+        directory: Directory.Data,
+      });
+      if (!downloadResult.path) {
+        console.error('[AudioCache] Full chapter download returned no path');
+        return false;
+      }
+      onProgress?.(100);
+    } else {
+      const arrayBuffer = await downloadWithProgress(remoteUrl, onProgress);
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < bytes.length; i += chunkSize) {
+        const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+        binary += String.fromCharCode(...slice);
+      }
+      const base64 = btoa(binary);
+      await Filesystem.writeFile({
+        path: filePath,
+        data: base64,
+        directory: Directory.Data,
+      });
     }
-    const base64 = btoa(binary);
-    await Filesystem.writeFile({
-      path: filePath,
-      data: base64,
-      directory: Directory.Data,
-    });
 
     let sizeBytes = 0;
     try {
@@ -499,6 +521,7 @@ function downloadWithProgress(
 ): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
+    activeDownloadXhr = xhr;
     xhr.open('GET', url, true);
     xhr.responseType = 'arraybuffer';
 
@@ -509,6 +532,7 @@ function downloadWithProgress(
     };
 
     xhr.onload = () => {
+      activeDownloadXhr = null;
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve(xhr.response as ArrayBuffer);
       } else {
@@ -516,8 +540,9 @@ function downloadWithProgress(
       }
     };
 
-    xhr.onerror = () => reject(new Error('Network error during download'));
-    xhr.ontimeout = () => reject(new Error('Download timed out'));
+    xhr.onerror = () => { activeDownloadXhr = null; reject(new Error('Network error during download')); };
+    xhr.ontimeout = () => { activeDownloadXhr = null; reject(new Error('Download timed out')); };
+    xhr.onabort = () => { activeDownloadXhr = null; reject(new Error('Download cancelled')); };
     xhr.send();
   });
 }
