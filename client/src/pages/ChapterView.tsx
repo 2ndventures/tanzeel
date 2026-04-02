@@ -700,8 +700,8 @@ export default function ChapterView({
         <header
           className="w-full"
           style={{
-            background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 50%, transparent 100%)',
-            paddingBottom: '32px',
+            background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 60%, transparent 100%)',
+            paddingBottom: '48px',
           }}
         >
           <div className="relative flex items-center justify-between px-5 pt-3 pb-1">
