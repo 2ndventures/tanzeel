@@ -408,10 +408,141 @@ export function getDownloadedVerseNumbers(
     if (
       entry.reciterId === reciterId &&
       entry.surahNumber === surahNum &&
-      entry.source === 'download'
+      entry.source === 'download' &&
+      entry.verseNumber > 0
     ) {
       verses.push(entry.verseNumber);
     }
   }
   return verses.sort((a, b) => a - b);
+}
+
+export function chapterFileKey(reciterId: string, surahNum: number): string {
+  return `${reciterId}_chapter_${surahNum}`;
+}
+
+export function isFullChapterDownloaded(reciterId: string, surahNum: number): boolean {
+  if (!manifest) return false;
+  const key = chapterFileKey(reciterId, surahNum);
+  const entry = manifest.files[key];
+  return !!entry && entry.source === 'download';
+}
+
+export async function saveFullChapterAudio(
+  reciterId: string,
+  surahNum: number,
+  remoteUrl: string
+): Promise<boolean> {
+  if (!manifest) return false;
+
+  const key = chapterFileKey(reciterId, surahNum);
+  const existing = manifest.files[key];
+  if (existing && existing.source === 'download') return true;
+
+  const dirPath = `${AUDIO_DOWNLOAD_DIR}/${reciterId}`;
+  const filePath = `${dirPath}/chapter_${surahNum}.mp3`;
+
+  try {
+    await ensureDataDirectory(dirPath);
+
+    if (Capacitor.isNativePlatform()) {
+      const downloadResult = await Filesystem.downloadFile({
+        url: remoteUrl,
+        path: filePath,
+        directory: Directory.Data,
+      });
+      if (!downloadResult.path) {
+        console.error('[AudioCache] Full chapter download returned no path');
+        return false;
+      }
+    } else {
+      const response = await fetch(remoteUrl);
+      if (!response.ok) {
+        console.error('[AudioCache] Failed to fetch full chapter audio:', response.status);
+        return false;
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64 = btoa(binary);
+      await Filesystem.writeFile({
+        path: filePath,
+        data: base64,
+        directory: Directory.Data,
+      });
+    }
+
+    let sizeBytes = 0;
+    try {
+      const stat = await Filesystem.stat({ path: filePath, directory: Directory.Data });
+      sizeBytes = stat.size;
+    } catch {
+      sizeBytes = 0;
+    }
+
+    if (existing) {
+      manifest.totalSizeBytes -= existing.sizeBytes;
+    }
+
+    const now = new Date().toISOString();
+    manifest.files[key] = {
+      reciterId,
+      surahNumber: surahNum,
+      verseNumber: 0,
+      filePath,
+      sizeBytes,
+      cachedAt: now,
+      lastAccessedAt: now,
+      source: 'download',
+    };
+    manifest.totalSizeBytes += sizeBytes;
+    await saveManifest();
+    return true;
+  } catch (err) {
+    console.error('[AudioCache] Failed to save full chapter audio:', err);
+    return false;
+  }
+}
+
+export async function getFullChapterAudioUri(
+  reciterId: string,
+  surahNum: number
+): Promise<string | null> {
+  if (!manifest) return null;
+  const key = chapterFileKey(reciterId, surahNum);
+  const entry = manifest.files[key];
+  if (!entry) return null;
+
+  try {
+    if (Capacitor.isNativePlatform()) {
+      await Filesystem.stat({ path: entry.filePath, directory: Directory.Data });
+    }
+
+    entry.lastAccessedAt = new Date().toISOString();
+    saveManifest().catch(() => {});
+
+    if (Capacitor.isNativePlatform()) {
+      const uriResult = await Filesystem.getUri({
+        path: entry.filePath,
+        directory: Directory.Data,
+      });
+      return Capacitor.convertFileSrc(uriResult.uri);
+    }
+
+    const fileResult = await Filesystem.readFile({
+      path: entry.filePath,
+      directory: Directory.Data,
+    });
+    const base64String = fileResult.data as string;
+    return `data:audio/mpeg;base64,${base64String}`;
+  } catch (err) {
+    console.error('[AudioCache] Full chapter file not found on disk, removing entry:', err);
+    manifest.totalSizeBytes -= entry.sizeBytes;
+    delete manifest.files[key];
+    saveManifest().catch(() => {});
+    return null;
+  }
 }

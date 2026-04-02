@@ -5,6 +5,8 @@ import {
   getCachedAudioUri,
   getDownloadedVerseNumbers,
   getOfflineTimingData,
+  isFullChapterDownloaded,
+  getFullChapterAudioUri,
 } from '@/services/audioCache';
 import { RECITER_TO_QURAN_COM_ID } from '@/lib/reciters';
 import { getTimingUrl, getChapterAudioUrl, normalizeTimingResponse } from '@/lib/audioUrls';
@@ -513,6 +515,117 @@ export function useWordTimingAudio(
 
       const reciterString = quranComIdToReciterString(reciterId);
       if (reciterString) {
+        if (isFullChapterDownloaded(reciterString, chapterId)) {
+          const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;
+          if (loadIdRef.current !== myLoadId) return;
+          const offlineUri = await getFullChapterAudioUri(reciterString, chapterId);
+          if (loadIdRef.current !== myLoadId) return;
+
+          if (offlineUri && offlineTiming?.audio_files?.[0]) {
+            timingDataRef.current = offlineTiming.audio_files[0];
+
+            const container = document.createElement('div');
+            container.style.display = 'none';
+            container.id = `quran-audio-player-${chapterId}`;
+            document.body.appendChild(container);
+            audioContainerRef.current = container;
+
+            const audio = document.createElement('audio');
+            audio.preload = 'auto';
+            container.appendChild(audio);
+            audio.src = offlineUri;
+            audio.load();
+
+            audioCachePromise = Promise.resolve(null);
+
+            const handleLoadedMetadata = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              setState(prev => ({ ...prev, duration: audio.duration || 0, currentTime: 0 }));
+            };
+
+            const handleTimeUpdate = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              const currentTime = audio.currentTime;
+              const { verseKey, wordIndex } = findCurrentSegment(currentTime);
+              setState(prev => {
+                if (verseKey && verseKey !== prev.currentVerseKey) {
+                  onVerseChangeRef.current?.(verseKey);
+                }
+                return { ...prev, currentTime, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+              });
+            };
+
+            const handleCanPlay = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              retryCountRef.current = 0;
+              audio.playbackRate = speedRef.current;
+              if (autoplayRef.current) {
+                setState(prev => ({ ...prev, isLoading: false }));
+                audio.play().catch(() => {
+                  setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
+                });
+              } else {
+                setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+              }
+            };
+
+            const handlePlay = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              setState(prev => ({ ...prev, isPlaying: true, error: null }));
+            };
+
+            const handlePause = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              setState(prev => ({ ...prev, isPlaying: false }));
+            };
+
+            const handleEnded = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              if (repeatRef.current) {
+                audio.currentTime = 0;
+                audio.play();
+              } else {
+                setState(prev => ({ ...prev, isPlaying: false }));
+                onEndedRef.current?.();
+              }
+            };
+
+            const handleError = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              setState(prev => ({ ...prev, isLoading: false, isPlaying: false, error: 'Offline audio failed to load. Tap retry.' }));
+            };
+
+            audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+            audio.addEventListener('timeupdate', handleTimeUpdate);
+            audio.addEventListener('canplay', handleCanPlay);
+            audio.addEventListener('play', handlePlay);
+            audio.addEventListener('pause', handlePause);
+            audio.addEventListener('ended', handleEnded);
+            audio.addEventListener('error', handleError);
+
+            audio.playbackRate = speedRef.current;
+            audioRef.current = audio;
+
+            if (audio.readyState >= 2) handleLoadedMetadata();
+            if (audio.readyState >= 3) handleCanPlay();
+
+            cleanupRef.current = () => {
+              audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+              audio.removeEventListener('timeupdate', handleTimeUpdate);
+              audio.removeEventListener('canplay', handleCanPlay);
+              audio.removeEventListener('play', handlePlay);
+              audio.removeEventListener('pause', handlePause);
+              audio.removeEventListener('ended', handleEnded);
+              audio.removeEventListener('error', handleError);
+              audio.pause();
+              audio.src = '';
+              audio.remove();
+              audioRef.current = null;
+            };
+            return;
+          }
+        }
+
         const downloadedVerses = getDownloadedVerseNumbers(reciterString, chapterId);
         if (downloadedVerses.length > 0) {
           const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;

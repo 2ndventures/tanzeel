@@ -2,16 +2,17 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { getReciterById, getQuranComReciterId } from '@/lib/reciters';
 import {
   fileKey,
+  chapterFileKey,
   getManifest,
   removeManifestEntry,
   saveManifest,
-  cacheAudioFile,
-  isVerseCached,
+  isFullChapterDownloaded,
+  saveFullChapterAudio,
   saveOfflineTimingData,
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
 import { setItem, getItem, removeItem } from '@/lib/storage';
-import { getTimingUrl, getVerseAudioUrl, normalizeTimingResponse } from '@/lib/audioUrls';
+import { getTimingUrl, getChapterAudioUrl, normalizeTimingResponse } from '@/lib/audioUrls';
 
 const PENDING_DOWNLOAD_KEY = 'pendingDownload';
 
@@ -41,14 +42,10 @@ export async function clearPendingDownload(): Promise<void> {
 
 let cancelFlag = false;
 
-function buildAudioUrl(everyAyahFolder: string, surahNum: number, verseNum: number): string {
-  return getVerseAudioUrl(everyAyahFolder, surahNum, verseNum);
-}
-
 export async function downloadSurah(
   reciterId: string,
   surahNum: number,
-  totalVerses: number,
+  _totalVerses: number,
   onProgress?: (percent: number) => void
 ): Promise<void> {
   const reciter = getReciterById(reciterId);
@@ -58,47 +55,44 @@ export async function downloadSurah(
   }
 
   cancelFlag = false;
-  let completed = 0;
 
-  for (let v = 1; v <= totalVerses; v++) {
-    if (cancelFlag) {
-      console.log('[DownloadManager] Download cancelled');
-      return;
-    }
-
-    if (isVerseCached(reciterId, surahNum, v)) {
-      const manifest = getManifest();
-      const key = fileKey(reciterId, surahNum, v);
-      const entry = manifest?.files[key];
-      if (entry && entry.source === 'download') {
-        completed++;
-        onProgress?.(Math.round((completed / totalVerses) * 100));
-        continue;
-      }
-    }
-
-    const url = buildAudioUrl(reciter.everyAyahFolder, surahNum, v);
-    let success = false;
-
-    for (let attempt = 0; attempt < 2; attempt++) {
-      success = await cacheAudioFile(reciterId, surahNum, v, url, 'download');
-      if (success) break;
-      if (attempt === 0) {
-        console.warn(`[DownloadManager] Retry verse ${surahNum}:${v}`);
-        await new Promise(r => setTimeout(r, 500));
-      }
-    }
-
-    if (!success) {
-      console.error(`[DownloadManager] Failed to download verse ${surahNum}:${v} after 2 attempts`);
-    }
-
-    completed++;
-    onProgress?.(Math.round((completed / totalVerses) * 100));
+  if (isFullChapterDownloaded(reciterId, surahNum)) {
+    onProgress?.(100);
+    return;
   }
 
+  const quranComId = getQuranComReciterId(reciterId);
+  const chapterUrl = getChapterAudioUrl(quranComId, surahNum);
+  if (!chapterUrl) {
+    console.error('[DownloadManager] No chapter audio URL for reciter:', reciterId);
+    return;
+  }
+
+  if (cancelFlag) return;
+
+  onProgress?.(5);
+
+  let success = false;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (cancelFlag) return;
+    success = await saveFullChapterAudio(reciterId, surahNum, chapterUrl);
+    if (success) break;
+    if (attempt === 0) {
+      console.warn(`[DownloadManager] Retry full chapter ${surahNum}`);
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+
+  if (!success) {
+    console.error(`[DownloadManager] Failed to download chapter ${surahNum} after 2 attempts`);
+    return;
+  }
+
+  if (cancelFlag) return;
+
+  onProgress?.(90);
+
   try {
-    const quranComId = getQuranComReciterId(reciterId);
     const timingUrl = getTimingUrl(quranComId, surahNum);
     const timingResponse = await fetch(timingUrl);
     if (timingResponse.ok) {
@@ -109,6 +103,8 @@ export async function downloadSurah(
   } catch (err) {
     console.warn('[DownloadManager] Failed to cache timing data:', err);
   }
+
+  onProgress?.(100);
 }
 
 export async function downloadAllSurahs(
@@ -143,6 +139,20 @@ export async function deleteSurahDownload(
 ): Promise<void> {
   const manifest = getManifest();
   if (!manifest) return;
+
+  const chapKey = chapterFileKey(reciterId, surahNum);
+  const chapEntry = manifest.files[chapKey];
+  if (chapEntry && chapEntry.source === 'download') {
+    try {
+      await Filesystem.deleteFile({
+        path: chapEntry.filePath,
+        directory: Directory.Data,
+      });
+    } catch (err) {
+      console.error(`[DownloadManager] Failed to delete ${chapEntry.filePath}:`, err);
+    }
+    removeManifestEntry(chapKey);
+  }
 
   for (let v = 1; v <= totalVerses; v++) {
     const key = fileKey(reciterId, surahNum, v);
@@ -213,6 +223,8 @@ export function getDownloadStatus(
   surahNum: number,
   totalVerses: number
 ): 'none' | 'partial' | 'complete' {
+  if (isFullChapterDownloaded(reciterId, surahNum)) return 'complete';
+
   const manifest = getManifest();
   if (!manifest) return 'none';
 
