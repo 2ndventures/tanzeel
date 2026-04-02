@@ -52,7 +52,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
             <button
               key={tab.id}
               onClick={() => { triggerHaptic('light'); onTabChange(tab.id); }}
-              className="relative flex flex-col items-center gap-1.5 min-h-[48px] min-w-[48px] justify-center hover-elevate active-elevate-2 rounded-lg px-2"
+              className="relative flex flex-col items-center gap-1.5 min-h-[48px] min-w-[48px] justify-center rounded-lg px-2"
               data-testid={`button-nav-${tab.id}`}
             >
               {tab.id === "settings" && isDownloading && (
