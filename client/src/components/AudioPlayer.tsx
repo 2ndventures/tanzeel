@@ -332,9 +332,9 @@ export default function AudioPlayer({
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
       <div className="relative" data-testid="audio-player-content">
-        {/* Seamless gradient + blur — fades from transparent to dark */}
+        {/* Seamless gradient + blur — matches content background */}
         <div className="absolute inset-0 [-webkit-backdrop-filter:blur(40px)_saturate(180%)] [backdrop-filter:blur(40px)_saturate(180%)]" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.4) 15%, rgba(var(--player-gradient-rgb),0.75) 40%, rgba(var(--player-gradient-rgb),0.92) 70%, rgba(var(--player-gradient-rgb),0.98) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.2) 15%, rgba(var(--player-gradient-rgb),0.35) 40%, rgba(var(--player-gradient-rgb),0.5) 70%, rgba(var(--player-gradient-rgb),0.6) 100%)' }} />
 
         <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 

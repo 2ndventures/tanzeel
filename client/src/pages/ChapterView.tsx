@@ -698,9 +698,9 @@ export default function ChapterView({
         style={{ willChange: 'transform' }}
       >
         <header
-          className="w-full"
+          className="w-full [-webkit-backdrop-filter:blur(40px)_saturate(180%)] [backdrop-filter:blur(40px)_saturate(180%)]"
           style={{
-            background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 60%, transparent 100%)',
+            background: 'linear-gradient(to bottom, rgba(var(--player-gradient-rgb),0.45) 0%, rgba(var(--player-gradient-rgb),0.25) 50%, transparent 100%)',
             paddingBottom: '48px',
           }}
         >
