@@ -455,33 +455,20 @@ export async function saveFullChapterAudio(
   try {
     await ensureDataDirectory(dirPath);
 
-    if (Capacitor.isNativePlatform()) {
-      const downloadResult = await Filesystem.downloadFile({
-        url: remoteUrl,
-        path: filePath,
-        directory: Directory.Data,
-      });
-      if (!downloadResult.path) {
-        console.error('[AudioCache] Full chapter download returned no path');
-        return false;
-      }
-      onProgress?.(100);
-    } else {
-      const arrayBuffer = await downloadWithProgress(remoteUrl, onProgress);
-      const bytes = new Uint8Array(arrayBuffer);
-      let binary = '';
-      const chunkSize = 8192;
-      for (let i = 0; i < bytes.length; i += chunkSize) {
-        const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-        binary += String.fromCharCode(...slice);
-      }
-      const base64 = btoa(binary);
-      await Filesystem.writeFile({
-        path: filePath,
-        data: base64,
-        directory: Directory.Data,
-      });
+    const arrayBuffer = await downloadWithProgress(remoteUrl, onProgress);
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+      binary += String.fromCharCode(...slice);
     }
+    const base64 = btoa(binary);
+    await Filesystem.writeFile({
+      path: filePath,
+      data: base64,
+      directory: Directory.Data,
+    });
 
     let sizeBytes = 0;
     try {
