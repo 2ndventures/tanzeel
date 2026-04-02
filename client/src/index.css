@@ -844,6 +844,11 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
                 opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  .content-fade-mask {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 56px, black calc(100% - 120px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 56px, black calc(100% - 120px), transparent 100%);
+  }
+
   /* Focused Flow vertical scroll */
   .vertical-verse-scroll {
     scroll-snap-type: y mandatory;

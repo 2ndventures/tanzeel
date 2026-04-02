@@ -265,7 +265,7 @@ export default function FocusedFlowView({
   }
 
   return (
-    <div className="relative flex-1 overflow-hidden">
+    <div className="relative flex-1 overflow-hidden content-fade-mask">
       <button
         onClick={() => setTranslationVisible(v => !v)}
         style={{ top: 'calc(96px + env(safe-area-inset-top, 0px))' }}

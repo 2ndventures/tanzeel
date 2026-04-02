@@ -197,7 +197,7 @@ export default function MushafPageView({
   const activeVerse = verses.find((v) => v.number === currentVerse);
 
   return (
-    <div className="relative flex-1 overflow-hidden flex flex-col">
+    <div className="relative flex-1 overflow-hidden flex flex-col content-fade-mask">
 
       {/* ── Embla Carousel ── */}
       <div className="flex-1 overflow-hidden" ref={emblaRef}>
