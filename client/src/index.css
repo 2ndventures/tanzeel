@@ -845,8 +845,8 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
   }
 
   .content-fade-mask {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 160px, black calc(100% - 160px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 160px, black calc(100% - 160px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 180px, black calc(100% - 200px), transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 180px, black calc(100% - 200px), transparent 100%);
   }
 
   /* Focused Flow vertical scroll */

@@ -698,7 +698,7 @@ export default function ChapterView({
         style={{ willChange: 'transform' }}
       >
         <header
-          className="w-full bg-background"
+          className="w-full"
           style={{
             paddingBottom: '8px',
           }}
