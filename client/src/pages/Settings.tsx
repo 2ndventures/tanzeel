@@ -154,8 +154,6 @@ export default function Settings({
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reciterView, setReciterView] = useState(false);
-  const [scriptView, setScriptView] = useState(false);
-  const [spacingView, setSpacingView] = useState(false);
   const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, fileCount: 0 });
   const [isClearing, setIsClearing] = useState(false);
 
@@ -173,18 +171,10 @@ export default function Settings({
           setReciterView(false);
           return true;
         }
-        if (scriptView) {
-          setScriptView(false);
-          return true;
-        }
-        if (spacingView) {
-          setSpacingView(false);
-          return true;
-        }
         return false;
       });
     }
-  }, [onRegisterBackHandler, reciterView, scriptView, spacingView]);
+  }, [onRegisterBackHandler, reciterView]);
 
   const handleFeedbackSubmit = async () => {
     if (!feedback.trim()) {
@@ -216,31 +206,7 @@ export default function Settings({
     }
   };
 
-  const scriptOptions = [
-    { value: 'uthmani', label: 'Uthmani', description: 'Standard Madani script' },
-    { value: 'indopak', label: 'IndoPak', description: 'Nastaliq style script' },
-    { value: 'tajweed', label: 'Tajweed', description: 'Color-coded pronunciation rules' },
-  ] as const;
-
-  const spacingOptions = [
-    { value: 'Compact', label: 'Compact' },
-    { value: 'Normal', label: 'Normal' },
-    { value: 'Relaxed', label: 'Relaxed' },
-    { value: 'Loose', label: 'Loose' },
-  ];
-
-  const scriptLabel = scriptOptions.find(o => o.value === arabicScript)?.label || 'Uthmani';
-  const spacingLabel = spacingOptions.find(o => o.value === lineSpacing)?.label || 'Normal';
-
-  if (reciterView || scriptView || spacingView) {
-    const subViewTitle = reciterView ? 'Select Reciter' : scriptView ? 'Arabic Script' : 'Line Spacing';
-    const subViewTestId = reciterView ? 'reciter' : scriptView ? 'script' : 'spacing';
-    const onBack = () => {
-      setReciterView(false);
-      setScriptView(false);
-      setSpacingView(false);
-    };
-
+  if (reciterView) {
     return (
       <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
         <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
@@ -252,21 +218,21 @@ export default function Settings({
         <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
           <div className="px-6 pt-4 pb-4 flex items-center gap-3">
             <button
-              onClick={onBack}
+              onClick={() => setReciterView(false)}
               className="flex size-10 items-center justify-center transition-colors active:opacity-60 shrink-0"
-              data-testid={`button-${subViewTestId}-back`}
+              data-testid="button-reciter-back"
             >
               <ChevronLeft className="w-5 h-5 text-foreground/80" />
             </button>
-            <h1 className="text-xl font-semibold text-foreground" data-testid={`text-${subViewTestId}-title`}>
-              {subViewTitle}
+            <h1 className="text-xl font-semibold text-foreground" data-testid="text-reciter-title">
+              Select Reciter
             </h1>
           </div>
         </div>
 
         <div className="relative flex-1 overflow-y-auto min-h-0 pb-nav-clearance">
           <div className="px-6 py-4 space-y-1">
-            {reciterView && allReciters.map((r) => {
+            {allReciters.map((r) => {
               const isSelected = reciter === r.id;
               return (
                 <button
@@ -288,53 +254,6 @@ export default function Settings({
                       <p className="text-xs text-muted-foreground mt-0.5">{r.style}</p>
                     )}
                   </div>
-                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                </button>
-              );
-            })}
-
-            {scriptView && scriptOptions.map((option) => {
-              const isSelected = arabicScript === option.value;
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    onArabicScriptChange(option.value);
-                    setScriptView(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
-                    isSelected ? 'bg-primary/15' : 'hover-elevate'
-                  }`}
-                  data-testid={`script-option-${option.value}`}
-                >
-                  <div className="text-left">
-                    <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
-                      {option.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
-                  </div>
-                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                </button>
-              );
-            })}
-
-            {spacingView && spacingOptions.map((option) => {
-              const isSelected = lineSpacing === option.value;
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    onLineSpacingChange(option.value);
-                    setSpacingView(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
-                    isSelected ? 'bg-primary/15' : 'hover-elevate'
-                  }`}
-                  data-testid={`spacing-option-${option.value.toLowerCase()}`}
-                >
-                  <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
-                    {option.label}
-                  </p>
                   {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
                 </button>
               );
@@ -373,29 +292,21 @@ export default function Settings({
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
               <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <button
-                onClick={() => setScriptView(true)}
-                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
-                data-testid="menu-item-script"
-              >
-                <span className="text-sm text-foreground/80">Arabic Script</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{scriptLabel}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </button>
+              <PillRow
+                label="Arabic Script"
+                value={arabicScript}
+                options={[{ label: "Uthmani", value: "uthmani" }, { label: "IndoPak", value: "indopak" }, { label: "Tajweed", value: "tajweed" }]}
+                onChange={(v) => onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed')}
+                testIdPrefix="button-script"
+              />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <button
-                onClick={() => setSpacingView(true)}
-                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
-                data-testid="menu-item-spacing"
-              >
-                <span className="text-sm text-foreground/80">Line Spacing</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{spacingLabel}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </button>
+              <PillRow
+                label="Line Spacing"
+                value={lineSpacing}
+                options={[{ label: "Compact", value: "Compact" }, { label: "Normal", value: "Normal" }, { label: "Relaxed", value: "Relaxed" }, { label: "Loose", value: "Loose" }]}
+                onChange={onLineSpacingChange}
+                testIdPrefix="button-spacing"
+              />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Verse numbers" checked={showVerseNumbers} onCheckedChange={onShowVerseNumbersChange} testId="toggle-verse-numbers" />
             </div>

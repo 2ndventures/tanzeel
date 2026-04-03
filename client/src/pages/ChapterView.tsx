@@ -698,7 +698,7 @@ export default function ChapterView({
         style={{ willChange: 'transform' }}
       >
         <header
-          className="w-full [-webkit-backdrop-filter:blur(30px)_saturate(150%)] [backdrop-filter:blur(30px)_saturate(150%)]"
+          className="w-full"
           style={{
             background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 60%, transparent 100%)',
             paddingBottom: '48px',
@@ -812,8 +812,6 @@ export default function ChapterView({
                 <SheetTitle className="text-xl text-foreground">
                   {menuView === 'main' && 'Options'}
                   {menuView === 'reciter' && 'Select Reciter'}
-                  {menuView === 'script' && 'Arabic Script'}
-                  {menuView === 'spacing' && 'Line Spacing'}
                 </SheetTitle>
               </SheetHeader>
 
@@ -988,31 +986,51 @@ export default function ChapterView({
                         Appearance
                       </h3>
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-                        <button
-                          onClick={() => setMenuView('script')}
-                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
-                          data-testid="menu-item-script"
-                        >
-                          <span className="text-sm text-foreground/80">Arabic Script</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">
-                              {arabicScript === 'uthmani' ? 'Uthmani' : arabicScript === 'indopak' ? 'IndoPak' : 'Tajweed'}
-                            </span>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        <div className="flex items-center justify-between gap-3 py-2.5">
+                          <span className="text-sm text-foreground/80 shrink-0">Arabic Script</span>
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
+                            {([
+                              { value: 'uthmani', label: 'Uthmani' },
+                              { value: 'indopak', label: 'IndoPak' },
+                              { value: 'tajweed', label: 'Tajweed' },
+                            ] as const).map((option) => (
+                              <button
+                                key={option.value}
+                                onClick={() => onArabicScriptChange?.(option.value)}
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                  arabicScript === option.value
+                                    ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
+                                    : 'text-muted-foreground'
+                                }`}
+                                style={arabicScript !== option.value ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
+                                data-testid={`button-script-${option.value}`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
                           </div>
-                        </button>
+                        </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <button
-                          onClick={() => setMenuView('spacing')}
-                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
-                          data-testid="menu-item-spacing"
-                        >
-                          <span className="text-sm text-foreground/80">Line Spacing</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">{lineSpacing}</span>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        <div className="flex items-center justify-between gap-3 py-2.5">
+                          <span className="text-sm text-foreground/80 shrink-0">Line Spacing</span>
+                          <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
+                            {["Compact", "Normal", "Relaxed", "Loose"].map((spacing) => (
+                              <button
+                                key={spacing}
+                                onClick={() => onLineSpacingChange?.(spacing)}
+                                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                                  lineSpacing === spacing
+                                    ? 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
+                                    : 'text-muted-foreground'
+                                }`}
+                                style={lineSpacing !== spacing ? { backgroundColor: 'hsl(var(--sheet-muted))' } : undefined}
+                                data-testid={`button-spacing-${spacing.toLowerCase()}`}
+                              >
+                                {spacing}
+                              </button>
+                            ))}
                           </div>
-                        </button>
+                        </div>
                       </div>
                     </div>
 
@@ -1070,65 +1088,6 @@ export default function ChapterView({
                   </div>
                 )}
 
-
-                {menuView === 'script' && (
-                  <div className="space-y-1">
-                    {([
-                      { value: 'uthmani' as const, label: 'Uthmani', description: 'Standard Madani script' },
-                      { value: 'indopak' as const, label: 'IndoPak', description: 'Nastaliq style script' },
-                      { value: 'tajweed' as const, label: 'Tajweed', description: 'Color-coded pronunciation rules' },
-                    ]).map((option) => {
-                      const isSelected = arabicScript === option.value;
-                      return (
-                        <button
-                          key={option.value}
-                          onClick={() => {
-                            onArabicScriptChange?.(option.value);
-                            setMenuView('main');
-                          }}
-                          className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
-                            isSelected ? 'bg-primary/15' : 'hover-elevate'
-                          }`}
-                          data-testid={`script-option-${option.value}`}
-                        >
-                          <div className="text-left">
-                            <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
-                              {option.label}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
-                          </div>
-                          {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {menuView === 'spacing' && (
-                  <div className="space-y-1">
-                    {['Compact', 'Normal', 'Relaxed', 'Loose'].map((option) => {
-                      const isSelected = lineSpacing === option;
-                      return (
-                        <button
-                          key={option}
-                          onClick={() => {
-                            onLineSpacingChange?.(option);
-                            setMenuView('main');
-                          }}
-                          className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
-                            isSelected ? 'bg-primary/15' : 'hover-elevate'
-                          }`}
-                          data-testid={`spacing-option-${option.toLowerCase()}`}
-                        >
-                          <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
-                            {option}
-                          </p>
-                          {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
 
                 {menuView === 'reciter' && (
                   <div className="space-y-1">

@@ -334,7 +334,7 @@ export default function AudioPlayer({
       <div className="relative" data-testid="audio-player-content">
         {/* Frosted glass: backdrop-blur + gradient from transparent to bg color */}
         <div className="absolute inset-0 [-webkit-backdrop-filter:blur(40px)_saturate(180%)] [backdrop-filter:blur(40px)_saturate(180%)]" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.1) 10%, rgba(var(--player-gradient-rgb),0.25) 25%, rgba(var(--player-gradient-rgb),0.45) 45%, rgba(var(--player-gradient-rgb),0.6) 70%, rgba(var(--player-gradient-rgb),0.7) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.15) 10%, rgba(var(--player-gradient-rgb),0.4) 25%, rgba(var(--player-gradient-rgb),0.7) 45%, rgba(var(--player-gradient-rgb),0.9) 70%, rgba(var(--player-gradient-rgb),0.98) 100%)' }} />
 
         <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 
