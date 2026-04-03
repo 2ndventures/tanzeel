@@ -95,7 +95,7 @@ export default function ChapterView({
   const [versesError, setVersesError] = useState<string | null>(null);
   
   // Collapsible header hook
-  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader();
+  const { isCollapsed, scrollContainerRef } = useCollapsibleHeader({ disabled: layoutMode !== 'focused-flow' });
   
   const didSeekRef = useRef(false);
   const userScrollingRef = useRef(false);
@@ -365,7 +365,7 @@ export default function ChapterView({
           const container = scrollContainerRef.current;
           if (verseElement && container) {
             const headerElement = document.querySelector('.header-safe-padding');
-            const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : (isCollapsed ? 60 : 80);
+            const headerHeight = headerElement ? headerElement.getBoundingClientRect().height : 72;
             const verseRect = (verseElement as HTMLElement).getBoundingClientRect();
             const containerRect = container.getBoundingClientRect();
             const verseRelativeTop = verseRect.top - containerRect.top + container.scrollTop;
@@ -688,20 +688,19 @@ export default function ChapterView({
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
       <div className={`fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`} style={{ height: 'env(safe-area-inset-top, 0px)' }} />
 
-      {/* Gradient Fade Header */}
+      {/* Header */}
       <div
         className={`fixed top-0 left-0 right-0 z-50 header-safe-padding transition-all duration-300 ${
           shouldAutoHideHeader
             ? (headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none')
-            : (isCollapsed && layoutMode === 'standard' ? 'header-collapsed' : 'header-expanded')
-        } ${!shouldAutoHideHeader ? 'header-transition' : ''}`}
+            : ''
+        }`}
         style={{ willChange: 'transform' }}
       >
         <header
           className="w-full"
           style={{
-            background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 60%, transparent 100%)',
-            paddingBottom: '48px',
+            paddingBottom: '8px',
           }}
         >
           <div className="relative flex items-center justify-between px-5 pt-3 pb-1">
@@ -1176,8 +1175,8 @@ export default function ChapterView({
       {layoutMode === 'standard' ? (
         <div
           ref={scrollContainerRef}
-          className="relative flex-1 overflow-y-auto px-6 pb-[260px] transition-[padding] duration-300 content-fade-mask"
-          style={{ paddingTop: isCollapsed ? 'calc(80px + env(safe-area-inset-top, 0px))' : 'calc(100px + env(safe-area-inset-top, 0px))' }}
+          className="relative flex-1 overflow-y-auto px-6 pb-[260px] content-fade-mask"
+          style={{ paddingTop: 'calc(72px + env(safe-area-inset-top, 0px))' }}
         >
           <div className="max-w-2xl mx-auto space-y-4">
             {isLoadingVerses && (
