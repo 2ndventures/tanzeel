@@ -154,6 +154,8 @@ export default function Settings({
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reciterView, setReciterView] = useState(false);
+  const [scriptView, setScriptView] = useState(false);
+  const [spacingView, setSpacingView] = useState(false);
   const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, fileCount: 0 });
   const [isClearing, setIsClearing] = useState(false);
 
@@ -171,10 +173,18 @@ export default function Settings({
           setReciterView(false);
           return true;
         }
+        if (scriptView) {
+          setScriptView(false);
+          return true;
+        }
+        if (spacingView) {
+          setSpacingView(false);
+          return true;
+        }
         return false;
       });
     }
-  }, [onRegisterBackHandler, reciterView]);
+  }, [onRegisterBackHandler, reciterView, scriptView, spacingView]);
 
   const handleFeedbackSubmit = async () => {
     if (!feedback.trim()) {
@@ -265,6 +275,132 @@ export default function Settings({
     );
   }
 
+  const scriptLabels: Record<string, string> = { uthmani: 'Uthmani', indopak: 'IndoPak', tajweed: 'Tajweed' };
+  const scriptOptions = [
+    { value: 'uthmani', label: 'Uthmani', description: 'Standard Arabic script used in most printed Qurans' },
+    { value: 'indopak', label: 'IndoPak', description: 'Nastaliq-style script common in South Asia' },
+    { value: 'tajweed', label: 'Tajweed', description: 'Color-coded script highlighting tajweed rules' },
+  ] as const;
+
+  if (scriptView) {
+    return (
+      <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
+        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
+        </div>
+
+        <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
+          <div className="px-6 pt-4 pb-4 flex items-center gap-3">
+            <button
+              onClick={() => setScriptView(false)}
+              className="flex size-10 items-center justify-center transition-colors active:opacity-60 shrink-0"
+              data-testid="button-script-back"
+            >
+              <ChevronLeft className="w-5 h-5 text-foreground/80" />
+            </button>
+            <h1 className="text-xl font-semibold text-foreground" data-testid="text-script-title">
+              Arabic Script
+            </h1>
+          </div>
+        </div>
+
+        <div className="relative flex-1 overflow-y-auto min-h-0 pb-nav-clearance">
+          <div className="px-6 py-4 space-y-1">
+            {scriptOptions.map((option) => {
+              const isSelected = arabicScript === option.value;
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    onArabicScriptChange(option.value);
+                    setScriptView(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
+                    isSelected ? 'bg-primary/15' : 'hover-elevate'
+                  }`}
+                  data-testid={`script-option-${option.value}`}
+                >
+                  <div className="text-left">
+                    <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
+                      {option.label}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
+                  </div>
+                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const spacingOptions = [
+    { value: 'Compact', description: 'Minimal space between lines' },
+    { value: 'Normal', description: 'Balanced line spacing' },
+    { value: 'Relaxed', description: 'More room between lines' },
+    { value: 'Loose', description: 'Maximum line spacing' },
+  ];
+
+  if (spacingView) {
+    return (
+      <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
+        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
+        <div className="fixed inset-0 -z-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
+        </div>
+
+        <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
+          <div className="px-6 pt-4 pb-4 flex items-center gap-3">
+            <button
+              onClick={() => setSpacingView(false)}
+              className="flex size-10 items-center justify-center transition-colors active:opacity-60 shrink-0"
+              data-testid="button-spacing-back"
+            >
+              <ChevronLeft className="w-5 h-5 text-foreground/80" />
+            </button>
+            <h1 className="text-xl font-semibold text-foreground" data-testid="text-spacing-title">
+              Line Spacing
+            </h1>
+          </div>
+        </div>
+
+        <div className="relative flex-1 overflow-y-auto min-h-0 pb-nav-clearance">
+          <div className="px-6 py-4 space-y-1">
+            {spacingOptions.map((option) => {
+              const isSelected = lineSpacing === option.value;
+              return (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    onLineSpacingChange(option.value);
+                    setSpacingView(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
+                    isSelected ? 'bg-primary/15' : 'hover-elevate'
+                  }`}
+                  data-testid={`spacing-option-${option.value.toLowerCase()}`}
+                >
+                  <div className="text-left">
+                    <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
+                      {option.value}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{option.description}</p>
+                  </div>
+                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
       <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
@@ -292,21 +428,29 @@ export default function Settings({
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
               <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Arabic Script"
-                value={arabicScript}
-                options={[{ label: "Uthmani", value: "uthmani" }, { label: "IndoPak", value: "indopak" }, { label: "Tajweed", value: "tajweed" }]}
-                onChange={(v) => onArabicScriptChange(v as 'uthmani' | 'indopak' | 'tajweed')}
-                testIdPrefix="button-script"
-              />
+              <button
+                onClick={() => setScriptView(true)}
+                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
+                data-testid="menu-item-script"
+              >
+                <span className="text-sm text-foreground/80">Arabic Script</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{scriptLabels[arabicScript] || arabicScript}</span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </button>
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <PillRow
-                label="Line Spacing"
-                value={lineSpacing}
-                options={[{ label: "Compact", value: "Compact" }, { label: "Normal", value: "Normal" }, { label: "Relaxed", value: "Relaxed" }, { label: "Loose", value: "Loose" }]}
-                onChange={onLineSpacingChange}
-                testIdPrefix="button-spacing"
-              />
+              <button
+                onClick={() => setSpacingView(true)}
+                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 rounded-md"
+                data-testid="menu-item-spacing"
+              >
+                <span className="text-sm text-foreground/80">Line Spacing</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{lineSpacing}</span>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                </div>
+              </button>
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <ToggleRow label="Verse numbers" checked={showVerseNumbers} onCheckedChange={onShowVerseNumbersChange} testId="toggle-verse-numbers" />
             </div>

@@ -1,0 +1,25 @@
+#31 - Replace pill buttons with selector sub-views for Arabic Script and Line Spacing
+What & Why
+Arabic Script and Line Spacing settings currently use horizontal pill/button selectors. The user wants them to use the same selector pattern as the reciter — a tappable row that shows the current value, which navigates to a full list-style selector sub-view when tapped. This applies to both the Settings page and the ChapterView playback sheet.
+
+Done looks like
+In the Settings page, Arabic Script and Line Spacing each show as a tappable row (like the Reciter row) displaying the label on the left and current value + chevron on the right
+Tapping either row navigates to a full-screen selector sub-view (like the reciter selector) with a back button, title, and list of options with a checkmark on the selected option
+In the ChapterView playback settings sheet, Arabic Script and Line Spacing also show as tappable rows that open inline selector sub-views within the sheet
+The pill buttons are removed for these two settings in both locations
+All data-testid attributes are preserved or updated consistently
+Out of scope
+Font size selectors (Arabic, Translation, Transliteration) — these stay as pill buttons
+Any changes to the reciter selector itself
+Tasks
+Settings page — Arabic Script selector sub-view — Replace the PillRow for Arabic Script with a tappable menu row (matching the Reciter row pattern). Add a sub-view state and render a full-screen selector view when active, following the same layout as the reciter selector (back button, title, scrollable list with checkmarks).
+
+Settings page — Line Spacing selector sub-view — Same treatment for Line Spacing: tappable row showing current value, navigating to a selector sub-view with all spacing options listed.
+
+ChapterView playback sheet — Arabic Script selector — Replace the inline pill buttons for Arabic Script in the playback settings sheet with a tappable row that opens a selector sub-view within the sheet content area.
+
+ChapterView playback sheet — Line Spacing selector — Same treatment for Line Spacing in the playback sheet.
+
+Relevant files
+client/src/pages/Settings.tsx:64-93,209-265,292-309,346-361
+client/src/pages/ChapterView.tsx:983-1034
