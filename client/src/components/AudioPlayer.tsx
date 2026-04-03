@@ -331,12 +331,9 @@ export default function AudioPlayer({
     <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
-      <div className="relative" data-testid="audio-player-content">
-        {/* Seamless gradient + blur — fades from transparent to dark */}
-        <div className="absolute inset-0 [-webkit-backdrop-filter:blur(40px)_saturate(180%)] [backdrop-filter:blur(40px)_saturate(180%)]" />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.15) 10%, rgba(var(--player-gradient-rgb),0.4) 25%, rgba(var(--player-gradient-rgb),0.7) 45%, rgba(var(--player-gradient-rgb),0.9) 70%, rgba(var(--player-gradient-rgb),0.98) 100%)' }} />
+      <div className="relative bg-background" data-testid="audio-player-content">
 
-        <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
+        <div className="relative px-6 pt-6 pb-5 safe-area-bottom">
 
         {/* ── Surah info: bold name left, Arabic right ── */}
         <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
