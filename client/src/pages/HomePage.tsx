@@ -202,23 +202,16 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 >
                   {daily.verse}
                 </p>
-                <div className="w-10 h-px bg-[hsl(var(--glow-primary)/0.35)] mb-4" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
-                <p
-                  className="text-sm leading-relaxed text-muted-foreground italic max-w-[280px] mb-4"
-                  style={{ opacity: 0, animation: 'verseReveal 0.6s ease-out 0.8s forwards' }}
-                >
-                  &ldquo;{daily.translation}&rdquo;
-                </p>
-                <div className="w-10 h-px bg-[hsl(var(--glow-primary)/0.35)] mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.0s forwards' }} />
+                <div className="w-10 h-px bg-[hsl(var(--glow-primary)/0.35)] mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
                 <p
                   className="text-xs font-medium text-secondary mb-1"
-                  style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.1s forwards' }}
+                  style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.8s forwards' }}
                 >
                   {dailyChapter.englishName} {daily.id}:{daily.ayah}
                 </p>
                 <p
                   className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-muted-foreground/50"
-                  style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 1.2s forwards' }}
+                  style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.9s forwards' }}
                 >
                   Verse of the Day
                 </p>
