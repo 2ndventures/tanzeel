@@ -690,7 +690,7 @@ export default function ChapterView({
 
       {/* Header */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 bg-background header-safe-padding transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding transition-all duration-300 ${
           shouldAutoHideHeader
             ? (headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none')
             : ''
@@ -700,7 +700,8 @@ export default function ChapterView({
         <header
           className="w-full"
           style={{
-            paddingBottom: '8px',
+            background: 'linear-gradient(to bottom, var(--header-gradient-start) 0%, var(--header-gradient-mid) 60%, transparent 100%)',
+            paddingBottom: '48px',
           }}
         >
           <div className="relative flex items-center justify-between px-5 pt-3 pb-1">
