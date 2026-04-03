@@ -690,7 +690,7 @@ export default function ChapterView({
 
       {/* Header */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 bg-background header-safe-padding transition-all duration-300 ${
           shouldAutoHideHeader
             ? (headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none')
             : ''
