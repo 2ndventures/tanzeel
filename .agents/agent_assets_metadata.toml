@@ -6,3 +6,9 @@ id = "dpq6ZOOv7k0qp4S_iDKY5"
 uri = "file://verses_report.csv"
 type = "table"
 title = "Arabic Verses Report (6,236 verses)"
+
+[[outputs]]
+id = "2zj_-TScqNWNQeh-rIQ_M"
+uri = "file://verses_report.json"
+type = "unspecified"
+title = "Arabic Verses JSON (6,236 verses)"
