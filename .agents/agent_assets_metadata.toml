@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "dpq6ZOOv7k0qp4S_iDKY5"
+uri = "file://verses_report.csv"
+type = "table"
+title = "Arabic Verses Report (6,236 verses)"
