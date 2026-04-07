@@ -13,7 +13,7 @@ export interface Verse {
   translation: string;
 }
 
-export type LayoutMode = 'standard' | 'focused-flow' | 'mushaf' | 'hifz';
+export type LayoutMode = 'standard' | 'focused-flow' | 'mushaf';
 
 // Utility function to remove "سُورَةُ" prefix from Arabic chapter names
 // to match quran.com display format

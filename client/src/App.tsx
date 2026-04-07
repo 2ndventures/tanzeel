@@ -125,7 +125,7 @@ function App() {
       if (savedAutoplay !== null) setAutoplay(JSON.parse(savedAutoplay));
 
       const savedLayout = await getItem('layoutMode');
-      if (savedLayout === 'focused-flow' || savedLayout === 'mushaf' || savedLayout === 'hifz') setLayoutMode(savedLayout);
+      if (savedLayout === 'focused-flow' || savedLayout === 'mushaf') setLayoutMode(savedLayout);
 
       const savedArabicFont = await getItem('arabicFontSize');
       if (savedArabicFont) setArabicFontSize(savedArabicFont);

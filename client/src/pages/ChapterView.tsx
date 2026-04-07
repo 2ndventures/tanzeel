@@ -6,7 +6,6 @@ import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
 import MushafPageView from "@/components/MushafPageView";
-import HifzView from "@/components/HifzView";
 import { useCollapsibleHeader } from "@/hooks/useCollapsibleHeader";
 import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
@@ -1279,23 +1278,6 @@ export default function ChapterView({
         </div>
       ) : layoutMode === 'focused-flow' ? (
         <FocusedFlowView
-          verses={verses}
-          isLoadingVerses={isLoadingVerses}
-          versesError={versesError}
-          chapterId={chapterId}
-          currentVerse={currentVerse}
-          currentWordIndex={currentWordIndex}
-          isPlaying={isPlaying}
-          showTranslation={showTranslation}
-          arabicFontSize={arabicFontSize}
-          translationFontSize={translationFontSize}
-          lineSpacing={lineSpacing}
-          arabicScript={arabicScript}
-          onVerseClick={handleVerseClick}
-          isCollapsed={isCollapsed}
-        />
-      ) : layoutMode === 'hifz' ? (
-        <HifzView
           verses={verses}
           isLoadingVerses={isLoadingVerses}
           versesError={versesError}
