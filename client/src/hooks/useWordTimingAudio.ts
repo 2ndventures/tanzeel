@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getCachedTimingData, cacheTimingData, getCachedAudioUrl, cacheAudioFile, getTimingDataFromMemory, storeTimingDataInMemory } from '@/lib/audioCache';
+import { getTimingDataFromMemory, storeTimingDataInMemory } from '@/lib/audioCache';
 import { getItem, setItem, removeItem } from '@/lib/storage';
 import {
   getCachedAudioUri,
@@ -489,7 +489,6 @@ export function useWordTimingAudio(
 
   const loadAudio = useCallback(async () => {
     const myLoadId = loadIdRef.current;
-    let audioCachePromise: Promise<string | null> | null = null;
     try {
       if (cleanupRef.current) {
         cleanupRef.current();
@@ -536,8 +535,6 @@ export function useWordTimingAudio(
             container.appendChild(audio);
             audio.src = offlineUri;
             audio.load();
-
-            audioCachePromise = Promise.resolve(null);
 
             const handleLoadedMetadata = () => {
               if (loadIdRef.current !== myLoadId) return;
@@ -659,8 +656,6 @@ export function useWordTimingAudio(
       audio.preload = 'auto';
       container.appendChild(audio);
 
-      audioCachePromise = getCachedAudioUrl(reciterId, chapterId);
-
       const predictableUrl = getChapterAudioUrl(reciterId, chapterId);
       if (predictableUrl) {
         audio.src = predictableUrl;
@@ -673,13 +668,6 @@ export function useWordTimingAudio(
         const memCached = getTimingDataFromMemory(reciterId, chapterId);
         if (memCached) return memCached;
 
-        const cachedTiming = await getCachedTimingData(reciterId, chapterId);
-        if (cachedTiming) {
-          const data = await cachedTiming.json() as TimingData;
-          storeTimingDataInMemory(reciterId, chapterId, data);
-          return data;
-        }
-
         const timingResponse = await fetch(timingUrl);
         if (!timingResponse.ok) {
           const errorText = await timingResponse.text().catch(() => 'Unable to read error');
@@ -689,24 +677,16 @@ export function useWordTimingAudio(
         const rawData = await timingResponse.json() as Record<string, unknown>;
         const normalized = normalizeTimingResponse(rawData);
         const data: TimingData = { audio_files: normalized.audio_files as AudioFile[] };
-        const cacheResponse = new Response(JSON.stringify(data), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-        cacheTimingData(reciterId, chapterId, cacheResponse).catch(() => {});
         storeTimingDataInMemory(reciterId, chapterId, data);
         return data;
       };
 
-      const [timingData, cachedBlobUrl] = await Promise.all([
-        fetchTimingData(),
-        audioCachePromise,
-      ]);
+      const timingData = await fetchTimingData();
 
       if (loadIdRef.current !== myLoadId) {
         audio.pause();
         audio.src = '';
         audio.remove();
-        if (cachedBlobUrl) URL.revokeObjectURL(cachedBlobUrl);
         container.remove();
         return;
       }
@@ -728,17 +708,9 @@ export function useWordTimingAudio(
         throw new Error('No audio URL found in timing data');
       }
 
-      let effectiveAudioUrl: string;
-      if (cachedBlobUrl) {
-        effectiveAudioUrl = cachedBlobUrl;
-      } else {
-        effectiveAudioUrl = audioUrl;
-        cacheAudioFile(audioUrl, reciterId, chapterId).catch(() => {});
-      }
-
-      const alreadyPreloading = audio.src && audio.src === effectiveAudioUrl;
+      const alreadyPreloading = audio.src && audio.src === audioUrl;
       if (!alreadyPreloading) {
-        audio.src = effectiveAudioUrl;
+        audio.src = audioUrl;
         audio.load();
       }
 
@@ -870,9 +842,6 @@ export function useWordTimingAudio(
         audio.removeEventListener('ended', handleEnded);
         audio.removeEventListener('error', handleError);
         audio.pause();
-        if (cachedBlobUrl) {
-          URL.revokeObjectURL(cachedBlobUrl);
-        }
         audio.src = '';
         audio.remove();
         audioRef.current = null;
@@ -881,10 +850,6 @@ export function useWordTimingAudio(
     } catch (error) {
       if (loadIdRef.current !== myLoadId) return;
       console.error('Failed to load audio:', error instanceof Error ? error.message : error);
-
-      if (audioCachePromise) {
-        audioCachePromise.then(url => { if (url) URL.revokeObjectURL(url); }).catch(() => {});
-      }
 
       if (retryCountRef.current < MAX_AUTO_RETRIES) {
         retryCountRef.current++;

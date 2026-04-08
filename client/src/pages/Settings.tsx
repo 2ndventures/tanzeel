@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
 
@@ -7,10 +7,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
 import { ChevronRight, ChevronLeft, Check, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { getCacheOnlyStats, clearCache, getManifest } from "@/services/audioCache";
+import { getManifest } from "@/services/audioCache";
 
 function getDownloadedSize(): number {
   const manifest = getManifest();
@@ -156,16 +156,6 @@ export default function Settings({
   const [reciterView, setReciterView] = useState(false);
   const [scriptView, setScriptView] = useState(false);
   const [spacingView, setSpacingView] = useState(false);
-  const [cacheStats, setCacheStats] = useState({ totalSizeBytes: 0, fileCount: 0 });
-  const [isClearing, setIsClearing] = useState(false);
-
-  const refreshCacheStats = useCallback(() => {
-    setCacheStats(getCacheOnlyStats());
-  }, []);
-
-  useEffect(() => {
-    refreshCacheStats();
-  }, [refreshCacheStats]);
   useEffect(() => {
     if (onRegisterBackHandler) {
       onRegisterBackHandler(() => {
@@ -530,55 +520,6 @@ export default function Settings({
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </button>
-              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-sm text-foreground/80">Audio Cache</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {formatBytes(cacheStats.totalSizeBytes)} used
-                  </p>
-                </div>
-                {cacheStats.fileCount > 0 ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <button
-                        className="text-xs text-destructive hover-elevate active-elevate-2 rounded-md px-2 py-1"
-                        disabled={isClearing}
-                        data-testid="button-clear-cache"
-                      >
-                        {isClearing ? "Clearing..." : "Clear"}
-                      </button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Clear Audio Cache</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Clear all cached audio? You'll need an internet connection to listen again.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel data-testid="button-cancel-clear-cache">Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={async () => {
-                            setIsClearing(true);
-                            try {
-                              await clearCache();
-                              refreshCacheStats();
-                            } finally {
-                              setIsClearing(false);
-                            }
-                          }}
-                          data-testid="button-confirm-clear-cache"
-                        >
-                          Clear Cache
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                ) : (
-                  <span className="text-xs text-muted-foreground/50" data-testid="text-cache-usage">Empty</span>
-                )}
-              </div>
             </div>
           </div>
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { chapters, getDisplayArabicName } from "@/lib/quranMetadata";
 import { getReciterById } from "@/lib/reciters";
-import { getCacheStats, setMaxCacheSize, getManifest } from "@/services/audioCache";
+import { getManifest } from "@/services/audioCache";
 import {
   downloadSurah,
   downloadAllSurahs,
@@ -26,19 +26,16 @@ function formatBytes(bytes: number): string {
   return `${(bytes / 1073741824).toFixed(1)} GB`;
 }
 
-function getStorageBreakdown(): { cached: number; downloaded: number } {
+function getDownloadedStorageBytes(): number {
   const manifest = getManifest();
-  if (!manifest) return { cached: 0, downloaded: 0 };
-  let cached = 0;
+  if (!manifest) return 0;
   let downloaded = 0;
   for (const entry of Object.values(manifest.files)) {
     if (entry.source === "download") {
       downloaded += entry.sizeBytes;
-    } else {
-      cached += entry.sizeBytes;
     }
   }
-  return { cached, downloaded };
+  return downloaded;
 }
 
 function getSurahDownloadedSize(reciterId: string, surahNum: number): number {
@@ -70,8 +67,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
   const reciterData = getReciterById(reciter);
   const reciterName = reciterData?.name || "Unknown Reciter";
 
-  const [stats, setStats] = useState(() => getCacheStats());
-  const [breakdown, setBreakdown] = useState(() => getStorageBreakdown());
+  const [downloadedBytes, setDownloadedBytes] = useState(() => getDownloadedStorageBytes());
   const [activeDownload, setActiveDownload] = useState<ActiveDownload | null>(null);
   const [surahStatuses, setSurahStatuses] = useState<Record<number, "none" | "partial" | "complete">>({});
   const [confirmSurah, setConfirmSurah] = useState<number | null>(null);
@@ -81,8 +77,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
   const downloadingRef = useRef(false);
 
   const refreshAll = useCallback(() => {
-    setStats(getCacheStats());
-    setBreakdown(getStorageBreakdown());
+    setDownloadedBytes(getDownloadedStorageBytes());
     const statuses: Record<number, "none" | "partial" | "complete"> = {};
     for (const ch of chapters) {
       statuses[ch.id] = getDownloadStatus(reciter, ch.id, ch.verseCount);
@@ -244,45 +239,10 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
             </h3>
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: "hsl(var(--sheet-muted) / 0.4)", border: "1px solid hsl(var(--sheet-muted))" }}>
               <div className="flex items-center justify-between py-3">
-                <p className="text-sm text-foreground/80">Total Audio Storage</p>
+                <p className="text-sm text-foreground/80">Downloaded Audio</p>
                 <span className="text-sm font-medium text-foreground/70" data-testid="text-total-storage">
-                  {formatBytes(stats.totalSizeBytes)}
+                  {formatBytes(downloadedBytes)}
                 </span>
-              </div>
-              <div className="border-t" style={{ borderColor: "hsl(var(--sheet-muted))" }} />
-              <div className="py-3">
-                <p className="text-xs text-muted-foreground" data-testid="text-storage-breakdown">
-                  {formatBytes(breakdown.cached)} auto-cached, {formatBytes(breakdown.downloaded)} downloaded
-                </p>
-              </div>
-              <div className="border-t" style={{ borderColor: "hsl(var(--sheet-muted))" }} />
-              <div className="flex items-center justify-between py-3 gap-3">
-                <span className="text-sm text-foreground/80 shrink-0">Cache Limit</span>
-                <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                  {[
-                    { label: "500 MB", value: 524288000 },
-                    { label: "1 GB", value: 1073741824 },
-                    { label: "2 GB", value: 2147483648 },
-                    { label: "5 GB", value: 5368709120 },
-                  ].map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={async () => {
-                        await setMaxCacheSize(opt.value);
-                        refreshAll();
-                      }}
-                      className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
-                        stats.maxSizeBytes === opt.value
-                          ? "bg-primary/20 ring-1 ring-primary text-primary"
-                          : "text-muted-foreground"
-                      }`}
-                      style={stats.maxSizeBytes !== opt.value ? { backgroundColor: "hsl(var(--sheet-muted))" } : undefined}
-                      data-testid={`button-cache-limit-${opt.value}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
               </div>
             </div>
           </div>

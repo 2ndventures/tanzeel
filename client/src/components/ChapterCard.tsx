@@ -1,6 +1,4 @@
 import { getDisplayArabicName } from "@/lib/quranMetadata";
-import { isSurahFullyCached } from "@/services/audioCache";
-import { CheckCircle2 } from "lucide-react";
 
 interface ChapterCardProps {
   number: number;
@@ -29,16 +27,9 @@ export default function ChapterCard({
   meaning,
   onClick,
   style,
-  currentReciterId,
-  audioCacheReady: _audioCacheReady,
 }: ChapterCardProps) {
-  void _audioCacheReady;
   const colorIndex = (number - 1) % badgeStyles.length;
   const badge = badgeStyles[colorIndex];
-
-  const isFullyCached = currentReciterId
-    ? isSurahFullyCached(currentReciterId, number, verseCount)
-    : false;
 
   return (
     <div
@@ -64,12 +55,6 @@ export default function ChapterCard({
               >
                 {englishName}
               </h3>
-              {isFullyCached && (
-                <CheckCircle2
-                  className="w-3.5 h-3.5 text-accent/70 shrink-0"
-                  data-testid={`icon-cached-${number}`}
-                />
-              )}
             </div>
             <p className="text-xs text-muted-foreground">
               {meaning} • {verseCount} Ayahs
