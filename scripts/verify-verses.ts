@@ -12,7 +12,6 @@ function normalize(text: string): string {
     .replace(/\u00A0/g, ' ')
     .replace(/\u0640/g, '')
     .replace(/\u06DC/g, '')
-    .replace(/[\u065C\u0670]/g, (m) => m)
     .normalize('NFC')
     .replace(/\s+/g, ' ')
     .trim();
