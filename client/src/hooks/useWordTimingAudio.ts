@@ -211,6 +211,7 @@ export function useWordTimingAudio(
   const loadIdRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rafIdRef = useRef<number | null>(null);
 
   const preloadNextVerses = useCallback(async (
     currentVerseNum: number,
@@ -280,7 +281,6 @@ export function useWordTimingAudio(
       }
       setState(prev => ({
         ...prev,
-        currentTime: ct,
         currentWordIndex: wordIndex,
       }));
     };
@@ -551,7 +551,7 @@ export function useWordTimingAudio(
                 if (verseKey && verseKey !== prev.currentVerseKey) {
                   onVerseChangeRef.current?.(verseKey);
                 }
-                return { ...prev, currentTime, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+                return { ...prev, currentVerseKey: verseKey, currentWordIndex: wordIndex };
               });
             };
 
@@ -761,7 +761,6 @@ export function useWordTimingAudio(
           
           return {
             ...prev,
-            currentTime,
             currentVerseKey: verseKey,
             currentWordIndex: wordIndex,
           };
@@ -932,6 +931,36 @@ export function useWordTimingAudio(
     };
   }, [loadAudio, enabled]);
 
+  useEffect(() => {
+    if (!state.isPlaying) {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      return;
+    }
+    let active = true;
+    const tick = () => {
+      if (!active) return;
+      const audio = audioRef.current;
+      if (audio) {
+        const t = audio.currentTime;
+        setState(prev => (Math.abs(prev.currentTime - t) > 0.03 ? { ...prev, currentTime: t } : prev));
+        rafIdRef.current = requestAnimationFrame(tick);
+      } else {
+        rafIdRef.current = null;
+      }
+    };
+    rafIdRef.current = requestAnimationFrame(tick);
+    return () => {
+      active = false;
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, [state.isPlaying]);
+
   const retry = useCallback(() => {
     retryCountRef.current = 0;
     if (retryTimerRef.current) {
@@ -943,6 +972,10 @@ export function useWordTimingAudio(
 
   useEffect(() => {
     return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       if (vbvSkipTimerRef.current) {
         clearTimeout(vbvSkipTimerRef.current);
         vbvSkipTimerRef.current = null;
