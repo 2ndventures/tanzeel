@@ -12,3 +12,9 @@ id = "2zj_-TScqNWNQeh-rIQ_M"
 uri = "file://verses_report.json"
 type = "unspecified"
 title = "Arabic Verses JSON (6,236 verses)"
+
+[[outputs]]
+id = "YDnNZJi8gUcvnnYgLKkwf"
+uri = "file://verification_report.txt"
+type = "text"
+title = "Quran Verse Verification Report (6,236 verses)"
