@@ -945,7 +945,7 @@ export function useWordTimingAudio(
       const audio = audioRef.current;
       if (audio) {
         const t = audio.currentTime;
-        setState(prev => (Math.abs(prev.currentTime - t) > 0.03 ? { ...prev, currentTime: t } : prev));
+        setState(prev => (prev.currentTime !== t ? { ...prev, currentTime: t } : prev));
         rafIdRef.current = requestAnimationFrame(tick);
       } else {
         rafIdRef.current = null;
