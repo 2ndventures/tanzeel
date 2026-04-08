@@ -57,25 +57,27 @@ class LazyChapterService {
       this.fetchScriptText(chapterId, script),
     ]);
 
-    // Build a lookup from verse_key (e.g. "2:3") to the script's Arabic text
-    const textByKey = new Map<string, string>();
+    // Build a lookup from verse_key (e.g. "2:3") to the script's text and optional word array
+    const scriptByKey = new Map<string, { text: string; words?: string[] }>();
     for (const v of scriptData) {
-      textByKey.set(v.verse_key, v.text);
+      scriptByKey.set(v.verse_key, { text: v.text, words: v.words });
     }
 
-    // Merge: replace arabicText with the script edition, keep transliteration/translation
+    // Merge: replace arabicText (and arabicWords if provided) with the script edition
     const verses: Verse[] = baseChapter.verses.map((verse, index) => {
       const verseKey = `${chapterId}:${verse.number || index + 1}`;
+      const scriptEntry = scriptByKey.get(verseKey);
       return {
         ...verse,
-        arabicText: textByKey.get(verseKey) || verse.arabicText,
+        arabicText: scriptEntry?.text || verse.arabicText,
+        ...(scriptEntry?.words ? { arabicWords: scriptEntry.words } : {}),
       };
     });
 
     return { id: chapterId, verses };
   }
 
-  private async fetchScriptText(chapterId: number, script: ArabicScript): Promise<{ verse_key: string; text: string }[]> {
+  private async fetchScriptText(chapterId: number, script: ArabicScript): Promise<{ verse_key: string; text: string; words?: string[] }[]> {
     const url = `${API_BASE_URL}/api/quran-text/${script}/${chapterId}`;
     const response = await fetch(url);
     if (!response.ok) {

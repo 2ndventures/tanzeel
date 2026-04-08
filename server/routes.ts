@@ -261,36 +261,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { script, chapter } = req.params;
 
-      // Map our script names to Quran.com API endpoint names and response field names
-      const scriptConfig: Record<string, { endpoint: string; field: string }> = {
-        indopak: { endpoint: "indopak", field: "text_indopak" },
-        tajweed: { endpoint: "uthmani_tajweed", field: "text_uthmani_tajweed" },
-      };
-
-      const config = scriptConfig[script];
-      if (!config) {
+      if (script !== 'indopak' && script !== 'tajweed') {
         return res.status(400).json({ error: `Unknown script: ${script}` });
       }
 
-      const apiUrl = `https://api.quran.com/api/v4/quran/verses/${config.endpoint}?chapter_number=${chapter}`;
-      console.log(`📡 Fetching ${script} text: ${apiUrl}`);
+      let apiUrl: string;
+      let verses: { verse_key: string; text: string; words?: string[] }[];
 
-      const response = await fetch(apiUrl);
+      if (script === 'indopak') {
+        // Fetch per-word IndoPak text so word count exactly matches Quran.com timing API
+        // The full-verse string has a different spacing convention (e.g. standalone وَ tokens)
+        // that causes tokenization to produce more words than the timing data expects.
+        apiUrl = `https://api.quran.com/api/v4/verses/by_chapter/${chapter}?words=true&word_fields=text_indopak&per_page=300&fields=verse_key`;
+        console.log(`📡 Fetching indopak per-word text: ${apiUrl}`);
 
-      if (!response.ok) {
-        console.error(`❌ Quran text API error: ${response.status}`);
-        return res.status(response.status).json({ error: "Failed to fetch Quran text" });
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          console.error(`❌ Quran text API error (indopak): ${response.status}`);
+          return res.status(response.status).json({ error: "Failed to fetch Quran text" });
+        }
+
+        const data = await response.json();
+        console.log(`✅ Loaded indopak per-word text for chapter ${chapter}`);
+
+        // Build per-word arrays from the API word objects.
+        // IndoPak text_indopak can contain internal spaces within a single word token
+        // (Nastaliq font convention), so joining and re-splitting by space is unreliable.
+        // We return both:
+        //   - text: words joined for whole-verse display (may have internal spaces)
+        //   - words: the pre-split array (API word boundaries, exact same count as timing data)
+        verses = (data.verses || []).map((v: any) => {
+          const wordTexts: string[] = (v.words || [])
+            .filter((w: any) => w.char_type_name === 'word')
+            .map((w: any) => w.text_indopak || '');
+          return {
+            verse_key: v.verse_key,
+            text: wordTexts.join(' '),
+            words: wordTexts,
+          };
+        });
+
+      } else {
+        // Tajweed: full verse HTML with <tajweed> tags; existing tokenizer handles it correctly
+        apiUrl = `https://api.quran.com/api/v4/quran/verses/uthmani_tajweed?chapter_number=${chapter}`;
+        console.log(`📡 Fetching tajweed text: ${apiUrl}`);
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          console.error(`❌ Quran text API error (tajweed): ${response.status}`);
+          return res.status(response.status).json({ error: "Failed to fetch Quran text" });
+        }
+
+        const data = await response.json();
+        console.log(`✅ Loaded tajweed text for chapter ${chapter}`);
+
+        verses = (data.verses || []).map((v: any) => ({
+          verse_key: v.verse_key,
+          text: (v.text_uthmani_tajweed || "").replace(/\s*<span\s+class=end>[\u0660-\u0669\d]+<\/span>/g, ''),
+        }));
       }
-
-      const data = await response.json();
-      console.log(`✅ Loaded ${script} text for chapter ${chapter}`);
-
-      const verses = (data.verses || []).map((v: any) => ({
-        verse_key: v.verse_key,
-        text: script === 'tajweed'
-          ? (v[config.field] || "").replace(/\s*<span\s+class=end>[\u0660-\u0669\d]+<\/span>/g, '')
-          : v[config.field] || "",
-      }));
 
       res.setHeader("Cache-Control", "public, max-age=86400");
       res.setHeader("Content-Type", "application/json");

@@ -108,7 +108,8 @@ export default function FocusedFlowView({
         return;
       }
 
-      const words = tokenizeArabicWords(verse.arabicText);
+      // Use pre-split word array when available (e.g. IndoPak has internal spaces within tokens)
+      const words = verse.arabicWords ?? tokenizeArabicWords(verse.arabicText);
 
       if (words.length <= WORDS_PER_PAGE) {
         result.push({

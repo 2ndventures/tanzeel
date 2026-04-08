@@ -226,9 +226,12 @@ export default function MushafPageView({
                         : "mushaf-verse-idle";
 
                       const isTajweed = arabicScript === "tajweed";
-                      const words = isTajweed
-                        ? tokenizeTajweedWords(verse.arabicText)
-                        : tokenizeArabicWords(verse.arabicText);
+                      // Use pre-split word array when available (IndoPak has internal spaces)
+                      const words = verse.arabicWords
+                        ? verse.arabicWords
+                        : isTajweed
+                          ? tokenizeTajweedWords(verse.arabicText)
+                          : tokenizeArabicWords(verse.arabicText);
 
                       return (
                         <span

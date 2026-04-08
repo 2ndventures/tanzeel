@@ -1256,6 +1256,7 @@ export default function ChapterView({
                   chapterId={chapterId}
                   verseNumber={verseNumber}
                   arabicText={verse.arabicText}
+                  arabicWords={verse.arabicWords}
                   transliteration={verse.transliteration}
                   translation={verse.translation}
                   showTransliteration={showTransliteration}

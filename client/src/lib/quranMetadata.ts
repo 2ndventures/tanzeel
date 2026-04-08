@@ -11,6 +11,9 @@ export interface Verse {
   arabicText: string;
   transliteration: string;
   translation: string;
+  /** Pre-split word array for scripts where space-tokenization is unreliable (e.g. IndoPak).
+   *  When present, VerseCard uses this instead of tokenizing arabicText. */
+  arabicWords?: string[];
 }
 
 export type LayoutMode = 'standard' | 'focused-flow' | 'mushaf';

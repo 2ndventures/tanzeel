@@ -8,6 +8,9 @@ interface VerseCardProps {
   chapterId: number;
   verseNumber: number;
   arabicText: string;
+  /** Pre-split word array (bypasses tokenization). Used for IndoPak where
+   *  the script's text_indopak tokens can contain internal spaces. */
+  arabicWords?: string[];
   transliteration?: string;
   translation: string;
   showTransliteration: boolean;
@@ -30,6 +33,7 @@ export default function VerseCard({
   chapterId,
   verseNumber,
   arabicText,
+  arabicWords: arabicWordsProp,
   transliteration,
   translation,
   showTransliteration,
@@ -54,9 +58,13 @@ export default function VerseCard({
     isBookmarked(chapterId, verseNumber).then(setBookmarked);
   }, [chapterId, verseNumber]);
 
-  const words = arabicScript === 'tajweed'
-    ? tokenizeTajweedWords(arabicText)
-    : tokenizeArabicWords(arabicText);
+  // Use pre-split word array when provided (e.g. IndoPak, where internal spaces inside
+  // text_indopak tokens would cause space-tokenization to produce wrong word count)
+  const words = arabicWordsProp
+    ? arabicWordsProp
+    : arabicScript === 'tajweed'
+      ? tokenizeTajweedWords(arabicText)
+      : tokenizeArabicWords(arabicText);
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 
