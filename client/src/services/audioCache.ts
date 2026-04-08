@@ -87,6 +87,15 @@ export async function initAudioCache(): Promise<void> {
     manifest = createDefaultManifest();
     await saveManifest();
   }
+
+  try {
+    await Filesystem.rmdir({
+      path: 'audio-cache',
+      directory: Directory.Cache,
+      recursive: true,
+    });
+  } catch {
+  }
 }
 
 export async function getCachedAudioUri(
