@@ -1,6 +1,6 @@
 # Overview
 
-Tanzeel is a mobile-first Quran Reading application that provides users with an immersive experience to read, listen to, and study the Holy Quran. It features translations, transliterations, and audio recitation with word-level synchronized highlighting. Built with React, TypeScript, and shadcn/ui, it offers a modern, premium glassmorphism interface with adaptable light and dark themes, optimized for mobile. The application aims to deliver a highly functional and aesthetically pleasing digital Quran experience, enabling features like continuous chapter audio playback, customizable display settings, and robust bookmarking.
+Tanzeel is a mobile-first Quran Reading application designed to provide an immersive experience for reading, listening to, and studying the Holy Quran. It features translations, transliterations, and audio recitation with word-level synchronized highlighting. The application aims to deliver a highly functional and aesthetically pleasing digital Quran experience, optimized for mobile with a premium glassmorphism interface and adaptable light/dark themes. Key capabilities include continuous chapter audio playback, customizable display settings, and robust bookmarking.
 
 # User Preferences
 
@@ -10,129 +10,55 @@ Preferred communication style: Simple, everyday language.
 
 ## Frontend Architecture
 
-The frontend uses React 18 with TypeScript and Vite, adopting a component-based architecture. UI is built with shadcn/ui (New York variant) and Tailwind CSS, focusing on a mobile-first design with a premium glassmorphism aesthetic that supports both light and dark themes. State management relies on React Hooks and React Query. Navigation is handled client-side across HomePage, SurahJuz, Bookmarks, and Settings screens. The design system ensures consistent premium glassmorphism across all UI elements, adapting seamlessly to themes with elegant shadows and gradient backgrounds. Headers use large, bold typography and circular action buttons.
-
-### Mobile-First Responsive Design
-
-All UI components utilize viewport-relative units for responsiveness, ensuring proper display and scrolling on various mobile screen sizes. This includes dropdowns, modals, spacing, and minimum 48px touch targets for accessibility.
-
-### Layout System
-
-All pages use a flex-based layout pattern: outer container is `flex flex-col h-[100dvh]`, headers are in-flow `shrink-0` elements with `header-safe-padding` for safe area insets, content areas use `flex-1 overflow-y-auto min-h-0`, and BottomNav is an in-flow `shrink-0` element with `safe-area-bottom`. The SurahJuz page features a collapsible header using `max-h`/`opacity` CSS transitions that animate sections in/out based on scroll position and search state. ChapterView is an exception where the header keeps `position: fixed` due to complex auto-hide/gradient behavior. iOS safe area handling uses `html::before` pseudo-element in `@layer base`, Capacitor `resize: 'none'` keyboard mode, and global `focusout`/`visualViewport` scroll reset in main.tsx.
-
-### Accessibility Compliance
-
-The application meets WCAG 2.1 standards through semantic HTML, comprehensive keyboard navigation with `focus-visible` styling, extensive ARIA labels for screen reader support, and optimized touch targets.
-
-### Onboarding Experience
-
-A first-time user onboarding flow guides users through initial setup. It includes a welcome screen highlighting features and a font customization screen with live previews for Arabic, transliteration, and translation text sizes. Preferences are persisted via localStorage.
-
-### Theme System
-
-A comprehensive light and dark theme system is implemented using CSS variables. Themes adapt automatically across all UI components using semantic tokens, maintaining a consistent premium glassmorphism aesthetic with responsive background gradients, card styling, text colors, borders, and shadows.
-
-The color system uses three layers:
-- **`--primary`** (navy `234 34% 17%` in light / indigo in dark): Used exclusively for interactive elements — buttons, focus rings, selected states, toggles, and text that indicates interactivity.
-- **`--secondary`** / **`--accent`**: Supporting semantic colors for UI controls and badges.
-- **`--glow-primary`**, **`--glow-secondary`**, **`--glow-accent`**: Decorative gradient/glow variables defined in both `:root` and `.dark`. Used for all ambient background gradients, decorative blobs, icon containers, verse ornaments, and sheet overlays. Light mode uses royal blue / teal / purple; dark mode uses amber / orange / warm brown. This separation ensures decorative elements feel vibrant and warm in both themes without conflicting with interactive primary navy.
+The frontend uses React 18 with TypeScript and Vite, employing a component-based architecture. UI is built with shadcn/ui and Tailwind CSS, prioritizing a mobile-first design with a premium glassmorphism aesthetic that supports both light and dark themes. State management is handled with React Hooks and React Query. The application ensures accessibility compliance through semantic HTML, keyboard navigation, ARIA labels, and optimized touch targets. A first-time user onboarding flow guides initial setup and font customization. A comprehensive light and dark theme system is implemented using CSS variables and a three-layered color system for consistent aesthetics.
 
 ## Backend Architecture
 
-The backend is an Express.js server in Node.js with TypeScript, providing a RESTful API, serving the production frontend, and proxying audio to resolve CORS issues. It uses an in-memory `IStorage` interface, designed for future database migration.
+The backend is an Express.js server in Node.js with TypeScript, providing a RESTful API, serving the production frontend, and proxying audio requests to resolve CORS issues. It uses an in-memory storage interface, designed for future database migration.
 
 ## Database Architecture
 
-The application is configured with Drizzle ORM for PostgreSQL (via `@neondatabase/serverless`) and Drizzle Kit for migrations. It currently uses in-memory storage but is set up for serverless PostgreSQL.
+The application is configured with Drizzle ORM for PostgreSQL and Drizzle Kit for migrations, currently utilizing in-memory storage but set up for serverless PostgreSQL.
 
 ## Audio Playback System
 
-The system provides continuous chapter audio playback with word-level synchronized highlighting. Audio state is managed centrally via `AudioProvider` (`client/src/contexts/AudioContext.tsx`), which wraps `useWordTimingAudio` at the app level and exposes playback controls through the `useAudio()` hook. This enables persistent audio across navigation — a `MiniPlayer` component (`client/src/components/MiniPlayer.tsx`) shows a compact bar above the bottom nav when audio is playing and the user navigates away from ChapterView. The mini player displays the chapter name, progress bar, and play/pause control; tapping it navigates back to the playing chapter. ChapterView registers verse-change and ended callbacks via ref-based registration to handle auto-scroll and chapter-end navigation. Global playback speed is persistent via `localStorage`. The system supports 10 professional reciters from EveryAyah.com, with dynamic word and verse highlighting and auto-scrolling.
-
-### Platform-Aware Audio URL Routing
-
-`client/src/lib/audioUrls.ts` centralizes platform-aware URL construction for audio resources:
-- **Timing API**: On native (Capacitor), calls `api.qurancdn.com` directly; on web, routes through `/api/audio-timing/` proxy.
-- **Verse audio (VBV preview)**: On native, calls `everyayah.com` directly; on web, routes through `/api/verse-audio/` proxy.
-- **API normalization**: `normalizeTimingResponse()` handles Quran.com API inconsistency (`audio_file` object vs `audio_files` array) client-side, enabling direct CDN calls on native without server-side normalization. The server proxy still normalizes for web compatibility.
-- This eliminates the double-hop (native → Replit proxy → CDN → Replit proxy → native) that caused ~8s startup delays on mobile apps.
-
-### Offline Playback (Verse-by-Verse)
-
-Offline playback uses verse-by-verse (VBV) mode exclusively for instant start — no merge/decode step. When downloaded verses are available, the first verse plays immediately while the next 2 verses are preloaded in the background using a `Map<number, HTMLAudioElement>` ref. The preload system cleans up stale entries and prevents duplicate loads via double-checking the map before insertion. Word-level highlighting works in VBV mode via `vbvTimingsRef`. The old merge path (`client/src/lib/audioMerger.ts`) that decoded all MP3s into a single WAV blob has been removed from the playback flow for performance. On native platforms, `getCachedAudioUri` validates file existence via `Filesystem.stat()` before returning URIs; on web, `readFile` naturally throws for missing files.
-
-### Audio Caching (Capacitor Filesystem)
-
-A Capacitor Filesystem-based audio cache (`client/src/services/audioCache.ts`) stores verse-level MP3s with a dual-directory strategy:
-- **Auto-cached files** (source `'cache'`): stored in `Directory.Cache` (`audio-cache/` folder), subject to LRU eviction when total size exceeds the configurable limit (default 2 GB).
-- **Explicitly downloaded files** (source `'download'`): stored in `Directory.Data` (`audio-downloads/` folder), exempt from LRU eviction, only removed by explicit user action.
-- A shared manifest (`audio-cache/manifest.json` in `Directory.Data`) tracks all entries with reciter/surah/verse keys, sizes, timestamps, and source type. Legacy manifest entries without a `source` field are normalized to `'cache'` on init.
-- `cacheAudioFile()` returns `boolean` success status for callers to implement retry logic.
-- `getCachedAudioUri()` resolves the correct directory based on entry source.
-
-The legacy browser Cache API store (`client/src/lib/audioCache.ts`) still exists for backward compatibility but playback integration with the new Capacitor store is deferred.
-
-### Audio Download Manager
-
-`client/src/services/audioDownloadManager.ts` orchestrates bulk offline downloads:
-- `downloadSurah(reciterId, surahNum, totalVerses, onProgress?)`: Downloads all verses for a surah sequentially with per-verse retry (2 attempts, 500ms delay) and cancellation support. Skips already-downloaded verses. Reports aggregate percent progress.
-- `downloadAllSurahs(reciterId, onProgress?)`: Iterates all 114 surahs.
-- `cancelDownload()`: Sets a flag checked between verse downloads.
-- `deleteSurahDownload(reciterId, surahNum, totalVerses)`: Removes downloaded files for one surah.
-- `deleteReciterDownloads(reciterId)`: Removes all downloaded files for a reciter.
-- `getDownloadStatus(reciterId, surahNum, totalVerses)`: Returns `'none' | 'partial' | 'complete'`.
-- Audio URLs constructed directly from EveryAyah.com pattern: `https://everyayah.com/data/{everyAyahFolder}/{SSS}{VVV}.mp3`.
-
-### Audio Manager Page
-
-`client/src/pages/AudioManager.tsx` — full-screen page accessible from Settings > Offline Storage > "Audio Manager":
-- **Storage Summary**: Total audio storage, breakdown (auto-cached vs downloaded), cache limit pill selector.
-- **Reciter Section**: Shows current reciter name, "Download All Surahs" button with estimated size (~2.2 GB), and list of all 114 surahs with download status icons (not downloaded / downloading spinner / complete / partial).
-- **Download Progress**: Sticky progress bar at top with percentage and cancel button (shows "Cancelling..." state for immediate feedback).
-- **Apple Compliance**: Confirmation dialogs before any download starts showing estimated size. "Download All" dialog warns about ~15-30 minute duration.
-- **Delete Flow**: Tapping a downloaded surah shows delete confirmation dialog.
-- Registered as page type `"audio-manager"` in App.tsx, Android back button returns to Settings.
+The system provides continuous chapter audio playback with word-level synchronized highlighting. Audio state is managed centrally, enabling persistent audio across navigation via a MiniPlayer component. It supports 10 professional reciters and includes platform-aware audio URL routing to optimize performance. Offline playback is supported via a verse-by-verse (VBV) mode with preloading, and an audio caching system using Capacitor Filesystem for storing MP3s in dual directories (auto-cached and explicitly downloaded). An Audio Download Manager orchestrates bulk offline downloads with retry and cancellation support, and a dedicated Audio Manager Page allows users to manage their downloads and view storage summaries.
 
 ## Page Transitions
 
-The app uses a fluid page transition system with simultaneous exit and entry animations. Navigation direction is determined by `PAGE_DEPTH` in App.tsx — deeper pages trigger forward/back parallax slides, same-depth pages use crossfade. During transitions, both the outgoing and incoming pages render simultaneously for 300ms (200ms for tab crossfades). The outgoing page has `pointer-events: none` to prevent interaction. Forward transitions slide the new page in from the right while the old page shifts 30% left and dims. Back transitions reverse this. Tab switches use a simple opacity crossfade. CSS animations use `cubic-bezier(0.32, 0.72, 0, 1)` for natural deceleration. Same-page navigation is short-circuited to avoid duplicate renders.
+The app utilizes a fluid page transition system with simultaneous exit and entry animations, employing parallax slides for deeper navigation and crossfades for same-depth pages or tab switches.
 
 ## Haptic Feedback
 
-A haptics utility (`client/src/lib/haptics.ts`) provides tactile feedback using Capacitor's Haptics plugin on native platforms and `navigator.vibrate()` as a web fallback. Two intensities: light (15ms / ImpactStyle.Light) for play/pause, bookmark, tab switch, speed change, and layout change; medium (40ms / ImpactStyle.Medium) for swipe navigation between surahs.
+A haptics utility provides tactile feedback using Capacitor's Haptics plugin on native platforms and `navigator.vibrate()` as a web fallback, with light and medium intensities for different interactions.
 
 ## Swipe Navigation
 
-Horizontal swipe gestures in ChapterView allow navigating between surahs (left swipe → next, right swipe → previous). Thresholds: 75px horizontal distance, 100px max vertical tolerance, 600ms max duration. A floating pill indicator with the target surah name appears briefly before navigation. Disabled in Mushaf mode which uses horizontal swipe for page navigation.
+Horizontal swipe gestures in ChapterView allow navigation between surahs, with a floating pill indicator briefly showing the target surah name. This is disabled in Mushaf mode.
 
 ## Reading Position Tracking
 
-The reading stats system tracks verse-level position via scroll detection (debounced 500ms). When a user scrolls through verses, the visible verse at 40% viewport height is saved as `lastReadVerse`. The "Continue Reading" card on the Home page passes this verse number to ChapterView, which scrolls directly to that position on load.
+A reading stats system tracks verse-level position via scroll detection, saving the `lastReadVerse` to enable users to "Continue Reading" from their last position.
 
 ## Bookmarking System
 
-A customizable verse bookmarking system is implemented, stored in `localStorage`. It allows users to add/remove bookmarks, organize them into custom folders, add notes, and navigate directly to bookmarked verses. The system includes duplicate prevention for folder names and is integrated into `VerseCard` and a dedicated `Bookmarks` page.
+A customizable verse bookmarking system stores bookmarks in `localStorage`, allowing users to add/remove, organize into folders, add notes, and navigate directly to bookmarked verses.
 
 ## Search System
 
-The SurahJuz page features a 3-layer search system triggered when users type 3+ characters:
-1. **Surah Name Filtering**: Instant client-side filtering of chapter names (and meanings) with transliteration normalization
-2. **Topic Index Matching**: Client-side keyword matching against 50+ curated Quranic themes (`client/src/lib/topicIndex.ts`)
-3. **Full-Text Translation Search**: Server-side search across all 6,236 verse translations via `GET /api/search?q=<query>`. Results show highlighted matching text snippets. Search index is lazily loaded and cached in memory on first request. Returns up to 30 results.
-
-When searching, the page title and tab switcher collapse to maximize screen space for results. Topic results show verse references with translation previews loaded on demand. Translation search results show highlighted matching text with context.
+The SurahJuz page features a 3-layer search system: Surah Name Filtering (client-side), Topic Index Matching (client-side), and Full-Text Translation Search (server-side across all verse translations). Search results show highlighted snippets and context.
 
 ## Download Progress Badge
 
-`client/src/lib/downloadState.ts` provides a lightweight pub/sub system for download activity state. AudioManager broadcasts download start/stop/cancel events. BottomNav subscribes and shows an animated pulsing dot on the Settings tab when a download is active, visible from any page.
+A lightweight pub/sub system provides download activity state, displaying an animated pulsing dot on the Settings tab when a download is active.
 
 ## Screen Wake Lock
 
-ChapterView uses the Web `Screen Wake Lock` API (`navigator.wakeLock`) to prevent the screen from dimming/locking during audio playback. The lock is acquired when playback starts and released when paused/stopped. It handles visibility changes to re-acquire the lock when the app returns to foreground.
+ChapterView uses the Web `Screen Wake Lock` API to prevent the screen from dimming/locking during audio playback.
 
 ## Data Management
 
-Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored client-side. User preferences (theme, reciter, speed, auto-scroll, repeat, autoplay) are managed using local storage. Word-level timing data is fetched dynamically from the Quran.com API.
+Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored client-side. User preferences are managed using local storage. Word-level timing data is fetched dynamically.
 
 # External Dependencies
 
@@ -140,10 +66,10 @@ Quran data (chapters, verses, Arabic text, English translations, transliteration
 - **Styling & Utilities**: Tailwind CSS, class-variance-authority, clsx, tailwind-merge.
 - **Forms & Validation**: React Hook Form, Zod, @hookform/resolvers.
 - **Data Fetching & State**: TanStack Query (React Query).
-- **Database & ORM**: Drizzle ORM, @neondatabase/serverless, connect-pg-simple.
-- **Fonts**: Google Fonts — Scheherazade New (Uthmani/Tajweed primary), Amiri (fallback), Noto Nastaliq Urdu (IndoPak).
-- **Tajweed Color System**: CSS colors for `<tajweed>` HTML tags map to the Quran.com V4 COLRv1 font's CPAL dark palette (palette index 1). Mapping: ham_wasl/slnt/laam_shamsiyah=#999999 [2], madda_normal=#ffc1e0 [5], madda_permissible=#ff5e8e [9], madda_obligatory=#ff8e3b [4], madda_necessary=#e30000 [3], ghunna/ikhfa=#26b55d [6], qalqala=#00deff [8], tafkhim=#3c84d5 [7]. Note: Quran.com's V4 COLR font additionally colors tafkhim (heavy) letters at the glyph level; these are not tagged by the HTML tajweed API and thus cannot be replicated via CSS alone.
+- **Database & ORM**: Drizzle ORM, @neondatabase/serverless.
+- **Fonts**: Google Fonts (Scheherazade New, Amiri, Noto Nastaliq Urdu).
+- **Tajweed Color System**: CSS colors for `<tajweed>` HTML tags mapping to Quran.com V4 COLRv1 font's CPAL dark palette.
 - **External APIs & Data Sources**:
-    - **Quran.com Audio API**: Provides continuous chapter audio files and word-level timing data via a backend proxy.
-    - **Al-Quran Cloud API**: Used for pre-fetching static Quran text data (Arabic, Sahih International English translation, transliteration).
-- **Mobile Deployment**: Capacitor for native iOS and Android app deployment, @capacitor/haptics for native haptic feedback, @capacitor/filesystem for local file storage, @capacitor/network for network status detection.
+    - **Quran.com Audio API**: For continuous chapter audio and word-level timing data.
+    - **Al-Quran Cloud API**: For static Quran text data (Arabic, Sahih International English translation, transliteration).
+- **Mobile Deployment**: Capacitor for native iOS/Android, @capacitor/haptics, @capacitor/filesystem, @capacitor/network.
