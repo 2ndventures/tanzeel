@@ -322,7 +322,9 @@ export default function AudioPlayer({
   }
 
   // ── Full player ──
-  const remaining = Math.max(0, duration - currentTime);
+  // Guard against stale currentTime during chapter transitions (when duration resets to 0 first)
+  const safeCurrentTime = duration > 0 ? Math.min(currentTime, duration) : 0;
+  const remaining = Math.max(0, duration - safeCurrentTime);
 
   return (
     <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
@@ -357,7 +359,7 @@ export default function AudioPlayer({
         {/* ── Seek bar ── */}
         <div className="mb-1">
           <Slider
-            value={[isScrubbing ? scrubValue : currentTime]}
+            value={[isScrubbing ? scrubValue : safeCurrentTime]}
             max={duration || 1}
             step={0.1}
             onValueChange={(value) => {
@@ -380,7 +382,7 @@ export default function AudioPlayer({
           />
           <div className="flex items-center justify-between mt-1.5 px-0.5">
             <span className="text-[11px] tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-current-time">
-              {formatTime(isScrubbing ? scrubValue : currentTime)}
+              {formatTime(isScrubbing ? scrubValue : safeCurrentTime)}
             </span>
             <span className="text-[11px] tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-duration">
               -{formatTime(isScrubbing ? Math.max(0, duration - scrubValue) : remaining)}
@@ -449,8 +451,9 @@ export default function AudioPlayer({
           {/* Center: skip back 15s, play/pause, skip forward 15s */}
           <div className="flex items-center gap-8">
             <button
-              onClick={() => onSeek?.(Math.max(0, currentTime - 15))}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all"
+              onClick={() => { if (!isLoading && duration > 0) onSeek?.(Math.max(0, safeCurrentTime - 15)); }}
+              disabled={isLoading || duration === 0}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all disabled:opacity-40"
               aria-label="Skip back 15 seconds"
               data-testid="button-skip-back"
             >
@@ -476,8 +479,9 @@ export default function AudioPlayer({
             </button>
 
             <button
-              onClick={() => onSeek?.(Math.min(duration, currentTime + 15))}
-              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all"
+              onClick={() => { if (!isLoading && duration > 0) onSeek?.(Math.min(duration, safeCurrentTime + 15)); }}
+              disabled={isLoading || duration === 0}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all disabled:opacity-40"
               aria-label="Skip forward 15 seconds"
               data-testid="button-skip-forward"
             >

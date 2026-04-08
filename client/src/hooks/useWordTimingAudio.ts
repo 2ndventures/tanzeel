@@ -266,9 +266,10 @@ export function useWordTimingAudio(
     const verseTiming = vbvTimingsRef.current.find(t => t.verse_key === verseKey);
 
     const handleLoadedMetadata = () => {
+      const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
       setState(prev => ({
         ...prev,
-        duration: audio.duration || 0,
+        duration: dur,
         currentTime: 0,
       }));
     };
@@ -416,7 +417,7 @@ export function useWordTimingAudio(
 
       if (audio.readyState >= 3) {
         audio.playbackRate = speedRef.current;
-        setState(prev => ({ ...prev, isLoading: false, duration: audio.duration || 0, currentTime: 0 }));
+        setState(prev => ({ ...prev, isLoading: false, duration: isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0, currentTime: 0 }));
         if (shouldPlay) {
           audio.play().catch(() => {
             setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
@@ -509,7 +510,7 @@ export function useWordTimingAudio(
 
       verseByVerseRef.current = false;
 
-      setState(prev => ({ ...prev, isLoading: true, error: null, currentVerseKey: null, currentWordIndex: null, currentTime: 0, duration: 0 }));
+      setState(prev => ({ ...prev, isPlaying: false, isLoading: true, error: null, currentVerseKey: null, currentWordIndex: null, currentTime: 0, duration: 0 }));
 
       syncSpeed();
 
@@ -540,7 +541,8 @@ export function useWordTimingAudio(
 
             const handleLoadedMetadata = () => {
               if (loadIdRef.current !== myLoadId) return;
-              setState(prev => ({ ...prev, duration: audio.duration || 0, currentTime: 0 }));
+              const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
+              setState(prev => ({ ...prev, duration: dur, currentTime: 0 }));
             };
 
             const handleTimeUpdate = () => {
@@ -742,9 +744,10 @@ export function useWordTimingAudio(
 
       const handleLoadedMetadata = () => {
         if (loadIdRef.current !== myLoadId) return;
+        const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
         setState(prev => ({ 
           ...prev, 
-          duration: audio.duration || 0,
+          duration: dur,
           currentTime: 0
         }));
       };
@@ -946,10 +949,8 @@ export function useWordTimingAudio(
       if (audio) {
         const t = audio.currentTime;
         setState(prev => (prev.currentTime !== t ? { ...prev, currentTime: t } : prev));
-        rafIdRef.current = requestAnimationFrame(tick);
-      } else {
-        rafIdRef.current = null;
       }
+      rafIdRef.current = requestAnimationFrame(tick);
     };
     rafIdRef.current = requestAnimationFrame(tick);
     return () => {
