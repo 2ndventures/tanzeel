@@ -368,7 +368,7 @@ export default function AudioPlayer({
               setScrubValue(value[0]);
             }}
             onValueCommit={(value) => {
-              onSeek?.(value[0]);
+              if (!isLoading && duration > 0) onSeek?.(value[0]);
               isScrubbingRef.current = false;
               setIsScrubbing(false);
             }}
