@@ -150,41 +150,63 @@ export function useWordTimingAudio(
     return newSpeed;
   }, [initialSpeed]);
 
+  // Binary search within a verse's word segments
+  const findWordInVerse = useCallback((
+    t: WordSegment,
+    currentTimeMs: number
+  ): { verseKey: string; wordIndex: number | null } => {
+    const segs = t.segments;
+    if (segs.length === 0) return { verseKey: t.verse_key, wordIndex: null };
+    let lo = 0, hi = segs.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const s = segs[mid];
+      if (currentTimeMs < s[1]) hi = mid - 1;
+      else if (currentTimeMs > s[2]) lo = mid + 1;
+      else return { verseKey: t.verse_key, wordIndex: s[0] - 1 };
+    }
+    // Between words — hold last word until next one starts
+    return { verseKey: t.verse_key, wordIndex: segs[segs.length - 1][0] - 1 };
+  }, []);
+
   const findCurrentSegment = useCallback((currentTime: number) => {
     if (!timingDataRef.current) return { verseKey: null, wordIndex: null };
-
     const timings = timingDataRef.current.verse_timings;
     const currentTimeMs = currentTime * 1000;
-    
-    for (const timing of timings) {
-      if (currentTimeMs >= timing.timestamp_from && currentTimeMs < timing.timestamp_to) {
-        const verseSegments = timing.segments;
-        
-        if (verseSegments.length === 0) {
-          return { verseKey: timing.verse_key, wordIndex: null };
+
+    // Fast path: check cached verse index first (O(1) for the common sequential case)
+    const ci = currentVerseIndexRef.current;
+    if (ci >= 0 && ci < timings.length) {
+      const t = timings[ci];
+      if (currentTimeMs >= t.timestamp_from && currentTimeMs < t.timestamp_to) {
+        return findWordInVerse(t, currentTimeMs);
+      }
+      // Check the next verse (normal forward playback)
+      if (ci + 1 < timings.length) {
+        const next = timings[ci + 1];
+        if (currentTimeMs >= next.timestamp_from && currentTimeMs < next.timestamp_to) {
+          currentVerseIndexRef.current = ci + 1;
+          return findWordInVerse(next, currentTimeMs);
         }
-        
-        for (let i = 0; i < verseSegments.length; i++) {
-          const segment = verseSegments[i];
-          const wordIndex = segment[0] - 1;
-          const wordStart = segment[1];
-          const wordEnd = segment[2];
-          
-          if (currentTimeMs >= wordStart && currentTimeMs <= wordEnd) {
-            return { verseKey: timing.verse_key, wordIndex };
-          }
-        }
-        
-        const lastSegment = verseSegments[verseSegments.length - 1];
-        return { 
-          verseKey: timing.verse_key, 
-          wordIndex: lastSegment ? lastSegment[0] - 1 : null
-        };
       }
     }
 
+    // Slow path: binary search over verse_timings (O(log n))
+    let lo = 0, hi = timings.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const t = timings[mid];
+      if (currentTimeMs < t.timestamp_from) hi = mid - 1;
+      else if (currentTimeMs >= t.timestamp_to) lo = mid + 1;
+      else {
+        currentVerseIndexRef.current = mid;
+        return findWordInVerse(t, currentTimeMs);
+      }
+    }
+
+    currentVerseIndexRef.current = -1;
     return { verseKey: null, wordIndex: null };
-  }, []);
+  }, [findWordInVerse]);
 
   const findVbvWordIndex = useCallback((currentTime: number, verseTiming: WordSegment): number | null => {
     if (!verseTiming.segments || verseTiming.segments.length === 0) return null;
@@ -212,6 +234,8 @@ export function useWordTimingAudio(
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafIdRef = useRef<number | null>(null);
+  // Cached verse index for O(1) fast-path in findCurrentSegment; reset on seek/chapter change
+  const currentVerseIndexRef = useRef<number>(-1);
 
   const preloadNextVerses = useCallback(async (
     currentVerseNum: number,
@@ -280,10 +304,10 @@ export function useWordTimingAudio(
       if (verseTiming) {
         wordIndex = findVbvWordIndex(ct, verseTiming);
       }
-      setState(prev => ({
-        ...prev,
-        currentWordIndex: wordIndex,
-      }));
+      setState(prev => {
+        if (prev.currentWordIndex === wordIndex) return prev;
+        return { ...prev, currentWordIndex: wordIndex };
+      });
     };
 
     const handleCanPlay = () => {
@@ -512,6 +536,7 @@ export function useWordTimingAudio(
       }
 
       verseByVerseRef.current = false;
+      currentVerseIndexRef.current = -1;
 
       setState(prev => ({ ...prev, isPlaying: false, isLoading: true, error: null, currentVerseKey: null, currentWordIndex: null, currentTime: 0, duration: 0 }));
 
@@ -551,6 +576,7 @@ export function useWordTimingAudio(
               const currentTime = audio.currentTime;
               const { verseKey, wordIndex } = findCurrentSegment(currentTime);
               setState(prev => {
+                if (prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex) return prev;
                 if (verseKey && verseKey !== prev.currentVerseKey) {
                   onVerseChangeRef.current?.(verseKey);
                 }
@@ -641,89 +667,35 @@ export function useWordTimingAudio(
       audio.preload = 'auto';
       container.appendChild(audio);
 
+      // Start audio buffering immediately — timing fetches in parallel below
       const predictableUrl = getChapterAudioUrl(reciterId, chapterId);
       if (predictableUrl) {
         audio.src = predictableUrl;
         audio.load();
       }
 
-      const timingUrl = getTimingUrl(reciterId, chapterId);
-
-      const fetchTimingData = async (): Promise<TimingData> => {
-        const memCached = getTimingDataFromMemory(reciterId, chapterId);
-        if (memCached) return memCached;
-
-        const timingResponse = await fetch(timingUrl);
-        if (!timingResponse.ok) {
-          const errorText = await timingResponse.text().catch(() => 'Unable to read error');
-          throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
-        }
-
-        const rawData = await timingResponse.json() as Record<string, unknown>;
-        const normalized = normalizeTimingResponse(rawData);
-        const data: TimingData = { audio_files: normalized.audio_files as AudioFile[] };
-        storeTimingDataInMemory(reciterId, chapterId, data);
-        return data;
-      };
-
-      const timingData = await fetchTimingData();
-
-      if (loadIdRef.current !== myLoadId) {
-        audio.pause();
-        audio.src = '';
-        audio.remove();
-        container.remove();
-        return;
-      }
-
-      if (!timingData.audio_files || !Array.isArray(timingData.audio_files) || timingData.audio_files.length === 0) {
-        throw new Error('No audio files found in timing data');
-      }
-      
-      const audioFile = timingData.audio_files[0];
-      
-      if (!audioFile) {
-        throw new Error('Audio file data is missing');
-      }
-      
-      timingDataRef.current = audioFile;
-
-      const audioUrl = audioFile.audio_url;
-      if (!audioUrl) {
-        throw new Error('No audio URL found in timing data');
-      }
-
-      const alreadyPreloading = audio.src && audio.src === audioUrl;
-      if (!alreadyPreloading) {
-        audio.src = audioUrl;
-        audio.load();
-      }
+      // ── Register all handlers NOW (before timing arrives) ──────────────────
+      // handleTimeUpdate guards on timingDataRef.current so it's a no-op until
+      // timing data lands; everything else (canplay, play, pause…) works fine
+      // without timing data.
 
       const handleLoadedMetadata = () => {
         if (loadIdRef.current !== myLoadId) return;
         const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
-        setState(prev => ({ 
-          ...prev, 
-          duration: dur,
-          currentTime: 0
-        }));
+        setState(prev => ({ ...prev, duration: dur, currentTime: 0 }));
       };
 
       const handleTimeUpdate = () => {
         if (loadIdRef.current !== myLoadId) return;
-        const currentTime = audio.currentTime;
-        const { verseKey, wordIndex } = findCurrentSegment(currentTime);
-        
+        if (!timingDataRef.current) return; // word tracking waits until timing arrives
+        const ct = audio.currentTime;
+        const { verseKey, wordIndex } = findCurrentSegment(ct);
         setState(prev => {
+          if (prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex) return prev;
           if (verseKey && verseKey !== prev.currentVerseKey) {
             onVerseChangeRef.current?.(verseKey);
           }
-          
-          return {
-            ...prev,
-            currentVerseKey: verseKey,
-            currentWordIndex: wordIndex,
-          };
+          return { ...prev, currentVerseKey: verseKey, currentWordIndex: wordIndex };
         });
       };
 
@@ -731,7 +703,6 @@ export function useWordTimingAudio(
         if (loadIdRef.current !== myLoadId) return;
         retryCountRef.current = 0;
         audio.playbackRate = speedRef.current;
-        
         if (autoplayRef.current) {
           setState(prev => ({ ...prev, isLoading: false }));
           audio.play().catch(() => {
@@ -749,10 +720,7 @@ export function useWordTimingAudio(
 
       const handlePause = () => {
         if (loadIdRef.current !== myLoadId) return;
-        setState(prev => ({ 
-          ...prev, 
-          isPlaying: false
-        }));
+        setState(prev => ({ ...prev, isPlaying: false }));
       };
 
       const handleEnded = () => {
@@ -770,22 +738,17 @@ export function useWordTimingAudio(
         if (loadIdRef.current !== myLoadId) return;
         const target = e.target as HTMLAudioElement;
         const mediaError = target.error;
-        
         if (mediaError) {
           console.error('Audio error:', mediaError.code, mediaError.message);
         }
-        
         if (retryCountRef.current < MAX_AUTO_RETRIES) {
           retryCountRef.current++;
           const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
           retryTimerRef.current = setTimeout(() => {
-            if (loadIdRef.current === myLoadId) {
-              loadAudio();
-            }
+            if (loadIdRef.current === myLoadId) loadAudio();
           }, delay);
           return;
         }
-        
         tryVerseByVerseFallback().then(fellBack => {
           if (loadIdRef.current !== myLoadId) return;
           if (!fellBack) {
@@ -808,17 +771,13 @@ export function useWordTimingAudio(
       audio.addEventListener('error', handleError);
 
       audio.playbackRate = speedRef.current;
-
       audioRef.current = audio;
 
-      if (audio.readyState >= 2) {
-        handleLoadedMetadata();
-      }
-      if (audio.readyState >= 3) {
-        handleCanPlay();
-      }
+      // Handle the case where audio was already ready (e.g. browser-cached)
+      if (audio.readyState >= 2) handleLoadedMetadata();
+      if (audio.readyState >= 3) handleCanPlay();
 
-      const cleanup = () => {
+      cleanupRef.current = () => {
         audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
         audio.removeEventListener('timeupdate', handleTimeUpdate);
         audio.removeEventListener('canplay', handleCanPlay);
@@ -831,7 +790,76 @@ export function useWordTimingAudio(
         audio.remove();
         audioRef.current = null;
       };
-      cleanupRef.current = cleanup;
+
+      // ── Fetch timing data in background — audio plays while this resolves ──
+      // Uses memory cache (instant) on subsequent loads, network only on first.
+      const timingUrl = getTimingUrl(reciterId, chapterId);
+      (async () => {
+        const memCached = getTimingDataFromMemory(reciterId, chapterId);
+        const timingData: TimingData = memCached ?? await (async () => {
+          const timingResponse = await fetch(timingUrl);
+          if (!timingResponse.ok) {
+            const errorText = await timingResponse.text().catch(() => 'Unable to read error');
+            throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
+          }
+          const rawData = await timingResponse.json() as Record<string, unknown>;
+          const normalized = normalizeTimingResponse(rawData);
+          const data: TimingData = { audio_files: normalized.audio_files as AudioFile[] };
+          storeTimingDataInMemory(reciterId, chapterId, data);
+          return data;
+        })();
+
+        if (loadIdRef.current !== myLoadId) return;
+
+        if (!timingData.audio_files?.length || !timingData.audio_files[0]) {
+          throw new Error('No audio files found in timing data');
+        }
+        const audioFile = timingData.audio_files[0];
+        if (!audioFile.audio_url) throw new Error('No audio URL found in timing data');
+
+        timingDataRef.current = audioFile;
+
+        // Switch to the timing-specified URL only if it differs from what we preloaded
+        if (audio.src !== audioFile.audio_url) {
+          audio.src = audioFile.audio_url;
+          audio.load();
+        }
+
+        // Immediately resolve current segment if audio is already mid-stream
+        currentVerseIndexRef.current = -1;
+        const ct = audio.currentTime;
+        if (ct > 0) {
+          const { verseKey, wordIndex } = findCurrentSegment(ct);
+          setState(prev => {
+            if (prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex) return prev;
+            if (verseKey && verseKey !== prev.currentVerseKey) {
+              onVerseChangeRef.current?.(verseKey);
+            }
+            return { ...prev, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+          });
+        }
+      })().catch(err => {
+        if (loadIdRef.current !== myLoadId) return;
+        console.error('Failed to load timing data:', err instanceof Error ? err.message : err);
+        if (retryCountRef.current < MAX_AUTO_RETRIES) {
+          retryCountRef.current++;
+          const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
+          retryTimerRef.current = setTimeout(() => {
+            if (loadIdRef.current === myLoadId) loadAudio();
+          }, delay);
+          return;
+        }
+        tryVerseByVerseFallback().then(fellBack => {
+          if (loadIdRef.current !== myLoadId) return;
+          if (!fellBack) {
+            setState(prev => ({
+              ...prev,
+              isLoading: false,
+              error: 'Audio failed to load. Tap retry to try again.',
+            }));
+          }
+        });
+      });
     } catch (error) {
       if (loadIdRef.current !== myLoadId) return;
       console.error('Failed to load audio:', error instanceof Error ? error.message : error);
@@ -983,6 +1011,7 @@ export function useWordTimingAudio(
   const seek = useCallback((time: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
+      currentVerseIndexRef.current = -1; // invalidate cached verse position
       setState(prev => ({ ...prev, currentTime: time }));
     }
   }, []);
@@ -1008,7 +1037,7 @@ export function useWordTimingAudio(
     if (verseTiming && audioRef.current) {
       const seekTime = verseTiming.timestamp_from / 1000;
       audioRef.current.currentTime = seekTime;
-      
+      currentVerseIndexRef.current = -1; // invalidate cached verse position
       const { verseKey: newVerseKey, wordIndex: newWordIndex } = findCurrentSegment(seekTime);
       setState(prev => ({
         ...prev,
