@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
+import tanzeelIconPath from "@assets/TanzeelIcon-03_1775753082084.png";
 import { chapters } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -92,9 +93,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                   Tanzeel
                 </h2>
               </div>
-              <div className="relative size-16 flex items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-primary to-secondary shadow-[0_0_20px_hsl(var(--glow-primary)/0.35)]">
-                <Icon icon="solar:book-bold" className="size-8 text-primary-foreground" />
-              </div>
+              <img
+                src={tanzeelIconPath}
+                alt="Tanzeel"
+                className="size-16 rounded-3xl shadow-[0_0_20px_hsl(var(--glow-primary)/0.35)]"
+              />
             </div>
           </div>
         </div>
