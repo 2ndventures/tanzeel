@@ -277,11 +277,6 @@ export default function AudioPlayer({
 
   // ── Compact mode ──
   if (compact) {
-    const progressFraction = duration > 0 ? currentTime / duration : 0;
-    const radius = 22;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference * (1 - progressFraction);
-
     return (
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         <Drawer>
@@ -297,24 +292,20 @@ export default function AudioPlayer({
           <LayoutDrawerContent layoutMode={layoutMode} onLayoutModeChange={onLayoutModeChange} />
         </Drawer>
         <button
-          className={`size-14 rounded-full bg-card/95 backdrop-blur-2xl shadow-lg flex items-center justify-center ring-1 disabled:opacity-50 relative ${error ? 'ring-destructive/60' : 'ring-border/40'}`}
+          className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl active:scale-95 active:bg-black/[.10] dark:active:bg-white/[.12] transition-all disabled:opacity-50"
           onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
           disabled={isLoading}
           aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
           data-testid="compact-play-button"
         >
-          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 56 56">
-            <circle cx="28" cy="28" r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth="3" opacity="0.3" />
-            <circle cx="28" cy="28" r={radius} fill="none" stroke={error ? "hsl(var(--destructive))" : "hsl(var(--glow-primary))"} strokeWidth="3" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} className={`progress-ring-arc ${!error && strokeDashoffset < circumference ? 'progress-ring-glow-arc' : ''}`} />
-          </svg>
           {error ? (
-            <Icon icon="solar:refresh-bold" className="size-5 text-destructive relative z-10" />
+            <Icon icon="solar:refresh-bold" className="size-6 text-destructive" />
           ) : isLoading ? (
-            <div className="size-5 border-2 border-foreground border-t-transparent rounded-full animate-spin" />
+            <div className="size-5 border-2 border-foreground/80 dark:border-white/80 border-t-transparent rounded-full animate-spin" />
           ) : isPlaying ? (
-            <Icon icon="solar:pause-bold" className="size-5 text-foreground relative z-10" />
+            <Icon icon="solar:pause-bold" className="size-6 text-foreground dark:text-white" />
           ) : (
-            <Icon icon="solar:play-bold" className="size-5 text-foreground ml-0.5 relative z-10" />
+            <Icon icon="solar:play-bold" className="size-6 text-foreground dark:text-white ml-0.5" />
           )}
         </button>
       </div>
@@ -461,20 +452,20 @@ export default function AudioPlayer({
             </button>
 
             <button
-              className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 active:brightness-90 transition-all disabled:opacity-50 ${error ? 'bg-destructive/90 text-destructive-foreground' : 'bg-[hsl(var(--glow-primary))] text-white'}`}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl active:scale-95 active:bg-black/[.10] dark:active:bg-white/[.12] transition-all disabled:opacity-50"
               onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
               disabled={isLoading}
               aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
               data-testid="button-play-pause"
             >
               {error ? (
-                <Icon icon="solar:refresh-bold" className="size-7" aria-hidden="true" />
+                <Icon icon="solar:refresh-bold" className="size-8 text-destructive" aria-hidden="true" />
               ) : isLoading ? (
-                <div className="size-6 border-[2.5px] border-white/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
+                <div className="size-6 border-[2.5px] border-foreground/80 dark:border-white/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
               ) : isPlaying ? (
-                <Icon icon="solar:pause-bold" className="size-7 text-white" aria-hidden="true" />
+                <Icon icon="solar:pause-bold" className="size-8 text-foreground dark:text-white" aria-hidden="true" />
               ) : (
-                <Icon icon="solar:play-bold" className="size-7 text-white ml-0.5" aria-hidden="true" />
+                <Icon icon="solar:play-bold" className="size-8 text-foreground dark:text-white ml-0.5" aria-hidden="true" />
               )}
             </button>
 
