@@ -13,12 +13,6 @@ interface ChapterCardProps {
   audioCacheReady?: boolean;
 }
 
-const badgeStyles = [
-  { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
-  { bg: "bg-[hsl(var(--glow-secondary)/0.18)]", text: "text-secondary" },
-  { bg: "bg-[hsl(var(--glow-accent)/0.18)]", text: "text-accent" },
-];
-
 export default function ChapterCard({
   number,
   arabicName,
@@ -28,9 +22,6 @@ export default function ChapterCard({
   onClick,
   style,
 }: ChapterCardProps) {
-  const colorIndex = (number - 1) % badgeStyles.length;
-  const badge = badgeStyles[colorIndex];
-
   return (
     <div
       className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
@@ -41,10 +32,18 @@ export default function ChapterCard({
       <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">
         <div className="flex items-center gap-4 w-full">
           <div
-            className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}
+            className="flex size-12 shrink-0 items-center justify-center rounded-2xl"
+            style={{
+              background: "linear-gradient(135deg, hsl(220 70% 56%), hsl(var(--glow-primary)))",
+            }}
             data-testid={`text-chapter-number-${number}`}
           >
-            <span className={`${badge.text} text-lg font-bold`}>{number}</span>
+            <span
+              className="text-lg font-bold text-white"
+              style={{ textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}
+            >
+              {number}
+            </span>
           </div>
 
           <div className="flex-1 min-w-0">
