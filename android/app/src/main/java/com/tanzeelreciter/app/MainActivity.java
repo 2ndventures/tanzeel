@@ -1,4 +1,4 @@
-package com.tanzeel.app;
+package com.tanzeelreciter.app;
 
 import com.getcapacitor.BridgeActivity;
 

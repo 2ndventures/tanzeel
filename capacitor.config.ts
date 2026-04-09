@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.tanzeel.app',
+  appId: 'com.tanzeelreciter.app',
   appName: 'Tanzeel',
   webDir: 'dist/public',
   server: {
