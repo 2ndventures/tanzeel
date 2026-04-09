@@ -303,9 +303,9 @@ export default function AudioPlayer({
           ) : isLoading ? (
             <div className="size-5 border-2 border-foreground/80 dark:border-white/80 border-t-transparent rounded-full animate-spin" />
           ) : isPlaying ? (
-            <Icon icon="solar:pause-bold" className="size-6 text-foreground dark:text-white" />
+            <Icon icon="solar:pause-bold" className="size-6 text-foreground" />
           ) : (
-            <Icon icon="solar:play-bold" className="size-6 text-foreground dark:text-white ml-0.5" />
+            <Icon icon="solar:play-bold" className="size-6 text-foreground ml-0.5" />
           )}
         </button>
       </div>
@@ -463,9 +463,9 @@ export default function AudioPlayer({
               ) : isLoading ? (
                 <div className="size-6 border-[2.5px] border-foreground/80 dark:border-white/80 border-t-transparent rounded-full animate-spin" role="status" aria-label="Loading" />
               ) : isPlaying ? (
-                <Icon icon="solar:pause-bold" className="size-8 text-foreground dark:text-white" aria-hidden="true" />
+                <Icon icon="solar:pause-bold" className="size-8 text-foreground" aria-hidden="true" />
               ) : (
-                <Icon icon="solar:play-bold" className="size-8 text-foreground dark:text-white ml-0.5" aria-hidden="true" />
+                <Icon icon="solar:play-bold" className="size-8 text-foreground ml-0.5" aria-hidden="true" />
               )}
             </button>
 
