@@ -1039,7 +1039,7 @@ span.end {
   color: hsl(var(--glow-primary));
   font-weight: 700;
 }
-:root .active-word {
+:root:not(.dark) .active-word {
   text-shadow: 0 0 10px hsl(38 88% 38% / 0.35);
 }
 .verse-end-ornament {
