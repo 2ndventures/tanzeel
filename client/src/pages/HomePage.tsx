@@ -81,7 +81,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background to-card">
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-br from-[hsl(var(--glow-primary)/0.20)] via-transparent to-[hsl(var(--glow-accent)/0.14)] dark:from-[hsl(var(--glow-primary)/0.12)] dark:to-[hsl(var(--glow-accent)/0.08)]" />
+      <div className="fixed inset-0 pointer-events-none bg-gradient-to-br from-[hsl(var(--glow-primary)/0.20)] via-transparent to-[hsl(var(--glow-accent)/0.14)] dark:from-[hsl(var(--glow-primary)/0.07)] dark:via-transparent dark:to-[hsl(220_70%_56%/0.16)]" />
 
       <div className="relative flex flex-col flex-1 min-h-0">
         <div className="header-safe-padding shrink-0">
