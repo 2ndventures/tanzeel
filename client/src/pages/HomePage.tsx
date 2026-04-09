@@ -105,7 +105,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <div ref={scrollRef} className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
         <PullToRefresh onRefresh={handleRefresh} scrollRef={scrollRef}>
           <div
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(var(--glow-primary)/0.18)] via-[hsl(var(--glow-secondary)/0.10)] to-[hsl(var(--glow-accent)/0.06)] dark:from-transparent dark:via-[hsl(220_70%_56%/0.08)] dark:to-[hsl(220_70%_56%/0.14)] p-8 shadow-[0_0_30px_hsl(var(--glow-primary)/0.2)] dark:shadow-[0_10px_40px_hsl(220_70%_56%/0.10)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(var(--glow-primary)/0.18)] via-[hsl(var(--glow-secondary)/0.10)] to-[hsl(var(--glow-accent)/0.06)] dark:from-[hsl(var(--glow-primary)/0.12)] dark:via-[hsl(220_70%_56%/0.10)] dark:to-[hsl(220_70%_56%/0.05)] p-8 shadow-[0_0_30px_hsl(var(--glow-primary)/0.2)] dark:shadow-[0_10px_40px_hsl(220_70%_56%/0.10)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
             onClick={() => onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined); }}}
@@ -114,7 +114,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}
             data-testid="card-continue-reading"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.08)] to-[hsl(var(--glow-secondary)/0.08)] dark:from-transparent dark:to-[hsl(220_70%_56%/0.06)] rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.08)] to-[hsl(var(--glow-secondary)/0.08)] dark:from-[hsl(var(--glow-primary)/0.05)] dark:to-[hsl(220_70%_56%/0.08)] rounded-3xl" />
             <div className="relative mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-foreground/70">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
