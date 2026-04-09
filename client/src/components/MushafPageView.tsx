@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Verse, chapters, getDisplayArabicName } from "@/lib/quranMetadata";
-import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { paginateVerses, getPageIndexForVerse } from "@/lib/mushafPagination";
 import {
   Drawer,
@@ -227,11 +227,15 @@ export default function MushafPageView({
 
                       const isTajweed = arabicScript === "tajweed";
                       // Use pre-split word array when available (IndoPak has internal spaces)
-                      const words = verse.arabicWords
+                      const rawWords = verse.arabicWords
                         ? verse.arabicWords
                         : isTajweed
                           ? tokenizeTajweedWords(verse.arabicText)
                           : tokenizeArabicWords(verse.arabicText);
+                      // Sanitise IndoPak words to remove characters that render as □ boxes
+                      const words = arabicScript === 'indopak'
+                        ? rawWords.map(stripIndopakBoxChars)
+                        : rawWords;
 
                       return (
                         <span

@@ -14,6 +14,26 @@
  *   U+FBB2–U+FBC2  Arabic presentation forms for waqf (ṣalā, qalā, etc.)
  */
 
+/**
+ * Strips Unicode characters that render as □ tofu boxes in the Noto Nastaliq
+ * Urdu font used for IndoPak script.  Apply this to every word string before
+ * rendering in IndoPak mode.
+ *
+ * Removed ranges:
+ *   U+06D6–U+06ED  Quranic pause/stop annotation marks
+ *   U+08A0–U+08FF  Arabic Extended-A (extra Quranic diacritics)
+ *   U+FD3E–U+FD3F  Ornate Quranic parentheses
+ *   U+E000–U+F8FF  BMP Private Use Area (Quran.com proprietary markers such
+ *                  as U+E021, U+E022 — no public font has glyphs for these)
+ *   U+200B–U+200F  Zero-width / bidi control characters
+ *   U+FEFF         BOM / zero-width no-break space
+ *
+ * All actual Arabic letters and standard harakat are preserved.
+ */
+export function stripIndopakBoxChars(s: string): string {
+  return s.replace(/[\u06D6-\u06ED\u08A0-\u08FF\uFD3E\uFD3F\uE000-\uF8FF\u200B-\u200F\uFEFF]/g, '');
+}
+
 const STANDALONE_WAQF_RE = /^[\u0610-\u061A\u06D6-\u06ED\u08D4-\u08E1\uFBB2-\uFBC2]+$/;
 
 /**

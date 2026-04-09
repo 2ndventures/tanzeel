@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Icon } from "@iconify/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords, applyTafkhimColoring } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, applyTafkhimColoring, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { tafsirService, DEFAULT_TAFSIR_ID, TafsirEntry } from "@/services/tafsirService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VerseCardSkeleton } from "@/components/VerseCard";
@@ -148,7 +148,16 @@ export default function ScientificView({
   const verse = verses[currentVerse - 1];
   if (!verse) return null;
 
-  const arabicWords = arabicScript !== 'tajweed' ? tokenizeArabicWords(verse.arabicText) : [];
+  // For IndoPak, use the pre-split word array if available so token count matches
+  // timing data; then strip any box-rendering annotation characters from each word.
+  const arabicWordsRaw = arabicScript === 'tajweed'
+    ? []
+    : (arabicScript === 'indopak' && verse.arabicWords)
+      ? verse.arabicWords
+      : tokenizeArabicWords(verse.arabicText);
+  const arabicWords = arabicScript === 'indopak'
+    ? arabicWordsRaw.map(stripIndopakBoxChars)
+    : arabicWordsRaw;
   const translitWords = verse.transliteration ? verse.transliteration.split(' ') : [];
   // Pad arrays to same length
   const maxLen = Math.max(arabicWords.length, translitWords.length);

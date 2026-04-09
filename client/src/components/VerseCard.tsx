@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
-import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
 import { triggerHaptic } from "@/lib/haptics";
 
@@ -60,11 +60,17 @@ export default function VerseCard({
 
   // Use pre-split word array when provided (e.g. IndoPak, where internal spaces inside
   // text_indopak tokens would cause space-tokenization to produce wrong word count)
-  const words = arabicWordsProp
+  const rawWords = arabicWordsProp
     ? arabicWordsProp
     : arabicScript === 'tajweed'
       ? tokenizeTajweedWords(arabicText)
       : tokenizeArabicWords(arabicText);
+
+  // For IndoPak, sanitise every word to clear any cached pre-fix data or
+  // characters the server strip may have missed.
+  const words = arabicScript === 'indopak'
+    ? rawWords.map(stripIndopakBoxChars)
+    : rawWords;
 
   const arabicFontClass = arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic';
 

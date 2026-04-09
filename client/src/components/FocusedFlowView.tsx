@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
-import { tokenizeArabicWords, tokenizeTajweedWords } from "@/lib/arabicTokenizer";
+import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 
 const WORDS_PER_PAGE = 18;
 
@@ -109,7 +109,11 @@ export default function FocusedFlowView({
       }
 
       // Use pre-split word array when available (e.g. IndoPak has internal spaces within tokens)
-      const words = verse.arabicWords ?? tokenizeArabicWords(verse.arabicText);
+      const rawWords = verse.arabicWords ?? tokenizeArabicWords(verse.arabicText);
+      // Sanitise IndoPak words to remove box-rendering annotation characters
+      const words = arabicScript === 'indopak'
+        ? rawWords.map(stripIndopakBoxChars)
+        : rawWords;
 
       if (words.length <= WORDS_PER_PAGE) {
         result.push({
