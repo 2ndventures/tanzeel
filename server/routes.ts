@@ -291,14 +291,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         //   - text: words joined for whole-verse display (may have internal spaces)
         //   - words: the pre-split array (API word boundaries, exact same count as timing data)
 
-        // Sanitise IndoPak word text by stripping Unicode characters that the
-        // "Noto Nastaliq Urdu" font has no glyphs for, which would render as □ boxes:
-        //   U+06D6–U+06ED  Quranic annotation chars (pause/stop marks, sajda marker, etc.)
-        //   U+08A0–U+08FF  Arabic Extended-A (additional Quranic diacritics)
+        // Sanitise IndoPak word text by stripping characters that render as □ boxes.
+        // The Quran.com text_indopak field embeds several non-letter markers:
+        //
+        //   U+06D6–U+06ED  Quranic annotation chars (pause/stop marks, sajda, etc.)
+        //   U+08A0–U+08FF  Arabic Extended-A (extra Quranic diacritics)
         //   U+FD3E–U+FD3F  Ornate Quranic parentheses
-        // These are recitation marks only — stripping them preserves full textual accuracy.
+        //   U+E000–U+F8FF  BMP Private Use Area — proprietary Quran.com markers
+        //                  (e.g. U+E021, U+E022) that no public font defines
+        //   U+200F         Right-to-Left Mark (bidi control, invisible but may box)
+        //   U+200E         Left-to-Right Mark (same reason)
+        //   U+200B         Zero Width Space
+        //   U+FEFF         BOM / Zero Width No-Break Space
+        //
+        // All actual Arabic letters and standard harakat are preserved.
         const sanitiseIndopakWord = (text: string): string =>
-          text.replace(/[\u06D6-\u06ED\u08A0-\u08FF\uFD3E\uFD3F]/g, '');
+          text.replace(/[\u06D6-\u06ED\u08A0-\u08FF\uFD3E\uFD3F\uE000-\uF8FF\u200B-\u200F\uFEFF]/g, '');
 
         verses = (data.verses || []).map((v: any) => {
           const wordTexts: string[] = (v.words || [])
