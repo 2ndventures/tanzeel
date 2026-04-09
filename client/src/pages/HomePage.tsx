@@ -100,12 +100,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               />
             </div>
           </div>
+          <div className="hidden dark:block h-8 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
 
         <div ref={scrollRef} className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
         <PullToRefresh onRefresh={handleRefresh} scrollRef={scrollRef}>
           <div
-            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(var(--glow-primary)/0.18)] via-[hsl(var(--glow-secondary)/0.10)] to-[hsl(var(--glow-accent)/0.06)] dark:from-[hsl(var(--glow-primary)/0.12)] dark:via-[hsl(220_70%_56%/0.10)] dark:to-[hsl(220_70%_56%/0.05)] p-8 shadow-lg shadow-[0_0_30px_hsl(var(--glow-primary)/0.2)] dark:shadow-[0_0_30px_hsl(220_70%_56%/0.18)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[hsl(var(--glow-primary)/0.18)] via-[hsl(var(--glow-secondary)/0.10)] to-[hsl(var(--glow-accent)/0.06)] dark:from-[hsl(var(--glow-primary)/0.12)] dark:via-[hsl(220_70%_56%/0.10)] dark:to-[hsl(220_70%_56%/0.05)] p-8 shadow-lg shadow-[0_0_30px_hsl(var(--glow-primary)/0.2)] dark:shadow-[0_10px_40px_hsl(220_70%_56%/0.12)] backdrop-blur-sm cursor-pointer flex-1 flex flex-col justify-center animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
             onClick={() => onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined); }}}
