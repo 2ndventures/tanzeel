@@ -279,7 +279,7 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
                       className="w-full flex items-center gap-3 px-4 py-3 hover-elevate active-elevate-2 text-left"
                       onClick={() => {
                         if (isCurrentlyDownloading) return;
-                        if (status === "complete") {
+                        if (status === "complete" || status === "partial") {
                           setDeleteSurahNum(ch.id);
                         } else if (!downloadingRef.current) {
                           setConfirmSurah(ch.id);

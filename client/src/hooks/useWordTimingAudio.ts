@@ -297,15 +297,18 @@ export function useWordTimingAudio(
     };
 
     const handlePlay = () => {
+      if (audioRef.current !== audio) return;
       setState(prev => ({ ...prev, isPlaying: true, error: null }));
       preloadNextVerses(verseNum, reciterString);
     };
 
     const handlePause = () => {
+      if (audioRef.current !== audio) return;
       setState(prev => ({ ...prev, isPlaying: false }));
     };
 
     const handleEnded = () => {
+      if (audioRef.current !== audio) return;
       if (repeatRef.current) {
         audio.currentTime = 0;
         audio.play();
@@ -322,6 +325,7 @@ export function useWordTimingAudio(
     };
 
     const handleError = () => {
+      if (audioRef.current !== audio) return;
       setState(prev => ({
         ...prev,
         isLoading: false,
@@ -625,25 +629,6 @@ export function useWordTimingAudio(
           }
         }
 
-        const downloadedVerses = getDownloadedVerseNumbers(reciterString, chapterId);
-        if (downloadedVerses.length > 0) {
-          const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;
-          if (loadIdRef.current !== myLoadId) return;
-          if (offlineTiming?.audio_files?.[0]?.verse_timings) {
-            vbvTimingsRef.current = offlineTiming.audio_files[0].verse_timings;
-            timingDataRef.current = offlineTiming.audio_files[0];
-          } else {
-            vbvTimingsRef.current = [];
-          }
-
-          verseByVerseRef.current = true;
-          vbvAvailableVersesRef.current = downloadedVerses;
-
-          const firstVerse = downloadedVerses[0];
-          await loadVerseByVerseAudio(firstVerse, autoplayRef.current, reciterString);
-          if (loadIdRef.current !== myLoadId) return;
-          return;
-        }
       }
 
       const container = document.createElement('div');
