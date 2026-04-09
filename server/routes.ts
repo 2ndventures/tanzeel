@@ -290,10 +290,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // We return both:
         //   - text: words joined for whole-verse display (may have internal spaces)
         //   - words: the pre-split array (API word boundaries, exact same count as timing data)
+
+        // Sanitise IndoPak word text by stripping Unicode characters that the
+        // "Noto Nastaliq Urdu" font has no glyphs for, which would render as □ boxes:
+        //   U+06D6–U+06ED  Quranic annotation chars (pause/stop marks, sajda marker, etc.)
+        //   U+08A0–U+08FF  Arabic Extended-A (additional Quranic diacritics)
+        //   U+FD3E–U+FD3F  Ornate Quranic parentheses
+        // These are recitation marks only — stripping them preserves full textual accuracy.
+        const sanitiseIndopakWord = (text: string): string =>
+          text.replace(/[\u06D6-\u06ED\u08A0-\u08FF\uFD3E\uFD3F]/g, '');
+
         verses = (data.verses || []).map((v: any) => {
           const wordTexts: string[] = (v.words || [])
             .filter((w: any) => w.char_type_name === 'word')
-            .map((w: any) => w.text_indopak || '');
+            .map((w: any) => sanitiseIndopakWord(w.text_indopak || ''));
           return {
             verse_key: v.verse_key,
             text: wordTexts.join(' '),
