@@ -1,4 +1,4 @@
-package com.simplequran.app;
+package com.tanzeel.app;
 
 import com.getcapacitor.BridgeActivity;
 
