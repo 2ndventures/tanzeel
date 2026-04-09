@@ -100,7 +100,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               />
             </div>
           </div>
-          <div className="hidden dark:block h-8 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+          <div className="hidden dark:block h-8 -mt-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
 
         <div ref={scrollRef} className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
