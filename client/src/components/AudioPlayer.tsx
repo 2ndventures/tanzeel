@@ -321,10 +321,10 @@ export default function AudioPlayer({
     <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
-      <div className="relative" data-testid="audio-player-content" style={{ backgroundColor: 'rgb(var(--player-gradient-rgb))' }}>
-        <div className="absolute inset-x-0 top-0 h-px" style={{ backgroundColor: 'rgba(var(--player-gradient-rgb), 0.3)', boxShadow: '0 -1px 0 0 rgba(0,0,0,0.08)' }} />
+      <div className="relative" data-testid="audio-player-content">
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.15) 10%, rgba(var(--player-gradient-rgb),0.4) 25%, rgba(var(--player-gradient-rgb),0.7) 45%, rgba(var(--player-gradient-rgb),0.9) 70%, rgba(var(--player-gradient-rgb),1) 100%)' }} />
 
-        <div className="relative px-6 pt-5 pb-5 safe-area-bottom">
+        <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 
         {/* ── Surah info: bold name left, Arabic right ── */}
         <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
