@@ -1082,3 +1082,10 @@ span.end {
   border-color: hsl(170 60% 50% / 0.45);
   color: hsl(170 60% 50% / 0.8);
 }
+
+/* Dark-mode-only gradient image background — light mode keeps its own theme gradient */
+.dark .bg-screen-gradient {
+  background-image: url('/gradient-bg.png');
+  background-size: cover;
+  background-position: center top;
+}

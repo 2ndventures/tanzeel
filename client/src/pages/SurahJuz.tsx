@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import bgGradient from "@assets/background_1775845611367.png";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
@@ -219,7 +218,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
   });
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
+    <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background bg-screen-gradient">
 
       <div ref={headerRef} className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
         <div className={`overflow-hidden transition-all duration-300 ${

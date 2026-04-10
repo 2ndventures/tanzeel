@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import bgGradient from "@assets/background_1775845611367.png";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -131,7 +130,7 @@ export default function OnboardingScreen({
   const exampleVerse = exampleVerses.length > 0 ? exampleVerses[0] : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center safe-area-pad" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center safe-area-pad bg-background bg-screen-gradient">
 
       <div className="w-full max-w-lg px-8 py-6">
         {step === 0 && (

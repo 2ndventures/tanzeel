@@ -2,7 +2,6 @@ import { Icon } from "@iconify/react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import tanzeelIconPath from "@assets/appicon_1775843269879.png";
-import bgGradient from "@assets/background_1775845611367.png";
 import { chapters } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 import PullToRefresh from "@/components/PullToRefresh";
@@ -81,7 +80,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
   const versesLeft = Math.max(0, currentChapter.verseCount - (stats.lastReadVerse || 0));
 
   return (
-    <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
+    <div className="flex flex-col h-full bg-gradient-to-b from-background to-card bg-screen-gradient">
 
       <div className="relative flex flex-col flex-1 min-h-0">
         <div className="header-safe-padding shrink-0">

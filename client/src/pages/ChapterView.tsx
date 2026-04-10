@@ -20,7 +20,6 @@ import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
 import { getVerseAudioUrl } from "@/lib/audioUrls";
-import bgGradient from "@assets/background_1775845611367.png";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -671,12 +670,7 @@ export default function ChapterView({
 
   return (
     <div
-      className="relative flex flex-col h-full overflow-hidden"
-      style={{
-        backgroundImage: `url(${bgGradient})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center top',
-      }}
+      className="relative flex flex-col h-full overflow-hidden bg-gradient-to-b from-background via-background/95 to-background bg-screen-gradient"
       onTouchStart={handleSwipeTouchStart}
       onTouchEnd={handleSwipeTouchEnd}
     >
@@ -686,8 +680,8 @@ export default function ChapterView({
       </div>
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
       <div
-        className={`fixed top-0 left-0 right-0 z-[51] pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
-        style={{ height: 'env(safe-area-inset-top, 0px)', backgroundColor: 'rgb(13, 29, 53)' }}
+        className={`fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
+        style={{ height: 'env(safe-area-inset-top, 0px)' }}
       />
 
       {/* Header */}
@@ -799,7 +793,7 @@ export default function ChapterView({
                   <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[73vh] flex flex-col overflow-hidden" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top', borderColor: 'hsl(var(--sheet-muted))' }}>
+            <SheetContent side="bottom" className="h-[73vh] flex flex-col overflow-hidden bg-screen-gradient" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
               {menuView !== 'main' && (
                 <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
                   <ChevronLeft className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
