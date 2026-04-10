@@ -1036,11 +1036,13 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  color: hsl(var(--glow-primary));
-  font-weight: 700;
+  background: hsl(38 88% 50% / 0.15);
+  border-radius: 0.3em;
+  padding-inline: 0.15em;
+  color: inherit;
 }
-:root:not(.dark) .active-word {
-  text-shadow: 0 0 10px hsl(38 88% 38% / 0.35);
+.dark .active-word {
+  background: hsl(45 93% 58% / 0.18);
 }
 .verse-end-ornament {
   display: inline-flex;
