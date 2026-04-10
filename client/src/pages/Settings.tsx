@@ -209,12 +209,7 @@ export default function Settings({
 
   if (reciterView) {
     return (
-      <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
-        </div>
+      <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
 
         <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
           <div className="px-6 pt-4 pb-4 flex items-center gap-3">
@@ -275,12 +270,7 @@ export default function Settings({
 
   if (scriptView) {
     return (
-      <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
-        </div>
+      <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
 
         <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
           <div className="px-6 pt-4 pb-4 flex items-center gap-3">
@@ -338,12 +328,7 @@ export default function Settings({
 
   if (spacingView) {
     return (
-      <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-        <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
-        <div className="fixed inset-0 -z-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
-        </div>
+      <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
 
         <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
           <div className="px-6 pt-4 pb-4 flex items-center gap-3">
@@ -536,12 +521,7 @@ export default function Settings({
                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-[55vh] rounded-t-3xl overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
-                  <div className="absolute inset-0 pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.10)] via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.12)] via-transparent to-transparent" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(var(--glow-accent)/0.08)] via-transparent to-transparent" />
-                  </div>
+                <SheetContent side="bottom" className="h-[55vh] rounded-t-3xl overflow-hidden" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top', borderColor: 'hsl(var(--sheet-muted))' }}>
                   <SheetHeader className="relative z-10">
                     <SheetTitle className="text-xl font-semibold text-foreground">Send Feedback</SheetTitle>
                   </SheetHeader>
