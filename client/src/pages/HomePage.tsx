@@ -1,7 +1,7 @@
 import { Icon } from "@iconify/react";
 import { useState, useEffect, useRef, useCallback } from "react";
 
-import tanzeelIconPath from "@assets/TanzeelIcon-03_1775753082084.png";
+import tanzeelIconPath from "@assets/TanzeelIcon-new_1775842822812.png";
 import { chapters } from "@/lib/quranMetadata";
 import { getReadingStats } from "@/lib/readingStats";
 import PullToRefresh from "@/components/PullToRefresh";
