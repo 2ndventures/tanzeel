@@ -20,6 +20,7 @@ import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 import { triggerHaptic } from "@/lib/haptics";
 import { getVerseAudioUrl } from "@/lib/audioUrls";
+import bgGradient from "@assets/background_1775845611367.png";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -670,22 +671,24 @@ export default function ChapterView({
 
   return (
     <div
-      className="relative flex flex-col h-full overflow-hidden bg-gradient-to-b from-background via-background/95 to-background"
+      className="relative flex flex-col h-full overflow-hidden"
+      style={{
+        backgroundImage: `url(${bgGradient})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+      }}
       onTouchStart={handleSwipeTouchStart}
       onTouchEnd={handleSwipeTouchEnd}
     >
-      {/* Rich layered gradients for depth - adapts to theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.12)] via-background/50 to-background/90" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.15)] via-transparent to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[hsl(var(--glow-secondary)/0.10)] via-transparent to-transparent" />
-      {/* Vignette effect */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20" />
       {/* Screen reader announcements for verse changes */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
-      <div className={`fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`} style={{ height: 'env(safe-area-inset-top, 0px)' }} />
+      <div
+        className={`fixed top-0 left-0 right-0 z-[51] pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
+        style={{ height: 'env(safe-area-inset-top, 0px)', backgroundColor: 'rgb(13, 29, 53)' }}
+      />
 
       {/* Header */}
       <div
