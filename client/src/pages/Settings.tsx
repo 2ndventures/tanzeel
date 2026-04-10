@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import bgGradient from "@assets/background_1775845611367.png";
 import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
 
@@ -392,13 +393,7 @@ export default function Settings({
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-      <div className="fixed inset-0 -z-10 bg-gradient-to-b from-background via-background/95 to-background" />
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[hsl(var(--glow-primary)/0.08)] rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[hsl(var(--glow-accent)/0.06)] rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[hsl(var(--glow-secondary)/0.05)] rounded-full blur-3xl" />
-      </div>
+    <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
 
       <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
         <div className="px-6 pt-4 pb-6">

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import bgGradient from "@assets/background_1775845611367.png";
 import { Icon } from "@iconify/react";
 
 import { chapters } from "@/lib/quranMetadata";
@@ -60,8 +61,7 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-background to-card">
-      <div className="fixed inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.06)] via-transparent to-[hsl(var(--glow-accent)/0.05)] opacity-50 pointer-events-none" />
+    <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
 
       <div className="relative flex flex-col flex-1 min-h-0">
         <div className="header-safe-padding shrink-0">

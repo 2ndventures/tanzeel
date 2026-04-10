@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import bgGradient from "@assets/background_1775845611367.png";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
@@ -218,11 +219,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
   });
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.12)] via-background/50 to-background/90 pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.15)] via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[hsl(var(--glow-secondary)/0.10)] via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/20 pointer-events-none" />
+    <div className="flex flex-col h-full" style={{ backgroundImage: `url(${bgGradient})`, backgroundSize: 'cover', backgroundPosition: 'center top' }}>
 
       <div ref={headerRef} className="relative shrink-0 z-10 bg-background/95 backdrop-blur-xl">
         <div className={`overflow-hidden transition-all duration-300 ${
