@@ -83,7 +83,7 @@
   --chart-4: 234 34% 30%;
   --chart-5: 255 45% 55%;
 
-  --glow-primary: 38 88% 38%;
+  --glow-primary: 33 95% 50%;
   --glow-secondary: 195 70% 42%;
   --glow-accent: 255 45% 55%;
 
@@ -1040,7 +1040,7 @@ span.end {
   font-weight: 700;
 }
 :root:not(.dark) .active-word {
-  text-shadow: 0 0 10px hsl(38 88% 38% / 0.35);
+  text-shadow: 0 0 12px hsl(33 95% 50% / 0.40);
 }
 .verse-end-ornament {
   display: inline-flex;
