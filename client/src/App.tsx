@@ -493,7 +493,7 @@ function App() {
             />
           )}
 
-          {storageReady && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay}>
+          {storageReady && !showOnboarding && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay}>
             <div className="h-full">
               <div className={isTransitioning ? "page-transition-container" : "h-full"}>
                 {isTransitioning && prevPage && (
