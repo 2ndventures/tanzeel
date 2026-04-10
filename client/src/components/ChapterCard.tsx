@@ -1,4 +1,6 @@
 import { getDisplayArabicName } from "@/lib/quranMetadata";
+import { isSurahFullyCached } from "@/services/audioCache";
+import { CheckCircle2 } from "lucide-react";
 
 interface ChapterCardProps {
   number: number;
@@ -13,6 +15,12 @@ interface ChapterCardProps {
   audioCacheReady?: boolean;
 }
 
+const badgeStyles = [
+  { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
+  { bg: "bg-[hsl(var(--glow-secondary)/0.18)]", text: "text-secondary" },
+  { bg: "bg-[hsl(var(--glow-accent)/0.18)]", text: "text-accent" },
+];
+
 export default function ChapterCard({
   number,
   arabicName,
@@ -21,7 +29,17 @@ export default function ChapterCard({
   meaning,
   onClick,
   style,
+  currentReciterId,
+  audioCacheReady: _audioCacheReady,
 }: ChapterCardProps) {
+  void _audioCacheReady;
+  const colorIndex = (number - 1) % badgeStyles.length;
+  const badge = badgeStyles[colorIndex];
+
+  const isFullyCached = currentReciterId
+    ? isSurahFullyCached(currentReciterId, number, verseCount)
+    : false;
+
   return (
     <div
       className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
@@ -32,18 +50,10 @@ export default function ChapterCard({
       <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">
         <div className="flex items-center gap-4 w-full">
           <div
-            className="flex size-12 shrink-0 items-center justify-center rounded-2xl"
-            style={{
-              background: "linear-gradient(135deg, hsl(220 70% 56%), hsl(var(--glow-primary)))",
-            }}
+            className={`flex size-12 shrink-0 items-center justify-center rounded-2xl ${badge.bg} shadow-inner`}
             data-testid={`text-chapter-number-${number}`}
           >
-            <span
-              className="text-lg font-bold text-white"
-              style={{ textShadow: "0 1px 3px rgba(0,0,0,0.35)" }}
-            >
-              {number}
-            </span>
+            <span className={`${badge.text} text-lg font-bold`}>{number}</span>
           </div>
 
           <div className="flex-1 min-w-0">
@@ -54,6 +64,12 @@ export default function ChapterCard({
               >
                 {englishName}
               </h3>
+              {isFullyCached && (
+                <CheckCircle2
+                  className="w-3.5 h-3.5 text-accent/70 shrink-0"
+                  data-testid={`icon-cached-${number}`}
+                />
+              )}
             </div>
             <p className="text-xs text-muted-foreground">
               {meaning} • {verseCount} Ayahs
