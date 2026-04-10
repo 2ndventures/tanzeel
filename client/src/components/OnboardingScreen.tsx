@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { chapters, Verse } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
@@ -61,42 +60,9 @@ export default function OnboardingScreen({
       case "Small": return "text-sm";
       case "Medium": return "text-base";
       case "Large": return "text-lg";
+      case "Extra Large": return "text-xl";
       default: return "text-base";
     }
-  };
-
-  const arabicSizeToSlider = (size: string): number => {
-    switch(size) {
-      case "Small": return 0;
-      case "Medium": return 33;
-      case "Large": return 66;
-      case "Extra Large": return 100;
-      default: return 66;
-    }
-  };
-
-  const sliderToArabicSize = (value: number): string => {
-    if (value <= 16) return "Small";
-    if (value <= 49) return "Medium";
-    if (value <= 83) return "Large";
-    return "Extra Large";
-  };
-
-  const translationSizeToSlider = (size: string): number => {
-    switch(size) {
-      case "Off": return 0;
-      case "Small": return 33;
-      case "Medium": return 66;
-      case "Large": return 100;
-      default: return 66;
-    }
-  };
-
-  const sliderToTranslationSize = (value: number): string => {
-    if (value <= 12) return "Off";
-    if (value <= 45) return "Small";
-    if (value <= 78) return "Medium";
-    return "Large";
   };
 
   const getTransliterationFontSize = (size: string) => {
@@ -104,25 +70,9 @@ export default function OnboardingScreen({
       case "Small": return "text-xs";
       case "Medium": return "text-sm";
       case "Large": return "text-base";
+      case "Extra Large": return "text-lg";
       default: return "text-xs";
     }
-  };
-
-  const transliterationSizeToSlider = (size: string): number => {
-    switch(size) {
-      case "Off": return 0;
-      case "Small": return 33;
-      case "Medium": return 66;
-      case "Large": return 100;
-      default: return 0;
-    }
-  };
-
-  const sliderToTransliterationSize = (value: number): string => {
-    if (value <= 12) return "Off";
-    if (value <= 45) return "Small";
-    if (value <= 66) return "Medium";
-    return "Large";
   };
 
   // Example chapter and verse - Al-Fatiha
@@ -249,63 +199,107 @@ export default function OnboardingScreen({
             )}
 
             {/* Font Size Controls */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Arabic Font Size */}
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">
-                    Arabic Text Size
-                  </label>
-                  <span className="text-xs text-muted-foreground">
-                    {arabicFontSize}
-                  </span>
+                  <label className="text-sm font-medium text-foreground">Arabic Text Size</label>
+                  <span className="text-xs text-muted-foreground">{arabicFontSize}</span>
                 </div>
-                <Slider
-                  value={[arabicSizeToSlider(arabicFontSize)]}
-                  onValueChange={([value]) => onArabicFontSizeChange(sliderToArabicSize(value))}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-arabic-font-size"
-                />
+                <div className="grid grid-cols-4 gap-2">
+                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => onArabicFontSizeChange(opt.value)}
+                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                        arabicFontSize === opt.value
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'bg-muted text-muted-foreground hover-elevate'
+                      }`}
+                      data-testid={`button-arabic-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="space-y-3">
+              {/* Translation */}
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">
-                    Translation
-                  </label>
+                  <label className="text-sm font-medium text-foreground">Translation</label>
                   <span className={`text-xs ${translationFontSize === "Off" ? "text-destructive" : "text-muted-foreground"}`}>
                     {translationFontSize}
                   </span>
                 </div>
-                <Slider
-                  value={[translationSizeToSlider(translationFontSize)]}
-                  onValueChange={([value]) => onTranslationFontSizeChange(sliderToTranslationSize(value))}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-translation-font-size"
-                />
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => onTranslationFontSizeChange("Off")}
+                    className={`w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                      translationFontSize === "Off"
+                        ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                        : 'bg-muted text-muted-foreground hover-elevate'
+                    }`}
+                    data-testid="button-translation-size-off"
+                  >
+                    Off
+                  </button>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => onTranslationFontSizeChange(opt.value)}
+                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                          translationFontSize === opt.value
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted text-muted-foreground hover-elevate'
+                        }`}
+                        data-testid={`button-translation-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-3">
+              {/* Transliteration */}
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">
-                    Transliteration
-                  </label>
+                  <label className="text-sm font-medium text-foreground">Transliteration</label>
                   <span className={`text-xs ${transliterationFontSize === "Off" ? "text-destructive" : "text-muted-foreground"}`}>
                     {transliterationFontSize}
                   </span>
                 </div>
-                <Slider
-                  value={[transliterationSizeToSlider(transliterationFontSize)]}
-                  onValueChange={([value]) => onTransliterationFontSizeChange(sliderToTransliterationSize(value))}
-                  max={100}
-                  step={1}
-                  className="w-full"
-                  data-testid="slider-transliteration-font-size"
-                />
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => onTransliterationFontSizeChange("Off")}
+                    className={`w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                      transliterationFontSize === "Off"
+                        ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                        : 'bg-muted text-muted-foreground hover-elevate'
+                    }`}
+                    data-testid="button-transliteration-size-off"
+                  >
+                    Off
+                  </button>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => onTransliterationFontSizeChange(opt.value)}
+                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                          transliterationFontSize === opt.value
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted text-muted-foreground hover-elevate'
+                        }`}
+                        data-testid={`button-transliteration-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
 

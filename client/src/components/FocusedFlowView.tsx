@@ -71,6 +71,7 @@ export default function FocusedFlowView({
       case "Small": return "text-sm";
       case "Medium": return "text-base";
       case "Large": return "text-lg";
+      case "Extra Large": return "text-xl";
       default: return "text-base";
     }
   };
