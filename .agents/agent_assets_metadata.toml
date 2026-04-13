@@ -18,3 +18,9 @@ id = "YDnNZJi8gUcvnnYgLKkwf"
 uri = "file://verification_report.txt"
 type = "text"
 title = "Verification Report — All Verses Match"
+
+[[outputs]]
+id = "Izxa4VULdEq_Wh0G47r2m"
+uri = "file://tanzeel-technical-audit.docx"
+type = "word_document"
+title = "Tanzeel — Technical Audit Report"
