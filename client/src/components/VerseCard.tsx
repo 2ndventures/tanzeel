@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
-import { triggerHaptic } from "@/lib/haptics";
 
 interface VerseCardProps {
   chapterId: number;
@@ -79,7 +78,6 @@ export default function VerseCard({
 
   const handleBookmarkToggle = useCallback(async (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
-    triggerHaptic('light');
     if (bookmarked) {
       await removeBookmark(chapterId, verseNumber);
       setBookmarked(false);

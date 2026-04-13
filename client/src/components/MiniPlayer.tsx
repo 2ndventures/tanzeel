@@ -94,7 +94,6 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
           <button
             className="flex-1 min-w-0 flex items-center gap-3"
             onClick={() => {
-              triggerHaptic('light');
               onNavigateToChapter(chapter.id);
             }}
             data-testid="mini-player-navigate"

@@ -1,5 +1,4 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from "react";
-import { triggerHaptic } from "@/lib/haptics";
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void>;
@@ -152,7 +151,6 @@ export default function PullToRefresh({
 
       if (distance >= THRESHOLD && !hapticTriggered.current) {
         hapticTriggered.current = true;
-        triggerHaptic('medium');
       }
 
       e.preventDefault();
@@ -166,7 +164,6 @@ export default function PullToRefresh({
 
       if (currentPull >= THRESHOLD && phase === "idle") {
         setPhase("refreshing");
-        triggerHaptic('light');
         try {
           await onRefresh();
         } finally {

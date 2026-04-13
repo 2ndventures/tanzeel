@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
-import { triggerHaptic } from "@/lib/haptics";
 import { getVerseAudioUrl } from "@/lib/audioUrls";
 
 interface ChapterViewProps {
@@ -587,7 +586,6 @@ export default function ChapterView({
   const goToNextSurah = useCallback(() => {
     const nextChapterId = chapterId + 1;
     if (nextChapterId <= 114) {
-      triggerHaptic('medium');
       onNavigate('chapter', nextChapterId);
     }
   }, [chapterId, onNavigate]);
@@ -613,7 +611,6 @@ export default function ChapterView({
   const goToPreviousSurah = useCallback(() => {
     const prevChapterId = chapterId - 1;
     if (prevChapterId >= 1) {
-      triggerHaptic('medium');
       onNavigate('chapter', prevChapterId);
     }
   }, [chapterId, onNavigate]);

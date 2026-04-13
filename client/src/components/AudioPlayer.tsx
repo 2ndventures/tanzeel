@@ -81,7 +81,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
             return (
               <button
                 key={opt.mode}
-                onClick={() => { triggerHaptic('light'); onLayoutModeChange?.(opt.mode); }}
+                onClick={() => { onLayoutModeChange?.(opt.mode); }}
                 className={`relative rounded-xl overflow-hidden transition-all ${
                   isSelected
                     ? 'ring-2 ring-primary shadow-md shadow-primary/15'
@@ -232,7 +232,6 @@ export default function AudioPlayer({
   const speedIsModified = Math.abs(speed - 1.0) > 0.01;
 
   const cycleSpeed = () => {
-    triggerHaptic('light');
     const currentIndex = speedOptions.findIndex(s => Math.abs(s - speed) < 0.01);
     if (currentIndex >= 0) {
       const nextIndex = (currentIndex + 1) % speedOptions.length;
@@ -398,7 +397,7 @@ export default function AudioPlayer({
                 value={[speed]} min={0.5} max={2.0} step={0.1}
                 showTooltip tooltipContent={(v) => `${formatSpeed(v)}`}
                 onValueChange={(value) => onSpeedChange?.(Math.round(value[0] * 10) / 10)}
-                onValueCommit={() => { triggerHaptic('light'); setShowSpeedSlider(false); }}
+                onValueCommit={() => { setShowSpeedSlider(false); }}
                 className="flex-1" aria-label="Fine playback speed" data-testid="slider-speed"
               />
               <span className="text-xs font-medium text-muted-foreground/60 dark:text-white/40 w-8 shrink-0">2x</span>
@@ -440,7 +439,7 @@ export default function AudioPlayer({
           {/* Center: skip back 15s, play/pause, skip forward 15s */}
           <div className="flex items-center gap-8">
             <button
-              onClick={() => { if (!isLoading && duration > 0) onSeek?.(Math.max(0, safeCurrentTime - 15)); }}
+              onClick={() => { if (!isLoading && duration > 0) { triggerHaptic('medium'); onSeek?.(Math.max(0, safeCurrentTime - 15)); } }}
               disabled={isLoading || duration === 0}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all disabled:opacity-40"
               aria-label="Skip back 15 seconds"
@@ -468,7 +467,7 @@ export default function AudioPlayer({
             </button>
 
             <button
-              onClick={() => { if (!isLoading && duration > 0) onSeek?.(Math.min(duration, safeCurrentTime + 15)); }}
+              onClick={() => { if (!isLoading && duration > 0) { triggerHaptic('medium'); onSeek?.(Math.min(duration, safeCurrentTime + 15)); } }}
               disabled={isLoading || duration === 0}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/80 dark:text-white/80 rounded-xl active:bg-black/[.13] dark:active:bg-white/[.15] active:scale-95 transition-all disabled:opacity-40"
               aria-label="Skip forward 15 seconds"
