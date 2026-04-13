@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 
 const MEDIA_SESSION_ARTWORK: MediaImage[] = [
-  { src: '/icons/tanzeel-icon.png', sizes: '1024x1024', type: 'image/png' },
+  { src: '/icons/appicon.png', sizes: '1024x1024', type: 'image/png' },
 ];
 
 interface MediaSessionOptions {
