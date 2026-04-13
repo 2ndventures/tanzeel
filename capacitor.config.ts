@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'always',
     scrollEnabled: false,
-    backgroundColor: '#101828'
+    backgroundColor: '#3d1e00'
   },
   plugins: {
     Keyboard: {

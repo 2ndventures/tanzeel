@@ -19,9 +19,8 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-b from-primary to-secondary transition-opacity duration-500 ${
-        fadeOut ? "opacity-0" : "opacity-100"
-      }`}
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}
+      style={{ background: 'linear-gradient(to bottom, hsl(43, 92%, 42%), hsl(28, 95%, 28%))' }}
     >
       {/* Decorative circles */}
       <svg

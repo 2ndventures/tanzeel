@@ -680,8 +680,8 @@ export default function ChapterView({
       </div>
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
       <div
-        className={`fixed top-0 left-0 right-0 z-[51] bg-background pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
-        style={{ height: 'env(safe-area-inset-top, 0px)' }}
+        className={`fixed top-0 left-0 right-0 z-[51] pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
+        style={{ height: 'env(safe-area-inset-top, 0px)', backgroundColor: 'var(--header-gradient-start)' }}
       />
 
       {/* Header */}
