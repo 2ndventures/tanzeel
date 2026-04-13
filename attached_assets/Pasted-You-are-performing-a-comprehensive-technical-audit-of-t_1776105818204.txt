@@ -1,0 +1,90 @@
+You are performing a comprehensive technical audit of this codebase — a React + TypeScript + Capacitor Quran reading app called Tanzeel. Read every relevant source file before forming conclusions. Do not guess based on filenames alone. Do not make any changes — this is read-only analysis only.
+
+Produce a structured markdown report. Begin with a **Summary Table** at the top with columns:
+
+| File / Package | Category | Recommended Action |
+
+Categories: Dead Code · Unused Dep · Duplicate · Security · Bug Risk · Performance · Architecture · Hygiene
+Actions: Remove · Keep · Investigate · Refactor · Consolidate
+
+Then cover each section below in full detail.
+
+---
+
+## 1. DEAD CODE & UNUSED FILES
+- List every file that is imported nowhere and appears unused in active code.
+- Specifically audit: `useAudioPlayer.ts`, `server/replit_integrations/`, `shared/schema.ts`, `client/src/components/examples/`, `@capgo/native-audio`, `ScientificView.tsx`, `TajweedLegend.tsx`, `PullToRefresh.tsx`.
+- Flag any hooks, components, contexts, or services that are written but never called from active source.
+- Note any `.bak` or backup files that should be cleaned up.
+
+## 2. UNUSED DEPENDENCIES
+- Go through every entry in `package.json` (both `dependencies` and `devDependencies`).
+- For each package, confirm whether it is actually imported or used anywhere in the active source tree.
+- Flag anything installed but never imported, with a specific note on: `@capgo/native-audio`, `drizzle-orm`, `drizzle-zod`, `@neondatabase/serverless`, `passport`, `passport-local`, `express-session`, `connect-pg-simple`, `memorystore`, `openai`, `jimp`, `recharts`, `embla-carousel-react`, `react-day-picker`, `input-otp`, `react-resizable-panels`, `framer-motion`.
+- Flag any packages that serve duplicate purposes (e.g. both `react-icons` and `lucide-react` and `@iconify/react` installed — which is actually used where?).
+
+## 3. SCHEMA & DATABASE AUDIT
+- Review `drizzle.config.ts` and `shared/schema.ts`.
+- Check if `@neondatabase/serverless`, `drizzle-orm`, and `drizzle-zod` are actively used anywhere beyond scaffolding.
+- Confirm whether there is a live database connection or if this is entirely vestigial.
+- Audit `server/storage.ts` — is the `IStorage` interface implemented anywhere?
+- Report the full picture: what auth/session packages are installed vs what is actually wired up.
+
+## 4. API & SERVER ROUTE AUDIT
+- List every route defined in `server/routes.ts` with its method, path, and purpose.
+- For each route, confirm whether the client actually calls it (search for fetch/axios calls to that path in client code).
+- Flag any server routes that are proxying external APIs (quran.com, everyayah.com, qurancdn.com) that the native Capacitor app could call directly — and confirm whether `Capacitor.isNativePlatform()` guards are already in place in `audioUrls.ts`.
+- Identify any routes defined in `server/replit_integrations/` and whether they are registered or dead.
+
+## 5. DUPLICATE & REDUNDANT CODE
+- Compare `useWordTimingAudio.ts` and `useAudioPlayer.ts` — map what each does, where they overlap, and whether `useAudioPlayer.ts` is still called anywhere.
+- Identify any logic duplicated between `client/src/services/audioCache.ts` and `client/src/lib/audioCache.ts`.
+- Check for component-level duplication between `client/src/components/examples/` and the active components.
+- Flag any other repeated patterns across the codebase (e.g. identical URL construction logic appearing in multiple files).
+
+## 6. ARCHITECTURE & CODE QUALITY
+- Evaluate the custom page-switching system in `App.tsx` vs using the installed `wouter` router. What are the tradeoffs and risks at the current scale?
+- Assess prop drilling depth from `App.tsx` to leaf components — map which props are drilled more than 2 levels deep and should be in Context.
+- Identify components over 400 lines that should be decomposed (`ChapterView.tsx` at 1366 lines, `AudioPlayer.tsx` at 503 lines, `Settings.tsx` at 640 lines`).
+- Flag any missing `useMemo`/`useCallback`/`React.memo` optimizations, especially in `ChapterView.tsx` which renders all verse cards.
+- Assess whether the `requestAnimationFrame` loop in `useWordTimingAudio.ts` is guarded against running when the tab/app is backgrounded.
+- Check for state synchronization risks between `selectedChapter` in `App.tsx` and `activeChapterId` in `AudioContext`.
+- Evaluate `AudioContext` for unnecessary re-renders caused by context value object recreation.
+
+## 7. AUDIO SYSTEM DEEP DIVE
+- Trace the full playback path: user tap → `loadChapter()` → `HTMLAudioElement` → rAF loop → verse highlight → auto-scroll.
+- Identify any race conditions or memory leaks in `useWordTimingAudio.ts` (Audio object creation, rAF loop teardown, AbortController usage).
+- Audit the server-side audio proxy in `routes.ts`: does it handle HTTP Range requests correctly for seeking? Are there timeout or stream error edge cases?
+- Evaluate the `audioCache` Capacitor Filesystem service: is the manifest pattern safe against corruption? What is the failure mode?
+- Flag any issues with the `audioMerger.ts` WAV-stitching approach.
+
+## 8. SECURITY FLAGS
+- Check every source file for hardcoded API keys, secrets, tokens, or credentials.
+- Audit `server/routes.ts` for SSRF risk — can reciter/chapter params be manipulated to proxy arbitrary URLs? Are params sanitized before URL construction?
+- Is the Express server configured with CORS, rate limiting, or request size limits?
+- Review `ios/App/App/Info.plist` for any sensitive values.
+- Check `client/src/config.ts` for anything that should not be committed.
+
+## 9. NATIVE / CAPACITOR
+- Audit `Info.plist`: are all required permissions and background modes correctly declared for audio playback?
+- Is `UIBackgroundModes: audio` sufficient for HTML5 Audio background playback, or are additional entitlements needed?
+- Identify any web-only APIs used without a `Capacitor.isNativePlatform()` guard that would break on iOS/Android.
+- Is `@capacitor/keyboard` `resize: 'none'` appropriate for all screen layouts?
+
+## 10. ERROR HANDLING & RESILIENCE
+- Does `useWordTimingAudio.ts` handle the case where timing data fetch succeeds but the audio URL 404s?
+- What happens if the user loses network mid-playback on a non-cached surah?
+- Is `ErrorBoundary.tsx` placed at a granular enough level, or can an audio error crash the whole app?
+- Audit retry logic in `audioDownloadManager.ts`.
+
+## 11. PACKAGE.JSON HYGIENE
+- Are all scripts (`dev`, `build`, `start`, `check`, `db:push`) valid and still relevant?
+- Are there dependency version conflicts or peer dependency warnings worth noting?
+- Identify any packages that serve the same purpose as another installed package.
+
+## 12. QUICK WINS vs MAJOR REFACTORS
+Close the report with two prioritized lists:
+- **Quick wins** (under 2 hours each): low-risk, high-value removals or fixes.
+- **Major refactors** (multi-day): architectural changes worth formally planning.
+
+Be specific throughout — reference exact file names and line numbers where possible. Do not produce generic advice.
