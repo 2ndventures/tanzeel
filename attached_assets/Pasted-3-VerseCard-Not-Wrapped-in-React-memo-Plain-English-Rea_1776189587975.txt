@@ -1,0 +1,35 @@
+3. VerseCard Not Wrapped in React.memo
+Plain English
+React re-renders components when their parent re-renders, unless you explicitly tell it not to. React.memo is that instruction — it tells React "only re-render this component if its props actually changed."
+During audio playback, your useWordTimingAudio hook runs a requestAnimationFrame loop — this fires roughly 60 times per second to update the playback position and keep the word highlighting smooth. Every time it fires, it updates state in AudioContext, which causes ChapterView to re-render, which causes every single VerseCard on screen to re-render.
+For Al-Fatihah (7 verses) this is barely noticeable. For Al-Baqarah (286 verses), you're asking React to re-render 286 components, 60 times per second, and only 1 of them actually changed (the currently-highlighted verse). That's 17,160 wasted renders per second. On an older iPhone this will cause dropped frames and choppy highlighting.
+Code Impact
+The fix is wrapping VerseCard in React.memo with a custom comparator that only triggers a re-render when something about that specific verse has actually changed:
+// ❌ CURRENT — re-renders on every rAF tick
+export function VerseCard({ 
+  chapterId, verseNumber, arabicText, isCurrentVerse, currentWordIndex, ...
+}: VerseCardProps) {
+  return ( /* renders every frame */ );
+}
+// ✅ FIXED — only re-renders when this verse's state changes
+export const VerseCard = React.memo(function VerseCard({ 
+  chapterId, verseNumber, arabicText, isCurrentVerse, currentWordIndex, ...
+}: VerseCardProps) {
+  return ( /* renders only when needed */ );
+}, (prevProps, nextProps) => {
+  // Return true = skip re-render (props are "equal enough")
+  // Return false = do re-render
+  
+  // Only re-render if this verse's highlighted state changed
+  if (prevProps.isCurrentVerse !== nextProps.isCurrentVerse) return false;
+  
+  // Only re-render if the highlighted word changed AND this is the current verse
+  if (nextProps.isCurrentVerse && prevProps.currentWordIndex !== nextProps.currentWordIndex) return false;
+  
+  // Only re-render if the actual text content changed
+  if (prevProps.arabicText !== nextProps.arabicText) return false;
+  if (prevProps.translation !== nextProps.translation) return false;
+  
+  return true; // everything else — skip
+});
+The result: during playback, only 1-2 VerseCard components re-render per frame instead of all 286. This is the single biggest performance gain available in the codebase right now.
