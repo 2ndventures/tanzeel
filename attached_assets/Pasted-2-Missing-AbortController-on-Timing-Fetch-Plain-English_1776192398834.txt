@@ -1,0 +1,36 @@
+2. Missing AbortController on Timing Fetch
+Plain English
+When a user taps a surah to play, your app fires off an HTTP request to fetch the word-timing data (the JSON that tells it exactly when each word is being spoken). This fetch takes a moment — maybe half a second, maybe longer on slow connections.
+Now imagine the user taps a surah, changes their mind immediately, and taps a different one. Your app starts a second fetch for the new surah. But the first fetch is still running in the background. When it finishes, it tries to apply its timing data to the player — but the player has already moved on. The app correctly ignores the stale data (via the loadIdRef counter), but the network request already completed and wasted bandwidth. On a slow connection or with rapid chapter-switching, you could have 5-6 stale requests all completing for chapters the user no longer cares about.
+An AbortController is a browser API that lets you cancel a fetch request mid-flight. The moment the user switches chapters, you cancel the previous fetch so it never completes.
+Code Impact
+In useWordTimingAudio.ts, the timing fetch currently looks roughly like:
+// ❌ CURRENT — fetch runs to completion even if chapter changes
+const loadAudio = async (chapterId: number) => {
+  const currentLoadId = ++loadIdRef.current;
+  
+  const timingData = await fetch(getTimingUrl(reciterId, chapterId))
+    .then(r => r.json());
+  
+  if (loadIdRef.current !== currentLoadId) return; // stale, discard
+  // apply timing data...
+};
+With AbortController:
+// ✅ FIXED — fetch is cancelled when chapter changes
+const abortControllerRef = useRef<AbortController | null>(null);
+const loadAudio = async (chapterId: number) => {
+  // Cancel any in-flight fetch from a previous chapter
+  abortControllerRef.current?.abort();
+  abortControllerRef.current = new AbortController();
+  
+  const currentLoadId = ++loadIdRef.current;
+  
+  try {
+    const timingData = await fetch(getTimingUrl(reciterId, chapterId), {
+      signal: abortControllerRef.current.signal  // <-- this is the key line
+    }).then(r => r.json());
+    
+    if (loadIdRef.current !== currentLoadId) return;
+    // apply timing data...
+  } catch (err) {
+    if (err.name === 'AbortError') return; // expected, not an error
