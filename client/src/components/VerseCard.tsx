@@ -53,12 +53,16 @@ function VerseCardInner({
   const highlighted = isCurrentVerse && isInVerseRange;
   const [bookmarked, setBookmarked] = useState(false);
 
-  // Latest-ref pattern: always holds the current callbacks so memoized renders
-  // never call a stale closure when the user taps a verse or toggles a bookmark.
+  // Latest-ref pattern: update synchronously during every render so event handlers
+  // always call the most recent callback. Note: refs are NOT updated on memo-skipped
+  // renders, so a very brief window of staleness can exist if the parent recreates
+  // these callbacks between two skipped renders. In practice this is safe here
+  // because any meaningful state change (isPlaying, isCurrentVerse) also triggers
+  // a re-render that refreshes these refs.
   const onClickRef = useRef(onClick);
-  useEffect(() => { onClickRef.current = onClick; });
+  onClickRef.current = onClick;
   const onBookmarkChangeRef = useRef(onBookmarkChange);
-  useEffect(() => { onBookmarkChangeRef.current = onBookmarkChange; });
+  onBookmarkChangeRef.current = onBookmarkChange;
 
   useEffect(() => {
     isBookmarked(chapterId, verseNumber).then(setBookmarked);
