@@ -23,6 +23,9 @@ async function getSearchIndex() {
   return searchIndex;
 }
 
+const SAFE_PARAM = /^[a-zA-Z0-9_\-]+$/;
+const SAFE_NUM = /^[0-9]+$/;
+
 export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/search", async (req, res) => {
     try {
@@ -52,7 +55,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/verse-audio/:reciterFolder/:surah/:ayah", async (req, res) => {
     try {
       const { reciterFolder, surah, ayah } = req.params;
-      
+
+      if (!SAFE_PARAM.test(reciterFolder) || !SAFE_PARAM.test(surah) || !SAFE_PARAM.test(ayah)) {
+        return res.status(400).json({ error: 'Invalid parameters' });
+      }
+
       // Construct EveryAyah.com URL
       const audioUrl = `https://everyayah.com/data/${reciterFolder}/${surah}${ayah}.mp3`;
       console.log(`📡 Fetching verse audio: ${audioUrl}`);
@@ -88,7 +95,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/audio/:reciter/:chapter", async (req, res) => {
     try {
       const { reciter, chapter } = req.params;
-      
+
+      if (!SAFE_PARAM.test(reciter) || !SAFE_NUM.test(chapter)) {
+        return res.status(400).json({ error: 'Invalid parameters' });
+      }
+
       // Use chapter number as-is (no zero-padding needed for Quran.com CDN)
       let audioUrl = `https://download.quranicaudio.com/qdc/${reciter}/murattal/${chapter}.mp3`;
       console.log(`🎵 Audio proxy request: ${reciter}/${chapter}`);
@@ -199,7 +210,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/audio-timing/:reciterId/:chapter", async (req, res) => {
     try {
       const { reciterId, chapter } = req.params;
-      
+
+      if (!SAFE_NUM.test(reciterId) || !SAFE_NUM.test(chapter)) {
+        return res.status(400).json({ error: 'Invalid parameters' });
+      }
+
       // Fetch timing data from Quran.com API
       const timingUrl = `https://api.qurancdn.com/api/qdc/audio/reciters/${reciterId}/audio_files?chapter=${chapter}&segments=true`;
       console.log(`📡 Fetching timing data: ${timingUrl}`);
@@ -260,6 +275,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/quran-text/:script/:chapter", async (req, res) => {
     try {
       const { script, chapter } = req.params;
+
+      if (!SAFE_NUM.test(chapter)) {
+        return res.status(400).json({ error: 'Invalid parameters' });
+      }
 
       if (script !== 'indopak' && script !== 'tajweed') {
         return res.status(400).json({ error: `Unknown script: ${script}` });
@@ -376,6 +395,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tafsir/:tafsirId/by-chapter/:chapter", async (req, res) => {
     try {
       const { tafsirId, chapter } = req.params;
+
+      if (!SAFE_NUM.test(tafsirId) || !SAFE_NUM.test(chapter)) {
+        return res.status(400).json({ error: 'Invalid parameters' });
+      }
+
       const apiUrl = `https://api.quran.com/api/v4/tafsirs/${tafsirId}?chapter_number=${chapter}`;
       console.log(`📡 Fetching tafsir ${tafsirId} for chapter ${chapter}: ${apiUrl}`);
 
