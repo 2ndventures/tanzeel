@@ -53,10 +53,12 @@ function VerseCardInner({
   const highlighted = isCurrentVerse && isInVerseRange;
   const [bookmarked, setBookmarked] = useState(false);
 
-  // Latest-ref pattern: always holds the current onClick so memoized renders
-  // never call a stale closure when the user taps a verse.
+  // Latest-ref pattern: always holds the current callbacks so memoized renders
+  // never call a stale closure when the user taps a verse or toggles a bookmark.
   const onClickRef = useRef(onClick);
   useEffect(() => { onClickRef.current = onClick; });
+  const onBookmarkChangeRef = useRef(onBookmarkChange);
+  useEffect(() => { onBookmarkChangeRef.current = onBookmarkChange; });
 
   useEffect(() => {
     isBookmarked(chapterId, verseNumber).then(setBookmarked);
@@ -86,8 +88,8 @@ function VerseCardInner({
       await addBookmark(chapterId, verseNumber);
       setBookmarked(true);
     }
-    onBookmarkChange?.();
-  }, [bookmarked, chapterId, verseNumber, onBookmarkChange]);
+    onBookmarkChangeRef.current?.();
+  }, [bookmarked, chapterId, verseNumber]);
 
   const handleBookmarkKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -265,6 +267,9 @@ function VerseCardInner({
 }
 
 export const VerseCard = memo(VerseCardInner, (prev, next) => {
+  // Re-render if identity changed (e.g. chapter navigation reuses card slots)
+  if (prev.chapterId !== next.chapterId) return false;
+  if (prev.verseNumber !== next.verseNumber) return false;
   // Re-render if playback state for this verse changed
   if (prev.isCurrentVerse !== next.isCurrentVerse) return false;
   if (prev.isInVerseRange !== next.isInVerseRange) return false;
@@ -273,6 +278,7 @@ export const VerseCard = memo(VerseCardInner, (prev, next) => {
   if (next.isCurrentVerse && prev.currentWordIndex !== next.currentWordIndex) return false;
   // Re-render if content changed
   if (prev.arabicText !== next.arabicText) return false;
+  if (prev.arabicWords !== next.arabicWords) return false;
   if (prev.translation !== next.translation) return false;
   if (prev.transliteration !== next.transliteration) return false;
   // Re-render if display settings changed
