@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Icon } from "@iconify/react";
+import tanzeel from "@assets/Tanzeel_White_1776178805122.png";
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -35,13 +35,13 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
         <circle cx="60" cy="200" r="60" stroke="white" strokeWidth="0.5" />
       </svg>
 
-      {/* Content */}
-      <div className="relative flex flex-col items-center justify-center gap-4 px-6 text-center">
-        <Icon icon="solar:moon-stars-bold" className="size-24 text-white" />
-        <h1 className="text-4xl font-black tracking-tight text-white">
-          Tanzeel
-        </h1>
-      </div>
+      {/* Brand logo */}
+      <img
+        src={tanzeel}
+        alt="Tanzeel"
+        className="relative"
+        style={{ width: '78%', maxWidth: '300px' }}
+      />
 
       {/* Bottom pill */}
       <div className="absolute bottom-10 w-32 h-1.5 rounded-full bg-white/40" />
