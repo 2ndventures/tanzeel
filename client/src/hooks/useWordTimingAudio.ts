@@ -231,6 +231,7 @@ export function useWordTimingAudio(
   const MAX_AUTO_RETRIES = 2;
   const cleanupRef = useRef<(() => void) | null>(null);
   const loadIdRef = useRef(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafIdRef = useRef<number | null>(null);
@@ -516,6 +517,8 @@ export function useWordTimingAudio(
   }, [reciterId, chapterId, loadVerseByVerseAudio]);
 
   const loadAudio = useCallback(async () => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
     const myLoadId = loadIdRef.current;
     try {
       if (cleanupRef.current) {
@@ -797,7 +800,7 @@ export function useWordTimingAudio(
       (async () => {
         const memCached = getTimingDataFromMemory(reciterId, chapterId);
         const timingData: TimingData = memCached ?? await (async () => {
-          const timingResponse = await fetch(timingUrl);
+          const timingResponse = await fetch(timingUrl, { signal: abortControllerRef.current?.signal });
           if (!timingResponse.ok) {
             const errorText = await timingResponse.text().catch(() => 'Unable to read error');
             throw new Error(`Timing API returned ${timingResponse.status}: ${errorText}`);
@@ -839,6 +842,7 @@ export function useWordTimingAudio(
           });
         }
       })().catch(err => {
+        if (err.name === 'AbortError') return;
         if (loadIdRef.current !== myLoadId) return;
         console.error('Failed to load timing data:', err instanceof Error ? err.message : err);
         if (retryCountRef.current < MAX_AUTO_RETRIES) {
@@ -897,6 +901,7 @@ export function useWordTimingAudio(
     loadAudio();
     return () => {
       loadIdRef.current++;
+      abortControllerRef.current?.abort();
       if (retryTimerRef.current) {
         clearTimeout(retryTimerRef.current);
         retryTimerRef.current = null;
