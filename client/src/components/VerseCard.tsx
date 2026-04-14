@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef, memo } from "react";
 import { Icon } from "@iconify/react";
 import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
@@ -28,7 +28,7 @@ interface VerseCardProps {
   onBookmarkChange?: () => void;
 }
 
-export default function VerseCard({
+function VerseCardInner({
   chapterId,
   verseNumber,
   arabicText,
@@ -53,20 +53,21 @@ export default function VerseCard({
   const highlighted = isCurrentVerse && isInVerseRange;
   const [bookmarked, setBookmarked] = useState(false);
 
+  // Latest-ref pattern: always holds the current onClick so memoized renders
+  // never call a stale closure when the user taps a verse.
+  const onClickRef = useRef(onClick);
+  useEffect(() => { onClickRef.current = onClick; });
+
   useEffect(() => {
     isBookmarked(chapterId, verseNumber).then(setBookmarked);
   }, [chapterId, verseNumber]);
 
-  // Use pre-split word array when provided (e.g. IndoPak, where internal spaces inside
-  // text_indopak tokens would cause space-tokenization to produce wrong word count)
   const rawWords = arabicWordsProp
     ? arabicWordsProp
     : arabicScript === 'tajweed'
       ? tokenizeTajweedWords(arabicText)
       : tokenizeArabicWords(arabicText);
 
-  // For IndoPak, sanitise every word to clear any cached pre-fix data or
-  // characters the server strip may have missed.
   const words = arabicScript === 'indopak'
     ? rawWords.map(stripIndopakBoxChars)
     : rawWords;
@@ -148,7 +149,7 @@ export default function VerseCard({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      onClick?.();
+      onClickRef.current?.();
     }
   };
 
@@ -165,7 +166,7 @@ export default function VerseCard({
       aria-label={`Verse ${chapterId}:${verseNumber}. ${highlighted ? 'Currently playing. ' : ''}Click to ${isPlaying ? 'pause' : 'play'} this verse.`}
       role="button"
       tabIndex={0}
-      onClick={onClick}
+      onClick={() => onClickRef.current?.()}
       onKeyDown={handleKeyDown}
     >
       <div className="px-5 py-3">
@@ -262,6 +263,32 @@ export default function VerseCard({
     </div>
   );
 }
+
+export const VerseCard = memo(VerseCardInner, (prev, next) => {
+  // Re-render if playback state for this verse changed
+  if (prev.isCurrentVerse !== next.isCurrentVerse) return false;
+  if (prev.isInVerseRange !== next.isInVerseRange) return false;
+  if (prev.isPlaying !== next.isPlaying) return false;
+  // Re-render if word highlight changed AND this is the active verse
+  if (next.isCurrentVerse && prev.currentWordIndex !== next.currentWordIndex) return false;
+  // Re-render if content changed
+  if (prev.arabicText !== next.arabicText) return false;
+  if (prev.translation !== next.translation) return false;
+  if (prev.transliteration !== next.transliteration) return false;
+  // Re-render if display settings changed
+  if (prev.showTransliteration !== next.showTransliteration) return false;
+  if (prev.showTranslation !== next.showTranslation) return false;
+  if (prev.arabicFontSize !== next.arabicFontSize) return false;
+  if (prev.translationFontSize !== next.translationFontSize) return false;
+  if (prev.transliterationFontSize !== next.transliterationFontSize) return false;
+  if (prev.lineSpacing !== next.lineSpacing) return false;
+  if (prev.showVerseNumbers !== next.showVerseNumbers) return false;
+  if (prev.arabicScript !== next.arabicScript) return false;
+  // onClick and onBookmarkChange are handled via latest-ref — skip comparison
+  return true;
+});
+
+export default VerseCard;
 
 function VerseCardSkeleton({ index }: { index: number }) {
   const delayClass = `animation-delay-${(index % 5) * 100}`;
