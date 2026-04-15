@@ -319,7 +319,7 @@ export default function AudioPlayer({
   return (
     <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
-    }`} data-testid="audio-player-wrapper" style={{ willChange: 'transform' }}>
+    }`} data-testid="audio-player-wrapper" data-no-swipe="true" style={{ willChange: 'transform' }}>
       <div className="relative" data-testid="audio-player-content">
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(var(--player-gradient-rgb),0.15) 10%, rgba(var(--player-gradient-rgb),0.4) 25%, rgba(var(--player-gradient-rgb),0.7) 45%, rgba(var(--player-gradient-rgb),0.9) 70%, rgba(var(--player-gradient-rgb),1) 100%)' }} />
 

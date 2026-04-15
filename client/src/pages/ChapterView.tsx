@@ -624,6 +624,7 @@ export default function ChapterView({
 
   const handleSwipeTouchStart = useCallback((e: React.TouchEvent) => {
     if (layoutMode === 'mushaf') return;
+    if ((e.target as Element).closest('[data-no-swipe]')) return;
     const touch = e.touches[0];
     touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
   }, [layoutMode]);

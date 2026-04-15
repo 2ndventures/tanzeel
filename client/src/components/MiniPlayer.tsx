@@ -79,6 +79,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
       }`}
       style={{ bottom: hasBottomNav ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 'env(safe-area-inset-bottom, 0px)' }}
       data-testid="mini-player"
+      data-no-swipe="true"
     >
       <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
         <div className="h-[3px] bg-muted/30">
