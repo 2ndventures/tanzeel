@@ -292,7 +292,7 @@ export default function AudioPlayer({
         </Drawer>
         <button
           className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl active:scale-95 active:bg-black/[.10] dark:active:bg-white/[.12] transition-all disabled:opacity-50"
-          onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
+          onClick={() => { error && onRetry ? onRetry() : onPlayPause?.(); }}
           disabled={isLoading}
           aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
           data-testid="compact-play-button"
@@ -450,7 +450,7 @@ export default function AudioPlayer({
 
             <button
               className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl active:scale-95 active:bg-black/[.10] dark:active:bg-white/[.12] transition-all disabled:opacity-50"
-              onClick={() => { triggerHaptic('light'); error && onRetry ? onRetry() : onPlayPause?.(); }}
+              onClick={() => { error && onRetry ? onRetry() : onPlayPause?.(); }}
               disabled={isLoading}
               aria-label={error ? "Retry audio" : isLoading ? "Loading audio" : isPlaying ? "Pause audio" : "Play audio"}
               data-testid="button-play-pause"

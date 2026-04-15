@@ -502,8 +502,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   <div
                     key={juz.id}
                     className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
+                    role="button"
+                    tabIndex={0}
                     style={{ animationDelay: `${index * 30}ms` }}
                     onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", juz.startChapter); }}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", juz.startChapter); } }}
                     data-testid={`juz-card-${juz.id}`}
                   >
                     <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">

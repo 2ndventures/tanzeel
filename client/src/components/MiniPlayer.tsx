@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { useAudio } from "@/contexts/AudioContext";
 import { chapters, getDisplayArabicName } from "@/lib/quranMetadata";
-import { triggerHaptic } from "@/lib/haptics";
 
 interface MiniPlayerProps {
   onNavigateToChapter: (chapterId: number) => void;
@@ -137,7 +136,6 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
             className="flex size-10 shrink-0 items-center justify-center rounded-full active:scale-95 transition-transform disabled:opacity-50"
             onClick={(e) => {
               e.stopPropagation();
-              triggerHaptic('light');
               if (error) {
                 retry();
               } else {

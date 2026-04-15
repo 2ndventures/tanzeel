@@ -21,6 +21,7 @@ import type { LayoutMode } from "@/lib/quranMetadata";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { initStorage, getItem, setItem, removeItem } from "@/lib/storage";
 import { initAudioCache } from "@/services/audioCache";
+import { triggerHaptic } from "@/lib/haptics";
 
 const CapApp = registerPlugin<{
   exitApp: () => Promise<void>;
@@ -61,6 +62,19 @@ function App() {
       setShowSplash(false);
     }
   }, [storageReady, splashAnimDone]);
+
+  useEffect(() => {
+    const handler = (e: PointerEvent) => {
+      const target = e.target as Element | null;
+      if (!target) return;
+      const interactive = target.closest(
+        'button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="radio"]'
+      );
+      if (interactive) triggerHaptic('light');
+    };
+    document.addEventListener('pointerdown', handler, { passive: true });
+    return () => document.removeEventListener('pointerdown', handler);
+  }, []);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
