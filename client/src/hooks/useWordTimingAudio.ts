@@ -837,6 +837,7 @@ export function useWordTimingAudio(
 
         if (audio.src !== audioFile.audio_url) {
           const wasPlaying = !audio.paused;
+          const swapLoadId = myLoadId;
           srcChangingRef.current = true;
           audio.src = audioFile.audio_url;
           audio.load();
@@ -845,6 +846,7 @@ export function useWordTimingAudio(
             audio.removeEventListener('loadeddata', clearFlag);
             audio.removeEventListener('error', clearFlag);
             clearTimeout(safetyTimeout);
+            if (loadIdRef.current !== swapLoadId) return;
             srcChangingRef.current = false;
             if (wasPlaying && audio.paused) {
               audio.play().catch(() => {});
