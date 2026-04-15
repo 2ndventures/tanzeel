@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useRef, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useWordTimingAudio, type AudioFile } from '@/hooks/useWordTimingAudio';
 import { getQuranComReciterId } from '@/lib/reciters';
 import { chapters } from '@/lib/quranMetadata';
@@ -93,29 +93,46 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     endedCallbackRef.current = cb;
   }, []);
 
-  const value: AudioContextValue = {
+  const {
+    isPlaying: hookIsPlaying, currentTime: hookCurrentTime, duration: hookDuration,
+    currentVerseKey: hookCurrentVerseKey, currentWordIndex: hookCurrentWordIndex,
+    isLoading: hookIsLoading, error: hookError, speed: hookSpeed,
+    togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
+    setSpeed, getTimingData, retry,
+  } = hookResult;
+
+  const value = useMemo<AudioContextValue>(() => ({
     activeChapterId,
-    isPlaying: enabled ? hookResult.isPlaying : false,
-    currentTime: enabled ? hookResult.currentTime : 0,
-    duration: enabled ? hookResult.duration : 0,
-    currentVerseKey: enabled ? hookResult.currentVerseKey : null,
-    currentWordIndex: enabled ? hookResult.currentWordIndex : null,
-    isLoading: enabled ? hookResult.isLoading : false,
-    error: enabled ? hookResult.error : null,
-    speed: hookResult.speed,
+    isPlaying:        enabled ? hookIsPlaying        : false,
+    currentTime:      enabled ? hookCurrentTime      : 0,
+    duration:         enabled ? hookDuration         : 0,
+    currentVerseKey:  enabled ? hookCurrentVerseKey  : null,
+    currentWordIndex: enabled ? hookCurrentWordIndex : null,
+    isLoading:        enabled ? hookIsLoading        : false,
+    error:            enabled ? hookError            : null,
+    speed: hookSpeed,
     loadChapter,
     stopAudio,
-    togglePlayPause: hookResult.togglePlayPause,
-    pauseAudio: hookResult.pauseAudio,
-    playAudio: hookResult.playAudio,
-    seek: hookResult.seek,
-    seekToVerse: hookResult.seekToVerse,
-    setSpeed: hookResult.setSpeed,
-    getTimingData: hookResult.getTimingData,
-    retry: hookResult.retry,
+    togglePlayPause,
+    pauseAudio,
+    playAudio,
+    seek,
+    seekToVerse,
+    setSpeed,
+    getTimingData,
+    retry,
     registerVerseChangeCallback,
     registerEndedCallback,
-  };
+  }), [
+    activeChapterId, enabled,
+    hookIsPlaying, hookCurrentTime, hookDuration,
+    hookCurrentVerseKey, hookCurrentWordIndex,
+    hookIsLoading, hookError, hookSpeed,
+    togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
+    setSpeed, getTimingData, retry,
+    loadChapter, stopAudio,
+    registerVerseChangeCallback, registerEndedCallback,
+  ]);
 
   return (
     <AudioContext.Provider value={value}>
