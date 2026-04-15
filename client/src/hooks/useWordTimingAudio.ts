@@ -204,6 +204,15 @@ export function useWordTimingAudio(
       }
     }
 
+    // Between verses — hold the last word of the verse that just ended rather than
+    // blanking the highlight. After the binary search, lo is the index of the first
+    // verse whose timestamp_from exceeds currentTimeMs, so lo-1 is the one that ended.
+    const prevIdx = lo - 1;
+    if (prevIdx >= 0 && prevIdx < timings.length) {
+      currentVerseIndexRef.current = prevIdx;
+      const prev = timings[prevIdx];
+      return findWordInVerse(prev, prev.timestamp_to - 1);
+    }
     currentVerseIndexRef.current = -1;
     return { verseKey: null, wordIndex: null };
   }, [findWordInVerse]);
@@ -931,7 +940,15 @@ export function useWordTimingAudio(
       const audio = audioRef.current;
       if (audio) {
         const t = audio.currentTime;
-        setState(prev => (prev.currentTime !== t ? { ...prev, currentTime: t } : prev));
+        const { verseKey, wordIndex } = findCurrentSegment(t);
+        setState(prev => {
+          const timeChanged = prev.currentTime !== t;
+          const verseChanged = prev.currentVerseKey !== verseKey;
+          const wordChanged = prev.currentWordIndex !== wordIndex;
+          if (!timeChanged && !verseChanged && !wordChanged) return prev;
+          if (verseKey && verseChanged) onVerseChangeRef.current?.(verseKey);
+          return { ...prev, currentTime: t, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+        });
       }
       rafIdRef.current = requestAnimationFrame(tick);
     };
@@ -943,7 +960,7 @@ export function useWordTimingAudio(
         rafIdRef.current = null;
       }
     };
-  }, [state.isPlaying]);
+  }, [state.isPlaying, findCurrentSegment]);
 
   const retry = useCallback(() => {
     retryCountRef.current = 0;
@@ -1017,9 +1034,15 @@ export function useWordTimingAudio(
     if (audioRef.current) {
       audioRef.current.currentTime = time;
       currentVerseIndexRef.current = -1; // invalidate cached verse position
-      setState(prev => ({ ...prev, currentTime: time }));
+      const { verseKey, wordIndex } = findCurrentSegment(time);
+      setState(prev => ({
+        ...prev,
+        currentTime: time,
+        currentVerseKey: verseKey,
+        currentWordIndex: wordIndex,
+      }));
     }
-  }, []);
+  }, [findCurrentSegment]);
 
   const seekToVerse = useCallback((verseKey: string) => {
     if (verseByVerseRef.current) {
