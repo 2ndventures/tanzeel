@@ -165,8 +165,8 @@ export function useWordTimingAudio(
       else if (currentTimeMs > s[2]) lo = mid + 1;
       else return { verseKey: t.verse_key, wordIndex: s[0] - 1 };
     }
-    // Between words — hold last word until next one starts
-    return { verseKey: t.verse_key, wordIndex: segs[segs.length - 1][0] - 1 };
+    if (lo > 0) return { verseKey: t.verse_key, wordIndex: segs[lo - 1][0] - 1 };
+    return { verseKey: t.verse_key, wordIndex: null };
   }, []);
 
   const findCurrentSegment = useCallback((currentTime: number) => {
@@ -244,8 +244,8 @@ export function useWordTimingAudio(
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafIdRef = useRef<number | null>(null);
-  // Cached verse index for O(1) fast-path in findCurrentSegment; reset on seek/chapter change
   const currentVerseIndexRef = useRef<number>(-1);
+  const srcChangingRef = useRef(false);
 
   const preloadNextVerses = useCallback(async (
     currentVerseNum: number,
@@ -338,6 +338,7 @@ export function useWordTimingAudio(
 
     const handlePause = () => {
       if (audioRef.current !== audio) return;
+      if (srcChangingRef.current) return;
       setState(prev => ({ ...prev, isPlaying: false }));
     };
 
@@ -528,6 +529,7 @@ export function useWordTimingAudio(
   const loadAudio = useCallback(async () => {
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
+    srcChangingRef.current = false;
     const myLoadId = loadIdRef.current;
     try {
       if (cleanupRef.current) {
@@ -617,6 +619,7 @@ export function useWordTimingAudio(
 
             const handlePause = () => {
               if (loadIdRef.current !== myLoadId) return;
+              if (srcChangingRef.current) return;
               setState(prev => ({ ...prev, isPlaying: false }));
             };
 
@@ -732,6 +735,7 @@ export function useWordTimingAudio(
 
       const handlePause = () => {
         if (loadIdRef.current !== myLoadId) return;
+        if (srcChangingRef.current) return;
         setState(prev => ({ ...prev, isPlaying: false }));
       };
 
@@ -831,10 +835,25 @@ export function useWordTimingAudio(
 
         timingDataRef.current = audioFile;
 
-        // Switch to the timing-specified URL only if it differs from what we preloaded
         if (audio.src !== audioFile.audio_url) {
+          const wasPlaying = !audio.paused;
+          srcChangingRef.current = true;
           audio.src = audioFile.audio_url;
           audio.load();
+          const clearFlag = () => {
+            audio.removeEventListener('canplay', clearFlag);
+            audio.removeEventListener('loadeddata', clearFlag);
+            audio.removeEventListener('error', clearFlag);
+            clearTimeout(safetyTimeout);
+            srcChangingRef.current = false;
+            if (wasPlaying && audio.paused) {
+              audio.play().catch(() => {});
+            }
+          };
+          audio.addEventListener('canplay', clearFlag);
+          audio.addEventListener('loadeddata', clearFlag);
+          audio.addEventListener('error', clearFlag);
+          const safetyTimeout = setTimeout(clearFlag, 3000);
         }
 
         // Immediately resolve current segment if audio is already mid-stream
@@ -940,15 +959,22 @@ export function useWordTimingAudio(
       const audio = audioRef.current;
       if (audio) {
         const t = audio.currentTime;
-        const { verseKey, wordIndex } = findCurrentSegment(t);
-        setState(prev => {
-          const timeChanged = prev.currentTime !== t;
-          const verseChanged = prev.currentVerseKey !== verseKey;
-          const wordChanged = prev.currentWordIndex !== wordIndex;
-          if (!timeChanged && !verseChanged && !wordChanged) return prev;
-          if (verseKey && verseChanged) onVerseChangeRef.current?.(verseKey);
-          return { ...prev, currentTime: t, currentVerseKey: verseKey, currentWordIndex: wordIndex };
-        });
+        if (verseByVerseRef.current) {
+          setState(prev => {
+            if (prev.currentTime === t) return prev;
+            return { ...prev, currentTime: t };
+          });
+        } else {
+          const { verseKey, wordIndex } = findCurrentSegment(t);
+          setState(prev => {
+            const timeChanged = prev.currentTime !== t;
+            const verseChanged = prev.currentVerseKey !== verseKey;
+            const wordChanged = prev.currentWordIndex !== wordIndex;
+            if (!timeChanged && !verseChanged && !wordChanged) return prev;
+            if (verseKey && verseChanged) onVerseChangeRef.current?.(verseKey);
+            return { ...prev, currentTime: t, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+          });
+        }
       }
       rafIdRef.current = requestAnimationFrame(tick);
     };
@@ -961,6 +987,19 @@ export function useWordTimingAudio(
       }
     };
   }, [state.isPlaying, findCurrentSegment]);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const audio = audioRef.current;
+      if (!audio || srcChangingRef.current) return;
+      const playing = !audio.paused && !audio.ended && audio.readyState >= 2;
+      setState(prev => {
+        if (prev.isPlaying === playing) return prev;
+        return { ...prev, isPlaying: playing };
+      });
+    }, 500);
+    return () => clearInterval(id);
+  }, []);
 
   const retry = useCallback(() => {
     retryCountRef.current = 0;
