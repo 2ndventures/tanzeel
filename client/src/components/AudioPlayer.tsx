@@ -224,7 +224,9 @@ export default function AudioPlayer({
   };
 
   const formatSpeed = (s: number) => {
-    return s % 1 === 0 ? `${s.toFixed(0)}x` : `${parseFloat(s.toFixed(1))}x`;
+    if (s % 1 === 0) return `${s.toFixed(0)}x`;
+    const trimmed = parseFloat(s.toFixed(2)).toString();
+    return `${trimmed}x`;
   };
 
   const speedIsModified = Math.abs(speed - 1.0) > 0.01;
@@ -376,7 +378,7 @@ export default function AudioPlayer({
               data-testid="button-speed"
             >
               <span className="text-sm font-bold leading-none">
-                {speed % 1 === 0 ? speed.toFixed(0) : parseFloat(speed.toFixed(1))}
+                {speed % 1 === 0 ? speed.toFixed(0) : parseFloat(speed.toFixed(2))}
                 <span className="text-[10px] relative -top-0.5">x</span>
               </span>
               <Icon icon="solar:alt-arrow-up-linear" className="size-3" aria-hidden="true" />
