@@ -145,11 +145,9 @@ export default function AudioPlayer({
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
-  const [showSpeedSlider, setShowSpeedSlider] = useState(false);
-  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const didLongPressRef = useRef(false);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const speedButtonRef = useRef<HTMLButtonElement>(null);
-  const sliderContainerRef = useRef<HTMLDivElement>(null);
+  const speedMenuRef = useRef<HTMLDivElement>(null);
 
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubValue, setScrubValue] = useState(0);
@@ -231,48 +229,23 @@ export default function AudioPlayer({
 
   const speedIsModified = Math.abs(speed - 1.0) > 0.01;
 
-  const cycleSpeed = () => {
-    const currentIndex = speedOptions.findIndex(s => Math.abs(s - speed) < 0.01);
-    if (currentIndex >= 0) {
-      const nextIndex = (currentIndex + 1) % speedOptions.length;
-      onSpeedChange?.(speedOptions[nextIndex]);
-    } else {
-      const next = speedOptions.find(s => s > speed + 0.01) ?? speedOptions[0];
-      onSpeedChange?.(next);
-    }
-  };
-
-  const handlePointerDown = useCallback(() => {
-    didLongPressRef.current = false;
-    longPressTimerRef.current = setTimeout(() => {
-      didLongPressRef.current = true;
-      setShowSpeedSlider(true);
-    }, 400);
-  }, []);
-
-  const handlePointerUp = useCallback(() => {
-    if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
-    if (!didLongPressRef.current) {
-      if (showSpeedSlider) { setShowSpeedSlider(false); } else { cycleSpeed(); }
-    }
-  }, [speed, onSpeedChange, showSpeedSlider]);
-
-  const handlePointerCancel = useCallback(() => {
-    if (longPressTimerRef.current) { clearTimeout(longPressTimerRef.current); longPressTimerRef.current = null; }
-  }, []);
+  const handleSelectSpeed = useCallback((value: number) => {
+    onSpeedChange?.(value);
+    setShowSpeedMenu(false);
+  }, [onSpeedChange]);
 
   useEffect(() => {
-    if (!showSpeedSlider) return;
+    if (!showSpeedMenu) return;
     const handleClickOutside = (e: PointerEvent) => {
-      const container = sliderContainerRef.current;
+      const container = speedMenuRef.current;
       const btn = speedButtonRef.current;
       if (container && !container.contains(e.target as Node) && btn && !btn.contains(e.target as Node)) {
-        setShowSpeedSlider(false);
+        setShowSpeedMenu(false);
       }
     };
     const timeout = setTimeout(() => document.addEventListener('pointerdown', handleClickOutside), 50);
     return () => { clearTimeout(timeout); document.removeEventListener('pointerdown', handleClickOutside); };
-  }, [showSpeedSlider]);
+  }, [showSpeedMenu]);
 
   // ── Compact mode ──
   if (compact) {
@@ -378,35 +351,6 @@ export default function AudioPlayer({
           </div>
         </div>
 
-        {/* ── Speed slider panel (long-press) ── */}
-        {showSpeedSlider && (
-          <div
-            ref={sliderContainerRef}
-            className="rounded-2xl bg-black/5 dark:bg-white/10 ring-1 ring-black/10 dark:ring-white/10 p-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
-            data-testid="speed-slider-panel"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-muted-foreground dark:text-white/50 uppercase tracking-wide">Speed</span>
-              <button onClick={() => onSpeedChange?.(1.0)} className="text-xs text-foreground/80 dark:text-white/80 font-semibold px-2 py-0.5 rounded-md hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-                Reset
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-medium text-muted-foreground/60 dark:text-white/40 w-8 text-right shrink-0">0.5x</span>
-              <Slider
-                value={[speed]} min={0.5} max={2.0} step={0.1}
-                showTooltip tooltipContent={(v) => `${formatSpeed(v)}`}
-                onValueChange={(value) => onSpeedChange?.(Math.round(value[0] * 10) / 10)}
-                onValueCommit={() => { setShowSpeedSlider(false); }}
-                className="flex-1" aria-label="Fine playback speed" data-testid="slider-speed"
-              />
-              <span className="text-xs font-medium text-muted-foreground/60 dark:text-white/40 w-8 shrink-0">2x</span>
-            </div>
-            <div className="text-center mt-2">
-              <span className="text-sm font-bold text-foreground/90 dark:text-white/90">{formatSpeed(speed)}</span>
-            </div>
-          </div>
-        )}
 
         {error && (
           <p className="text-center text-xs font-medium text-destructive dark:text-red-400 mt-2 mb-0 animate-in fade-in duration-200" data-testid="text-audio-error">
@@ -417,24 +361,55 @@ export default function AudioPlayer({
         {/* ── Controls row ── */}
         <div className="flex items-center justify-between mt-4 px-2">
 
-          {/* Speed — plain text, gold when not 1x */}
-          <button
-            ref={speedButtonRef}
-            onPointerDown={handlePointerDown}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerCancel}
-            onContextMenu={(e) => e.preventDefault()}
-            className={`min-h-[44px] w-10 flex items-center justify-center select-none touch-none rounded-xl transition-colors active:bg-black/[.13] dark:active:bg-white/[.15] ${
-              speedIsModified ? 'text-[hsl(var(--glow-primary))]' : 'text-muted-foreground dark:text-white/50'
-            }`}
-            aria-label={`Playback speed ${formatSpeed(speed)}. Tap to cycle, hold for fine control`}
-            data-testid="button-speed"
-          >
-            <span className="text-sm font-bold leading-none">
-              {speed % 1 === 0 ? speed.toFixed(0) : parseFloat(speed.toFixed(1))}
-              <span className="text-[10px] relative -top-0.5">x</span>
-            </span>
-          </button>
+          {/* Speed — opens preset chip popover */}
+          <div className="relative">
+            <button
+              ref={speedButtonRef}
+              onClick={() => setShowSpeedMenu(v => !v)}
+              className={`min-h-[44px] min-w-[44px] px-2 flex items-center justify-center gap-0.5 select-none rounded-xl transition-colors active:bg-black/[.13] dark:active:bg-white/[.15] ${
+                speedIsModified ? 'text-[hsl(var(--glow-primary))]' : 'text-muted-foreground dark:text-white/50'
+              }`}
+              aria-label={`Playback speed ${formatSpeed(speed)}. Tap to change.`}
+              aria-haspopup="menu"
+              aria-expanded={showSpeedMenu}
+              data-testid="button-speed"
+            >
+              <span className="text-sm font-bold leading-none">
+                {speed % 1 === 0 ? speed.toFixed(0) : parseFloat(speed.toFixed(1))}
+                <span className="text-[10px] relative -top-0.5">x</span>
+              </span>
+              <Icon icon="solar:alt-arrow-up-linear" className="size-3" aria-hidden="true" />
+            </button>
+
+            {showSpeedMenu && (
+              <div
+                ref={speedMenuRef}
+                role="menu"
+                className="absolute bottom-full mb-2 left-0 z-50 rounded-2xl bg-black/80 dark:bg-white/10 backdrop-blur-md ring-1 ring-white/10 shadow-2xl p-1.5 flex items-center gap-1 animate-in fade-in slide-in-from-bottom-1 duration-150"
+                data-testid="speed-preset-panel"
+              >
+                {speedOptions.map((value) => {
+                  const isSelected = Math.abs(value - speed) < 0.01;
+                  return (
+                    <button
+                      key={value}
+                      role="menuitemradio"
+                      aria-checked={isSelected}
+                      onClick={() => handleSelectSpeed(value)}
+                      className={`min-h-[36px] px-2.5 rounded-xl text-xs font-bold leading-none transition-colors active:bg-white/15 ${
+                        isSelected
+                          ? 'bg-[hsl(var(--glow-primary)/0.18)] text-[hsl(var(--glow-primary))]'
+                          : 'text-white/80 hover:bg-white/10'
+                      }`}
+                      data-testid={`chip-speed-${value}`}
+                    >
+                      {formatSpeed(value)}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Center: skip back 15s, play/pause, skip forward 15s */}
           <div className="flex items-center gap-8">
