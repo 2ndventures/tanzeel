@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Icon } from "@iconify/react";
-import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, ChevronUp, Play, Pause, Loader2, CircleOff } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -171,7 +171,7 @@ export default function ChapterView({
 
   // State for managing menu navigation
   const [menuView, setMenuView] = useState<'main' | 'display' | 'reciter' | 'arabic' | 'translation' | 'transliteration' | 'spacing' | 'script'>('main');
-  const [previewCollapsed, setPreviewCollapsed] = useState(false);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Ref to hold pauseAudio so startPreview can access it regardless of hook ordering
@@ -806,90 +806,6 @@ export default function ChapterView({
                 </SheetTitle>
               </SheetHeader>
 
-              {menuView === 'main' && (
-                <div className="shrink-0 px-4 pb-2 relative z-10" data-testid="options-live-preview">
-                  <div className="rounded-xl px-4 py-2.5" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.5)', borderBottom: '1px solid hsl(var(--sheet-muted))' }}>
-                    <button
-                      className="flex items-center justify-between w-full"
-                      onClick={() => setPreviewCollapsed(!previewCollapsed)}
-                      data-testid="button-toggle-preview"
-                    >
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50">Preview</p>
-                      {previewCollapsed ? (
-                        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/50" />
-                      ) : (
-                        <ChevronUp className="w-3.5 h-3.5 text-muted-foreground/50" />
-                      )}
-                    </button>
-                    <div
-                      className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                        previewCollapsed ? 'max-h-0 opacity-0 mt-0' : 'max-h-80 opacity-100 mt-2'
-                      }`}
-                    >
-                      <div className={`transition-all duration-200 ${
-                        lineSpacing === "Compact" ? "space-y-1" :
-                        lineSpacing === "Normal" ? "space-y-2" :
-                        lineSpacing === "Relaxed" ? "space-y-3" :
-                        "space-y-4"
-                      }`}>
-                        {showVerseNumbers && (
-                          <span
-                            className="inline-block text-xs font-semibold tabular-nums text-muted-foreground/70 transition-all duration-200"
-                            data-testid="preview-verse-number"
-                          >
-                            1:1
-                          </span>
-                        )}
-                        <p
-                          dir="rtl"
-                          className={`${
-                            arabicScript === 'indopak' ? 'font-indopak' : 'font-arabic'
-                          } text-foreground transition-all duration-200 ${
-                            arabicFontSize === "Small" ? "text-xl md:text-2xl" :
-                            arabicFontSize === "Medium" ? "text-2xl md:text-3xl" :
-                            arabicFontSize === "Large" ? "text-3xl md:text-4xl" :
-                            "text-4xl md:text-5xl"
-                          } ${
-                            lineSpacing === "Compact" ? "leading-[2]" :
-                            lineSpacing === "Normal" ? "leading-[2.4]" :
-                            lineSpacing === "Relaxed" ? "leading-[2.8]" :
-                            "leading-[3.2]"
-                          }`}
-                          data-testid="preview-arabic"
-                        >
-                          بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-                        </p>
-                        {showTransliteration && (
-                          <p
-                            className={`italic text-muted-foreground transition-all duration-200 ${
-                              transliterationFontSize === "Small" ? "text-xs" :
-                              transliterationFontSize === "Medium" ? "text-sm" :
-                              transliterationFontSize === "Large" ? "text-base" :
-                              "text-lg"
-                            }`}
-                            data-testid="preview-transliteration"
-                          >
-                            Bismi l-lāhi r-raḥmāni r-raḥīm
-                          </p>
-                        )}
-                        {showTranslation && (
-                          <p
-                            className={`text-muted-foreground transition-all duration-200 ${
-                              translationFontSize === "Small" ? "text-sm" :
-                              translationFontSize === "Medium" ? "text-base" :
-                              translationFontSize === "Large" ? "text-lg" :
-                              "text-xl"
-                            }`}
-                            data-testid="preview-translation"
-                          >
-                            In the name of Allah, the Entirely Merciful, the Especially Merciful.
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16 relative z-10 px-4">
                 {menuView === 'main' && (
@@ -933,7 +849,7 @@ export default function ChapterView({
                                 } ${
                                   translationFontSize === s.value
                                     ? s.value === 'Off'
-                                      ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                                      ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
                                       : 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
@@ -958,7 +874,7 @@ export default function ChapterView({
                                 } ${
                                   transliterationFontSize === s.value
                                     ? s.value === 'Off'
-                                      ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                                      ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
                                       : 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                                     : 'text-muted-foreground'
                                 }`}
