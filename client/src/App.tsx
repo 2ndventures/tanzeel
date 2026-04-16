@@ -77,12 +77,7 @@ function App() {
   }, []);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches;
-    }
-    return true;
-  });
+  const [darkMode, setDarkMode] = useState(true);
   
   const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>('uthmani');
   const [reciter, setReciter] = useState(DEFAULT_RECITER);
