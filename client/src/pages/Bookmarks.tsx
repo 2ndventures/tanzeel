@@ -64,10 +64,10 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
 
       <div className="relative flex flex-col flex-1 min-h-0">
         <div className="header-safe-padding shrink-0">
-          <div className="px-8 py-6">
-            <h2 className="font-heading text-5xl font-black tracking-tighter text-foreground" data-testid="text-bookmarks-title">
+          <div className="px-6 pt-4 pb-5">
+            <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" data-testid="text-bookmarks-title">
               Bookmarks
-            </h2>
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {bookmarks.length} saved {bookmarks.length === 1 ? 'verse' : 'verses'}
             </p>

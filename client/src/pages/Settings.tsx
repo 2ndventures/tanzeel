@@ -379,9 +379,9 @@ export default function Settings({
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background bg-screen-gradient">
 
-      <div className="bg-background/95 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
+      <div className="header-safe-padding shrink-0">
         <div className="px-6 pt-4 pb-6">
-          <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" style={{textShadow: '0 2px 8px rgba(0,0,0,0.1)'}} data-testid="text-title">
+          <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground" data-testid="text-title">
             Settings
           </h1>
         </div>
