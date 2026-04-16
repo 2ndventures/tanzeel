@@ -16,6 +16,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
     isLoading,
     currentTime,
     duration,
+    currentVerseKey,
     error,
     togglePlayPause,
     retry,
@@ -69,7 +70,16 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
   if (!mounted || !lastChapterRef.current) return null;
 
   const chapter = lastChapterRef.current;
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const totalVerses = chapter ? (chapters.find(c => c.id === chapter.id)?.verseCount ?? 1) : 1;
+  const progress = (() => {
+    if (currentVerseKey && duration > 0) {
+      const verseNum = parseInt(currentVerseKey.split(':')[1]);
+      const verseStart = (verseNum - 1) / totalVerses;
+      const withinVerse = Math.min(currentTime / duration, 1) / totalVerses;
+      return Math.min((verseStart + withinVerse) * 100, 100);
+    }
+    return duration > 0 ? Math.min((currentTime / duration) * 100, 100) : 0;
+  })();
   const arabicName = getDisplayArabicName(chapter.arabicName);
 
   return (
