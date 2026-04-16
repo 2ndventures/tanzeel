@@ -320,13 +320,19 @@ export function useWordTimingAudio(
       });
     };
 
+    let hasAutoStarted = false;
     const handleCanPlay = () => {
       audio.playbackRate = speedRef.current;
-      setState(prev => ({ ...prev, isLoading: false }));
-      if (shouldPlay) {
-        audio.play().catch(() => {
-          setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
-        });
+      if (!hasAutoStarted) {
+        hasAutoStarted = true;
+        setState(prev => ({ ...prev, isLoading: false }));
+        if (shouldPlay) {
+          audio.play().catch(() => {
+            setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
+          });
+        } else {
+          setState(prev => ({ ...prev, isLoading: false }));
+        }
       }
     };
 
@@ -598,17 +604,21 @@ export function useWordTimingAudio(
               });
             };
 
+            let hasAutoStarted = false;
             const handleCanPlay = () => {
               if (loadIdRef.current !== myLoadId) return;
               retryCountRef.current = 0;
               audio.playbackRate = speedRef.current;
-              if (autoplayRef.current) {
-                setState(prev => ({ ...prev, isLoading: false }));
-                audio.play().catch(() => {
-                  setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
-                });
-              } else {
-                setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+              if (!hasAutoStarted) {
+                hasAutoStarted = true;
+                if (autoplayRef.current) {
+                  setState(prev => ({ ...prev, isLoading: false }));
+                  audio.play().catch(() => {
+                    setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
+                  });
+                } else {
+                  setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+                }
               }
             };
 
@@ -714,17 +724,21 @@ export function useWordTimingAudio(
         });
       };
 
+      let hasAutoStarted = false;
       const handleCanPlay = () => {
         if (loadIdRef.current !== myLoadId) return;
         retryCountRef.current = 0;
         audio.playbackRate = speedRef.current;
-        if (autoplayRef.current) {
-          setState(prev => ({ ...prev, isLoading: false }));
-          audio.play().catch(() => {
-            setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
-          });
-        } else {
-          setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+        if (!hasAutoStarted) {
+          hasAutoStarted = true;
+          if (autoplayRef.current) {
+            setState(prev => ({ ...prev, isLoading: false }));
+            audio.play().catch(() => {
+              setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
+            });
+          } else {
+            setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+          }
         }
       };
 
@@ -997,6 +1011,7 @@ export function useWordTimingAudio(
       const playing = !audio.paused && !audio.ended && audio.readyState >= 2;
       setState(prev => {
         if (prev.isPlaying === playing) return prev;
+        if (!playing && prev.isLoading) return prev;
         return { ...prev, isPlaying: playing };
       });
     }, 500);
