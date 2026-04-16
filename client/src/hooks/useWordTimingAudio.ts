@@ -375,11 +375,28 @@ export function useWordTimingAudio(
       }));
     };
 
+    // `playing` fires when actual playback resumes after a pause or buffer recovery —
+    // more authoritative than `play` for sync. `waiting`/`stalled` fire when the
+    // browser pauses internally while it buffers. Tracking them prevents the mini
+    // player + lock-screen icon from flickering between play/pause states.
+    const handlePlaying = () => {
+      if (audioRef.current !== audio) return;
+      setState(prev => ({ ...prev, isPlaying: true, isLoading: false, error: null }));
+    };
+    const handleWaiting = () => {
+      if (audioRef.current !== audio) return;
+      setState(prev => prev.isLoading ? prev : { ...prev, isLoading: true });
+    };
+    const handleStalled = handleWaiting;
+
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('play', handlePlay);
+    audio.addEventListener('playing', handlePlaying);
     audio.addEventListener('pause', handlePause);
+    audio.addEventListener('waiting', handleWaiting);
+    audio.addEventListener('stalled', handleStalled);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
@@ -388,7 +405,10 @@ export function useWordTimingAudio(
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('playing', handlePlaying);
       audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('waiting', handleWaiting);
+      audio.removeEventListener('stalled', handleStalled);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
       audio.pause();
@@ -649,11 +669,27 @@ export function useWordTimingAudio(
               setState(prev => ({ ...prev, isLoading: false, isPlaying: false, error: 'Offline audio failed to load. Tap retry.' }));
             };
 
+            // See note in VBV block: tracking `playing`/`waiting`/`stalled` keeps the
+            // mini-player + lock-screen icon in sync during buffer recovery and
+            // browser-initiated pause/resume cycles.
+            const handlePlaying = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              setState(prev => ({ ...prev, isPlaying: true, isLoading: false, error: null }));
+            };
+            const handleWaiting = () => {
+              if (loadIdRef.current !== myLoadId) return;
+              setState(prev => prev.isLoading ? prev : { ...prev, isLoading: true });
+            };
+            const handleStalled = handleWaiting;
+
             audio.addEventListener('loadedmetadata', handleLoadedMetadata);
             audio.addEventListener('timeupdate', handleTimeUpdate);
             audio.addEventListener('canplay', handleCanPlay);
             audio.addEventListener('play', handlePlay);
+            audio.addEventListener('playing', handlePlaying);
             audio.addEventListener('pause', handlePause);
+            audio.addEventListener('waiting', handleWaiting);
+            audio.addEventListener('stalled', handleStalled);
             audio.addEventListener('ended', handleEnded);
             audio.addEventListener('error', handleError);
 
@@ -668,7 +704,10 @@ export function useWordTimingAudio(
               audio.removeEventListener('timeupdate', handleTimeUpdate);
               audio.removeEventListener('canplay', handleCanPlay);
               audio.removeEventListener('play', handlePlay);
+              audio.removeEventListener('playing', handlePlaying);
               audio.removeEventListener('pause', handlePause);
+              audio.removeEventListener('waiting', handleWaiting);
+              audio.removeEventListener('stalled', handleStalled);
               audio.removeEventListener('ended', handleEnded);
               audio.removeEventListener('error', handleError);
               audio.pause();
@@ -792,11 +831,27 @@ export function useWordTimingAudio(
         });
       };
 
+      // See note in VBV block: tracking `playing`/`waiting`/`stalled` keeps the mini
+      // player + lock-screen icon in sync during buffer recovery and browser-initiated
+      // pause/resume cycles (especially over flaky networks during online streaming).
+      const handlePlaying = () => {
+        if (loadIdRef.current !== myLoadId) return;
+        setState(prev => ({ ...prev, isPlaying: true, isLoading: false, error: null }));
+      };
+      const handleWaiting = () => {
+        if (loadIdRef.current !== myLoadId) return;
+        setState(prev => prev.isLoading ? prev : { ...prev, isLoading: true });
+      };
+      const handleStalled = handleWaiting;
+
       audio.addEventListener('loadedmetadata', handleLoadedMetadata);
       audio.addEventListener('timeupdate', handleTimeUpdate);
       audio.addEventListener('canplay', handleCanPlay);
       audio.addEventListener('play', handlePlay);
+      audio.addEventListener('playing', handlePlaying);
       audio.addEventListener('pause', handlePause);
+      audio.addEventListener('waiting', handleWaiting);
+      audio.addEventListener('stalled', handleStalled);
       audio.addEventListener('ended', handleEnded);
       audio.addEventListener('error', handleError);
 
@@ -812,7 +867,10 @@ export function useWordTimingAudio(
         audio.removeEventListener('timeupdate', handleTimeUpdate);
         audio.removeEventListener('canplay', handleCanPlay);
         audio.removeEventListener('play', handlePlay);
+        audio.removeEventListener('playing', handlePlaying);
         audio.removeEventListener('pause', handlePause);
+        audio.removeEventListener('waiting', handleWaiting);
+        audio.removeEventListener('stalled', handleStalled);
         audio.removeEventListener('ended', handleEnded);
         audio.removeEventListener('error', handleError);
         audio.pause();

@@ -1,7 +1,8 @@
 import { createContext, useContext, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useWordTimingAudio, type AudioFile } from '@/hooks/useWordTimingAudio';
-import { getQuranComReciterId } from '@/lib/reciters';
+import { getQuranComReciterId, getReciterById } from '@/lib/reciters';
 import { chapters } from '@/lib/quranMetadata';
+import { useMediaSession } from '@/hooks/useMediaSession';
 
 interface AudioContextValue {
   activeChapterId: number | null;
@@ -23,8 +24,10 @@ interface AudioContextValue {
   setSpeed: (speed: number) => void;
   getTimingData: () => AudioFile | null;
   retry: () => void;
+  goToNextChapter: () => void;
+  goToPreviousChapter: () => void;
   registerVerseChangeCallback: (cb: ((verseKey: string) => void) | null) => void;
-  registerEndedCallback: (cb: (() => void) | null) => void;
+  registerChapterChangeCallback: (cb: ((chapterId: number) => void) | null) => void;
 }
 
 const AudioContext = createContext<AudioContextValue | null>(null);
@@ -40,25 +43,29 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
   const [activeChapterId, setActiveChapterId] = useState<number | null>(null);
 
   const verseChangeCallbackRef = useRef<((verseKey: string) => void) | null>(null);
-  const endedCallbackRef = useRef<(() => void) | null>(null);
+  const chapterChangeCallbackRef = useRef<((chapterId: number) => void) | null>(null);
   const activeChapterIdRef = useRef<number | null>(null);
 
   activeChapterIdRef.current = activeChapterId;
+
+  const setActiveChapter = useCallback((chapterId: number) => {
+    setActiveChapterId(chapterId);
+    chapterChangeCallbackRef.current?.(chapterId);
+  }, []);
 
   const onVerseChange = useCallback((verseKey: string) => {
     verseChangeCallbackRef.current?.(verseKey);
   }, []);
 
   const onEnded = useCallback(() => {
-    if (endedCallbackRef.current) {
-      endedCallbackRef.current();
-    } else {
-      const currentId = activeChapterIdRef.current;
-      if (currentId && currentId < 114) {
-        setActiveChapterId(currentId + 1);
-      }
+    const currentId = activeChapterIdRef.current;
+    // Always advance the audio at the context level so background lock-screen and
+    // mini-player playback continue even if no UI is mounted to handle navigation.
+    // The chapter-change callback is what UIs register with to mirror the URL.
+    if (currentId && currentId < 114) {
+      setActiveChapter(currentId + 1);
     }
-  }, []);
+  }, [setActiveChapter]);
 
   const quranComReciterId = getQuranComReciterId(reciter);
   const enabled = activeChapterId !== null;
@@ -77,20 +84,34 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
   const loadChapter = useCallback((chapterId: number) => {
     const ch = chapters.find(c => c.id === chapterId);
     if (!ch) return;
-    setActiveChapterId(chapterId);
-  }, []);
+    setActiveChapter(chapterId);
+  }, [setActiveChapter]);
 
   const stopAudio = useCallback(() => {
     hookResult.pauseAudio();
     setActiveChapterId(null);
   }, [hookResult.pauseAudio]);
 
+  const goToNextChapter = useCallback(() => {
+    const currentId = activeChapterIdRef.current;
+    if (currentId && currentId < 114) {
+      setActiveChapter(currentId + 1);
+    }
+  }, [setActiveChapter]);
+
+  const goToPreviousChapter = useCallback(() => {
+    const currentId = activeChapterIdRef.current;
+    if (currentId && currentId > 1) {
+      setActiveChapter(currentId - 1);
+    }
+  }, [setActiveChapter]);
+
   const registerVerseChangeCallback = useCallback((cb: ((verseKey: string) => void) | null) => {
     verseChangeCallbackRef.current = cb;
   }, []);
 
-  const registerEndedCallback = useCallback((cb: (() => void) | null) => {
-    endedCallbackRef.current = cb;
+  const registerChapterChangeCallback = useCallback((cb: ((chapterId: number) => void) | null) => {
+    chapterChangeCallbackRef.current = cb;
   }, []);
 
   const {
@@ -121,8 +142,10 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     setSpeed,
     getTimingData,
     retry,
+    goToNextChapter,
+    goToPreviousChapter,
     registerVerseChangeCallback,
-    registerEndedCallback,
+    registerChapterChangeCallback,
   }), [
     activeChapterId, enabled,
     hookIsPlaying, hookCurrentTime, hookDuration,
@@ -131,8 +154,33 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
     setSpeed, getTimingData, retry,
     loadChapter, stopAudio,
-    registerVerseChangeCallback, registerEndedCallback,
+    goToNextChapter, goToPreviousChapter,
+    registerVerseChangeCallback,
+    registerChapterChangeCallback,
   ]);
+
+  // ── Global Media Session (lock-screen + Bluetooth controls) ──────────────────
+  // Lifted out of ChapterView so playback metadata + transport controls remain
+  // active on every page (Home, Bookmarks, Settings) for as long as audio is loaded.
+  const activeChapterInfo = activeChapterId ? chapters.find(c => c.id === activeChapterId) : null;
+  const reciterDisplayName = getReciterById(reciter)?.name || 'Mishary Rashid Alafasy';
+  const canGoNext = !!activeChapterId && activeChapterId < 114;
+  const canGoPrev = !!activeChapterId && activeChapterId > 1;
+  useMediaSession({
+    title: activeChapterInfo?.englishName || 'Quran',
+    artist: reciterDisplayName,
+    album: 'Tanzeel',
+    isPlaying: value.isPlaying,
+    currentTime: value.currentTime,
+    duration: value.duration,
+    speed: value.speed,
+    onPlay: playAudio,
+    onPause: pauseAudio,
+    onSeek: seek,
+    onNextTrack: canGoNext ? goToNextChapter : null,
+    onPreviousTrack: canGoPrev ? goToPreviousChapter : null,
+    active: enabled,
+  });
 
   return (
     <AudioContext.Provider value={value}>

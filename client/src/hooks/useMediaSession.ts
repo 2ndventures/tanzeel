@@ -15,6 +15,9 @@ interface MediaSessionOptions {
   onPlay: () => void;
   onPause: () => void;
   onSeek: (time: number) => void;
+  onNextTrack?: (() => void) | null;
+  onPreviousTrack?: (() => void) | null;
+  active?: boolean;
 }
 
 export function useMediaSession({
@@ -28,17 +31,28 @@ export function useMediaSession({
   onPlay,
   onPause,
   onSeek,
+  onNextTrack,
+  onPreviousTrack,
+  active = true,
 }: MediaSessionOptions) {
   const onPlayRef = useRef(onPlay);
   const onPauseRef = useRef(onPause);
   const onSeekRef = useRef(onSeek);
+  const onNextTrackRef = useRef(onNextTrack);
+  const onPreviousTrackRef = useRef(onPreviousTrack);
 
   useEffect(() => { onPlayRef.current = onPlay; }, [onPlay]);
   useEffect(() => { onPauseRef.current = onPause; }, [onPause]);
   useEffect(() => { onSeekRef.current = onSeek; }, [onSeek]);
+  useEffect(() => { onNextTrackRef.current = onNextTrack; }, [onNextTrack]);
+  useEffect(() => { onPreviousTrackRef.current = onPreviousTrack; }, [onPreviousTrack]);
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
+    if (!active) {
+      navigator.mediaSession.metadata = null;
+      return;
+    }
 
     navigator.mediaSession.metadata = new MediaMetadata({
       title,
@@ -52,7 +66,7 @@ export function useMediaSession({
         navigator.mediaSession.metadata = null;
       }
     };
-  }, [title, artist, album]);
+  }, [title, artist, album, active]);
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
@@ -77,6 +91,33 @@ export function useMediaSession({
       }
     };
   }, []);
+
+  // Register / unregister next & previous handlers based on whether callbacks are provided.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+    try {
+      navigator.mediaSession.setActionHandler(
+        'nexttrack',
+        onNextTrack ? () => onNextTrackRef.current?.() : null
+      );
+    } catch {}
+    return () => {
+      try { navigator.mediaSession.setActionHandler('nexttrack', null); } catch {}
+    };
+  }, [!!onNextTrack]);
+
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+    try {
+      navigator.mediaSession.setActionHandler(
+        'previoustrack',
+        onPreviousTrack ? () => onPreviousTrackRef.current?.() : null
+      );
+    } catch {}
+    return () => {
+      try { navigator.mediaSession.setActionHandler('previoustrack', null); } catch {}
+    };
+  }, [!!onPreviousTrack]);
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;

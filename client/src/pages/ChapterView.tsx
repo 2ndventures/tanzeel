@@ -11,7 +11,6 @@ import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMe
 import { lazyChapterService } from "@/services/lazyChapterService";
 import { useAudio } from "@/contexts/AudioContext";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
-import { useMediaSession } from "@/hooks/useMediaSession";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -341,14 +340,12 @@ export default function ChapterView({
     retry: retryAudio,
     loadChapter,
     registerVerseChangeCallback,
-    registerEndedCallback,
+    registerChapterChangeCallback,
   } = useAudio();
 
   useEffect(() => {
     loadChapter(chapterId);
   }, [chapterId, loadChapter]);
-
-  const goToNextSurahRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const handleVerseChange = (verseKey: string) => {
@@ -384,26 +381,19 @@ export default function ChapterView({
     return () => registerVerseChangeCallback(null);
   }, [autoScroll, isCollapsed, markProgrammaticScroll, registerVerseChangeCallback]);
 
+  // The AudioContext now drives chapter advance + global media session. ChapterView
+  // only needs to keep its URL/route in sync when the context switches chapters
+  // (via auto-advance, lock-screen next/previous, or anywhere else).
   useEffect(() => {
-    registerEndedCallback(() => goToNextSurahRef.current());
-    return () => registerEndedCallback(null);
-  }, [registerEndedCallback]);
+    registerChapterChangeCallback((newChapterId) => {
+      if (newChapterId !== chapterId) {
+        onNavigate('chapter', newChapterId);
+      }
+    });
+    return () => registerChapterChangeCallback(null);
+  }, [chapterId, onNavigate, registerChapterChangeCallback]);
 
   pauseAudioRef.current = pauseAudio;
-
-  const reciterDisplayName = getReciterById(reciter)?.name || 'Mishary Rashid Alafasy';
-  useMediaSession({
-    title: chapterInfo?.englishName || 'Quran',
-    artist: reciterDisplayName,
-    album: 'Tanzeel',
-    isPlaying,
-    currentTime,
-    duration,
-    speed,
-    onPlay: playAudio,
-    onPause: pauseAudio,
-    onSeek: seek,
-  });
 
   
   useEffect(() => {
@@ -589,8 +579,6 @@ export default function ChapterView({
       onNavigate('chapter', nextChapterId);
     }
   }, [chapterId, onNavigate]);
-
-  goToNextSurahRef.current = goToNextSurah;
 
   const handleVerseClick = useCallback((verseNumber: number) => {
     const verseKey = `${chapterId}:${verseNumber}`;
