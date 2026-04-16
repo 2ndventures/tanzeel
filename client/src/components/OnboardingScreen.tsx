@@ -232,10 +232,10 @@ export default function OnboardingScreen({
                     {translationFontSize}
                   </span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   <button
                     onClick={() => onTranslationFontSizeChange("Off")}
-                    className={`w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                    className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                       translationFontSize === "Off"
                         ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
                         : 'bg-muted text-muted-foreground hover-elevate'
@@ -244,22 +244,20 @@ export default function OnboardingScreen({
                   >
                     Off
                   </button>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
-                      <button
-                        key={opt.value}
-                        onClick={() => onTranslationFontSizeChange(opt.value)}
-                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                          translationFontSize === opt.value
-                            ? 'bg-primary text-primary-foreground shadow-sm'
-                            : 'bg-muted text-muted-foreground hover-elevate'
-                        }`}
-                        data-testid={`button-translation-size-${opt.value.toLowerCase().replace(' ', '-')}`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => onTranslationFontSizeChange(opt.value)}
+                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                        translationFontSize === opt.value
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'bg-muted text-muted-foreground hover-elevate'
+                      }`}
+                      data-testid={`button-translation-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -271,10 +269,10 @@ export default function OnboardingScreen({
                     {transliterationFontSize}
                   </span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-5 gap-2">
                   <button
                     onClick={() => onTransliterationFontSizeChange("Off")}
-                    className={`w-full py-3 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                    className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                       transliterationFontSize === "Off"
                         ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
                         : 'bg-muted text-muted-foreground hover-elevate'
@@ -283,22 +281,20 @@ export default function OnboardingScreen({
                   >
                     Off
                   </button>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
-                      <button
-                        key={opt.value}
-                        onClick={() => onTransliterationFontSizeChange(opt.value)}
-                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                          transliterationFontSize === opt.value
-                            ? 'bg-primary text-primary-foreground shadow-sm'
-                            : 'bg-muted text-muted-foreground hover-elevate'
-                        }`}
-                        data-testid={`button-transliteration-size-${opt.value.toLowerCase().replace(' ', '-')}`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => onTransliterationFontSizeChange(opt.value)}
+                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                        transliterationFontSize === opt.value
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'bg-muted text-muted-foreground hover-elevate'
+                      }`}
+                      data-testid={`button-transliteration-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
