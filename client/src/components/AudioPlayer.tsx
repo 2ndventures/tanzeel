@@ -388,7 +388,7 @@ export default function AudioPlayer({
               <div
                 ref={speedMenuRef}
                 role="menu"
-                className="absolute bottom-full mb-2 left-0 z-50 rounded-2xl bg-black/80 dark:bg-white/10 backdrop-blur-md ring-1 ring-white/10 shadow-2xl p-1.5 flex items-center gap-1 animate-in fade-in slide-in-from-bottom-1 duration-150"
+                className="absolute bottom-full mb-2 left-0 z-50 rounded-2xl bg-black/80 dark:bg-white/10 backdrop-blur-md ring-1 ring-white/10 shadow-2xl p-1.5 flex flex-col items-stretch gap-1 animate-in fade-in slide-in-from-bottom-1 duration-150"
                 data-testid="speed-preset-panel"
               >
                 {speedOptions.map((value) => {
@@ -399,7 +399,7 @@ export default function AudioPlayer({
                       role="menuitemradio"
                       aria-checked={isSelected}
                       onClick={() => handleSelectSpeed(value)}
-                      className={`min-h-[36px] px-2.5 rounded-xl text-xs font-bold leading-none transition-colors active:bg-white/15 ${
+                      className={`min-h-[36px] min-w-[56px] px-3 rounded-xl text-xs font-bold leading-none transition-colors active:bg-white/15 ${
                         isSelected
                           ? 'bg-[hsl(var(--glow-primary)/0.18)] text-[hsl(var(--glow-primary))]'
                           : 'text-white/80 hover:bg-white/10'
