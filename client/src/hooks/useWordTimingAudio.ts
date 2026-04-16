@@ -314,9 +314,18 @@ export function useWordTimingAudio(
       if (verseTiming) {
         wordIndex = findVbvWordIndex(ct, verseTiming);
       }
+      const actuallyPlaying = !audio.paused && !audio.ended;
       setState(prev => {
-        if (prev.currentWordIndex === wordIndex) return prev;
-        return { ...prev, currentWordIndex: wordIndex };
+        const sameWord = prev.currentWordIndex === wordIndex;
+        const needsLoadingClear = actuallyPlaying && prev.isLoading;
+        const needsPlayingSet = actuallyPlaying && !prev.isPlaying;
+        if (sameWord && !needsLoadingClear && !needsPlayingSet) return prev;
+        return {
+          ...prev,
+          currentWordIndex: wordIndex,
+          ...(needsLoadingClear && { isLoading: false }),
+          ...(needsPlayingSet && { isPlaying: true }),
+        };
       });
     };
 
@@ -615,12 +624,22 @@ export function useWordTimingAudio(
               if (loadIdRef.current !== myLoadId) return;
               const currentTime = audio.currentTime;
               const { verseKey, wordIndex } = findCurrentSegment(currentTime);
+              const actuallyPlaying = !audio.paused && !audio.ended;
               setState(prev => {
-                if (prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex) return prev;
+                const sameSegment = prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex;
+                const needsLoadingClear = actuallyPlaying && prev.isLoading;
+                const needsPlayingSet = actuallyPlaying && !prev.isPlaying;
+                if (sameSegment && !needsLoadingClear && !needsPlayingSet) return prev;
                 if (verseKey && verseKey !== prev.currentVerseKey) {
                   onVerseChangeRef.current?.(verseKey);
                 }
-                return { ...prev, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+                return {
+                  ...prev,
+                  currentVerseKey: verseKey,
+                  currentWordIndex: wordIndex,
+                  ...(needsLoadingClear && { isLoading: false }),
+                  ...(needsPlayingSet && { isPlaying: true }),
+                };
               });
             };
 
@@ -751,15 +770,40 @@ export function useWordTimingAudio(
 
       const handleTimeUpdate = () => {
         if (loadIdRef.current !== myLoadId) return;
-        if (!timingDataRef.current) return; // word tracking waits until timing arrives
+        const actuallyPlaying = !audio.paused && !audio.ended;
+        if (!timingDataRef.current) {
+          // Timing data not yet loaded — still reconcile play/loading state against real audio.
+          if (actuallyPlaying) {
+            setState(prev => {
+              const needsLoadingClear = prev.isLoading;
+              const needsPlayingSet = !prev.isPlaying;
+              if (!needsLoadingClear && !needsPlayingSet) return prev;
+              return {
+                ...prev,
+                ...(needsLoadingClear && { isLoading: false }),
+                ...(needsPlayingSet && { isPlaying: true }),
+              };
+            });
+          }
+          return;
+        }
         const ct = audio.currentTime;
         const { verseKey, wordIndex } = findCurrentSegment(ct);
         setState(prev => {
-          if (prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex) return prev;
+          const sameSegment = prev.currentVerseKey === verseKey && prev.currentWordIndex === wordIndex;
+          const needsLoadingClear = actuallyPlaying && prev.isLoading;
+          const needsPlayingSet = actuallyPlaying && !prev.isPlaying;
+          if (sameSegment && !needsLoadingClear && !needsPlayingSet) return prev;
           if (verseKey && verseKey !== prev.currentVerseKey) {
             onVerseChangeRef.current?.(verseKey);
           }
-          return { ...prev, currentVerseKey: verseKey, currentWordIndex: wordIndex };
+          return {
+            ...prev,
+            currentVerseKey: verseKey,
+            currentWordIndex: wordIndex,
+            ...(needsLoadingClear && { isLoading: false }),
+            ...(needsPlayingSet && { isPlaying: true }),
+          };
         });
       };
 
