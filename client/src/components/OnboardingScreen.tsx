@@ -228,7 +228,7 @@ export default function OnboardingScreen({
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-foreground">Translation</label>
-                  <span className={`text-xs ${translationFontSize === "Off" ? "text-destructive" : "text-muted-foreground"}`}>
+                  <span className="text-xs text-muted-foreground">
                     {translationFontSize}
                   </span>
                 </div>
@@ -237,7 +237,7 @@ export default function OnboardingScreen({
                     onClick={() => onTranslationFontSizeChange("Off")}
                     className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                       translationFontSize === "Off"
-                        ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                        ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
                         : 'bg-muted text-muted-foreground hover-elevate'
                     }`}
                     data-testid="button-translation-size-off"
@@ -265,7 +265,7 @@ export default function OnboardingScreen({
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-medium text-foreground">Transliteration</label>
-                  <span className={`text-xs ${transliterationFontSize === "Off" ? "text-destructive" : "text-muted-foreground"}`}>
+                  <span className="text-xs text-muted-foreground">
                     {transliterationFontSize}
                   </span>
                 </div>
@@ -274,7 +274,7 @@ export default function OnboardingScreen({
                     onClick={() => onTransliterationFontSizeChange("Off")}
                     className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
                       transliterationFontSize === "Off"
-                        ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                        ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
                         : 'bg-muted text-muted-foreground hover-elevate'
                     }`}
                     data-testid="button-transliteration-size-off"
