@@ -230,6 +230,7 @@ export default function AudioPlayer({
   const speedIsModified = Math.abs(speed - 1.0) > 0.01;
 
   const handleSelectSpeed = useCallback((value: number) => {
+    triggerHaptic('light');
     onSpeedChange?.(value);
     setShowSpeedMenu(false);
   }, [onSpeedChange]);
