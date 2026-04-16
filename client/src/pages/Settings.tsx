@@ -81,7 +81,7 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
             } ${
               value === opt.value
                 ? opt.value === 'Off'
-                  ? 'bg-destructive/20 ring-1 ring-inset ring-destructive text-destructive'
+                  ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
                   : 'bg-primary/20 ring-1 ring-inset ring-primary text-primary'
                 : 'text-muted-foreground'
             }`}
