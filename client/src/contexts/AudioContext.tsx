@@ -101,10 +101,19 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
 
   const goToPreviousChapter = useCallback(() => {
     const currentId = activeChapterIdRef.current;
-    if (currentId && currentId > 1) {
-      setActiveChapter(currentId - 1);
+    if (!currentId) return;
+    // Platform convention: "previous" within the first 3 seconds jumps to the
+    // previous surah; after that it restarts the current surah from the start.
+    if (hookResult.currentTime > 3) {
+      hookResult.seek(0);
+      return;
     }
-  }, [setActiveChapter]);
+    if (currentId > 1) {
+      setActiveChapter(currentId - 1);
+    } else {
+      hookResult.seek(0);
+    }
+  }, [setActiveChapter, hookResult.currentTime, hookResult.seek]);
 
   const registerVerseChangeCallback = useCallback((cb: ((verseKey: string) => void) | null) => {
     verseChangeCallbackRef.current = cb;
