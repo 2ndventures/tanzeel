@@ -1,8 +1,19 @@
 import express, { type Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many requests" },
+});
+
+app.use("/api/", apiLimiter);
 
 // Enable CORS for all routes (needed for mobile apps)
 app.use((req, res, next) => {
