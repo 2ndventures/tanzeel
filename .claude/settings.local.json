@@ -10,7 +10,9 @@
       "Bash(npm run build:*)",
       "Bash(kill:*)",
       "Bash(grep:*)",
-      "Bash(npx vite build:*)"
+      "Bash(npx vite build:*)",
+      "Read(//home/runner/**)",
+      "Bash(env)"
     ]
   }
 }
