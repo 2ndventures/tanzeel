@@ -24,3 +24,9 @@ id = "Izxa4VULdEq_Wh0G47r2m"
 uri = "file://tanzeel-technical-audit.docx"
 type = "word_document"
 title = "Tanzeel — Technical Audit Report"
+
+[[outputs]]
+id = "kTFL5-XQNlmtVaOMDwn0C"
+uri = "file://CODEBASE_AUDIT.md"
+type = "text"
+title = "Tanzeel Codebase Audit"
