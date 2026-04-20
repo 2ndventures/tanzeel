@@ -151,7 +151,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               </p>
               <div className="bg-muted/30 dark:bg-black/40 p-6 rounded-xl border border-border">
                 <p className="text-foreground/90 mb-2"><strong>2nd Ventures, LLC</strong></p>
-                <p className="text-foreground/90">Email: support@thirdventures.com</p>
+                <p className="text-foreground/90">Email: support@2ndventures.ai</p>
               </div>
             </section>
 

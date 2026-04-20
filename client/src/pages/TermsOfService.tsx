@@ -192,7 +192,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
                 Any dispute arising from these Terms or your use of the App shall be resolved through:
               </p>
               <ol className="list-decimal pl-6 text-foreground/90 space-y-2">
-                <li><strong>Informal Negotiation:</strong> Contact us at support@thirdventures.com to resolve the dispute informally</li>
+                <li><strong>Informal Negotiation:</strong> Contact us at support@2ndventures.ai to resolve the dispute informally</li>
                 <li><strong>Binding Arbitration:</strong> If informal negotiation fails, the dispute shall be resolved through binding arbitration in accordance with the American Arbitration Association's rules</li>
                 <li><strong>Class Action Waiver:</strong> You agree to resolve disputes on an individual basis and waive any right to participate in class actions</li>
               </ol>
@@ -241,7 +241,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
               </p>
               <div className="bg-muted/30 dark:bg-black/40 p-6 rounded-xl border border-border">
                 <p className="text-foreground/90 mb-2"><strong>2nd Ventures, LLC</strong></p>
-                <p className="text-foreground/90">Email: support@thirdventures.com</p>
+                <p className="text-foreground/90">Email: support@2ndventures.ai</p>
               </div>
             </section>
 
