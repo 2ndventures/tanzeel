@@ -1,0 +1,86 @@
+Scan this entire codebase and answer every question below with current, factual information from the actual code. Do not guess or hypothesize. If you cannot determine something, say "UNKNOWN" and explain what you'd need to find out. Return your answers as a single markdown document with the same section headers I use below.
+
+=== 1. IDENTITY & BRANDING ===
+- Current app name (display name in Info.plist, package.json name, capacitor.config.ts)
+- Current bundle ID / appId
+- Does the project reference any other name anywhere (old names in comments, file names, assets)?
+
+=== 2. BACKEND & HOSTING ===
+- What URL is the production backend pointing to right now? (check client/src/config.ts and any env files)
+- Is it still a replit.app URL, or has it been moved to a real host?
+- List every external domain the app makes network calls to (audio CDNs, APIs, analytics, anything)
+- Is there a fallback/retry strategy if a CDN fails? Show me the code or say no.
+
+=== 3. DEPENDENCIES ===
+- Paste the current package.json dependencies list
+- Which of these are actually imported anywhere in client/ or server/? Run grep and tell me which dependencies are installed but NEVER imported (dead deps).
+- Specifically: is @capgo/native-audio used? Is drizzle/neon/passport/express-session/openai/jimp used? 
+
+=== 4. CONTENT SOURCES & LICENSING ===
+- What is the exact source of the Arabic Quran text in public/data/chapters/*.json? Is there a README, credit, or comment identifying the source?
+- What is the exact source/translator of the English translation in those JSON files? (name of translator, e.g., Saheeh International, Pickthall)
+- Are there any license files, attribution notes, or LICENSE.md anywhere in the repo?
+- List every reciter in client/src/lib/reciters.ts and identify the CDN each one is fetched from.
+- Is there any written licensing/permission documentation for using these translations and recitations?
+
+=== 5. iOS / APPLE COMPLIANCE ===
+- Does ios/App/App/PrivacyInfo.xcprivacy exist? If yes, paste its full contents.
+- Does the Capacitor webDir privacy manifest exist (may be auto-generated)?
+- Full current contents of ios/App/App/Info.plist
+- Current value of MARKETING_VERSION and CURRENT_PROJECT_VERSION in the Xcode project
+- Does ios/App/App/Assets.xcassets contain a complete AppIcon set? List all icon sizes present.
+- Is there a launch screen configured?
+
+=== 6. CRASH REPORTING & ANALYTICS ===
+- Is Sentry, Crashlytics, Bugsnag, Rollbar, or any crash reporting tool installed? Show me the code.
+- Is any analytics tool installed (PostHog, Mixpanel, GA, Firebase Analytics, Amplitude, TelemetryDeck)?
+- Is there an ErrorBoundary component and is it actually wrapping the app? Show me where.
+- How are errors currently logged? Just console.error, or somewhere durable?
+
+=== 7. DATA MODEL & FUTURE-PROOFING ===
+- Paste the current bookmark data structure (client/src/lib/bookmarkService.ts or wherever bookmarks are defined)
+- Do bookmarks use UUIDs or sequential IDs?
+- Do bookmarks have createdAt/updatedAt timestamps?
+- Is there a userId field (even if always null) on local records?
+- Where exactly is user data stored? (Capacitor Preferences keys, localStorage keys — list them)
+
+=== 8. AUDIO / OFFLINE
+- Does audio caching to Capacitor Filesystem actually work end-to-end? Walk through the code path.
+- Can users delete downloaded audio? Show the code.
+- Is there a storage-used indicator in the UI?
+- What happens if a user's device runs out of space during a download?
+
+=== 9. ERROR HANDLING & UX EDGE CASES ===
+- What happens if the audio CDN returns 404 or times out? Show me the error handling code.
+- What happens if the timing API call fails? Does audio still play without word highlighting?
+- Is there offline detection using @capacitor/network? What does the app do when offline?
+- Are there loading states and error states for every async operation, or are some silent?
+
+=== 10. DEAD CODE & HYGIENE ===
+- List every file/folder that looks like dead code: components/examples/, .bak files, empty files, unused components.
+- Is shared/schema.ts still just one line?
+- Is server/storage.ts still an empty interface?
+- Any TODO / FIXME / HACK comments in the code? List them with file:line.
+
+=== 11. TESTING ===
+- Are there any tests? (any *.test.ts, *.spec.ts, __tests__ folders, playwright, cypress, vitest config)
+- Is there a test script in package.json?
+
+=== 12. BUILD & DEPLOYMENT ===
+- Current build scripts in package.json
+- Is there a CI/CD config? (.github/workflows, .gitlab-ci.yml, fastlane, Xcode Cloud config)
+- Is the iOS app set up for TestFlight? Does it have a provisioning profile configured?
+
+=== 13. PRIVACY POLICY & LEGAL ===
+- Current text of client/src/pages/PrivacyPolicy.tsx (paste it)
+- Current text of client/src/pages/TermsOfService.tsx (paste it)
+- Is there a hosted public URL for the privacy policy anywhere? Search for it in config files.
+- Is there a support email anywhere in the codebase or config?
+
+=== 14. ACCESSIBILITY ===
+- Do interactive elements have aria-labels? Spot-check VerseCard, AudioPlayer, BottomNav.
+- Are font sizes respecting system Dynamic Type on iOS, or just app-internal sizing?
+- Does VoiceOver work in a reasonable way through the main flows? (if unknown, say so)
+
+=== 15. ANYTHING I DIDN'T ASK ===
+List any concerns you noticed in the codebase that I didn't ask about but that are relevant to shipping to the App Store.
