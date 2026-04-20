@@ -1,0 +1,37 @@
+I have a file export_versus.csv with columns: surah_id, verse_number, arabic_text, transliteration, translation. It contains 6236 verses of the Quran from my app's local data.
+
+Verify the arabic_text column against the Tanzil.net reference Uthmani text, which is the scholarly standard.
+
+1. Download Tanzil's Uthmani XML from:
+   https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=xml-tanzil&agree=true
+   Get the quran-uthmani.xml file. If the direct URL fails, use the Quran.com API as a fallback:
+   https://api.quran.com/api/v4/quran/verses/uthmani
+
+2. Parse the reference into a dictionary mapping (surah, verse) -> reference_arabic_text.
+
+3. For each verse in verses_export.csv:
+   a. Apply Unicode NFC normalization to both the local text and the reference text (use unicodedata.normalize('NFC', ...))
+   b. Strip trailing/leading whitespace
+   c. Compare the normalized strings character-by-character
+   d. If they don't match exactly, compute a character-level diff showing the first ~5 differing characters with their Unicode codepoints (e.g., U+0651 vs U+0652)
+
+4. Output arabic_verification_report.csv with columns:
+   - surah_id
+   - verse_number
+   - match (Y or N)
+   - local_text
+   - reference_text  
+   - first_diff_position (integer, or empty if match)
+   - diff_codepoints (e.g., "local=U+0651 ref=U+0652" or empty if match)
+   - diff_length (how many characters differ)
+
+5. Print a summary to terminal:
+   - Total verses checked
+   - Verses matching exactly: N (XX.X%)
+   - Verses with differences: N (XX.X%)
+   - Top 10 surahs with most mismatches
+   - Pattern analysis: are mismatches concentrated in specific character types (diacritics, hamza variants, tatweel, etc.)?
+
+Use Python with requests, xml.etree.ElementTree (or lxml), csv, and unicodedata. Do not modify my source files. Expect that small differences in diacritic placement or Unicode normalization are common and not necessarily errors — the point is to find any mismatches so I can review them.
+
+After the report runs, highlight any mismatches that affect actual letters (not just diacritics) — those are the urgent ones.
