@@ -8,7 +8,7 @@ import { Capacitor } from '@capacitor/core';
 const getApiBaseUrl = (): string => {
   // Native app (iOS/Android): always use full production URL
   if (Capacitor.isNativePlatform()) {
-    return 'https://11424-newest-version-web266.replit.app';
+    return 'https://api.tanzeel.ai';
   }
   
   // Web browser: check the actual runtime hostname
@@ -22,7 +22,7 @@ const getApiBaseUrl = (): string => {
   }
   
   // Otherwise (production deployment), use full URL
-  return 'https://11424-newest-version-web266.replit.app';
+  return 'https://api.tanzeel.ai';
 };
 
 export const API_BASE_URL = getApiBaseUrl();

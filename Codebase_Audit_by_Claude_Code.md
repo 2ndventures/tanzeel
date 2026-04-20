@@ -34,7 +34,7 @@ The app was previously called "SimpleQuran" and was renamed to "Tanzeel". The ge
 **Production backend URL:**
 From `client/src/config.ts:11,25`:
 ```
-https://11424-newest-version-web266.replit.app
+https://api.tanzeel.ai
 ```
 
 **It is still a Replit URL.** It has not been moved to a custom domain.
@@ -45,7 +45,7 @@ https://11424-newest-version-web266.replit.app
 
 | Domain | Purpose | File(s) |
 |---|---|---|
-| `https://11424-newest-version-web266.replit.app` | Own backend (API proxy) | `client/src/config.ts` |
+| `https://api.tanzeel.ai` | Own backend (API proxy) | `client/src/config.ts` |
 | `https://download.quranicaudio.com` | Full chapter MP3 audio CDN | `client/src/lib/audioUrls.ts`, `server/routes.ts` |
 | `https://everyayah.com` | Verse-by-verse MP3 audio CDN | `client/src/lib/audioUrls.ts`, `server/routes.ts` |
 | `https://api.qurancdn.com` | Word-level timing/segments data | `client/src/lib/audioUrls.ts`, `server/routes.ts` |

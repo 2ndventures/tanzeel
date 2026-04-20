@@ -11,7 +11,7 @@ _Generated: April 20, 2026_
 - **Other names referenced**: legal entity is **2nd Ventures, LLC** (Privacy/Terms pages), support email is **support@thirdventures.com** (note the mismatch — "thirdventures" vs "2nd Ventures"). No leftover old project names found.
 
 ## 2. Backend & Hosting
-- **Production backend URL** (in `client/src/config.ts`): `https://11424-newest-version-web266.replit.app`
+- **Production backend URL** (in `client/src/config.ts`): `https://api.tanzeel.ai`
 - **Still on `.replit.app`** — has *not* been moved to a real custom domain. This is fine to ship but is a long-term reliability/branding risk.
 - **External domains the app calls**:
   - `api.qurancdn.com` (Quran.com timing/audio metadata)
@@ -154,7 +154,7 @@ interface Bookmark {
 ## 15. Things You Didn't Ask About But Should Know
 
 1. **`package.json` name is still `rest-express`** — Replit boilerplate. Won't appear in App Store but is sloppy.
-2. **Backend on a Replit dev URL in production** (`11424-newest-version-web266.replit.app`). If that URL ever changes, every shipped iOS app will break. Move to a stable custom domain *before* App Store launch.
+2. **Backend on a Replit dev URL in production** (`api.tanzeel.ai`). If that URL ever changes, every shipped iOS app will break. Move to a stable custom domain *before* App Store launch.
 3. **The "thirdventures.com" vs "2nd Ventures, LLC" mismatch** in legal docs may confuse Apple's review or users. Pick one identity.
 4. **Massive dead dep footprint** (~25 unused packages including `openai`, `passport`, `drizzle`, `@capgo/native-audio`). Apple reviewers will ask about `openai` if they notice it in the bundle.
 5. **No version bump strategy.** You're at MARKETING_VERSION `1.0`, build `1`. Every TestFlight build needs a unique build number — you'll need to start incrementing.
