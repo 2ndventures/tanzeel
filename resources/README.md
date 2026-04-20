@@ -56,7 +56,7 @@ If you prefer to manually create icons and splash screens:
 
 ## Current Logo
 
-The app currently uses a book icon (solar:book-bold) as a placeholder. Replace this with your actual Simple Quran logo design.
+The app currently uses a book icon (solar:book-bold) as a placeholder. Replace this with your actual Tanzeel logo design.
 
 ## Testing
 
