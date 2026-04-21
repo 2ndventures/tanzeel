@@ -15,7 +15,6 @@ import OnboardingScreen from "@/components/OnboardingScreen";
 import SplashScreen from "@/components/SplashScreen";
 import MiniPlayer from "@/components/MiniPlayer";
 import BottomNav from "@/components/BottomNav";
-import { WordColorTuner } from "@/components/WordColorTuner";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
@@ -186,6 +185,15 @@ function App() {
           setAudioCacheReady(true);
         });
     });
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.removeItem("tanzeel:devtool:active-word-color");
+      localStorage.removeItem("tanzeel:devtool:active-word-glow");
+      document.documentElement.style.removeProperty("--glow-primary");
+      document.getElementById("word-color-tuner-style")?.remove();
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -541,7 +549,6 @@ function App() {
             />
           </div>
         </AudioProvider>)}
-        {import.meta.env.DEV && <WordColorTuner />}
       </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
