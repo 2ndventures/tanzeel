@@ -337,7 +337,7 @@ export function useWordTimingAudio(
         setState(prev => ({ ...prev, isLoading: false }));
         if (shouldPlay) {
           audio.play().catch(() => {
-            setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to begin' }));
+            setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
           });
         } else {
           setState(prev => ({ ...prev, isLoading: false }));
@@ -380,7 +380,7 @@ export function useWordTimingAudio(
         ...prev,
         isLoading: false,
         isPlaying: false,
-        error: `Verse ${verseNum} isn\'t saved offline`,
+        error: `Failed to play verse ${verseNum} offline`,
       }));
     };
 
@@ -438,7 +438,7 @@ export function useWordTimingAudio(
       if (nextAvailable) {
         setState(prev => ({
           ...prev,
-          error: `Skipping verse ${verseNum} — not saved offline`,
+          error: `Verse ${verseNum} not available offline, skipping...`,
         }));
         if (vbvSkipTimerRef.current) clearTimeout(vbvSkipTimerRef.current);
         const currentLoadId = loadIdRef.current;
@@ -453,7 +453,7 @@ export function useWordTimingAudio(
         ...prev,
         isPlaying: false,
         isLoading: false,
-        error: 'No more verses saved offline',
+        error: 'No more downloaded verses available',
       }));
       onEndedRef.current?.();
       return;
@@ -494,7 +494,7 @@ export function useWordTimingAudio(
         setState(prev => ({ ...prev, isLoading: false, duration: isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0, currentTime: 0 }));
         if (shouldPlay) {
           audio.play().catch(() => {
-            setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to begin' }));
+            setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
           });
         }
         preloadNextVerses(verseNum, reciterString);
@@ -513,7 +513,7 @@ export function useWordTimingAudio(
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: `Verse ${verseNum} missing from storage`,
+        error: `Verse ${verseNum} file missing from storage`,
       }));
       return;
     }
@@ -653,7 +653,7 @@ export function useWordTimingAudio(
                 if (autoplayRef.current) {
                   setState(prev => ({ ...prev, isLoading: false }));
                   audio.play().catch(() => {
-                    setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to begin' }));
+                    setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
                   });
                 } else {
                   setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
@@ -685,7 +685,7 @@ export function useWordTimingAudio(
 
             const handleError = () => {
               if (loadIdRef.current !== myLoadId) return;
-              setState(prev => ({ ...prev, isLoading: false, isPlaying: false, error: 'Couldn\'t open the saved recitation. Tap retry.' }));
+              setState(prev => ({ ...prev, isLoading: false, isPlaying: false, error: 'Offline audio failed to load. Tap retry.' }));
             };
 
             // See note in VBV block: tracking `playing`/`waiting`/`stalled` keeps the
@@ -817,7 +817,7 @@ export function useWordTimingAudio(
           if (autoplayRef.current) {
             setState(prev => ({ ...prev, isLoading: false }));
             audio.play().catch(() => {
-              setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to begin' }));
+              setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
             });
           } else {
             setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
@@ -1171,7 +1171,7 @@ export function useWordTimingAudio(
     
     if (!state.isPlaying) {
       audioRef.current.play().catch(() => {
-        setState(prev => ({ ...prev, error: 'Tap play to begin' }));
+        setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
   }, [state.isPlaying]);
@@ -1183,7 +1183,7 @@ export function useWordTimingAudio(
       audioRef.current.pause();
     } else {
       audioRef.current.play().catch(() => {
-        setState(prev => ({ ...prev, error: 'Tap play to begin' }));
+        setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
   }, [state.isPlaying]);

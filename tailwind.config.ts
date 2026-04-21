@@ -95,7 +95,6 @@ export default {
         mono: ["var(--font-mono)"],
         arabic: ["var(--font-arabic)"],
         indopak: ["var(--font-indopak)"],
-        heading: ["var(--font-heading)"],
       },
       keyframes: {
         "accordion-down": {

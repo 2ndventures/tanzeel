@@ -356,7 +356,7 @@ export default function AudioPlayer({
 
 
         {error && (
-          <p className="text-center text-xs font-medium text-destructive mt-2 mb-0 animate-in fade-in duration-200" data-testid="text-audio-error">
+          <p className="text-center text-xs font-medium text-destructive dark:text-red-400 mt-2 mb-0 animate-in fade-in duration-200" data-testid="text-audio-error">
             {error}
           </p>
         )}

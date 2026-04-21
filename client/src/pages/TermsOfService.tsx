@@ -38,7 +38,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </p>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Agreement to Terms</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Agreement to Terms</h2>
               <p className="text-foreground/90 leading-relaxed">
                 These Terms of Service ("Terms") constitute a legally binding agreement between you and 2nd Ventures, LLC 
                 ("Company," "we," "us," or "our") concerning your access to and use of the Tanzeel mobile application 
@@ -48,7 +48,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">License Grant</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">License Grant</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, 
                 non-sublicensable, revocable license to:
@@ -60,7 +60,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Restrictions</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Restrictions</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 You agree that you will not:
               </p>
@@ -77,7 +77,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Intellectual Property Rights</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Intellectual Property Rights</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 The App and its entire contents, features, and functionality (including but not limited to all information, 
                 software, text, displays, images, video, audio, design, and selection and arrangement thereof) are owned by 
@@ -92,7 +92,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Purchases and Payments</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Purchases and Payments</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 If we offer a one-time purchase option or any other paid features in the future:
               </p>
@@ -106,7 +106,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">User Content and Conduct</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">User Content and Conduct</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 While using the App, you agree to:
               </p>
@@ -119,7 +119,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Disclaimer of Warranties</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Disclaimer of Warranties</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 THE APP IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS 
                 OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
@@ -136,7 +136,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Limitation of Liability</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Limitation of Liability</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL 2ND VENTURES, LLC, ITS AFFILIATES, DIRECTORS, 
                 EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, 
@@ -155,7 +155,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Indemnification</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Indemnification</h2>
               <p className="text-foreground/90 leading-relaxed">
                 You agree to indemnify, defend, and hold harmless 2nd Ventures, LLC and its affiliates, officers, directors, 
                 employees, and agents from and against any claims, liabilities, damages, losses, costs, expenses, or fees 
@@ -165,7 +165,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Termination</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Termination</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 We reserve the right to suspend or terminate your access to the App at any time, with or without cause, 
                 with or without notice, effective immediately. Upon termination:
@@ -178,7 +178,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Governing Law and Jurisdiction</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Governing Law and Jurisdiction</h2>
               <p className="text-foreground/90 leading-relaxed">
                 These Terms shall be governed by and construed in accordance with the laws of the State of Delaware, 
                 United States, without regard to its conflict of law provisions. You agree to submit to the exclusive 
@@ -187,7 +187,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Dispute Resolution</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Dispute Resolution</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 Any dispute arising from these Terms or your use of the App shall be resolved through:
               </p>
@@ -199,7 +199,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Changes to Terms</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Changes to Terms</h2>
               <p className="text-foreground/90 leading-relaxed">
                 We reserve the right to modify these Terms at any time. We will notify you of any material changes by 
                 posting the updated Terms in the App and updating the "Last Updated" date. Your continued use of the App 
@@ -208,7 +208,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Third-Party Services</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Third-Party Services</h2>
               <p className="text-foreground/90 leading-relaxed">
                 The App may contain links to or integrate with third-party services (such as Quran.com). We are not 
                 responsible for the content, privacy policies, or practices of any third-party services. Your use of 
@@ -217,7 +217,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Severability</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Severability</h2>
               <p className="text-foreground/90 leading-relaxed">
                 If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited 
                 or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force 
@@ -226,7 +226,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Entire Agreement</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Entire Agreement</h2>
               <p className="text-foreground/90 leading-relaxed">
                 These Terms, together with our Privacy Policy, constitute the entire agreement between you and 2nd 
                 Ventures, LLC regarding the use of the App and supersede all prior agreements and understandings, whether 
@@ -235,7 +235,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Contact Information</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Contact Information</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 If you have any questions about these Terms, please contact us:
               </p>
@@ -246,7 +246,7 @@ export default function TermsOfService({ onBack }: TermsOfServiceProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Acknowledgment</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-4">Acknowledgment</h2>
               <p className="text-foreground/90 leading-relaxed">
                 BY USING THE APP, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE AND AGREE TO BE BOUND BY THEM.
               </p>

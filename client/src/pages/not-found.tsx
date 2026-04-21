@@ -23,8 +23,8 @@ export default function NotFound() {
             
             <div className="relative flex flex-col items-center text-center">
               {/* Icon */}
-              <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-destructive/15 shadow-md shadow-inner ring-1 ring-border">
-                <Icon icon="solar:shield-warning-bold" className="size-10 text-destructive" />
+              <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-red-500/20 shadow-md shadow-inner ring-1 ring-border">
+                <Icon icon="solar:shield-warning-bold" className="size-10 text-red-400" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
               </div>
               
               {/* Title */}

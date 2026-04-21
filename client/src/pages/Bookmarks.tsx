@@ -82,10 +82,10 @@ export default function Bookmarks({ onNavigate, activeTab = "bookmarks" }: Bookm
                 <Icon icon="solar:bookmark-linear" className="size-8 text-muted-foreground/40" />
               </div>
               <p className="text-muted-foreground text-sm" data-testid="text-empty-bookmarks">
-                The page is unmarked
+                No bookmarks yet
               </p>
               <p className="text-muted-foreground/60 text-xs mt-1">
-                Tap the bookmark on any verse to keep your place
+                Tap the bookmark icon on any verse to save it
               </p>
             </div>
           ) : (

@@ -5,9 +5,8 @@ import ChapterCard from "@/components/ChapterCard";
 
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
-import { Search, BookOpen, ArrowRight } from "lucide-react";
+import { Search, BookOpen, ArrowRight, Loader } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
-import { BrandOrnament } from "@/components/BrandOrnament";
 import PullToRefresh from "@/components/PullToRefresh";
 
 interface TopicResult {
@@ -273,7 +272,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                         ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
                         : "text-muted-foreground"
                     }`}
-                    style={mode === "surah" ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.25)' } : undefined}
+                    style={mode === "surah" ? { boxShadow: '0 0 20px rgba(28,31,57,0.25)' } : undefined}
                     data-testid="button-mode-surah"
                   >
                     All Surahs
@@ -285,7 +284,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                         ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
                         : "text-muted-foreground"
                     }`}
-                    style={mode === "juz" ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.25)' } : undefined}
+                    style={mode === "juz" ? { boxShadow: '0 0 20px rgba(28,31,57,0.25)' } : undefined}
                     data-testid="button-mode-juz"
                   >
                     Juz
@@ -463,17 +462,17 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
           )}
 
           {isSearchingVerses && !showTopicResults && !showVerseSearch && filteredChapters.length === 0 && (
-            <div className="flex flex-col items-center gap-3 py-12">
-              <BrandOrnament size={48} animated />
-              <p className="text-sm text-muted-foreground">Turning the pages…</p>
+            <div className="text-center py-12">
+              <Loader className="w-5 h-5 animate-spin mx-auto text-muted-foreground mb-3" />
+              <p className="text-sm text-muted-foreground">Searching translations...</p>
             </div>
           )}
 
           {hasActiveSearch && !showTopicResults && !showVerseSearch && !isSearchingVerses && filteredChapters.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">Nothing found for that</p>
+              <p className="text-muted-foreground text-lg">No results found</p>
               <p className="text-sm text-muted-foreground mt-2">
-                Try a surah name, topic, or a word from a translation.
+                Try a different search term or topic
               </p>
             </div>
           ) : isLoading ? (
