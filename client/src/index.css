@@ -153,10 +153,10 @@
 
   --header-gradient-start: rgba(13, 29, 53, 1);
   --header-gradient-mid: rgba(13, 29, 53, 0.95);
-  --player-gradient-rgb: 30, 30, 32;
+  --player-gradient-rgb: 13, 29, 53;
 
-  --sheet-bg: 240 6% 6%;
-  --sheet-muted: 240 5% 12%;
+  --sheet-bg: 217 44% 9%;
+  --sheet-muted: 220 28% 17%;
 
   --background: 217 44% 11%;
 
@@ -196,33 +196,38 @@
 
   --primary-foreground: 234 34% 10%;
 
-  --secondary: 32 95% 52%;
+  /* Secondary — elevated navy surface, mirrors light mode's "secondary = the other brand color" */
+  --secondary: 220 28% 22%;
 
-  --secondary-foreground: 234 34% 10%;
+  --secondary-foreground: 0 0% 100%;
 
-  --muted: 220 15% 21%;
+  --muted: 220 20% 18%;
 
-  --muted-foreground: 220 13% 57%;
+  --muted-foreground: 220 13% 64%;
 
-  --accent: 28 80% 45%;
+  /* Accent — navy selection wash, no copper */
+  --accent: 220 25% 26%;
 
-  --accent-foreground: 234 34% 10%;
+  --accent-foreground: 0 0% 100%;
 
-  --destructive: 0 84% 60%;
+  --destructive: 0 70% 52%;
 
   --destructive-foreground: 0 0% 100%;
 
   --input: 220 20% 18%;
   --ring: 45 93% 58%;
-  --chart-1: 45 93% 66%;
-  --chart-2: 32 95% 52%;
-  --chart-3: 173 58% 49%;
-  --chart-4: 43 96% 66%;
-  --chart-5: 27 87% 77%;
 
+  /* Charts — gold + navy variants only, identical hue family to light mode */
+  --chart-1: 45 93% 66%;        /* gold */
+  --chart-2: 220 28% 70%;       /* navy light */
+  --chart-3: 45 80% 50%;        /* gold deep */
+  --chart-4: 220 20% 45%;       /* navy mid */
+  --chart-5: 45 60% 82%;        /* gold pale */
+
+  /* Glows — gold-only family, matches light mode */
   --glow-primary: 45 93% 58%;
-  --glow-secondary: 32 95% 52%;
-  --glow-accent: 28 80% 45%;
+  --glow-secondary: 45 93% 58%;
+  --glow-accent: 220 28% 22%;
 
   --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
   --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.35);
