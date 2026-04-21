@@ -194,7 +194,7 @@ function App() {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    const themeColor = darkMode ? '#101828' : '#ffffff';
+    const themeColor = darkMode ? '#101828' : '#F8F2E4';
     let meta = document.querySelector('meta[name="theme-color"]:not([media])') as HTMLMetaElement | null;
     if (!meta) {
       meta = document.createElement('meta');

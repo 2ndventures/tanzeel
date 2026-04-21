@@ -272,7 +272,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                         ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
                         : "text-muted-foreground"
                     }`}
-                    style={mode === "surah" ? { boxShadow: '0 0 20px rgba(28,31,57,0.25)' } : undefined}
+                    style={mode === "surah" ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.25)' } : undefined}
                     data-testid="button-mode-surah"
                   >
                     All Surahs
@@ -284,7 +284,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                         ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg"
                         : "text-muted-foreground"
                     }`}
-                    style={mode === "juz" ? { boxShadow: '0 0 20px rgba(28,31,57,0.25)' } : undefined}
+                    style={mode === "juz" ? { boxShadow: '0 0 20px hsl(var(--primary) / 0.25)' } : undefined}
                     data-testid="button-mode-juz"
                   >
                     Juz
