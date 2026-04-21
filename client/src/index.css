@@ -2,86 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE — warm parchment / ivory, daytime companion to dark mode */
+/* LIGHT MODE — warm parchment, daytime companion to dark mode */
 :root {
-  --button-outline: rgba(16, 35, 63, .10);
-  --badge-outline: rgba(16, 35, 63, .05);
+  --button-outline: rgba(16, 35, 63, .12);
+  --badge-outline: rgba(16, 35, 63, .06);
 
   /* Automatic computation of border around primary / danger buttons */
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(16, 35, 63, .05);
-  --elevate-2: rgba(16, 35, 63, .12);
+  /* Hover/active overlays — navy-tinted so interactions feel branded */
+  --elevate-1: rgba(16, 35, 63, .055);
+  --elevate-2: rgba(16, 35, 63, .14);
 
-  /* Warm ivory header/player gradients (#F7F4EC) */
-  --header-gradient-start: rgba(247, 244, 236, 1);
-  --header-gradient-mid: rgba(247, 244, 236, 0.95);
-  --player-gradient-rgb: 247, 244, 236;
+  /* Header/player gradients — deeper parchment (#EFE9D7) */
+  --header-gradient-start: rgba(239, 233, 215, 1);
+  --header-gradient-mid: rgba(239, 233, 215, 0.95);
+  --player-gradient-rgb: 239, 233, 215;
 
-  /* Sheets / modals — slightly warmer than page so they feel layered */
-  --sheet-bg: 42 31% 92%;       /* #F2EEE4 */
-  --sheet-muted: 39 27% 86%;    /* #E6DFD2 */
+  /* Sheets / modals — distinctly layered above the page */
+  --sheet-bg: 42 45% 94%;       /* #F4EFDD */
+  --sheet-muted: 38 28% 84%;    /* #DFD6BD */
 
-  /* Page background — soft ivory, not stark white */
-  --background: 43 39% 95%;     /* #F7F4EC */
-  --foreground: 216 61% 16%;    /* #10233F deep navy */
+  /* Page background — deeper parchment, no longer ivory-white */
+  --background: 40 32% 90%;     /* #ECE5CF parchment base */
+  --foreground: 217 50% 17%;    /* #161E36 softened deep navy */
 
-  /* Borders — warm parchment edge */
-  --border: 39 27% 86%;         /* #E6DFD2 */
+  /* Borders — warm, slightly more present so layers read clearly */
+  --border: 38 23% 80%;         /* #D6CCB3 */
 
-  /* Cards — faintly tinted cream, slightly elevated from page */
-  --card: 43 53% 97%;           /* #FBF8F2 */
-  --card-foreground: 216 61% 16%;
-  --card-border: 39 27% 86%;
+  /* Cards — meaningful tonal step above page so they feel tactile */
+  --card: 43 55% 95%;           /* #F8F2E0 */
+  --card-foreground: 217 50% 17%;
+  --card-border: 38 23% 80%;
 
-  /* Sidebar — secondary ivory surface */
-  --sidebar: 42 31% 92%;        /* #F2EEE4 */
-  --sidebar-foreground: 216 61% 16%;
-  --sidebar-border: 39 27% 86%;
-  --sidebar-primary: 42 77% 45%;          /* gold strong */
-  --sidebar-primary-foreground: 216 61% 12%;
-  --sidebar-accent: 46 80% 90%;           /* soft gold tint */
-  --sidebar-accent-foreground: 216 61% 16%;
-  --sidebar-ring: 42 77% 45%;
+  /* Sidebar / bottom nav — sister surface to background, visually connected */
+  --sidebar: 40 28% 88%;        /* #E7DFC7 */
+  --sidebar-foreground: 217 50% 17%;
+  --sidebar-border: 38 23% 78%;
+  --sidebar-primary: 42 77% 42%;          /* gold strong */
+  --sidebar-primary-foreground: 43 60% 97%;
+  --sidebar-accent: 46 65% 84%;           /* soft gold tint */
+  --sidebar-accent-foreground: 217 50% 17%;
+  --sidebar-ring: 42 77% 42%;
 
-  /* Popovers — elevated ivory */
-  --popover: 43 100% 99%;       /* #FFFDF8 */
-  --popover-foreground: 216 61% 16%;
-  --popover-border: 39 27% 86%;
+  /* Popovers — most elevated surface, warm ivory but never pure white */
+  --popover: 44 60% 96%;        /* #F9F2DE */
+  --popover-foreground: 217 50% 17%;
+  --popover-border: 38 23% 78%;
 
-  /* Primary brand — gold (focused accent, not overwhelming) */
-  --primary: 42 77% 45%;        /* #C9971A gold strong */
-  --primary-foreground: 43 100% 99%;
+  /* Primary brand — gold strong, focused accent */
+  --primary: 42 77% 42%;        /* #BF901A */
+  --primary-foreground: 44 60% 97%;
 
-  /* Secondary — deep navy, mirrors dark-mode brand continuity */
+  /* Secondary — deep navy, brand continuity with dark mode */
   --secondary: 215 50% 23%;     /* #1D3557 */
-  --secondary-foreground: 43 100% 99%;
+  --secondary-foreground: 44 60% 97%;
 
   /* Muted surfaces (search bars, input bg, soft chips) */
-  --muted: 42 31% 92%;          /* #F2EEE4 */
-  --muted-foreground: 213 13% 42%;  /* #5F6B7A */
+  --muted: 40 28% 86%;          /* #E2DABF */
+  --muted-foreground: 215 14% 36%;  /* #4F596A — softer than 42% */
 
-  /* Accent — soft gold tint for highlight surfaces */
-  --accent: 46 80% 83%;         /* #F6E7B3 */
-  --accent-foreground: 216 61% 16%;
+  /* Accent — soft gold tint for highlight surfaces (selected chips) */
+  --accent: 46 70% 80%;         /* #EDDBA1 */
+  --accent-foreground: 217 50% 17%;
 
-  --destructive: 0 70% 48%;
-  --destructive-foreground: 43 100% 99%;
+  --destructive: 0 65% 45%;
+  --destructive-foreground: 44 60% 97%;
 
-  --input: 39 27% 80%;
-  --ring: 42 77% 45%;
+  --input: 38 22% 76%;
+  --ring: 42 77% 42%;
 
   /* Charts — warm gold/navy family, cohesive with dark */
-  --chart-1: 42 77% 45%;
+  --chart-1: 42 77% 42%;
   --chart-2: 44 73% 55%;
   --chart-3: 215 50% 23%;
-  --chart-4: 28 65% 50%;
-  --chart-5: 213 13% 42%;
+  --chart-4: 28 65% 48%;
+  --chart-5: 215 14% 36%;
 
   /* Glows — gold, mirrors dark mode brand */
-  --glow-primary: 44 73% 55%;   /* #E0B43A gold accent */
-  --glow-secondary: 42 77% 45%; /* gold strong */
+  --glow-primary: 44 73% 50%;   /* #DDA926 gold */
+  --glow-secondary: 42 77% 42%;
   --glow-accent: 215 50% 23%;   /* navy */
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -1080,9 +1080,22 @@ span.end {
   color: hsl(170 60% 50% / 0.8);
 }
 
-/* Dark-mode-only gradient image background — light mode keeps its own theme gradient */
+/* Dark-mode gradient image background */
 .dark .bg-screen-gradient {
   background-image: url('/gradient-bg.png');
   background-size: cover;
   background-position: center top;
+}
+
+/* Light-mode parchment radial — subtle warm vignette so the page feels paper, not a flat fill */
+:root .bg-screen-gradient,
+.bg-screen-gradient:not(.dark *) {
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% 0%, hsl(46 60% 93%) 0%, transparent 60%),
+    radial-gradient(ellipse 120% 80% at 50% 100%, hsl(38 30% 86%) 0%, transparent 55%),
+    linear-gradient(180deg, hsl(43 45% 92%) 0%, hsl(40 32% 90%) 100%);
+  background-attachment: fixed;
+}
+.dark .bg-screen-gradient {
+  background-attachment: scroll;
 }
