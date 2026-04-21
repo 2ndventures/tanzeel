@@ -1093,3 +1093,12 @@ span.end {
   background-size: cover;
   background-position: center top;
 }
+/* Brand ornament pulse animation — used for splash and loading states */
+@keyframes brand-ornament-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 hsl(var(--glow-primary) / 0)); }
+  50%      { transform: scale(1.04); filter: drop-shadow(0 0 18px hsl(var(--glow-primary) / 0.45)); }
+}
+
+.brand-ornament-pulse {
+  animation: brand-ornament-pulse 2.6s ease-in-out infinite;
+}

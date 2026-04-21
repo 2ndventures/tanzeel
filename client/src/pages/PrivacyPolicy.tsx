@@ -38,7 +38,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </p>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Introduction</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Introduction</h2>
               <p className="text-foreground/90 leading-relaxed">
                 2nd Ventures, LLC ("we," "us," or "our") operates the Tanzeel mobile application (the "App"). 
                 This Privacy Policy explains our practices regarding the collection, use, and disclosure of information 
@@ -48,7 +48,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Information We Collect</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Information We Collect</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 <strong>Tanzeel does not collect, store, or transmit any personal data to our servers.</strong>
               </p>
@@ -67,7 +67,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Third-Party Services</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Third-Party Services</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 The App uses the following third-party service:
               </p>
@@ -85,7 +85,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Data Storage and Security</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Data Storage and Security</h2>
               <p className="text-foreground/90 leading-relaxed">
                 All user data is stored locally on your device using your device's native storage mechanisms. This data 
                 remains under your control and can be deleted at any time by uninstalling the app or clearing the app's 
@@ -94,7 +94,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">In-App Purchases</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">In-App Purchases</h2>
               <p className="text-foreground/90 leading-relaxed">
                 The App may offer a one-time purchase option in the future. If implemented, all purchase transactions 
                 will be processed through Apple's App Store or Google Play Store. We do not collect or store any payment 
@@ -104,7 +104,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Children's Privacy</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Children's Privacy</h2>
               <p className="text-foreground/90 leading-relaxed">
                 Our App is suitable for users of all ages, including children. Because we do not collect any personal 
                 information, we do not knowingly collect data from children under 13 (or the applicable age in your jurisdiction). 
@@ -113,7 +113,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Your Rights</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Your Rights</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 Since we do not collect or store any personal data on our servers, the following rights are inherently 
                 protected:
@@ -127,7 +127,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">International Data Transfers</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">International Data Transfers</h2>
               <p className="text-foreground/90 leading-relaxed">
                 We do not transfer any personal data internationally because we do not collect or store personal data. 
                 The only data transfer that occurs is when your device connects to Quran.com's servers to stream audio 
@@ -136,7 +136,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Changes to This Privacy Policy</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Changes to This Privacy Policy</h2>
               <p className="text-foreground/90 leading-relaxed">
                 We may update this Privacy Policy from time to time. We will notify you of any changes by posting the 
                 new Privacy Policy in the app and updating the "Last Updated" date. You are advised to review this Privacy 
@@ -145,7 +145,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">Contact Us</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">Contact Us</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 If you have any questions about this Privacy Policy, please contact us:
               </p>
@@ -156,7 +156,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">GDPR Compliance</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">GDPR Compliance</h2>
               <p className="text-foreground/90 leading-relaxed">
                 For users in the European Economic Area (EEA), we comply with GDPR requirements. Since we do not collect 
                 personal data, most GDPR obligations do not apply. However, we maintain this privacy policy to ensure 
@@ -165,7 +165,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4">CCPA Compliance</h2>
+              <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground mb-4">CCPA Compliance</h2>
               <p className="text-foreground/90 leading-relaxed mb-4">
                 For California residents, we comply with the California Consumer Privacy Act (CCPA). We do not:
               </p>

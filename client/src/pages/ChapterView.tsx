@@ -220,7 +220,7 @@ export default function ChapterView({
     previewAudioRef.current = audio;
 
     const showError = () => {
-      setPreviewError("Preview unavailable offline");
+      setPreviewError("Preview unavailable — no connection");
       stopPreview();
       setTimeout(() => setPreviewError(null), 2500);
     };
@@ -295,7 +295,7 @@ export default function ChapterView({
       .catch(err => {
         if (isMounted) {
           console.error('Failed to load chapter verses:', err);
-          setVersesError('Failed to load chapter verses. Please try again.');
+          setVersesError('We couldn\'t load this chapter. Try again.');
           setIsLoadingVerses(false);
         }
       });
