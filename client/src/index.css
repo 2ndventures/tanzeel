@@ -2,87 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE — minimal parchment + navy, gold as the only accent */
+/* LIGHT MODE — antique Mushaf paper. Paper, ink, and gilding only. */
 :root {
-  --button-outline: rgba(16, 35, 63, .10);
-  --badge-outline: rgba(16, 35, 63, .06);
+  --button-outline: rgba(26, 31, 46, .10);
+  --badge-outline: rgba(26, 31, 46, .06);
 
   /* Automatic computation of border around primary / danger buttons */
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
-  /* Hover/active overlays — navy ink */
-  --elevate-1: rgba(16, 35, 63, .04);
-  --elevate-2: rgba(16, 35, 63, .10);
+  /* Hover/active overlays — ink wash, same trick as dark mode's gold wash */
+  --elevate-1: rgba(26, 31, 46, .04);
+  --elevate-2: rgba(26, 31, 46, .09);
 
-  /* Header / player gradients — match page parchment (#F1EBD8) */
-  --header-gradient-start: rgba(241, 235, 216, 1);
-  --header-gradient-mid: rgba(241, 235, 216, 0.95);
-  --player-gradient-rgb: 241, 235, 216;
+  /* Header / player gradients — match page paper (#F5F1E8) */
+  --header-gradient-start: rgba(245, 241, 232, 1);
+  --header-gradient-mid: rgba(245, 241, 232, 0.95);
+  --player-gradient-rgb: 245, 241, 232;
 
-  /* Sheets / modals — same family as cards, no extra tone */
-  --sheet-bg: 42 45% 95%;       /* #F6F0DE */
-  --sheet-muted: 40 28% 88%;    /* #E7DFC7 */
+  /* Sheets / modals — same family as cards */
+  --sheet-bg: 40 40% 96%;       /* #FAF7EE */
+  --sheet-muted: 40 25% 87%;    /* #E2DCC8 */
 
-  /* Page background — single parchment tone */
-  --background: 42 38% 91%;     /* #F1EBD8 parchment */
-  --foreground: 217 50% 18%;    /* #17203A deep navy */
+  /* Page background — warm off-white paper, not yellow cream */
+  --background: 40 38% 93%;     /* #F5F1E8 */
+  --foreground: 224 28% 14%;    /* #1A1F2E navy-black ink */
 
-  /* Borders — barely-there, just a tonal whisper */
-  --border: 40 22% 82%;         /* #DAD2BB */
+  /* Borders — warm whisper, carries the layering work */
+  --border: 40 25% 87%;         /* #E8E2D2 */
 
-  /* Cards — one shade above page, that's it */
-  --card: 43 50% 96%;           /* #F8F2E0 */
-  --card-foreground: 217 50% 18%;
-  --card-border: 40 22% 82%;
+  /* Cards — almost imperceptibly above the page; separation comes from edge, not fill */
+  --card: 40 40% 96%;           /* #FAF7EE */
+  --card-foreground: 224 28% 14%;
+  --card-border: 40 25% 87%;
 
   /* Sidebar / bottom nav — same as card so chrome reads as one surface */
-  --sidebar: 43 50% 96%;        /* #F8F2E0 — matches card */
-  --sidebar-foreground: 217 50% 18%;
-  --sidebar-border: 40 22% 82%;
-  --sidebar-primary: 42 77% 42%;
-  --sidebar-primary-foreground: 43 50% 97%;
-  --sidebar-accent: 42 38% 88%;           /* parchment tint, not gold */
-  --sidebar-accent-foreground: 217 50% 18%;
-  --sidebar-ring: 42 77% 42%;
+  --sidebar: 40 40% 96%;        /* #FAF7EE */
+  --sidebar-foreground: 224 28% 14%;
+  --sidebar-border: 40 25% 87%;
+  --sidebar-primary: 42 73% 38%;
+  --sidebar-primary-foreground: 40 40% 97%;
+  --sidebar-accent: 224 28% 14%;          /* ink wash for selection — alpha applied at use-site */
+  --sidebar-accent-foreground: 224 28% 14%;
+  --sidebar-ring: 42 73% 38%;
 
   /* Popovers — same as card */
-  --popover: 43 50% 96%;
-  --popover-foreground: 217 50% 18%;
-  --popover-border: 40 22% 82%;
+  --popover: 40 40% 96%;
+  --popover-foreground: 224 28% 14%;
+  --popover-border: 40 25% 87%;
 
-  /* Primary brand — gold, the only color in the system */
-  --primary: 42 77% 42%;        /* #BF901A */
-  --primary-foreground: 43 50% 97%;
+  /* Primary brand — antique gilding, the only accent in the system */
+  --primary: 42 73% 38%;        /* #A8801A */
+  --primary-foreground: 40 40% 97%;
 
-  /* Secondary — navy */
-  --secondary: 215 50% 23%;     /* #1D3557 */
-  --secondary-foreground: 43 50% 97%;
+  /* Secondary — same navy-black ink */
+  --secondary: 224 28% 14%;     /* #1A1F2E */
+  --secondary-foreground: 40 40% 97%;
 
-  /* Muted — page-tone surface + soft navy text */
-  --muted: 42 38% 88%;          /* #EAE3CC */
-  --muted-foreground: 217 22% 38%;  /* navy-toned, not warm grey */
+  /* Muted — paper-tone surface + warm grey ink for whispered text */
+  --muted: 40 30% 90%;          /* #ECE6D5 */
+  --muted-foreground: 30 10% 38%;  /* #6B6358 warm neutral grey */
 
-  /* Accent — page tone, NOT a separate color (selected/hover surfaces) */
-  --accent: 42 38% 86%;         /* #E5DDC4 */
-  --accent-foreground: 217 50% 18%;
+  /* Accent — page tone for chip/highlight surfaces, no second color */
+  --accent: 40 30% 88%;         /* #E7E0CD */
+  --accent-foreground: 224 28% 14%;
 
-  --destructive: 0 60% 45%;
-  --destructive-foreground: 43 50% 97%;
+  --destructive: 0 55% 42%;
+  --destructive-foreground: 40 40% 97%;
 
-  --input: 40 22% 78%;
-  --ring: 42 77% 42%;
+  --input: 40 22% 82%;
+  --ring: 42 73% 38%;
 
-  /* Charts — only navy + gold variants, no orange/copper */
-  --chart-1: 42 77% 42%;
-  --chart-2: 215 50% 23%;
-  --chart-3: 42 60% 60%;
-  --chart-4: 217 22% 50%;
-  --chart-5: 217 22% 38%;
+  /* Charts — gold + navy only, four shades total */
+  --chart-1: 42 73% 38%;        /* gold */
+  --chart-2: 224 28% 14%;       /* ink */
+  --chart-3: 42 55% 60%;        /* gold light */
+  --chart-4: 224 18% 50%;       /* ink faded */
+  --chart-5: 30 10% 38%;        /* warm grey */
 
-  /* Glows — gold */
-  --glow-primary: 42 77% 45%;
-  --glow-secondary: 42 77% 42%;
-  --glow-accent: 215 50% 23%;
+  /* Glows — antique gold; active-word needs slight amber warmth to register on cream */
+  --glow-primary: 38 72% 45%;   /* #C8851F warmer gold for the active-word halo */
+  --glow-secondary: 42 73% 38%;
+  --glow-accent: 224 28% 14%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: Georgia, serif;
