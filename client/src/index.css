@@ -1093,6 +1093,10 @@ span.end {
   background-size: cover;
   background-position: center top;
 }
+/* --font-display alias kept for forward-compatibility with spec wording */
+:root { --font-display: var(--font-heading); }
+.dark { --font-display: var(--font-heading); }
+
 /* Brand ornament pulse animation — used for splash and loading states */
 @keyframes brand-ornament-pulse {
   0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 hsl(var(--glow-primary) / 0)); }
