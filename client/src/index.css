@@ -39,24 +39,24 @@
   --sidebar: 40 40% 96%;        /* #FAF7EE */
   --sidebar-foreground: 224 28% 14%;
   --sidebar-border: 40 25% 87%;
-  --sidebar-primary: 42 73% 38%;
+  --sidebar-primary: 224 28% 14%;         /* navy ink — primary action color */
   --sidebar-primary-foreground: 40 40% 97%;
-  --sidebar-accent: 224 28% 14%;          /* ink wash for selection — alpha applied at use-site */
+  --sidebar-accent: 40 30% 88%;           /* page-tone selection surface */
   --sidebar-accent-foreground: 224 28% 14%;
-  --sidebar-ring: 42 73% 38%;
+  --sidebar-ring: 45 89% 63%;             /* bright gold focus, matches dark mode */
 
   /* Popovers — same as card */
   --popover: 40 40% 96%;
   --popover-foreground: 224 28% 14%;
   --popover-border: 40 25% 87%;
 
-  /* Primary brand — antique gilding, the only accent in the system */
-  --primary: 42 73% 38%;        /* #A8801A */
+  /* Primary action — navy ink. Brand color does the heavy lifting on paper. */
+  --primary: 224 28% 14%;       /* #1A1F2E */
   --primary-foreground: 40 40% 97%;
 
-  /* Secondary — same navy-black ink */
-  --secondary: 224 28% 14%;     /* #1A1F2E */
-  --secondary-foreground: 40 40% 97%;
+  /* Secondary — bright gold (same as dark mode), with navy text for contrast */
+  --secondary: 45 89% 63%;      /* #F5C84A — identical to dark-mode gold */
+  --secondary-foreground: 224 28% 14%;
 
   /* Muted — paper-tone surface + warm grey ink for whispered text */
   --muted: 40 30% 90%;          /* #ECE6D5 */
@@ -70,18 +70,18 @@
   --destructive-foreground: 40 40% 97%;
 
   --input: 40 22% 82%;
-  --ring: 42 73% 38%;
+  --ring: 45 89% 63%;           /* bright gold focus rings */
 
-  /* Charts — gold + navy only, four shades total */
-  --chart-1: 42 73% 38%;        /* gold */
-  --chart-2: 224 28% 14%;       /* ink */
-  --chart-3: 42 55% 60%;        /* gold light */
-  --chart-4: 224 18% 50%;       /* ink faded */
+  /* Charts — navy + bright gold, identical hues to dark mode */
+  --chart-1: 224 28% 14%;       /* ink */
+  --chart-2: 45 89% 63%;        /* gold */
+  --chart-3: 224 18% 50%;       /* ink faded */
+  --chart-4: 45 75% 75%;        /* gold light */
   --chart-5: 30 10% 38%;        /* warm grey */
 
-  /* Glows — antique gold; active-word needs slight amber warmth to register on cream */
-  --glow-primary: 38 72% 45%;   /* #C8851F warmer gold for the active-word halo */
-  --glow-secondary: 42 73% 38%;
+  /* Glows — bright yellow-gold, identical to dark mode (#F5C84A) */
+  --glow-primary: 45 89% 63%;
+  --glow-secondary: 45 89% 63%;
   --glow-accent: 224 28% 14%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
