@@ -494,8 +494,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                 const endChapter = chapters.find(ch => ch.id === juz.endChapter);
                 const juzBadgeStyles = [
                   { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
-                  { bg: "bg-[hsl(var(--glow-secondary)/0.18)]", text: "text-secondary" },
-                  { bg: "bg-[hsl(var(--glow-accent)/0.18)]", text: "text-accent" },
+                  { bg: "bg-[hsl(var(--glow-primary)/0.12)]", text: "text-primary" },
+                  { bg: "bg-[hsl(var(--glow-primary)/0.22)]", text: "text-primary" },
                 ];
                 const badge = juzBadgeStyles[(juz.id - 1) % juzBadgeStyles.length];
                 return (

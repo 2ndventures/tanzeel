@@ -17,8 +17,8 @@ interface ChapterCardProps {
 
 const badgeStyles = [
   { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
-  { bg: "bg-[hsl(var(--glow-secondary)/0.18)]", text: "text-secondary" },
-  { bg: "bg-[hsl(var(--glow-accent)/0.18)]", text: "text-accent" },
+  { bg: "bg-[hsl(var(--glow-primary)/0.12)]", text: "text-primary" },
+  { bg: "bg-[hsl(var(--glow-primary)/0.22)]", text: "text-primary" },
 ];
 
 export default function ChapterCard({
@@ -69,7 +69,7 @@ export default function ChapterCard({
               </h3>
               {isFullyCached && (
                 <CheckCircle2
-                  className="w-3.5 h-3.5 text-accent/70 shrink-0"
+                  className="w-3.5 h-3.5 text-[hsl(var(--glow-primary))]/70 shrink-0"
                   data-testid={`icon-cached-${number}`}
                 />
               )}
