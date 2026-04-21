@@ -5,8 +5,9 @@ import ChapterCard from "@/components/ChapterCard";
 
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
-import { Search, BookOpen, ArrowRight, Loader } from "lucide-react";
+import { Search, BookOpen, ArrowRight } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
+import { BrandOrnament } from "@/components/BrandOrnament";
 import PullToRefresh from "@/components/PullToRefresh";
 
 interface TopicResult {
@@ -462,8 +463,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
           )}
 
           {isSearchingVerses && !showTopicResults && !showVerseSearch && filteredChapters.length === 0 && (
-            <div className="text-center py-12">
-              <Loader className="w-5 h-5 animate-spin mx-auto text-muted-foreground mb-3" />
+            <div className="flex flex-col items-center gap-3 py-12">
+              <BrandOrnament size={48} animated />
               <p className="text-sm text-muted-foreground">Turning the pages…</p>
             </div>
           )}

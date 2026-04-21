@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
+import { BrandOrnament } from "@/components/BrandOrnament";
 import { getVerseAudioUrl } from "@/lib/audioUrls";
 
 interface ChapterViewProps {
@@ -1102,7 +1103,7 @@ export default function ChapterView({
                     })}
                     {previewError && (
                       <div className="text-center py-2">
-                        <span className="text-xs text-red-400">{previewError}</span>
+                        <span className="text-xs text-destructive">{previewError}</span>
                       </div>
                     )}
                   </div>
@@ -1133,7 +1134,7 @@ export default function ChapterView({
             {/* Error state */}
             {versesError && !isLoadingVerses && (
               <div className="text-center py-12 space-y-4">
-                <Icon icon="mdi:alert-circle" className="w-16 h-16 mx-auto text-destructive" />
+                <div className="flex justify-center opacity-60"><BrandOrnament size={72} /></div>
                 <p className="text-lg text-destructive">{versesError}</p>
                 <Button onClick={() => window.location.reload()}>
                   Reload Page
@@ -1171,6 +1172,16 @@ export default function ChapterView({
                 />
               );
             })}
+
+            {/* End-of-chapter ornament divider */}
+            {!isLoadingVerses && !versesError && verses.length > 0 && (
+              <div className="flex flex-col items-center gap-3 py-10" data-testid="chapter-end-divider">
+                <BrandOrnament size={56} />
+                <p className="font-heading text-sm tracking-wide text-muted-foreground">
+                  End of chapter
+                </p>
+              </div>
+            )}
           </div>
         </div>
       ) : layoutMode === 'focused-flow' ? (
