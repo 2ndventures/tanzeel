@@ -2,87 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE — warm parchment, daytime companion to dark mode */
+/* LIGHT MODE — minimal parchment + navy, gold as the only accent */
 :root {
-  --button-outline: rgba(16, 35, 63, .12);
+  --button-outline: rgba(16, 35, 63, .10);
   --badge-outline: rgba(16, 35, 63, .06);
 
   /* Automatic computation of border around primary / danger buttons */
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
-  /* Hover/active overlays — navy-tinted so interactions feel branded */
-  --elevate-1: rgba(16, 35, 63, .055);
-  --elevate-2: rgba(16, 35, 63, .14);
+  /* Hover/active overlays — navy ink */
+  --elevate-1: rgba(16, 35, 63, .04);
+  --elevate-2: rgba(16, 35, 63, .10);
 
-  /* Header/player gradients — deeper parchment (#EFE9D7) */
-  --header-gradient-start: rgba(239, 233, 215, 1);
-  --header-gradient-mid: rgba(239, 233, 215, 0.95);
-  --player-gradient-rgb: 239, 233, 215;
+  /* Header / player gradients — match page parchment (#F1EBD8) */
+  --header-gradient-start: rgba(241, 235, 216, 1);
+  --header-gradient-mid: rgba(241, 235, 216, 0.95);
+  --player-gradient-rgb: 241, 235, 216;
 
-  /* Sheets / modals — distinctly layered above the page */
-  --sheet-bg: 42 45% 94%;       /* #F4EFDD */
-  --sheet-muted: 38 28% 84%;    /* #DFD6BD */
+  /* Sheets / modals — same family as cards, no extra tone */
+  --sheet-bg: 42 45% 95%;       /* #F6F0DE */
+  --sheet-muted: 40 28% 88%;    /* #E7DFC7 */
 
-  /* Page background — deeper parchment, no longer ivory-white */
-  --background: 40 32% 90%;     /* #ECE5CF parchment base */
-  --foreground: 217 50% 17%;    /* #161E36 softened deep navy */
+  /* Page background — single parchment tone */
+  --background: 42 38% 91%;     /* #F1EBD8 parchment */
+  --foreground: 217 50% 18%;    /* #17203A deep navy */
 
-  /* Borders — warm, slightly more present so layers read clearly */
-  --border: 38 23% 80%;         /* #D6CCB3 */
+  /* Borders — barely-there, just a tonal whisper */
+  --border: 40 22% 82%;         /* #DAD2BB */
 
-  /* Cards — meaningful tonal step above page so they feel tactile */
-  --card: 43 55% 95%;           /* #F8F2E0 */
-  --card-foreground: 217 50% 17%;
-  --card-border: 38 23% 80%;
+  /* Cards — one shade above page, that's it */
+  --card: 43 50% 96%;           /* #F8F2E0 */
+  --card-foreground: 217 50% 18%;
+  --card-border: 40 22% 82%;
 
-  /* Sidebar / bottom nav — sister surface to background, visually connected */
-  --sidebar: 40 28% 88%;        /* #E7DFC7 */
-  --sidebar-foreground: 217 50% 17%;
-  --sidebar-border: 38 23% 78%;
-  --sidebar-primary: 42 77% 42%;          /* gold strong */
-  --sidebar-primary-foreground: 43 60% 97%;
-  --sidebar-accent: 46 65% 84%;           /* soft gold tint */
-  --sidebar-accent-foreground: 217 50% 17%;
+  /* Sidebar / bottom nav — same as card so chrome reads as one surface */
+  --sidebar: 43 50% 96%;        /* #F8F2E0 — matches card */
+  --sidebar-foreground: 217 50% 18%;
+  --sidebar-border: 40 22% 82%;
+  --sidebar-primary: 42 77% 42%;
+  --sidebar-primary-foreground: 43 50% 97%;
+  --sidebar-accent: 42 38% 88%;           /* parchment tint, not gold */
+  --sidebar-accent-foreground: 217 50% 18%;
   --sidebar-ring: 42 77% 42%;
 
-  /* Popovers — most elevated surface, warm ivory but never pure white */
-  --popover: 44 60% 96%;        /* #F9F2DE */
-  --popover-foreground: 217 50% 17%;
-  --popover-border: 38 23% 78%;
+  /* Popovers — same as card */
+  --popover: 43 50% 96%;
+  --popover-foreground: 217 50% 18%;
+  --popover-border: 40 22% 82%;
 
-  /* Primary brand — gold strong, focused accent */
+  /* Primary brand — gold, the only color in the system */
   --primary: 42 77% 42%;        /* #BF901A */
-  --primary-foreground: 44 60% 97%;
+  --primary-foreground: 43 50% 97%;
 
-  /* Secondary — deep navy, brand continuity with dark mode */
+  /* Secondary — navy */
   --secondary: 215 50% 23%;     /* #1D3557 */
-  --secondary-foreground: 44 60% 97%;
+  --secondary-foreground: 43 50% 97%;
 
-  /* Muted surfaces (search bars, input bg, soft chips) */
-  --muted: 40 28% 86%;          /* #E2DABF */
-  --muted-foreground: 215 14% 36%;  /* #4F596A — softer than 42% */
+  /* Muted — page-tone surface + soft navy text */
+  --muted: 42 38% 88%;          /* #EAE3CC */
+  --muted-foreground: 217 22% 38%;  /* navy-toned, not warm grey */
 
-  /* Accent — soft gold tint for highlight surfaces (selected chips) */
-  --accent: 46 70% 80%;         /* #EDDBA1 */
-  --accent-foreground: 217 50% 17%;
+  /* Accent — page tone, NOT a separate color (selected/hover surfaces) */
+  --accent: 42 38% 86%;         /* #E5DDC4 */
+  --accent-foreground: 217 50% 18%;
 
-  --destructive: 0 65% 45%;
-  --destructive-foreground: 44 60% 97%;
+  --destructive: 0 60% 45%;
+  --destructive-foreground: 43 50% 97%;
 
-  --input: 38 22% 76%;
+  --input: 40 22% 78%;
   --ring: 42 77% 42%;
 
-  /* Charts — warm gold/navy family, cohesive with dark */
+  /* Charts — only navy + gold variants, no orange/copper */
   --chart-1: 42 77% 42%;
-  --chart-2: 44 73% 55%;
-  --chart-3: 215 50% 23%;
-  --chart-4: 28 65% 48%;
-  --chart-5: 215 14% 36%;
+  --chart-2: 215 50% 23%;
+  --chart-3: 42 60% 60%;
+  --chart-4: 217 22% 50%;
+  --chart-5: 217 22% 38%;
 
-  /* Glows — gold, mirrors dark mode brand */
-  --glow-primary: 44 73% 50%;   /* #DDA926 gold */
+  /* Glows — gold */
+  --glow-primary: 42 77% 45%;
   --glow-secondary: 42 77% 42%;
-  --glow-accent: 215 50% 23%;   /* navy */
+  --glow-accent: 215 50% 23%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: Georgia, serif;
@@ -1087,15 +1087,3 @@ span.end {
   background-position: center top;
 }
 
-/* Light-mode parchment radial — subtle warm vignette so the page feels paper, not a flat fill */
-:root .bg-screen-gradient,
-.bg-screen-gradient:not(.dark *) {
-  background-image:
-    radial-gradient(ellipse 90% 60% at 50% 0%, hsl(46 60% 93%) 0%, transparent 60%),
-    radial-gradient(ellipse 120% 80% at 50% 100%, hsl(38 30% 86%) 0%, transparent 55%),
-    linear-gradient(180deg, hsl(43 45% 92%) 0%, hsl(40 32% 90%) 100%);
-  background-attachment: fixed;
-}
-.dark .bg-screen-gradient {
-  background-attachment: scroll;
-}
