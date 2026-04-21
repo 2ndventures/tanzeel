@@ -1,0 +1,91 @@
+Redesign the light mode of my Quran reciter app so it feels cohesive with the existing dark mode, not like a generic white app.
+
+Context:
+My dark mode has a premium, immersive look with deep navy backgrounds, warm gold accents, rounded cards, soft gradients, subtle glow, and a calm spiritual reading experience. I want the light mode to preserve the same identity and hierarchy while feeling clean, elegant, warm, and readable.
+
+Important design goal:
+Do NOT create a stark white light theme. Instead, create a warm light theme inspired by parchment, ivory, and soft paper tones. The light mode should feel like the daytime companion to the dark mode.
+
+Design system requirements:
+- Keep the same layout structure, spacing, border radius, and component hierarchy as dark mode
+- Preserve the premium Quran-reader feel
+- Use warm ivory / cream backgrounds instead of pure white
+- Use deep navy for primary text and icons to preserve brand continuity
+- Use gold as a focused accent color, not as an overwhelming fill color
+- Replace dark-mode glow effects with subtle shadows, soft borders, and very light tinted surfaces
+- Keep the UI calm, spacious, and reverent
+- Ensure high readability for Arabic text, translations, controls, and settings
+
+Recommended palette:
+- Background: #F7F4EC
+- Secondary background: #F2EEE4
+- Card background: #FBF8F2
+- Elevated surface: #FFFDF8
+- Primary text: #10233F
+- Secondary text: #5F6B7A
+- Tertiary text: #8B93A1
+- Border/divider: #E6DFD2
+- Gold accent: #E0B43A
+- Gold strong: #C9971A
+- Soft gold tint: #F6E7B3
+- Accent navy: #1D3557
+
+Component styling guidance:
+1. App background
+- Use a soft warm ivory base
+- Add very subtle radial or linear tinting if needed, but keep it minimal
+- Avoid flat clinical white
+
+2. Cards
+- Use soft off-white or faintly tinted cream cards
+- Keep large rounded corners
+- Add thin borders and soft shadows for depth
+- Avoid heavy dark shadows
+
+3. Buttons and selected states
+- Primary selected pill/tab can use gold fill with deep navy text
+- Secondary buttons should use tinted backgrounds with borders
+- Hover/pressed states should feel soft and polished
+
+4. Search bars and input fields
+- Use slightly darker cream or misted backgrounds than the page
+- Rounded and integrated, not outlined harshly
+- Placeholder text should be muted slate
+
+5. Bottom navigation
+- Keep the same structure as dark mode
+- Use a softly elevated surface with subtle top border or shadow
+- Active item should use gold accent and navy icon/text
+- Inactive items should be muted slate
+
+6. Reader screen
+- Prioritize readability and reverence
+- Arabic text should remain highly legible and prominent
+- Translation text should be clear with comfortable contrast
+- Verse containers should be softly separated with light surfaces or faint dividers
+- Audio player controls should feel refined and integrated, not too bright
+
+7. Settings and modals
+- Use layered light surfaces with strong hierarchy
+- Option chips should have subtle fills and borders
+- Selected chips should use gold ring/fill treatment
+- Sheets and modal panels should feel elevated but soft
+
+8. Empty states and bookmarks
+- Keep the empty state gentle and minimal
+- Use soft icon containers and muted messaging
+- Preserve the app’s emotional tone
+
+Typography:
+- Preserve bold display headers
+- Use strong contrast for titles
+- Use softer text tones for metadata
+- Maintain clear hierarchy between Arabic, transliteration, and translation
+
+Output I want:
+- A redesigned light mode system for all current screens
+- Updated color tokens and component tokens
+- Consistent styles for splash, home, surahs list, reader, bookmarks, settings, modal sheets, and Arabic script selection
+- A short explanation of why each light-mode choice matches the dark-mode identity
+
+Please redesign the light mode to feel seamless with the current dark mode, like the same app in daylight rather than a separate theme.

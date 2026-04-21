@@ -2,90 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
+/* LIGHT MODE — warm parchment / ivory, daytime companion to dark mode */
 :root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+  --button-outline: rgba(16, 35, 63, .10);
+  --badge-outline: rgba(16, 35, 63, .05);
 
   /* Automatic computation of border around primary / danger buttons */
   --opaque-button-border-intensity: -8; /* In terms of percentages */
 
   /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .05);
-  --elevate-2: rgba(0,0,0, .13);
+  --elevate-1: rgba(16, 35, 63, .05);
+  --elevate-2: rgba(16, 35, 63, .12);
 
-  --header-gradient-start: rgba(243, 245, 252, 1);
-  --header-gradient-mid: rgba(243, 245, 252, 0.95);
-  --player-gradient-rgb: 243, 245, 252;
+  /* Warm ivory header/player gradients (#F7F4EC) */
+  --header-gradient-start: rgba(247, 244, 236, 1);
+  --header-gradient-mid: rgba(247, 244, 236, 0.95);
+  --player-gradient-rgb: 247, 244, 236;
 
-  --sheet-bg: 230 30% 96%;
-  --sheet-muted: 228 20% 90%;
+  /* Sheets / modals — slightly warmer than page so they feel layered */
+  --sheet-bg: 42 31% 92%;       /* #F2EEE4 */
+  --sheet-muted: 39 27% 86%;    /* #E6DFD2 */
 
-  --background: 228 30% 97%;
+  /* Page background — soft ivory, not stark white */
+  --background: 43 39% 95%;     /* #F7F4EC */
+  --foreground: 216 61% 16%;    /* #10233F deep navy */
 
-  --foreground: 234 34% 12%;
+  /* Borders — warm parchment edge */
+  --border: 39 27% 86%;         /* #E6DFD2 */
 
-  --border: 228 18% 87%;
+  /* Cards — faintly tinted cream, slightly elevated from page */
+  --card: 43 53% 97%;           /* #FBF8F2 */
+  --card-foreground: 216 61% 16%;
+  --card-border: 39 27% 86%;
 
-  --card: 230 28% 95%;
+  /* Sidebar — secondary ivory surface */
+  --sidebar: 42 31% 92%;        /* #F2EEE4 */
+  --sidebar-foreground: 216 61% 16%;
+  --sidebar-border: 39 27% 86%;
+  --sidebar-primary: 42 77% 45%;          /* gold strong */
+  --sidebar-primary-foreground: 216 61% 12%;
+  --sidebar-accent: 46 80% 90%;           /* soft gold tint */
+  --sidebar-accent-foreground: 216 61% 16%;
+  --sidebar-ring: 42 77% 45%;
 
-  --card-foreground: 234 34% 12%;
+  /* Popovers — elevated ivory */
+  --popover: 43 100% 99%;       /* #FFFDF8 */
+  --popover-foreground: 216 61% 16%;
+  --popover-border: 39 27% 86%;
 
-  --card-border: 228 18% 87%;
+  /* Primary brand — gold (focused accent, not overwhelming) */
+  --primary: 42 77% 45%;        /* #C9971A gold strong */
+  --primary-foreground: 43 100% 99%;
 
-  --sidebar: 230 24% 93%;
+  /* Secondary — deep navy, mirrors dark-mode brand continuity */
+  --secondary: 215 50% 23%;     /* #1D3557 */
+  --secondary-foreground: 43 100% 99%;
 
-  --sidebar-foreground: 234 34% 12%;
+  /* Muted surfaces (search bars, input bg, soft chips) */
+  --muted: 42 31% 92%;          /* #F2EEE4 */
+  --muted-foreground: 213 13% 42%;  /* #5F6B7A */
 
-  --sidebar-border: 228 18% 85%;
+  /* Accent — soft gold tint for highlight surfaces */
+  --accent: 46 80% 83%;         /* #F6E7B3 */
+  --accent-foreground: 216 61% 16%;
 
-  --sidebar-primary: 234 34% 17%;
+  --destructive: 0 70% 48%;
+  --destructive-foreground: 43 100% 99%;
 
-  --sidebar-primary-foreground: 0 0% 100%;
+  --input: 39 27% 80%;
+  --ring: 42 77% 45%;
 
-  --sidebar-accent: 228 20% 89%;
+  /* Charts — warm gold/navy family, cohesive with dark */
+  --chart-1: 42 77% 45%;
+  --chart-2: 44 73% 55%;
+  --chart-3: 215 50% 23%;
+  --chart-4: 28 65% 50%;
+  --chart-5: 213 13% 42%;
 
-  --sidebar-accent-foreground: 234 34% 12%;
-
-  --sidebar-ring: 234 34% 17%;
-
-  --popover: 230 25% 94%;
-
-  --popover-foreground: 234 34% 12%;
-
-  --popover-border: 228 18% 85%;
-
-  --primary: 234 34% 17%;
-
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 220 55% 52%;
-
-  --secondary-foreground: 0 0% 100%;
-
-  --muted: 228 16% 89%;
-
-  --muted-foreground: 228 12% 42%;
-
-  --accent: 195 70% 42%;
-
-  --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 84% 60%;
-
-  --destructive-foreground: 0 0% 100%;
-
-  --input: 228 14% 72%;
-  --ring: 234 34% 17%;
-  --chart-1: 220 55% 52%;
-  --chart-2: 195 70% 42%;
-  --chart-3: 173 58% 39%;
-  --chart-4: 234 34% 30%;
-  --chart-5: 255 45% 55%;
-
-  --glow-primary: 33 95% 50%;
-  --glow-secondary: 195 70% 42%;
-  --glow-accent: 255 45% 55%;
+  /* Glows — gold, mirrors dark mode brand */
+  --glow-primary: 44 73% 55%;   /* #E0B43A gold accent */
+  --glow-secondary: 42 77% 45%; /* gold strong */
+  --glow-accent: 215 50% 23%;   /* navy */
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: Georgia, serif;
@@ -1040,7 +1037,7 @@ span.end {
   font-weight: 700;
 }
 :root:not(.dark) .active-word {
-  text-shadow: 0 0 12px hsl(33 95% 50% / 0.40);
+  text-shadow: 0 0 12px hsl(var(--glow-primary) / 0.35);
 }
 .verse-end-ornament {
   display: inline-flex;
