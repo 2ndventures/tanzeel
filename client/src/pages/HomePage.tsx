@@ -141,7 +141,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="grid grid-cols-3 gap-4">
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -149,13 +149,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Browse all surahs"
                 data-testid="button-bookmarks"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary)/0.15)] shadow-inner">
-                  <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-primary))]" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-accent))] dark:text-foreground" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -163,13 +163,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="View favorites"
                 data-testid="button-favorites"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary)/0.12)] shadow-inner">
-                  <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-primary))]" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
+                  <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-accent))] dark:text-foreground" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Favorites</span>
               </div>
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-border/50 cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
                 onClick={() => onNavigate("settings", undefined, "settings")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("settings", undefined, "settings"); }}}
                 role="button"
@@ -177,8 +177,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Open settings"
                 data-testid="button-settings"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary)/0.22)] shadow-inner">
-                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-primary))]" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
+                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))] dark:text-foreground" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Settings</span>
               </div>
