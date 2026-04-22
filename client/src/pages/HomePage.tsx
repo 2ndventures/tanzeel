@@ -129,7 +129,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             <div className="mb-4 h-3 overflow-hidden rounded-full bg-foreground/10">
               <div
                 style={{ width: `${progress}%` }}
-                className="h-full rounded-full bg-gradient-to-r from-primary to-secondary shadow-inner"
+                className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-secondary shadow-inner"
               />
             </div>
             <div className="flex items-center justify-between text-xs text-foreground/80">

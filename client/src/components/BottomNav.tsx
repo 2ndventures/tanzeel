@@ -75,8 +75,8 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 {tab.label}
               </span>
               <div className={cn(
-                "h-1 w-1 rounded-full transition-all duration-200",
-                isActive ? "bg-primary scale-100 opacity-100" : "bg-transparent scale-0 opacity-0"
+                "h-1 rounded-full transition-all duration-200",
+                isActive ? "w-6 bg-primary opacity-100" : "w-1 bg-transparent opacity-0"
               )} />
             </button>
           );
