@@ -1038,7 +1038,12 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  color: hsl(var(--glow-primary));
+  background-color: hsl(var(--glow-primary) / 0.3);
+  border-radius: 0.25em;
+  padding-inline: 0.15em;
+  margin-inline: -0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 .verse-end-ornament {
   display: inline-flex;
