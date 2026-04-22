@@ -20,31 +20,44 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
   return (
     <div
       className={`fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}
-      style={{ background: 'linear-gradient(to bottom, hsl(46, 100%, 52%), hsl(22, 98%, 40%))' }}
+      style={{ background: 'linear-gradient(to bottom, hsl(224, 28%, 16%), hsl(217, 44%, 11%))' }}
+      role="img"
+      aria-label="Tanzeel"
     >
       {/* Decorative circles */}
       <svg
-        className="absolute inset-0 w-full h-full opacity-20"
+        className="absolute inset-0 w-full h-full opacity-25"
         viewBox="0 0 400 800"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle cx="320" cy="100" r="180" stroke="white" strokeWidth="1" />
-        <circle cx="80" cy="700" r="140" stroke="white" strokeWidth="1" />
-        <circle cx="350" cy="600" r="80" stroke="white" strokeWidth="0.5" />
-        <circle cx="60" cy="200" r="60" stroke="white" strokeWidth="0.5" />
+        <circle cx="320" cy="100" r="180" stroke="hsl(44, 92%, 53%)" strokeWidth="1" />
+        <circle cx="80" cy="700" r="140" stroke="hsl(44, 92%, 53%)" strokeWidth="1" />
+        <circle cx="350" cy="600" r="80" stroke="hsl(44, 92%, 53%)" strokeWidth="0.5" />
+        <circle cx="60" cy="200" r="60" stroke="hsl(44, 92%, 53%)" strokeWidth="0.5" />
       </svg>
 
-      {/* Brand logo */}
-      <img
-        src={tanzeel}
-        alt="Tanzeel"
+      {/* Brand logo — white PNG used as a mask, filled with brand gold */}
+      <div
         className="relative"
-        style={{ width: '78%', maxWidth: '300px' }}
+        style={{
+          width: '78%',
+          maxWidth: '300px',
+          aspectRatio: '300 / 120',
+          backgroundColor: 'hsl(44, 92%, 53%)',
+          WebkitMaskImage: `url(${tanzeel})`,
+          maskImage: `url(${tanzeel})`,
+          WebkitMaskRepeat: 'no-repeat',
+          maskRepeat: 'no-repeat',
+          WebkitMaskSize: 'contain',
+          maskSize: 'contain',
+          WebkitMaskPosition: 'center',
+          maskPosition: 'center',
+        }}
       />
 
       {/* Bottom pill */}
-      <div className="absolute bottom-10 w-32 h-1.5 rounded-full bg-white/40" />
+      <div className="absolute bottom-10 w-32 h-1.5 rounded-full bg-[hsl(44,92%,53%)]/50" />
     </div>
   );
 }
