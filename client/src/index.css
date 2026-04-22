@@ -1040,6 +1040,9 @@ span.end {
 .active-word {
   color: hsl(var(--glow-primary));
 }
+:root:not(.dark) .active-word {
+  color: hsl(35 95% 38%);
+}
 .verse-end-ornament {
   display: inline-flex;
   align-items: center;
