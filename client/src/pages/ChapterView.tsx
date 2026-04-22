@@ -1102,7 +1102,7 @@ export default function ChapterView({
                     })}
                     {previewError && (
                       <div className="text-center py-2">
-                        <span className="text-xs text-red-400">{previewError}</span>
+                        <span className="text-xs text-destructive dark:text-red-400">{previewError}</span>
                       </div>
                     )}
                   </div>
