@@ -93,18 +93,11 @@ export function useWordTimingAudio(
   autoplay: boolean = false,
   enabled: boolean = true
 ) {
-  // ── Persistent audio element refs ──────────────────────────────────────────
-  // The audio element is created ONCE when `enabled` first becomes true and
-  // reused for every chapter, every verse-by-verse transition, and every
-  // manual next/prev from the lock-screen MediaSession. iOS WKWebView only
-  // permits background playback to start without a fresh user gesture when
-  // the same audio element continues — destroying & recreating breaks the
-  // lock-screen Now Playing card and silences background autoplay.
+  // Single persistent audio element reused across all chapter / verse / reciter
+  // transitions so iOS keeps its lock-screen and background-audio binding.
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // Mirror props into refs so the persistent listeners always read the
-  // latest values (they're attached once and live across many src swaps).
   const repeatRef = useRef(repeat);
   const onVerseChangeRef = useRef(onVerseChange);
   const onEndedRef = useRef(onEnded);
@@ -112,20 +105,15 @@ export function useWordTimingAudio(
   const autoplayRef = useRef(autoplay);
   const reciterIdRef = useRef(reciterId);
 
-  // Playback context — what the persistent element is currently playing.
-  // Updated by loadAudio / loadVerseByVerseAudio / handleEnded BEFORE the
-  // src swap so listeners always see the right context.
   const currentChapterIdRef = useRef<number | null>(null);
   const currentVerseNumRef = useRef<number | null>(null);
   const verseByVerseRef = useRef(false);
 
-  // Timing & VBV data
   const timingDataRef = useRef<AudioFile | null>(null);
   const vbvAvailableVersesRef = useRef<number[]>([]);
   const vbvTimingsRef = useRef<WordSegment[]>([]);
   const vbvPreloadRef = useRef<Map<number, HTMLAudioElement>>(new Map());
 
-  // Async-fetch race guards (still needed even though listeners are persistent).
   const loadIdRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const retryCountRef = useRef(0);
@@ -134,8 +122,7 @@ export function useWordTimingAudio(
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const currentVerseIndexRef = useRef<number>(-1);
-  // Suppresses spurious pause-state updates while the browser unloads the
-  // previous src and loads a new one during an in-place swap.
+  // Suppresses pause-state updates while the browser unloads/loads a new src.
   const srcChangingRef = useRef(false);
 
   const [state, setState] = useState<WordTimingAudioState>({
@@ -149,7 +136,6 @@ export function useWordTimingAudio(
     currentWordIndex: null,
   });
 
-  // ── Prop-mirroring ─────────────────────────────────────────────────────────
   useEffect(() => { repeatRef.current = repeat; }, [repeat]);
   useEffect(() => { onVerseChangeRef.current = onVerseChange; }, [onVerseChange]);
   useEffect(() => { onEndedRef.current = onEnded; }, [onEnded]);
@@ -164,7 +150,6 @@ export function useWordTimingAudio(
     return newSpeed;
   }, [initialSpeed]);
 
-  // ── Word-finding helpers (unchanged) ───────────────────────────────────────
   const findWordInVerse = useCallback((
     t: WordSegment,
     currentTimeMs: number
@@ -242,9 +227,8 @@ export function useWordTimingAudio(
     return null;
   }, []);
 
-  // ── VBV preloader (unchanged behavior; preload elements are SEPARATE from
-  // the persistent main element — they exist only to warm the URI cache /
-  // network buffer; on advance, we transfer the src URL synchronously). ───
+  // VBV preload elements warm the URI/network cache; their src is transferred
+  // to the persistent main element on advance.
   const preloadNextVerses = useCallback(async (
     currentVerseNum: number,
     reciterString: string
@@ -287,15 +271,10 @@ export function useWordTimingAudio(
     }
   }, []);
 
-  // ── Forward declaration of loaders so handlers can reference them ──────────
+  // Forward refs so the persistent audio listeners can call loaders defined below.
   const loadAudioRef = useRef<() => Promise<void>>(async () => {});
-  const loadVbvRef = useRef<(verseNum: number, shouldPlay: boolean, reciterString: string) => Promise<void>>(async () => {});
   const tryVbvFallbackRef = useRef<() => Promise<boolean>>(async () => false);
 
-  // ── Persistent audio element + persistent listeners ────────────────────────
-  // Created once when `enabled` becomes true; torn down on unmount or when
-  // `enabled` becomes false (user explicitly stopped playback). All chapter
-  // and verse transitions reuse this element via src swaps.
   useEffect(() => {
     if (!enabled) return;
 
@@ -426,7 +405,7 @@ export function useWordTimingAudio(
         return;
       }
 
-      // ── VBV: in-place advance to next downloaded verse ──────────────────
+      // VBV: in-place advance to next downloaded verse
       if (verseByVerseRef.current) {
         const curVerse = currentVerseNumRef.current;
         const available = vbvAvailableVersesRef.current;
@@ -499,7 +478,7 @@ export function useWordTimingAudio(
         return;
       }
 
-      // ── Full-chapter: in-place advance to next chapter ──────────────────
+      // Full-chapter: in-place advance to next chapter
       const curChapter = currentChapterIdRef.current;
       if (autoplayRef.current && curChapter !== null && curChapter < 114) {
         const nextChapterId = curChapter + 1;
@@ -613,7 +592,6 @@ export function useWordTimingAudio(
     };
   }, [enabled, findCurrentSegment, findVbvWordIndex, preloadNextVerses]);
 
-  // ── loadVerseByVerseAudio: src swap on persistent element ──────────────────
   const loadVerseByVerseAudio = useCallback(async (
     verseNum: number,
     shouldPlay: boolean,
@@ -701,9 +679,6 @@ export function useWordTimingAudio(
     preloadNextVerses(verseNum, reciterString);
   }, [preloadNextVerses]);
 
-  loadVbvRef.current = loadVerseByVerseAudio;
-
-  // ── Verse-by-verse fallback ────────────────────────────────────────────────
   const tryVerseByVerseFallback = useCallback(async (): Promise<boolean> => {
     if (verseByVerseRef.current) return false;
     const reciterString = quranComIdToReciterString(reciterIdRef.current);
@@ -735,7 +710,6 @@ export function useWordTimingAudio(
 
   tryVbvFallbackRef.current = tryVerseByVerseFallback;
 
-  // ── loadAudio: src swap on persistent element ──────────────────────────────
   const loadAudio = useCallback(async () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -775,7 +749,7 @@ export function useWordTimingAudio(
 
     const reciterString = quranComIdToReciterString(reciterId);
 
-    // ── Offline full-chapter ─────────────────────────────────────────────
+    // Offline full-chapter
     if (reciterString && isFullChapterDownloaded(reciterString, chapterId)) {
       try {
         const offlineTiming = await getOfflineTimingData(reciterString, chapterId) as TimingData | null;
@@ -803,7 +777,7 @@ export function useWordTimingAudio(
       }
     }
 
-    // ── Online streaming ─────────────────────────────────────────────────
+    // Online streaming
     const predictableUrl = getChapterAudioUrl(reciterId, chapterId);
     if (!predictableUrl) {
       setState(prev => ({ ...prev, isLoading: false, error: 'No audio URL available for this chapter' }));
@@ -864,7 +838,6 @@ export function useWordTimingAudio(
 
   loadAudioRef.current = loadAudio;
 
-  // ── Trigger load when chapter / reciter / enabled changes ──────────────────
   useEffect(() => {
     if (!enabled) return;
     if (!audioRef.current) return; // setup effect hasn't run yet (same render)
@@ -882,7 +855,6 @@ export function useWordTimingAudio(
     };
   }, [chapterId, reciterId, enabled, loadAudio]);
 
-  // ── rAF tick for fine-grained currentTime + word highlighting ──────────────
   useEffect(() => {
     if (!state.isPlaying) {
       if (rafIdRef.current !== null) {
@@ -923,7 +895,6 @@ export function useWordTimingAudio(
     };
   }, [state.isPlaying, findCurrentSegment]);
 
-  // ── 500ms isPlaying reconciler ─────────────────────────────────────────────
   useEffect(() => {
     const id = setInterval(() => {
       const audio = audioRef.current;
