@@ -651,22 +651,22 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
 
   /* Verse of the Day card */
   .verse-of-day-card {
-    border: 1px solid hsl(var(--glow-primary) / 0.15);
+    border: 1px solid hsl(var(--glow-accent) / 0.18);
     background: linear-gradient(
       145deg,
       hsl(var(--card)) 0%,
       hsl(var(--card)) 50%,
-      hsl(var(--glow-primary) / 0.08) 100%
+      hsl(var(--glow-accent) / 0.08) 100%
     );
     box-shadow:
-      0 2px 16px hsl(var(--glow-primary) / 0.10),
-      inset 0 1px 0 hsl(var(--glow-primary) / 0.10);
+      0 2px 16px hsl(var(--glow-accent) / 0.12),
+      inset 0 1px 0 hsl(var(--glow-accent) / 0.10);
   }
 
   .verse-of-day-bg {
     background: radial-gradient(
       ellipse at 50% 0%,
-      hsl(var(--glow-primary) / 0.08) 0%,
+      hsl(var(--glow-accent) / 0.08) 0%,
       transparent 70%
     );
   }
