@@ -446,7 +446,9 @@ export function useWordTimingAudio(
 
             // Async URI fetch fallback (less ideal for background, but the
             // preloader normally has the next 2 verses warm, so this is rare).
+            const fallbackLoadId = loadIdRef.current;
             getCachedAudioUri(reciterString, chapter, nextVerse).then(uri => {
+              if (loadIdRef.current !== fallbackLoadId) return;
               if (!uri) {
                 setState(prev => ({ ...prev, isPlaying: false, error: `Verse ${nextVerse} file missing` }));
                 return;
