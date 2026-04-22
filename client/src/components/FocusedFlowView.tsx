@@ -315,7 +315,7 @@ export default function FocusedFlowView({
             >
               <div className="max-w-lg w-full px-8 text-center space-y-6">
                 <span className={`inline-block text-xs font-semibold tabular-nums ${
-                  isCurrentVerse ? 'text-primary' : 'text-muted-foreground/70'
+                  isCurrentVerse ? 'text-primary' : 'text-muted-foreground'
                 }`}>
                   {verseLabel}
                 </span>
@@ -360,7 +360,7 @@ export default function FocusedFlowView({
                     translationVisible ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
                     <p className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
-                      isCurrentVerse ? 'text-foreground' : 'text-foreground/80'
+                      isCurrentVerse ? 'text-foreground' : 'text-foreground/90'
                     }`}>
                       {page.translation}
                     </p>

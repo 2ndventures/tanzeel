@@ -183,7 +183,7 @@ function VerseCardInner({
                 className={`inline-block text-xs font-semibold tabular-nums transition-colors ${
                   highlighted
                     ? 'text-primary'
-                    : 'text-muted-foreground/70'
+                    : 'text-muted-foreground'
                 }`}
                 data-testid={`text-verse-number-${verseNumber}`}
               >
@@ -201,7 +201,7 @@ function VerseCardInner({
               <Icon
                 icon={bookmarked ? "solar:bookmark-bold" : "solar:bookmark-linear"}
                 className={`size-4 transition-colors ${
-                  bookmarked ? 'text-primary' : 'text-muted-foreground/50'
+                  bookmarked ? 'text-primary' : 'text-muted-foreground/70'
                 }`}
               />
             </button>
@@ -256,7 +256,7 @@ function VerseCardInner({
           {showTranslation && (
             <p
               className={`${getTranslationFontSize(translationFontSize)} transition-colors ${
-                highlighted ? 'text-foreground' : 'text-foreground/80'
+                highlighted ? 'text-foreground' : 'text-foreground/90'
               }`}
               data-testid={`text-translation-${verseNumber}`}
             >

@@ -308,13 +308,13 @@ export default function AudioPlayer({
               {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
             </h2>
             {reciterName && (
-              <p className="text-xs font-medium text-muted-foreground dark:text-white/50 truncate" data-testid="text-reciter-name">
+              <p className="text-xs font-medium text-muted-foreground dark:text-white/75 truncate" data-testid="text-reciter-name">
                 {reciterName}
               </p>
             )}
           </div>
           {surahNameArabic && (
-            <span className="font-arabic text-lg text-muted-foreground/60 dark:text-white/40 shrink-0 ml-4" data-testid="text-surah-arabic">
+            <span className="font-arabic text-lg text-muted-foreground dark:text-white/70 shrink-0 ml-4" data-testid="text-surah-arabic">
               {surahNameArabic}
             </span>
           )}

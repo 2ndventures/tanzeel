@@ -301,7 +301,7 @@ export default function MushafPageView({
                           className={`${getTranslationFontSize(translationFontSize)} text-muted-foreground text-center leading-relaxed transition-opacity duration-300`}
                           dir="ltr"
                         >
-                          <span className="text-xs text-primary/50 mr-1">
+                          <span className="text-xs text-primary/80 mr-1">
                             {chapterId}:{currentVerse}
                           </span>
                           {activeVerse.translation}

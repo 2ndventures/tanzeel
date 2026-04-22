@@ -116,11 +116,11 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.08)] to-[hsl(var(--glow-secondary)/0.08)] dark:from-[hsl(var(--glow-primary)/0.05)] dark:to-[hsl(220_70%_56%/0.08)] rounded-3xl" />
             <div className="relative mb-4 flex items-center justify-between">
               <div>
-                <p className="text-sm text-foreground/70">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
+                <p className="text-sm text-foreground/90">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
                 <h3 className="mt-2 font-heading text-3xl font-bold tracking-tighter text-foreground">
                   Surah {currentChapter.englishName}
                 </h3>
-                <p className="mt-2 text-sm text-foreground/60">
+                <p className="mt-2 text-sm text-foreground/80">
                   {stats.lastReadVerse > 0 ? `Ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}` : `${currentChapter.verseCount} Ayahs`}
                 </p>
               </div>
@@ -132,7 +132,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 className="h-full rounded-full bg-gradient-to-r from-primary to-secondary shadow-inner"
               />
             </div>
-            <div className="flex items-center justify-between text-xs text-foreground/60">
+            <div className="flex items-center justify-between text-xs text-foreground/80">
               <span>{progress}% Complete</span>
               <span>{stats.lastReadVerse > 0 ? `${versesLeft} Ayahs left` : `Ready to start`}</span>
             </div>
@@ -212,7 +212,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                   {dailyChapter.englishName} {daily.id}:{daily.ayah}
                 </p>
                 <p
-                  className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-muted-foreground/50"
+                  className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-muted-foreground/80"
                   style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.9s forwards' }}
                 >
                   Verse of the Day
