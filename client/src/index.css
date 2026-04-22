@@ -1039,10 +1039,6 @@ span.end {
 }
 .active-word {
   color: hsl(var(--glow-primary));
-  font-weight: 700;
-}
-:root:not(.dark) .active-word {
-  text-shadow: 0 0 12px hsl(var(--glow-primary) / 0.35);
 }
 .verse-end-ornament {
   display: inline-flex;
