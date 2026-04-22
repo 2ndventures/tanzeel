@@ -1038,12 +1038,10 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  background-color: hsl(var(--glow-primary) / 0.3);
-  border-radius: 0.25em;
-  padding-inline: 0.15em;
-  margin-inline: -0.15em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+  text-shadow:
+    0 0 6px hsl(var(--glow-primary) / 0.95),
+    0 0 14px hsl(var(--glow-primary) / 0.75),
+    0 0 24px hsl(var(--glow-primary) / 0.45);
 }
 .verse-end-ornament {
   display: inline-flex;
