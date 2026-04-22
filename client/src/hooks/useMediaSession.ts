@@ -55,6 +55,10 @@ export function useMediaSession({
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
     if (!active) {
+      // Only clear metadata when audio session is fully torn down (user stopped
+      // playback). Clearing on every title/album change would briefly null the
+      // iOS Now Playing card mid-session, which can drop the lock-screen
+      // controls when advancing between surahs.
       navigator.mediaSession.metadata = null;
       return;
     }
@@ -65,12 +69,9 @@ export function useMediaSession({
       album,
       artwork: MEDIA_SESSION_ARTWORK,
     });
-
-    return () => {
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = null;
-      }
-    };
+    // Intentionally no cleanup — the metadata stays bound across title/album
+    // updates so the lock-screen card transitions seamlessly. It will be
+    // cleared by the `!active` branch above when audio is stopped.
   }, [title, artist, album, active]);
 
   useEffect(() => {

@@ -247,6 +247,30 @@ export function useWordTimingAudio(
   const currentVerseIndexRef = useRef<number>(-1);
   const srcChangingRef = useRef(false);
 
+  // The chapter currently bound to the live audio element. handleEnded reads this
+  // (instead of the loadAudio closure's chapterId) so that after an in-place
+  // chapter advance, the next `ended` event computes "next" relative to the
+  // chapter actually playing, not the chapter that was loading when the
+  // listeners were attached.
+  const currentChapterIdRef = useRef<number | null>(null);
+
+  // Set by the previous chapter's `ended` handler when it has swapped the
+  // audio element's src to the next chapter's URL in-place and started
+  // playback. The next loadAudio invocation honors this token and skips
+  // teardown / element recreation, so iOS WKWebView keeps the lock-screen
+  // Now Playing card alive and background playback continues uninterrupted.
+  // Token is keyed by both chapterId AND reciterId so a reciter switch mid-
+  // transition does NOT silently keep playing the old reciter's audio.
+  const inPlaceAdvanceRef = useRef<{ chapterId: number; reciterId: number } | null>(null);
+  const inPlaceWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearInPlaceAdvance = useCallback(() => {
+    inPlaceAdvanceRef.current = null;
+    if (inPlaceWatchdogRef.current) {
+      clearTimeout(inPlaceWatchdogRef.current);
+      inPlaceWatchdogRef.current = null;
+    }
+  }, []);
+
   const preloadNextVerses = useCallback(async (
     currentVerseNum: number,
     reciterString: string
@@ -562,6 +586,69 @@ export function useWordTimingAudio(
   }, [reciterId, chapterId, loadVerseByVerseAudio]);
 
   const loadAudio = useCallback(async () => {
+    // ── In-place chapter advance fast path ──────────────────────────────────
+    // The previous chapter's `ended` handler already swapped the live audio
+    // element's src to this chapter's URL and called .play(), so iOS treats
+    // playback as a continuation and the lock-screen Now Playing card stays
+    // bound. Skip teardown + element recreation; just refresh timing data.
+    // Token must match BOTH chapterId and reciterId — otherwise (user switched
+    // reciter or jumped to a non-adjacent chapter mid-transition), discard
+    // the token and fall through to the normal teardown/recreate path so we
+    // don't keep playing the wrong audio under the wrong UI.
+    const inPlaceToken = inPlaceAdvanceRef.current;
+    if (
+      inPlaceToken !== null &&
+      inPlaceToken.chapterId === chapterId &&
+      inPlaceToken.reciterId === reciterId &&
+      audioRef.current
+    ) {
+      clearInPlaceAdvance();
+      currentChapterIdRef.current = chapterId;
+      timingDataRef.current = null;
+      currentVerseIndexRef.current = -1;
+      verseByVerseRef.current = false;
+      setState(prev => ({
+        ...prev,
+        currentVerseKey: null,
+        currentWordIndex: null,
+        error: null,
+      }));
+
+      const myLoadIdInPlace = loadIdRef.current;
+      const reciterStringInPlace = quranComIdToReciterString(reciterId);
+      const timingUrl = getTimingUrl(reciterId, chapterId);
+      try {
+        const memCached = getTimingDataFromMemory(reciterId, chapterId);
+        const timingData: TimingData = memCached ?? await (async () => {
+          const r = await fetch(timingUrl);
+          if (!r.ok) throw new Error(`Timing API ${r.status}`);
+          const raw = await r.json() as Record<string, unknown>;
+          const normalized = normalizeTimingResponse(raw);
+          const data: TimingData = { audio_files: normalized.audio_files as AudioFile[] };
+          storeTimingDataInMemory(reciterId, chapterId, data);
+          return data;
+        })();
+        if (loadIdRef.current !== myLoadIdInPlace) return;
+        if (timingData.audio_files?.[0]) {
+          timingDataRef.current = timingData.audio_files[0];
+        }
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') return;
+        // Audio is already playing the new chapter — timing-data refresh
+        // failure only affects word highlighting, not playback. Log and
+        // continue.
+        console.error('Tanzeel: timing refresh during in-place advance failed:', err);
+      }
+      // Suppress unused-variable warning for reciterStringInPlace; kept for
+      // future per-reciter timing endpoints.
+      void reciterStringInPlace;
+      return;
+    }
+
+    // Token didn't match the fast path — discard it so it can't poison a
+    // later cleanup. We're about to do a full teardown + recreate anyway.
+    clearInPlaceAdvance();
+
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
     srcChangingRef.current = false;
@@ -601,6 +688,7 @@ export function useWordTimingAudio(
 
           if (offlineUri && offlineTiming?.audio_files?.[0]) {
             timingDataRef.current = offlineTiming.audio_files[0];
+            currentChapterIdRef.current = chapterId;
 
             const container = document.createElement('div');
             container.style.display = 'none';
@@ -749,6 +837,7 @@ export function useWordTimingAudio(
       const audio = document.createElement('audio');
       audio.preload = 'auto';
       container.appendChild(audio);
+      currentChapterIdRef.current = chapterId;
 
       // Start audio buffering immediately — timing fetches in parallel below
       const predictableUrl = getChapterAudioUrl(reciterId, chapterId);
@@ -841,10 +930,62 @@ export function useWordTimingAudio(
         if (repeatRef.current) {
           audio.currentTime = 0;
           audio.play();
-        } else {
-          setState(prev => ({ ...prev, isPlaying: false }));
-          onEndedRef.current?.();
+          return;
         }
+        // ── In-place chapter advance ────────────────────────────────────────
+        // Swap the live audio element's src to the next chapter and call
+        // .play() synchronously inside this `ended` handler. iOS WKWebView
+        // treats this as a continuation of the active audio session, which
+        // (a) keeps the lock-screen Now Playing card bound and (b) is the
+        // only path that allows playback to start on a backgrounded /
+        // locked device without a fresh user gesture.
+        const curChapterId = currentChapterIdRef.current ?? chapterId;
+        if (autoplayRef.current && curChapterId < 114) {
+          const nextChapterId = curChapterId + 1;
+          const nextUrl = getChapterAudioUrl(reciterId, nextChapterId);
+          if (nextUrl) {
+            inPlaceAdvanceRef.current = { chapterId: nextChapterId, reciterId };
+            // Watchdog: if the React re-render + loadAudio invocation that
+            // consumes this token doesn't run within 5s (e.g. the host
+            // component unmounted, or AudioContext didn't propagate state),
+            // clear the token so future cleanup paths can tear down normally.
+            if (inPlaceWatchdogRef.current) clearTimeout(inPlaceWatchdogRef.current);
+            inPlaceWatchdogRef.current = setTimeout(() => {
+              inPlaceAdvanceRef.current = null;
+              inPlaceWatchdogRef.current = null;
+            }, 5000);
+            currentChapterIdRef.current = nextChapterId;
+            timingDataRef.current = null;
+            currentVerseIndexRef.current = -1;
+            srcChangingRef.current = true;
+            audio.src = nextUrl;
+            audio.load();
+            audio.play().catch(() => {});
+            const clearSrcFlag = () => {
+              audio.removeEventListener('canplay', clearSrcFlag);
+              audio.removeEventListener('loadeddata', clearSrcFlag);
+              audio.removeEventListener('error', clearSrcFlag);
+              srcChangingRef.current = false;
+            };
+            audio.addEventListener('canplay', clearSrcFlag);
+            audio.addEventListener('loadeddata', clearSrcFlag);
+            audio.addEventListener('error', clearSrcFlag);
+            setState(prev => ({
+              ...prev,
+              currentVerseKey: null,
+              currentWordIndex: null,
+              currentTime: 0,
+              duration: 0,
+            }));
+            // Notify React (AudioContext) so chapterId state advances and the
+            // visible UI / mini-player title updates. The resulting loadAudio
+            // re-invocation honors `inPlaceAdvanceRef` and skips teardown.
+            onEndedRef.current?.();
+            return;
+          }
+        }
+        setState(prev => ({ ...prev, isPlaying: false }));
+        onEndedRef.current?.();
       };
 
       const handleError = (e: Event) => {
@@ -1046,6 +1187,28 @@ export function useWordTimingAudio(
     }
     loadAudio();
     return () => {
+      // ── Skip teardown during in-place chapter advance ────────────────────
+      // The previous chapter's `ended` handler already swapped the audio
+      // element's src to the new chapter's URL and started playback. Tearing
+      // down here would kill iOS's lock-screen Now Playing card and stop
+      // background playback. We also intentionally do NOT bump loadIdRef so
+      // the existing listeners (still attached to the same element) keep
+      // updating state for the new chapter. They read currentChapterIdRef
+      // when computing "next", so they remain correct after the advance.
+      //
+      // We only honor the token when `enabled` is still true. If the host
+      // disabled audio (user stopped playback), we MUST tear down regardless
+      // of the token to respect that intent.
+      if (inPlaceAdvanceRef.current !== null && enabled) {
+        if (retryTimerRef.current) {
+          clearTimeout(retryTimerRef.current);
+          retryTimerRef.current = null;
+        }
+        return;
+      }
+      // Defensive: clear any lingering in-place token so it can't poison
+      // a future cleanup (e.g. user navigated away before token was consumed).
+      clearInPlaceAdvance();
       loadIdRef.current++;
       abortControllerRef.current?.abort();
       if (retryTimerRef.current) {
@@ -1060,8 +1223,9 @@ export function useWordTimingAudio(
         audioContainerRef.current.remove();
         audioContainerRef.current = null;
       }
+      currentChapterIdRef.current = null;
     };
-  }, [loadAudio, enabled]);
+  }, [loadAudio, enabled, clearInPlaceAdvance]);
 
   useEffect(() => {
     if (!state.isPlaying) {
