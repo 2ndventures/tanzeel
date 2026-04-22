@@ -43,7 +43,7 @@
   --sidebar-primary-foreground: 40 40% 97%;
   --sidebar-accent: 40 30% 88%;           /* page-tone selection surface */
   --sidebar-accent-foreground: 224 28% 14%;
-  --sidebar-ring: 45 89% 63%;             /* bright gold focus, matches dark mode */
+  --sidebar-ring: 44 92% 53%;             /* deep amber-gold focus, matches dark mode */
 
   /* Popovers — same as card */
   --popover: 40 40% 96%;
@@ -54,8 +54,8 @@
   --primary: 224 28% 14%;       /* #1A1F2E */
   --primary-foreground: 40 40% 97%;
 
-  /* Secondary — bright gold (same as dark mode), with navy text for contrast */
-  --secondary: 45 89% 63%;      /* #F5C84A — identical to dark-mode gold */
+  /* Secondary — deep amber-gold (same as dark mode), with navy text for contrast */
+  --secondary: 44 92% 53%;      /* #F6B817 — identical to dark-mode gold */
   --secondary-foreground: 224 28% 14%;
 
   /* Muted — paper-tone surface + warm grey ink for whispered text */
@@ -70,18 +70,18 @@
   --destructive-foreground: 40 40% 97%;
 
   --input: 40 22% 82%;
-  --ring: 45 89% 63%;           /* bright gold focus rings */
+  --ring: 44 92% 53%;           /* deep amber-gold focus rings */
 
-  /* Charts — navy + bright gold, identical hues to dark mode */
+  /* Charts — navy + deep amber-gold, identical hues to dark mode */
   --chart-1: 224 28% 14%;       /* ink */
-  --chart-2: 45 89% 63%;        /* gold */
+  --chart-2: 44 92% 53%;        /* gold */
   --chart-3: 224 18% 50%;       /* ink faded */
-  --chart-4: 45 75% 75%;        /* gold light */
+  --chart-4: 44 80% 70%;        /* gold light */
   --chart-5: 30 10% 38%;        /* warm grey */
 
-  /* Glows — bright yellow-gold, identical to dark mode (#F5C84A) */
-  --glow-primary: 45 89% 63%;
-  --glow-secondary: 45 89% 63%;
+  /* Glows — deep amber-gold, identical to dark mode (#F6B817) */
+  --glow-primary: 44 92% 53%;
+  --glow-secondary: 44 92% 53%;
   --glow-accent: 224 28% 14%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -176,7 +176,7 @@
 
   --sidebar-border: 220 20% 18%;
 
-  --sidebar-primary: 45 93% 58%;
+  --sidebar-primary: 44 92% 53%;
 
   --sidebar-primary-foreground: 234 34% 10%;
 
@@ -184,7 +184,7 @@
 
   --sidebar-accent-foreground: 0 0% 100%;
 
-  --sidebar-ring: 45 93% 58%;
+  --sidebar-ring: 44 92% 53%;
 
   --popover: 220 20% 20%;
 
@@ -192,7 +192,7 @@
 
   --popover-border: 220 15% 23%;
 
-  --primary: 45 93% 58%;
+  --primary: 44 92% 53%;
 
   --primary-foreground: 234 34% 10%;
 
@@ -215,18 +215,18 @@
   --destructive-foreground: 0 0% 100%;
 
   --input: 220 20% 18%;
-  --ring: 45 93% 58%;
+  --ring: 44 92% 53%;
 
   /* Charts — gold + navy variants only, identical hue family to light mode */
-  --chart-1: 45 93% 66%;        /* gold */
+  --chart-1: 44 92% 60%;        /* gold */
   --chart-2: 220 28% 70%;       /* navy light */
-  --chart-3: 45 80% 50%;        /* gold deep */
+  --chart-3: 44 88% 45%;        /* gold deep */
   --chart-4: 220 20% 45%;       /* navy mid */
-  --chart-5: 45 60% 82%;        /* gold pale */
+  --chart-5: 44 65% 78%;        /* gold pale */
 
   /* Glows — gold-only family, matches light mode */
-  --glow-primary: 45 93% 58%;
-  --glow-secondary: 45 93% 58%;
+  --glow-primary: 44 92% 53%;
+  --glow-secondary: 44 92% 53%;
   --glow-accent: 220 28% 22%;
 
   --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
