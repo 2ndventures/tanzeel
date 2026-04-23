@@ -21,6 +21,12 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
     private var commandsRegistered = false
     private var nextEnabled = false
     private var prevEnabled = false
+    /// Tracks whether the JS layer believes audio is currently playing. Used
+    /// by the interruption handler to (a) avoid auto-resuming after a real
+    /// interruption when the user had paused before it began, and (b) avoid
+    /// emitting spurious pause events on session activation noise.
+    private var jsBelievesPlaying = false
+    private var wasPlayingBeforeInterruption = false
 
     override public func load() {
         DispatchQueue.main.async { [weak self] in
@@ -56,14 +62,24 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
 
         switch type {
         case .began:
-            // Mirror the OS pause into the JS state so the UI shows paused.
-            notifyListeners("pause", data: [:])
+            // iOS already auto-pauses the WKWebView <audio> element on a real
+            // interruption — we do NOT need to forward a `pause` event to JS.
+            // Forwarding a pause was causing playback to die on TestFlight
+            // because spurious `.began` notifications fire when the audio
+            // session is first activated by the WebView, killing audio ~0.5s
+            // after the user pressed play. We just record state so we know
+            // whether to auto-resume on `.ended`.
+            wasPlayingBeforeInterruption = jsBelievesPlaying
         case .ended:
-            guard let optionsRaw = info[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
+            // Only auto-resume if the system explicitly says so AND the user
+            // was actually playing when the interruption began. This prevents
+            // re-starting playback after the user had manually paused.
+            guard
+                wasPlayingBeforeInterruption,
+                let optionsRaw = info[AVAudioSessionInterruptionOptionKey] as? UInt
+            else { return }
             let options = AVAudioSession.InterruptionOptions(rawValue: optionsRaw)
             if options.contains(.shouldResume) {
-                // Reactivate the session before asking JS to play, otherwise
-                // the WebView audio element will silently fail to resume.
                 do {
                     try AVAudioSession.sharedInstance().setActive(true, options: [])
                 } catch {
@@ -71,6 +87,7 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
                 }
                 notifyListeners("play", data: [:])
             }
+            wasPlayingBeforeInterruption = false
         @unknown default:
             break
         }
@@ -178,6 +195,7 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            self.jsBelievesPlaying = isPlaying
             self.nowPlayingInfo[MPNowPlayingInfoPropertyPlaybackRate] = isPlaying ? speed : 0.0
             if let pos = position {
                 self.nowPlayingInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = pos
