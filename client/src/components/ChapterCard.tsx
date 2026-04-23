@@ -16,9 +16,9 @@ interface ChapterCardProps {
 }
 
 const badgeStyles = [
-  { bg: "bg-[hsl(var(--glow-primary))]", text: "text-[hsl(var(--glow-accent))]" },
-  { bg: "bg-[hsl(var(--glow-primary))]", text: "text-[hsl(var(--glow-accent))]" },
-  { bg: "bg-[hsl(var(--glow-primary))]", text: "text-[hsl(var(--glow-accent))]" },
+  { bg: "bg-[hsl(var(--glow-accent))] dark:bg-[hsl(var(--glow-primary))]", text: "text-[hsl(var(--glow-primary))] dark:text-[hsl(var(--glow-accent))]" },
+  { bg: "bg-[hsl(var(--glow-accent))] dark:bg-[hsl(var(--glow-primary))]", text: "text-[hsl(var(--glow-primary))] dark:text-[hsl(var(--glow-accent))]" },
+  { bg: "bg-[hsl(var(--glow-accent))] dark:bg-[hsl(var(--glow-primary))]", text: "text-[hsl(var(--glow-primary))] dark:text-[hsl(var(--glow-accent))]" },
 ];
 
 export default function ChapterCard({
