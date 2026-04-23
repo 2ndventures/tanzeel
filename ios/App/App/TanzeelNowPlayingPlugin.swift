@@ -211,13 +211,13 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
             }
             MPNowPlayingInfoCenter.default().nowPlayingInfo = self.nowPlayingInfo
 
-            // Reassert audio session ownership so iOS keeps Tanzeel as the
-            // Now Playing app even after pause from the lock screen.
-            do {
-                try AVAudioSession.sharedInstance().setActive(true, options: [])
-            } catch {
-                // Non-fatal — session may already be active.
-            }
+            // NOTE: Do NOT call AVAudioSession.setActive(true) here. The session
+            // is already activated once at launch (AppDelegate) and once in
+            // load(). Calling it on every JS state push causes the WKWebView's
+            // <audio> element to lose its audio session on real iOS devices —
+            // playback starts, then dies after ~0.5s, and subsequent play()
+            // calls silently reject. Simulator does not exhibit this; only
+            // physical hardware does.
             call.resolve()
         }
     }
