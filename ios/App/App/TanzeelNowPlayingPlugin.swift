@@ -26,7 +26,53 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async { [weak self] in
             self?.activateAudioSession()
             self?.registerCommands()
+            self?.registerInterruptionObserver()
             self?.preloadArtwork()
+        }
+    }
+
+    /// Observe phone-call / Siri / other-app interruptions so playback resumes
+    /// automatically when the interruption ends (e.g. user finishes a call).
+    /// iOS pauses the WKWebView <audio> element on its own at interruption
+    /// start, but does not auto-resume — without this, users would have to
+    /// manually tap play after every call. We forward the same `pause` /
+    /// `play` events the lock-screen buttons use so the JS layer stays in
+    /// sync with the actual audio engine state.
+    private func registerInterruptionObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleInterruption(_:)),
+            name: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance()
+        )
+    }
+
+    @objc private func handleInterruption(_ notification: Notification) {
+        guard
+            let info = notification.userInfo,
+            let typeRaw = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+            let type = AVAudioSession.InterruptionType(rawValue: typeRaw)
+        else { return }
+
+        switch type {
+        case .began:
+            // Mirror the OS pause into the JS state so the UI shows paused.
+            notifyListeners("pause", data: [:])
+        case .ended:
+            guard let optionsRaw = info[AVAudioSessionInterruptionOptionKey] as? UInt else { return }
+            let options = AVAudioSession.InterruptionOptions(rawValue: optionsRaw)
+            if options.contains(.shouldResume) {
+                // Reactivate the session before asking JS to play, otherwise
+                // the WebView audio element will silently fail to resume.
+                do {
+                    try AVAudioSession.sharedInstance().setActive(true, options: [])
+                } catch {
+                    // Non-fatal — JS play() will retry activation indirectly.
+                }
+                notifyListeners("play", data: [:])
+            }
+        @unknown default:
+            break
         }
     }
 

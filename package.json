@@ -20,7 +20,6 @@
     "@capacitor/keyboard": "^7.0.5",
     "@capacitor/network": "^7.0.4",
     "@capacitor/preferences": "^7.0.0",
-    "@capgo/native-audio": "^7.9.2",
     "@hookform/resolvers": "^3.10.0",
     "@iconify/react": "^6.0.2",
     "@jridgewell/trace-mapping": "^0.3.25",
