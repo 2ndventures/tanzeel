@@ -269,10 +269,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                     onClick={() => setMode("surah")}
                     className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
                       mode === "surah"
-                        ? "bg-gradient-to-r from-primary via-primary to-secondary text-primary-foreground shadow-lg"
+                        ? "bg-primary text-primary-foreground shadow-lg"
                         : "text-muted-foreground"
                     }`}
-                    style={mode === "surah" ? { boxShadow: '0 0 20px rgba(30,37,53,0.25)' } : undefined}
                     data-testid="button-mode-surah"
                   >
                     All Surahs
@@ -281,10 +280,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                     onClick={() => setMode("juz")}
                     className={`flex-1 py-3 rounded-3xl font-semibold text-sm transition-all ${
                       mode === "juz"
-                        ? "bg-gradient-to-r from-primary via-primary to-secondary text-primary-foreground shadow-lg"
+                        ? "bg-primary text-primary-foreground shadow-lg"
                         : "text-muted-foreground"
                     }`}
-                    style={mode === "juz" ? { boxShadow: '0 0 20px rgba(30,37,53,0.25)' } : undefined}
                     data-testid="button-mode-juz"
                   >
                     Juz
