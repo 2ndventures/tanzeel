@@ -131,7 +131,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                     {stats.lastReadVerse > 0 ? `Ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}` : `${currentChapter.verseCount} Ayahs`}
                   </p>
                 </div>
-                <Icon icon="solar:book-2-bold" className="size-14 text-foreground/20" />
+                <Icon icon="solar:book-2-bold" className="size-14 text-[hsl(var(--glow-accent))]" />
               </div>
               <div className="mb-4 h-3 overflow-hidden rounded-full bg-foreground/10">
                 <div
