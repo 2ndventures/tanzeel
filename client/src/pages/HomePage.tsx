@@ -105,7 +105,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
         <PullToRefresh onRefresh={handleRefresh} scrollRef={scrollRef}>
           {/* Gradient-border wrapper — the 2px gradient bg shows as the border */}
           <div
-            className="p-[2px] rounded-3xl bg-gradient-to-br from-white to-[hsl(var(--glow-primary))] dark:from-[hsl(var(--glow-primary)/0.7)] dark:to-[hsl(var(--glow-primary)/0.2)] shadow-[0_0_30px_hsl(var(--glow-primary)/0.25)] dark:shadow-[0_10px_40px_hsl(var(--glow-primary)/0.15)] cursor-pointer flex-1 animate-fade-in-up"
+            className="p-[2px] rounded-3xl bg-gradient-to-br from-[hsl(224_28%_35%)] to-[hsl(224_28%_10%)] shadow-[0_4px_24px_hsl(224_28%_16%/0.3)] cursor-pointer flex-1 animate-fade-in-up"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
             onClick={() => onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined); }}}
