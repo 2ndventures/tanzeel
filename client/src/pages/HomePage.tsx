@@ -141,7 +141,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
           <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="grid grid-cols-3 gap-4">
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-primary/90 dark:bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-primary/20 dark:border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -149,13 +149,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Browse all surahs"
                 data-testid="button-bookmarks"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
-                  <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-accent))] dark:text-foreground" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-white/10 dark:bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-secondary dark:text-foreground" />
                 </div>
-                <span className="text-xs font-semibold text-foreground">Surahs</span>
+                <span className="text-xs font-semibold text-primary-foreground dark:text-foreground">Surahs</span>
               </div>
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-primary/90 dark:bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-primary/20 dark:border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -163,13 +163,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="View favorites"
                 data-testid="button-favorites"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
-                  <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-accent))] dark:text-foreground" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-white/10 dark:bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
+                  <Icon icon="solar:star-bold" className="size-7 text-secondary dark:text-foreground" />
                 </div>
-                <span className="text-xs font-semibold text-foreground">Favorites</span>
+                <span className="text-xs font-semibold text-primary-foreground dark:text-foreground">Favorites</span>
               </div>
               <div
-                className="flex flex-col items-center justify-center rounded-3xl bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-primary/90 dark:bg-card/80 p-4 shadow-lg backdrop-blur-sm border border-primary/20 dark:border-[hsl(var(--glow-accent)/0.18)] cursor-pointer"
                 onClick={() => onNavigate("settings", undefined, "settings")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("settings", undefined, "settings"); }}}
                 role="button"
@@ -177,10 +177,10 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Open settings"
                 data-testid="button-settings"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
-                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))] dark:text-foreground" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-white/10 dark:bg-[hsl(var(--glow-accent)/0.10)] shadow-inner">
+                  <Icon icon="solar:settings-bold" className="size-7 text-secondary dark:text-foreground" />
                 </div>
-                <span className="text-xs font-semibold text-foreground">Settings</span>
+                <span className="text-xs font-semibold text-primary-foreground dark:text-foreground">Settings</span>
               </div>
             </div>
           </div>
@@ -198,21 +198,21 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               <div className="verse-of-day-bg absolute inset-0" />
               <div className="relative px-6 py-6 flex flex-col items-center text-center">
                 <p
-                  className="font-arabic text-[1.7rem] leading-[2.4] text-foreground mb-4"
+                  className="font-arabic text-[1.7rem] leading-[2.4] text-primary-foreground dark:text-foreground mb-4"
                   dir="rtl"
                   style={{ opacity: 0, animation: 'verseReveal 0.7s ease-out 0.3s forwards' }}
                 >
                   {daily.verse}
                 </p>
-                <div className="w-10 h-px bg-[hsl(var(--glow-primary)/0.35)] mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
+                <div className="w-10 h-px bg-secondary/50 dark:bg-[hsl(var(--glow-primary)/0.35)] mb-3" style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.7s forwards' }} />
                 <p
-                  className="text-xs font-medium text-[hsl(var(--glow-primary))] mb-1"
+                  className="text-xs font-medium text-secondary dark:text-[hsl(var(--glow-primary))] mb-1"
                   style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.8s forwards' }}
                 >
                   {dailyChapter.englishName} {daily.id}:{daily.ayah}
                 </p>
                 <p
-                  className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-muted-foreground/80"
+                  className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary-foreground/60 dark:text-muted-foreground/80"
                   style={{ opacity: 0, animation: 'verseReveal 0.5s ease-out 0.9s forwards' }}
                 >
                   Verse of the Day
