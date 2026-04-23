@@ -650,9 +650,24 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
     to { opacity: 0; }
   }
 
+  /* Home screen background — light mode: cool navy-tinted top sweep → warm paper; dark: flat */
+  .home-bg {
+    background: linear-gradient(
+      180deg,
+      hsl(224 22% 87%) 0%,
+      hsl(224 20% 91%) 20%,
+      hsl(var(--background)) 52%
+    );
+  }
+  .dark .home-bg {
+    background: hsl(var(--background));
+  }
+
   /* Verse of the Day card */
   .verse-of-day-card {
-    background: hsl(var(--card));
+    background: hsl(var(--card) / 0.90);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   .verse-of-day-bg {
