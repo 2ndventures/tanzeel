@@ -154,8 +154,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Browse all surahs"
                 data-testid="button-bookmarks"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
-                  <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent))] dark:bg-[hsl(var(--glow-primary))] shadow-inner">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-primary))] dark:text-[hsl(var(--glow-accent))]" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
@@ -168,8 +168,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="View favorites"
                 data-testid="button-favorites"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
-                  <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent))] dark:bg-[hsl(var(--glow-primary))] shadow-inner">
+                  <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-primary))] dark:text-[hsl(var(--glow-accent))]" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Favorites</span>
               </div>
@@ -182,8 +182,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Open settings"
                 data-testid="button-settings"
               >
-                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
-                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-accent))] dark:bg-[hsl(var(--glow-primary))] shadow-inner">
+                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-primary))] dark:text-[hsl(var(--glow-accent))]" />
                 </div>
                 <span className="text-xs font-semibold text-foreground">Settings</span>
               </div>
