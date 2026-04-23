@@ -80,8 +80,8 @@
   --chart-5: 220 12% 38%;       /* cool slate */
 
   /* Glows — deep amber-gold, identical to dark mode (#F6B817) */
-  --glow-primary: 44 92% 53%;
-  --glow-secondary: 44 92% 53%;
+  --glow-primary: 43 93% 53%;
+  --glow-secondary: 43 93% 53%;
   --glow-accent: 224 28% 16%;
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -225,8 +225,8 @@
   --chart-5: 44 65% 78%;        /* gold pale */
 
   /* Glows — gold-only family, matches light mode */
-  --glow-primary: 44 92% 53%;
-  --glow-secondary: 44 92% 53%;
+  --glow-primary: 43 93% 53%;
+  --glow-secondary: 43 93% 53%;
   --glow-accent: 224 28% 22%;
 
   --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
@@ -1038,10 +1038,8 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  text-shadow:
-    0 0 6px hsl(var(--glow-primary) / 0.95),
-    0 0 14px hsl(var(--glow-primary) / 0.75),
-    0 0 24px hsl(var(--glow-primary) / 0.45);
+  color: hsl(var(--glow-primary));
+  text-shadow: 0 0 4px hsl(var(--glow-primary) / 0.35);
 }
 .verse-end-ornament {
   display: inline-flex;
