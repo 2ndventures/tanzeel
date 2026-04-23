@@ -127,6 +127,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     isPlaying: hookIsPlaying, currentTime: hookCurrentTime, duration: hookDuration,
     currentVerseKey: hookCurrentVerseKey, currentWordIndex: hookCurrentWordIndex,
     isLoading: hookIsLoading, error: hookError, speed: hookSpeed,
+    isStalled: hookIsStalled,
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
     setSpeed, getTimingData, retry,
   } = hookResult;
@@ -183,6 +184,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     currentTime: value.currentTime,
     duration: value.duration,
     speed: value.speed,
+    isStalled: enabled ? hookIsStalled : false,
     onPlay: playAudio,
     onPause: pauseAudio,
     onSeek: seek,

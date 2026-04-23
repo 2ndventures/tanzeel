@@ -74,6 +74,11 @@ interface WordTimingAudioState {
   duration: number;
   currentVerseKey: string | null;
   currentWordIndex: number | null;
+  // True when the audio element has fired `waiting`/`stalled` and has not
+  // yet recovered (no `playing`/`canplay`/`pause` since). Surfaces through
+  // AudioContext so the Media Session layer can freeze the OS scrubber
+  // while the underlying audio is buffering on a slow connection.
+  isStalled: boolean;
 }
 
 function quranComIdToReciterString(quranComId: number): string | null {
@@ -154,6 +159,7 @@ export function useWordTimingAudio(
     duration: 0,
     currentVerseKey: null,
     currentWordIndex: null,
+    isStalled: false,
   });
 
   useEffect(() => { isPlayingRef.current = state.isPlaying; }, [state.isPlaying]);
@@ -417,7 +423,10 @@ export function useWordTimingAudio(
       // canplay is too early — the element is still paused at this point,
       // and any reconciliation read of audio.paused would falsely flip
       // isPlaying to false and flicker the play/pause icon.
-      setState(prev => prev.isLoading ? { ...prev, isLoading: false } : prev);
+      setState(prev => {
+        if (!prev.isLoading && !prev.isStalled) return prev;
+        return { ...prev, isLoading: false, isStalled: false };
+      });
     };
 
     const handleLoadedData = () => {
@@ -437,7 +446,7 @@ export function useWordTimingAudio(
 
     const handlePlaying = () => {
       clearSrcFlag();
-      setState(prev => ({ ...prev, isPlaying: true, isLoading: false, error: null }));
+      setState(prev => ({ ...prev, isPlaying: true, isLoading: false, isStalled: false, error: null }));
     };
 
     const handlePause = () => {
@@ -467,11 +476,18 @@ export function useWordTimingAudio(
           swapWatchdogRef.current = null;
         }
       }
-      setState(prev => ({ ...prev, isPlaying: false }));
+      setState(prev => ({ ...prev, isPlaying: false, isStalled: false }));
     };
 
+    // `waiting` fires when playback halts because the next frame isn't
+    // buffered yet; `stalled` fires when the network stops delivering data.
+    // Both indicate the audio clock is frozen — flip isStalled so the
+    // Media Session layer can pin the OS scrubber until playback resumes.
     const handleWaiting = () => {
-      setState(prev => prev.isLoading ? prev : { ...prev, isLoading: true });
+      setState(prev => {
+        if (prev.isLoading && prev.isStalled) return prev;
+        return { ...prev, isLoading: true, isStalled: true };
+      });
     };
 
     const handleEnded = () => {
@@ -735,7 +751,7 @@ export function useWordTimingAudio(
       preloaded.removeAttribute('src');
       preloaded.remove();
     } else {
-      setState(prev => ({ ...prev, isLoading: true }));
+      setState(prev => ({ ...prev, isLoading: true, isStalled: false }));
       const preLoadId = loadIdRef.current;
       uri = await getCachedAudioUri(reciterString, chapter, verseNum);
       if (loadIdRef.current !== preLoadId) return;
@@ -884,6 +900,7 @@ export function useWordTimingAudio(
     setState(prev => ({
       ...prev,
       isLoading: true,
+      isStalled: false,
       error: null,
       currentVerseKey: null,
       currentWordIndex: null,

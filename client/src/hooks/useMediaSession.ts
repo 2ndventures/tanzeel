@@ -23,6 +23,11 @@ interface MediaSessionOptions {
   onNextTrack?: (() => void) | null;
   onPreviousTrack?: (() => void) | null;
   active?: boolean;
+  // True when the underlying audio element is buffering (`waiting`/`stalled`)
+  // and the playback clock is frozen. While true we stop pushing 1Hz position
+  // updates and instead pin the OS scrubber at the current position so the
+  // lock-screen / Bluetooth UI doesn't keep advancing past silence.
+  isStalled?: boolean;
 }
 
 export function useMediaSession({
@@ -39,6 +44,7 @@ export function useMediaSession({
   onNextTrack,
   onPreviousTrack,
   active = true,
+  isStalled = false,
 }: MediaSessionOptions) {
   const onPlayRef = useRef(onPlay);
   const onPauseRef = useRef(onPause);
@@ -117,13 +123,17 @@ export function useMediaSession({
   // behind) currentTime captured from closure.
   useEffect(() => {
     if (!useNative || !active) return;
+    // While stalled, report paused to MPNowPlayingInfoCenter so the lock-
+    // screen play/pause glyph and scrubber both freeze. The hook's
+    // isPlaying state intentionally stays true (so the in-app UI keeps
+    // showing the spinner / pause icon) — only the OS view is masked.
     TanzeelNowPlaying.setPlaybackState({
-      isPlaying,
+      isPlaying: isPlaying && !isStalled,
       speed,
       position: currentTimeRef.current,
       duration,
     }).catch(() => {});
-  }, [useNative, active, isPlaying, speed, duration]);
+  }, [useNative, active, isPlaying, isStalled, speed, duration]);
 
   // Native iOS: throttle position updates (1Hz when playing) to keep the
   // lock-screen scrubber fluid without flooding the bridge. Reads latest
@@ -133,7 +143,10 @@ export function useMediaSession({
   // immediately instead of waiting for the next play.
   useEffect(() => {
     if (!useNative || !active) return;
-    if (!isPlaying) {
+    // While stalled (or paused) push a single "frozen at X" snapshot and
+    // skip the 1Hz interval so MPNowPlayingInfoCenter doesn't keep
+    // extrapolating the scrubber forward while audio is buffering.
+    if (!isPlaying || isStalled) {
       TanzeelNowPlaying.setPosition({
         position: currentTimeRef.current,
         duration: durationRef.current,
@@ -151,7 +164,7 @@ export function useMediaSession({
       }).catch(() => {});
     }, 1000);
     return () => clearInterval(id);
-  }, [useNative, active, isPlaying, isPlaying ? 0 : currentTime]);
+  }, [useNative, active, isPlaying, isStalled, isPlaying && !isStalled ? 0 : currentTime]);
 
   // Web MediaSession path. Runs on every platform (browser, PWA, Android, and
   // iOS Capacitor) — on iOS it acts as a fallback in case the native plugin
@@ -225,8 +238,13 @@ export function useMediaSession({
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
-    navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-  }, [isPlaying]);
+    // Report 'paused' to the OS while stalled so the lock-screen / Bluetooth
+    // scrubber freezes alongside the position snapshot we push below. The
+    // hook's own isPlaying state stays true so the in-app UI can keep
+    // showing a spinner / pause icon.
+    navigator.mediaSession.playbackState =
+      isPlaying && !isStalled ? 'playing' : 'paused';
+  }, [isPlaying, isStalled]);
 
   // Web MediaSession position-state updates. Mirrors the native iOS path:
   // when playing, runs a steady 1Hz interval that reads currentTime/duration/
@@ -242,6 +260,11 @@ export function useMediaSession({
       const d = durationRef.current;
       if (!d || d <= 0) return;
       try {
+        // playbackRate must be > 0 per the Media Session spec, so we always
+        // send the real rate. Freezing the scrubber while stalled is handled
+        // by the playbackState effect above, which flips to 'paused' — the
+        // OS then stops extrapolating the position forward and pins it to
+        // the snapshot we send here.
         navigator.mediaSession.setPositionState({
           duration: d,
           playbackRate: speedRef.current,
@@ -251,12 +274,14 @@ export function useMediaSession({
       }
     };
 
-    if (!isPlaying) {
+    // Stalled or paused → push one snapshot and stop the 1Hz interval.
+    // playbackState='paused' (set above) keeps the scrubber pinned.
+    if (!isPlaying || isStalled) {
       push();
       return;
     }
     push();
     const id = setInterval(push, 1000);
     return () => clearInterval(id);
-  }, [isPlaying, isPlaying ? 0 : currentTime, duration > 0]);
+  }, [isPlaying, isStalled, isPlaying && !isStalled ? 0 : currentTime, duration > 0]);
 }
