@@ -82,7 +82,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
       data-no-swipe="true"
     >
       <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
-        <div className="h-[3px] bg-muted/30">
+        <div className="h-[3px] bg-foreground/10 dark:bg-white/10">
           <div
             className="h-full transition-all duration-200"
             style={{ backgroundColor: 'hsl(var(--glow-primary))', width: `${progress}%` }}
