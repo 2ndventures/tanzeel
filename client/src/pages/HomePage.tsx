@@ -120,8 +120,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}
             data-testid="card-continue-reading"
           >
-            {/* Frosted glass card interior */}
-            <div className="relative overflow-hidden rounded-[22px] bg-card/90 py-5 px-8 flex flex-col justify-center h-full backdrop-blur-sm">
+            <div className="relative overflow-hidden rounded-[22px] bg-card py-5 px-8 flex flex-col justify-center h-full">
               <div className="relative mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-foreground/90">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
@@ -158,7 +157,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Browse all surahs"
                 data-testid="button-bookmarks"
               >
-                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card/90 backdrop-blur-sm p-4 h-full">
+                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card p-4 h-full">
                   <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
                     <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                   </div>
@@ -174,7 +173,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="View favorites"
                 data-testid="button-favorites"
               >
-                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card/90 backdrop-blur-sm p-4 h-full">
+                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card p-4 h-full">
                   <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
                     <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                   </div>
@@ -190,7 +189,7 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Open settings"
                 data-testid="button-settings"
               >
-                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card/90 backdrop-blur-sm p-4 h-full">
+                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card p-4 h-full">
                   <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
                     <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                   </div>

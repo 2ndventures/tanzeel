@@ -665,9 +665,7 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
 
   /* Verse of the Day card */
   .verse-of-day-card {
-    background: hsl(var(--card) / 0.90);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: hsl(var(--card));
   }
 
   .verse-of-day-bg {
