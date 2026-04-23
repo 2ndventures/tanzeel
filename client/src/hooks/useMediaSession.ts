@@ -46,6 +46,9 @@ export function useMediaSession({
   const onNextTrackRef = useRef(onNextTrack);
   const onPreviousTrackRef = useRef(onPreviousTrack);
   const isPlayingRef = useRef(isPlaying);
+  const currentTimeRef = useRef(currentTime);
+  const durationRef = useRef(duration);
+  const speedRef = useRef(speed);
 
   useEffect(() => { onPlayRef.current = onPlay; }, [onPlay]);
   useEffect(() => { onPauseRef.current = onPause; }, [onPause]);
@@ -53,6 +56,9 @@ export function useMediaSession({
   useEffect(() => { onNextTrackRef.current = onNextTrack; }, [onNextTrack]);
   useEffect(() => { onPreviousTrackRef.current = onPreviousTrack; }, [onPreviousTrack]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+  useEffect(() => { currentTimeRef.current = currentTime; }, [currentTime]);
+  useEffect(() => { durationRef.current = duration; }, [duration]);
+  useEffect(() => { speedRef.current = speed; }, [speed]);
 
   const useNative = isNativeNowPlayingAvailable();
 
@@ -118,25 +124,37 @@ export function useMediaSession({
   }, [useNative, active, isPlaying, speed, duration]);
 
   // Native iOS: throttle position updates (1Hz when playing) to keep the
-  // lock-screen scrubber fluid without flooding the bridge.
+  // lock-screen scrubber fluid without flooding the bridge. Reads latest
+  // currentTime / duration / speed from refs each tick so the value is never
+  // stale.
   useEffect(() => {
     if (!useNative || !active) return;
     if (!isPlaying) {
-      TanzeelNowPlaying.setPosition({ position: currentTime, duration, speed, isPlaying: false }).catch(() => {});
+      TanzeelNowPlaying.setPosition({
+        position: currentTimeRef.current,
+        duration: durationRef.current,
+        speed: speedRef.current,
+        isPlaying: false,
+      }).catch(() => {});
       return;
     }
     const id = setInterval(() => {
-      TanzeelNowPlaying.setPosition({ position: currentTime, duration, speed, isPlaying: true }).catch(() => {});
+      TanzeelNowPlaying.setPosition({
+        position: currentTimeRef.current,
+        duration: durationRef.current,
+        speed: speedRef.current,
+        isPlaying: true,
+      }).catch(() => {});
     }, 1000);
     return () => clearInterval(id);
-    // currentTime intentionally excluded — the interval reads the latest closure
-    // capture each time it runs (we re-create interval on play/pause/duration only).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [useNative, active, isPlaying, duration, speed]);
+  }, [useNative, active, isPlaying]);
 
-  // Web MediaSession path (browser / PWA / Android): unchanged behavior.
+  // Web MediaSession path. Runs on every platform (browser, PWA, Android, and
+  // iOS Capacitor) — on iOS it acts as a fallback in case the native plugin
+  // fails to register or initialize. Native MPNowPlayingInfoCenter takes
+  // visual precedence on iOS when it works; the duplicate handlers are
+  // harmless because play/pause/seek are idempotent.
   useEffect(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     if (!active) {
       navigator.mediaSession.metadata = null;
@@ -149,10 +167,9 @@ export function useMediaSession({
       album,
       artwork: MEDIA_SESSION_ARTWORK,
     });
-  }, [useNative, title, artist, album, active]);
+  }, [title, artist, album, active]);
 
   useEffect(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
 
     const playHandler = () => onPlayRef.current();
@@ -174,10 +191,9 @@ export function useMediaSession({
         navigator.mediaSession.setActionHandler('seekto', null);
       }
     };
-  }, [useNative]);
+  }, []);
 
   useEffect(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     try {
       navigator.mediaSession.setActionHandler(
@@ -188,10 +204,9 @@ export function useMediaSession({
     return () => {
       try { navigator.mediaSession.setActionHandler('nexttrack', null); } catch {}
     };
-  }, [useNative, !!onNextTrack]);
+  }, [!!onNextTrack]);
 
   useEffect(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     try {
       navigator.mediaSession.setActionHandler(
@@ -202,16 +217,14 @@ export function useMediaSession({
     return () => {
       try { navigator.mediaSession.setActionHandler('previoustrack', null); } catch {}
     };
-  }, [useNative, !!onPreviousTrack]);
+  }, [!!onPreviousTrack]);
 
   useEffect(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-  }, [useNative, isPlaying]);
+  }, [isPlaying]);
 
   const updatePositionState = useCallback(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator) || !duration || duration <= 0) return;
     try {
       navigator.mediaSession.setPositionState({
@@ -221,12 +234,11 @@ export function useMediaSession({
       });
     } catch {
     }
-  }, [useNative, currentTime, duration, speed]);
+  }, [currentTime, duration, speed]);
 
   const positionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
 
     if (isPlaying && duration > 0) {
@@ -248,5 +260,5 @@ export function useMediaSession({
         positionIntervalRef.current = null;
       }
     };
-  }, [useNative, isPlaying, duration, updatePositionState]);
+  }, [isPlaying, duration, updatePositionState]);
 }
