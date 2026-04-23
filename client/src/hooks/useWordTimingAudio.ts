@@ -124,6 +124,26 @@ export function useWordTimingAudio(
   const currentVerseIndexRef = useRef<number>(-1);
   // Suppresses pause-state updates while the browser unloads/loads a new src.
   const srcChangingRef = useRef(false);
+  // Wall-clock ms when srcChangingRef was last set. Used to bound the
+  // pause-suppression window so a real user pause during loading is never
+  // swallowed indefinitely.
+  const srcChangingAtRef = useRef(0);
+  // Watchdog timer that reconciles isPlaying after a src swap if neither
+  // 'playing' nor 'pause'/'error' arrives within a few seconds (rare
+  // WKWebView quirk).
+  const swapWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // When handleEnded does an in-place chapter swap, the React-side
+  // setActiveChapter() callback also fires, triggering loadAudio for the
+  // SAME chapterId. We mark the chapter id + reciter here so loadAudio
+  // knows to skip the redundant src reload (which would reset the audio
+  // element and cause a visible play→spinner→play flicker) and only
+  // refresh timing data. Reciter is part of the token so a reciter change
+  // (which keeps chapterId the same) still triggers a real reload.
+  const inPlaceAdvanceTokenRef = useRef<{ chapterId: number; reciterId: number } | null>(null);
+  // Mirror of state.isPlaying for stable transport callbacks (used as a
+  // fallback only — the audio element's `paused` property is preferred
+  // since it's always current).
+  const isPlayingRef = useRef(false);
 
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
@@ -135,6 +155,35 @@ export function useWordTimingAudio(
     currentVerseKey: null,
     currentWordIndex: null,
   });
+
+  useEffect(() => { isPlayingRef.current = state.isPlaying; }, [state.isPlaying]);
+
+  // Clear the src-change suppression flag and any pending watchdog.
+  const clearSrcFlag = useCallback(() => {
+    srcChangingRef.current = false;
+    if (swapWatchdogRef.current) {
+      clearTimeout(swapWatchdogRef.current);
+      swapWatchdogRef.current = null;
+    }
+  }, []);
+
+  // Begin a src-swap window: mark the flag, stamp the time, arm a watchdog
+  // that reconciles isPlaying against the audio element's actual paused
+  // state if no settling event arrives within ~2.5s.
+  const beginSrcSwap = useCallback(() => {
+    srcChangingRef.current = true;
+    srcChangingAtRef.current = Date.now();
+    if (swapWatchdogRef.current) clearTimeout(swapWatchdogRef.current);
+    swapWatchdogRef.current = setTimeout(() => {
+      swapWatchdogRef.current = null;
+      if (!srcChangingRef.current) return;
+      srcChangingRef.current = false;
+      const a = audioRef.current;
+      if (!a) return;
+      const playing = !a.paused && !a.ended && a.readyState >= 2;
+      setState(prev => prev.isPlaying === playing ? prev : { ...prev, isPlaying: playing });
+    }, 2500);
+  }, []);
 
   useEffect(() => { repeatRef.current = repeat; }, [repeat]);
   useEffect(() => { onVerseChangeRef.current = onVerseChange; }, [onVerseChange]);
@@ -290,9 +339,6 @@ export function useWordTimingAudio(
     container.appendChild(audio);
     audioRef.current = audio;
 
-    // Cleared once the src swap settles — see srcChangingRef rationale.
-    const clearSrcFlag = () => { srcChangingRef.current = false; };
-
     const handleLoadedMetadata = () => {
       const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
       setState(prev => ({ ...prev, duration: dur }));
@@ -365,12 +411,17 @@ export function useWordTimingAudio(
     const handleCanPlay = () => {
       retryCountRef.current = 0;
       audio.playbackRate = speedRef.current;
-      clearSrcFlag();
+      // Note: srcChangingRef is intentionally NOT cleared here. It only
+      // clears once playback actually resumes (handlePlaying) or the
+      // spurious post-swap pause is consumed (handlePause). Clearing on
+      // canplay is too early — the element is still paused at this point,
+      // and any reconciliation read of audio.paused would falsely flip
+      // isPlaying to false and flicker the play/pause icon.
       setState(prev => prev.isLoading ? { ...prev, isLoading: false } : prev);
     };
 
     const handleLoadedData = () => {
-      clearSrcFlag();
+      // No-op: see handleCanPlay note about srcChangingRef timing.
     };
 
     const handlePlay = () => {
@@ -390,7 +441,32 @@ export function useWordTimingAudio(
     };
 
     const handlePause = () => {
-      if (srcChangingRef.current) return;
+      // Pause events that arrive within 300ms of a src swap are treated
+      // as the browser's own teardown of the previous source and are
+      // suppressed (state.isPlaying stays as-is). Outside that window
+      // any pause is treated as user/system intent. The suppression flag
+      // is NOT consumed in the suppressed branch — it is cleared by the
+      // settling 'playing' event (clearSrcFlag), the 2.5s watchdog, an
+      // error event, or a real out-of-window pause.
+      if (srcChangingRef.current) {
+        const withinSwapWindow = (Date.now() - srcChangingAtRef.current) <= 300;
+        if (withinSwapWindow) {
+          // Suppressed teardown pause from the src swap. Do NOT consume
+          // srcChangingRef or cancel the watchdog: a subsequent 'playing'
+          // event will clear them, or — if neither 'playing' nor a real
+          // pause/error arrives — the 2.5s watchdog will reconcile state.
+          // Any later teardown-style pauses inside the same window are
+          // also suppressed (idempotent).
+          return;
+        }
+        // Real user/system pause outside the swap window — clear the
+        // suppression flag + watchdog and propagate.
+        srcChangingRef.current = false;
+        if (swapWatchdogRef.current) {
+          clearTimeout(swapWatchdogRef.current);
+          swapWatchdogRef.current = null;
+        }
+      }
       setState(prev => ({ ...prev, isPlaying: false }));
     };
 
@@ -425,11 +501,14 @@ export function useWordTimingAudio(
               preloaded.removeAttribute('src');
               preloaded.remove();
 
-              srcChangingRef.current = true;
+              beginSrcSwap();
               audio.src = nextUri;
               audio.playbackRate = speedRef.current;
               audio.load();
-              audio.play().catch(() => {});
+              audio.play().catch(() => {
+                clearSrcFlag();
+                setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+              });
               currentVerseNumRef.current = nextVerse;
               const newKey = `${chapter}:${nextVerse}`;
               currentVerseIndexRef.current = -1;
@@ -453,11 +532,14 @@ export function useWordTimingAudio(
                 setState(prev => ({ ...prev, isPlaying: false, error: `Verse ${nextVerse} file missing` }));
                 return;
               }
-              srcChangingRef.current = true;
+              beginSrcSwap();
               audio.src = uri;
               audio.playbackRate = speedRef.current;
               audio.load();
-              audio.play().catch(() => {});
+              audio.play().catch(() => {
+                clearSrcFlag();
+                setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+              });
               currentVerseNumRef.current = nextVerse;
               const newKey = `${chapter}:${nextVerse}`;
               currentVerseIndexRef.current = -1;
@@ -486,11 +568,21 @@ export function useWordTimingAudio(
         const nextChapterId = curChapter + 1;
         const nextUrl = getChapterAudioUrl(reciterIdRef.current, nextChapterId);
         if (nextUrl) {
-          srcChangingRef.current = true;
+          beginSrcSwap();
+          // Mark this chapter as already-loaded so the React-side loadAudio
+          // triggered by setActiveChapter() below skips the redundant src
+          // reload that would reset the audio element and flicker the UI.
+          inPlaceAdvanceTokenRef.current = { chapterId: nextChapterId, reciterId: reciterIdRef.current };
           audio.src = nextUrl;
           audio.playbackRate = speedRef.current;
           audio.load();
-          audio.play().catch(() => {});
+          audio.play().catch(() => {
+            // play() rejected (autoplay policy, network, etc.) — clear the
+            // swap window and reconcile state so the UI doesn't get stuck
+            // showing isPlaying:true.
+            clearSrcFlag();
+            setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+          });
           currentChapterIdRef.current = nextChapterId;
           timingDataRef.current = null;
           currentVerseIndexRef.current = -1;
@@ -668,7 +760,7 @@ export function useWordTimingAudio(
     }));
     onVerseChangeRef.current?.(verseKey);
 
-    srcChangingRef.current = true;
+    beginSrcSwap();
     audio.src = uri;
     audio.playbackRate = speedRef.current;
     audio.load();
@@ -716,6 +808,58 @@ export function useWordTimingAudio(
     const audio = audioRef.current;
     if (!audio) return;
 
+    // In-place chapter advance just happened (handleEnded already swapped
+    // src and called play()). Skip the redundant src reload here so the UI
+    // doesn't flicker; still kick off a timing-data fetch in the background
+    // so word highlighting catches up for the new chapter.
+    // Only bail when BOTH the chapter and reciter match the in-place token
+    // (a reciter change keeps chapterId the same but still requires a real
+    // src reload). Any non-matching call clears the stale token so it can't
+    // accidentally trigger a future bail.
+    const ipToken = inPlaceAdvanceTokenRef.current;
+    if (ipToken && (ipToken.chapterId !== chapterId || ipToken.reciterId !== reciterId)) {
+      inPlaceAdvanceTokenRef.current = null;
+    }
+    if (inPlaceAdvanceTokenRef.current && inPlaceAdvanceTokenRef.current.chapterId === chapterId && inPlaceAdvanceTokenRef.current.reciterId === reciterId) {
+      inPlaceAdvanceTokenRef.current = null;
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+      const myLoadId = ++loadIdRef.current;
+      verseByVerseRef.current = false;
+      currentChapterIdRef.current = chapterId;
+      currentVerseNumRef.current = null;
+      timingDataRef.current = null;
+      currentVerseIndexRef.current = -1;
+      const reciterStringInline = quranComIdToReciterString(reciterId);
+      try {
+        if (reciterStringInline && isFullChapterDownloaded(reciterStringInline, chapterId)) {
+          const off = await getOfflineTimingData(reciterStringInline, chapterId) as TimingData | null;
+          if (loadIdRef.current === myLoadId && off?.audio_files?.[0]) {
+            timingDataRef.current = off.audio_files[0];
+          }
+          return;
+        }
+        const memCached = getTimingDataFromMemory(reciterId, chapterId);
+        if (memCached?.audio_files?.[0]) {
+          timingDataRef.current = memCached.audio_files[0];
+          return;
+        }
+        const r = await fetch(getTimingUrl(reciterId, chapterId), { signal });
+        if (!r.ok) return;
+        const raw = await r.json() as Record<string, unknown>;
+        const normalized = normalizeTimingResponse(raw);
+        const data: TimingData = { audio_files: normalized.audio_files as AudioFile[] };
+        storeTimingDataInMemory(reciterId, chapterId, data);
+        if (loadIdRef.current === myLoadId && data.audio_files?.[0]) {
+          timingDataRef.current = data.audio_files[0];
+        }
+      } catch {
+        // Non-fatal: word highlighting will be unavailable until next load.
+      }
+      return;
+    }
+
     abortControllerRef.current?.abort();
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
@@ -761,7 +905,7 @@ export function useWordTimingAudio(
 
         if (offlineUri && offlineTiming?.audio_files?.[0]) {
           timingDataRef.current = offlineTiming.audio_files[0];
-          srcChangingRef.current = true;
+          beginSrcSwap();
           audio.src = offlineUri;
           audio.playbackRate = speedRef.current;
           audio.load();
@@ -786,7 +930,7 @@ export function useWordTimingAudio(
       return;
     }
 
-    srcChangingRef.current = true;
+    beginSrcSwap();
     audio.src = predictableUrl;
     audio.playbackRate = speedRef.current;
     audio.load();
@@ -820,7 +964,7 @@ export function useWordTimingAudio(
       // If timing data has a different URL than what we predicted, swap to it.
       if (audio.src !== audioFile.audio_url) {
         const wasPlaying = !audio.paused;
-        srcChangingRef.current = true;
+        beginSrcSwap();
         audio.src = audioFile.audio_url;
         audio.playbackRate = speedRef.current;
         audio.load();
@@ -866,21 +1010,31 @@ export function useWordTimingAudio(
       return;
     }
     let active = true;
+    // Throttle currentTime state updates so the playback bar / mini-player
+    // re-render at most ~12Hz (every 80ms) instead of every animation frame.
+    // Word-/verse-boundary changes still flush immediately for tight
+    // highlight sync.
+    const TIME_DELTA_S = 0.08;
+    let lastPushedTime = -1;
     const tick = () => {
       if (!active) return;
       const audio = audioRef.current;
       if (audio) {
         const t = audio.currentTime;
         if (verseByVerseRef.current) {
-          setState(prev => prev.currentTime === t ? prev : { ...prev, currentTime: t });
+          if (Math.abs(t - lastPushedTime) >= TIME_DELTA_S) {
+            lastPushedTime = t;
+            setState(prev => prev.currentTime === t ? prev : { ...prev, currentTime: t });
+          }
         } else {
           const { verseKey, wordIndex } = findCurrentSegment(t);
+          const timeShouldFlush = Math.abs(t - lastPushedTime) >= TIME_DELTA_S;
           setState(prev => {
-            const timeChanged = prev.currentTime !== t;
             const verseChanged = prev.currentVerseKey !== verseKey;
             const wordChanged = prev.currentWordIndex !== wordIndex;
-            if (!timeChanged && !verseChanged && !wordChanged) return prev;
+            if (!timeShouldFlush && !verseChanged && !wordChanged) return prev;
             if (verseKey && verseChanged) onVerseChangeRef.current?.(verseKey);
+            if (timeShouldFlush) lastPushedTime = t;
             return { ...prev, currentTime: t, currentVerseKey: verseKey, currentWordIndex: wordIndex };
           });
         }
@@ -897,19 +1051,10 @@ export function useWordTimingAudio(
     };
   }, [state.isPlaying, findCurrentSegment]);
 
-  useEffect(() => {
-    const id = setInterval(() => {
-      const audio = audioRef.current;
-      if (!audio || srcChangingRef.current) return;
-      const playing = !audio.paused && !audio.ended && audio.readyState >= 2;
-      setState(prev => {
-        if (prev.isPlaying === playing) return prev;
-        if (!playing && prev.isLoading) return prev;
-        return { ...prev, isPlaying: playing };
-      });
-    }, 500);
-    return () => clearInterval(id);
-  }, []);
+  // (Removed) 500ms safety poller. The event-driven path (play / playing /
+  // pause / ended / waiting / error) covers all transitions. The poller was
+  // racing with the src-swap suppression window and causing the play/pause
+  // icon to flicker during chapter auto-advance.
 
   const retry = useCallback(() => {
     retryCountRef.current = 0;
@@ -920,31 +1065,35 @@ export function useWordTimingAudio(
     loadAudio();
   }, [loadAudio]);
 
+  // Transport callbacks read `audio.paused` directly — the audio element
+  // is the only source of truth that's always current, so rapid double-taps
+  // can't race a stale React/ref value.
   const pauseAudio = useCallback(() => {
-    if (audioRef.current && state.isPlaying) {
-      audioRef.current.pause();
-    }
-  }, [state.isPlaying]);
+    const a = audioRef.current;
+    if (a && !a.paused) a.pause();
+  }, []);
 
   const playAudio = useCallback(() => {
-    if (!audioRef.current) return;
-    if (!state.isPlaying) {
-      audioRef.current.play().catch(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (a.paused) {
+      a.play().catch(() => {
         setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
     }
-  }, [state.isPlaying]);
+  }, []);
 
   const togglePlayPause = useCallback(() => {
-    if (!audioRef.current) return;
-    if (state.isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(() => {
+    const a = audioRef.current;
+    if (!a) return;
+    if (a.paused) {
+      a.play().catch(() => {
         setState(prev => ({ ...prev, error: 'Tap play to start audio' }));
       });
+    } else {
+      a.pause();
     }
-  }, [state.isPlaying]);
+  }, []);
 
   const seek = useCallback((time: number) => {
     if (audioRef.current) {
@@ -967,7 +1116,7 @@ export function useWordTimingAudio(
       if (isNaN(verseNum)) return;
       const reciterString = quranComIdToReciterString(reciterIdRef.current);
       if (!reciterString) return;
-      loadVerseByVerseAudio(verseNum, state.isPlaying, reciterString);
+      loadVerseByVerseAudio(verseNum, isPlayingRef.current, reciterString);
       return;
     }
 
@@ -985,7 +1134,7 @@ export function useWordTimingAudio(
         currentWordIndex: newWordIndex,
       }));
     }
-  }, [findCurrentSegment, state.isPlaying, loadVerseByVerseAudio]);
+  }, [findCurrentSegment, loadVerseByVerseAudio]);
 
   const setSpeed = useCallback((newSpeed: number) => {
     speedRef.current = newSpeed;
