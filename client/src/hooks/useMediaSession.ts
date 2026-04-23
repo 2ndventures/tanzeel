@@ -112,13 +112,15 @@ export function useMediaSession({
     }).catch(() => {});
   }, [useNative, active, title, artist, album, duration, !!onNextTrack, !!onPreviousTrack]);
 
-  // Native iOS: push playback state changes immediately.
+  // Native iOS: push playback state changes immediately. Reads the latest
+  // position from the ref so play/pause flips never send a stale (one-tick
+  // behind) currentTime captured from closure.
   useEffect(() => {
     if (!useNative || !active) return;
     TanzeelNowPlaying.setPlaybackState({
       isPlaying,
       speed,
-      position: currentTime,
+      position: currentTimeRef.current,
       duration,
     }).catch(() => {});
   }, [useNative, active, isPlaying, speed, duration]);
@@ -226,41 +228,35 @@ export function useMediaSession({
     navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
   }, [isPlaying]);
 
-  const updatePositionState = useCallback(() => {
-    if (!('mediaSession' in navigator) || !duration || duration <= 0) return;
-    try {
-      navigator.mediaSession.setPositionState({
-        duration,
-        playbackRate: speed,
-        position: Math.min(currentTime, duration),
-      });
-    } catch {
-    }
-  }, [currentTime, duration, speed]);
-
-  const positionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
+  // Web MediaSession position-state updates. Mirrors the native iOS path:
+  // when playing, runs a steady 1Hz interval that reads currentTime/duration/
+  // speed from refs (so the interval is created once and is not torn down on
+  // every state tick — calling setPositionState at the React update cadence
+  // confuses browser and OS media UIs and causes the lock-screen scrubber to
+  // jump). When paused, re-pushes whenever currentTime changes so manual
+  // scrubs / verse jumps update the lock screen immediately.
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
 
-    if (isPlaying && duration > 0) {
-      updatePositionState();
-      positionIntervalRef.current = setInterval(updatePositionState, 1000);
-    } else {
-      if (positionIntervalRef.current) {
-        clearInterval(positionIntervalRef.current);
-        positionIntervalRef.current = null;
-      }
-      if (duration > 0) {
-        updatePositionState();
-      }
-    }
-
-    return () => {
-      if (positionIntervalRef.current) {
-        clearInterval(positionIntervalRef.current);
-        positionIntervalRef.current = null;
+    const push = () => {
+      const d = durationRef.current;
+      if (!d || d <= 0) return;
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: d,
+          playbackRate: speedRef.current,
+          position: Math.min(currentTimeRef.current, d),
+        });
+      } catch {
       }
     };
-  }, [isPlaying, duration, updatePositionState]);
+
+    if (!isPlaying) {
+      push();
+      return;
+    }
+    push();
+    const id = setInterval(push, 1000);
+    return () => clearInterval(id);
+  }, [isPlaying, isPlaying ? 0 : currentTime, duration > 0]);
 }

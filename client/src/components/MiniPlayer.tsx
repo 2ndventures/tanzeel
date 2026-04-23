@@ -69,7 +69,11 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
   if (!mounted || !lastChapterRef.current) return null;
 
   const chapter = lastChapterRef.current;
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  // Clamp like the main AudioPlayer to prevent the bar overshooting 100%
+  // during chapter transitions (when duration briefly resets to 0/NaN before
+  // the new track's metadata loads).
+  const safeCurrentTime = duration > 0 ? Math.min(currentTime, duration) : 0;
+  const progress = duration > 0 ? (safeCurrentTime / duration) * 100 : 0;
   const arabicName = getDisplayArabicName(chapter.arabicName);
 
   return (
@@ -84,7 +88,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
       <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
         <div className="h-[3px] bg-foreground/10 dark:bg-white/10">
           <div
-            className="h-full transition-all duration-200"
+            className="h-full transition-[width] duration-100 ease-linear"
             style={{ backgroundColor: 'hsl(var(--glow-primary))', width: `${progress}%` }}
             data-testid="mini-player-progress"
           />
