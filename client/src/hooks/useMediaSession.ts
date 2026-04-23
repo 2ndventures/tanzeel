@@ -126,7 +126,9 @@ export function useMediaSession({
   // Native iOS: throttle position updates (1Hz when playing) to keep the
   // lock-screen scrubber fluid without flooding the bridge. Reads latest
   // currentTime / duration / speed from refs each tick so the value is never
-  // stale.
+  // stale. When paused, also re-pushes whenever currentTime changes so manual
+  // seeks (scrubber drag, verse jump) update the lock-screen position
+  // immediately instead of waiting for the next play.
   useEffect(() => {
     if (!useNative || !active) return;
     if (!isPlaying) {
@@ -147,7 +149,7 @@ export function useMediaSession({
       }).catch(() => {});
     }, 1000);
     return () => clearInterval(id);
-  }, [useNative, active, isPlaying]);
+  }, [useNative, active, isPlaying, isPlaying ? 0 : currentTime]);
 
   // Web MediaSession path. Runs on every platform (browser, PWA, Android, and
   // iOS Capacitor) — on iOS it acts as a fallback in case the native plugin
