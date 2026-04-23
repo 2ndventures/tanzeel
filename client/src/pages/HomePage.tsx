@@ -109,9 +109,8 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
 
         <div ref={scrollRef} className="flex flex-col flex-1 px-6 gap-4 min-h-0 overflow-y-auto pb-nav-clearance">
         <PullToRefresh onRefresh={handleRefresh} scrollRef={scrollRef}>
-          {/* Gradient-border wrapper — the 2px gradient bg shows as the border */}
           <div
-            className="p-[2px] rounded-3xl bg-gradient-to-br from-[hsl(224_28%_35%)] to-[hsl(224_28%_10%)] shadow-[0_4px_24px_hsl(224_28%_16%/0.3)] cursor-pointer flex-1 animate-fade-in-up"
+            className="relative overflow-hidden rounded-3xl bg-card shadow-lg cursor-pointer flex-1 animate-fade-in-up py-5 px-8 flex flex-col justify-center"
             style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
             onClick={() => onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined)}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", stats.lastReadChapter, undefined, stats.lastReadVerse > 0 ? stats.lastReadVerse : undefined); }}}
@@ -120,7 +119,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
             aria-label={`${stats.lastReadVerse > 0 ? 'Continue' : 'Start'} reading Surah ${currentChapter.englishName}, ${stats.lastReadVerse > 0 ? `at ayah ${stats.lastReadVerse} of ${currentChapter.verseCount}, ${progress}% complete` : `${currentChapter.verseCount} ayahs`}`}
             data-testid="card-continue-reading"
           >
-            <div className="relative overflow-hidden rounded-[22px] bg-card py-5 px-8 flex flex-col justify-center h-full">
               <div className="relative mb-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-foreground/90">{stats.lastReadVerse > 0 ? 'Continue Reading' : 'Start Reading'}</p>
@@ -143,13 +141,12 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 <span>{progress}% Complete</span>
                 <span>{stats.lastReadVerse > 0 ? `${versesLeft} Ayahs left` : `Ready to start`}</span>
               </div>
-            </div>
           </div>
 
           <div className="animate-fade-in-up" style={{ opacity: 0, animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="grid grid-cols-3 gap-4">
               <div
-                className="p-[2px] rounded-3xl bg-gradient-to-br from-[hsl(224_28%_35%)] to-[hsl(224_28%_10%)] shadow-lg cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card shadow-lg cursor-pointer p-4"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -157,15 +154,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Browse all surahs"
                 data-testid="button-bookmarks"
               >
-                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card p-4 h-full">
-                  <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
-                    <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
-                  </div>
-                  <span className="text-xs font-semibold text-foreground">Surahs</span>
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
+                  <Icon icon="solar:bookmark-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                 </div>
+                <span className="text-xs font-semibold text-foreground">Surahs</span>
               </div>
               <div
-                className="p-[2px] rounded-3xl bg-gradient-to-br from-[hsl(224_28%_35%)] to-[hsl(224_28%_10%)] shadow-lg cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card shadow-lg cursor-pointer p-4"
                 onClick={() => onNavigate("surah-juz", undefined, "surah")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("surah-juz", undefined, "surah"); }}}
                 role="button"
@@ -173,15 +168,13 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="View favorites"
                 data-testid="button-favorites"
               >
-                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card p-4 h-full">
-                  <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
-                    <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
-                  </div>
-                  <span className="text-xs font-semibold text-foreground">Favorites</span>
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
+                  <Icon icon="solar:star-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                 </div>
+                <span className="text-xs font-semibold text-foreground">Favorites</span>
               </div>
               <div
-                className="p-[2px] rounded-3xl bg-gradient-to-br from-[hsl(224_28%_35%)] to-[hsl(224_28%_10%)] shadow-lg cursor-pointer"
+                className="flex flex-col items-center justify-center rounded-3xl bg-card shadow-lg cursor-pointer p-4"
                 onClick={() => onNavigate("settings", undefined, "settings")}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("settings", undefined, "settings"); }}}
                 role="button"
@@ -189,19 +182,17 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                 aria-label="Open settings"
                 data-testid="button-settings"
               >
-                <div className="flex flex-col items-center justify-center rounded-[22px] bg-card p-4 h-full">
-                  <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
-                    <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
-                  </div>
-                  <span className="text-xs font-semibold text-foreground">Settings</span>
+                <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-[hsl(var(--glow-primary))] shadow-inner">
+                  <Icon icon="solar:settings-bold" className="size-7 text-[hsl(var(--glow-accent))]" />
                 </div>
+                <span className="text-xs font-semibold text-foreground">Settings</span>
               </div>
             </div>
           </div>
 
           <div className="flex-1 flex flex-col min-h-0 pb-4">
             <div
-              className="p-[2px] rounded-3xl bg-gradient-to-br from-[hsl(224_28%_35%)] to-[hsl(224_28%_10%)] shadow-lg cursor-pointer"
+              className="verse-of-day-card relative overflow-hidden rounded-3xl shadow-lg cursor-pointer"
               onClick={() => onNavigate("chapter", daily.id, undefined, daily.ayah)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", daily.id, undefined, daily.ayah); }}}
               role="button"
@@ -209,7 +200,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
               aria-label={`Verse of the day: ${daily.translation} — ${dailyChapter.englishName} ${daily.id}:${daily.ayah}`}
               data-testid="card-verse-of-day"
             >
-            <div className="verse-of-day-card relative overflow-hidden rounded-[22px]">
               <div className="verse-of-day-bg absolute inset-0" />
               <div className="relative px-6 py-6 flex flex-col items-center text-center">
                 <p
@@ -233,7 +223,6 @@ export default function HomePage({ onNavigate, activeTab = "home" }: HomePagePro
                   Verse of the Day
                 </p>
               </div>
-            </div>
             </div>
           </div>
         </PullToRefresh>
