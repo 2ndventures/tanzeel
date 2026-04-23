@@ -1,4 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
+import {
+  TanzeelNowPlaying,
+  isNativeNowPlayingAvailable,
+} from '@/lib/nativeNowPlaying';
+import type { PluginListenerHandle } from '@capacitor/core';
 
 const MEDIA_SESSION_ARTWORK: MediaImage[] = [
   { src: '/icons/tanzeel-logo-media.jpg', sizes: '512x512', type: 'image/jpeg' },
@@ -40,20 +45,100 @@ export function useMediaSession({
   const onSeekRef = useRef(onSeek);
   const onNextTrackRef = useRef(onNextTrack);
   const onPreviousTrackRef = useRef(onPreviousTrack);
+  const isPlayingRef = useRef(isPlaying);
 
   useEffect(() => { onPlayRef.current = onPlay; }, [onPlay]);
   useEffect(() => { onPauseRef.current = onPause; }, [onPause]);
   useEffect(() => { onSeekRef.current = onSeek; }, [onSeek]);
   useEffect(() => { onNextTrackRef.current = onNextTrack; }, [onNextTrack]);
   useEffect(() => { onPreviousTrackRef.current = onPreviousTrack; }, [onPreviousTrack]);
+  useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
 
+  const useNative = isNativeNowPlayingAvailable();
+
+  // Native iOS: register remote-command listeners once on mount.
   useEffect(() => {
+    if (!useNative) return;
+    let handles: PluginListenerHandle[] = [];
+    let cancelled = false;
+
+    (async () => {
+      const subs = await Promise.all([
+        TanzeelNowPlaying.addListener('play', () => onPlayRef.current()),
+        TanzeelNowPlaying.addListener('pause', () => onPauseRef.current()),
+        TanzeelNowPlaying.addListener('togglePlayPause', () => {
+          // Some older Bluetooth headsets send a single toggle command instead
+          // of explicit play/pause. Route by current playback state.
+          if (isPlayingRef.current) {
+            onPauseRef.current();
+          } else {
+            onPlayRef.current();
+          }
+        }),
+        TanzeelNowPlaying.addListener('nexttrack', () => onNextTrackRef.current?.()),
+        TanzeelNowPlaying.addListener('previoustrack', () => onPreviousTrackRef.current?.()),
+        TanzeelNowPlaying.addListener('seekto', (e) => onSeekRef.current(e.time)),
+      ]);
+      if (cancelled) {
+        subs.forEach(h => h.remove());
+        return;
+      }
+      handles = subs;
+    })();
+
+    return () => {
+      cancelled = true;
+      handles.forEach(h => h.remove());
+    };
+  }, [useNative]);
+
+  // Native iOS: push metadata + nav availability when active.
+  useEffect(() => {
+    if (!useNative) return;
+    if (!active) {
+      TanzeelNowPlaying.clear().catch(() => {});
+      return;
+    }
+    TanzeelNowPlaying.setMetadata({ title, artist, album, duration }).catch(() => {});
+    TanzeelNowPlaying.setNavEnabled({
+      next: !!onNextTrack,
+      previous: !!onPreviousTrack,
+    }).catch(() => {});
+  }, [useNative, active, title, artist, album, duration, !!onNextTrack, !!onPreviousTrack]);
+
+  // Native iOS: push playback state changes immediately.
+  useEffect(() => {
+    if (!useNative || !active) return;
+    TanzeelNowPlaying.setPlaybackState({
+      isPlaying,
+      speed,
+      position: currentTime,
+      duration,
+    }).catch(() => {});
+  }, [useNative, active, isPlaying, speed, duration]);
+
+  // Native iOS: throttle position updates (1Hz when playing) to keep the
+  // lock-screen scrubber fluid without flooding the bridge.
+  useEffect(() => {
+    if (!useNative || !active) return;
+    if (!isPlaying) {
+      TanzeelNowPlaying.setPosition({ position: currentTime, duration, speed, isPlaying: false }).catch(() => {});
+      return;
+    }
+    const id = setInterval(() => {
+      TanzeelNowPlaying.setPosition({ position: currentTime, duration, speed, isPlaying: true }).catch(() => {});
+    }, 1000);
+    return () => clearInterval(id);
+    // currentTime intentionally excluded — the interval reads the latest closure
+    // capture each time it runs (we re-create interval on play/pause/duration only).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useNative, active, isPlaying, duration, speed]);
+
+  // Web MediaSession path (browser / PWA / Android): unchanged behavior.
+  useEffect(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     if (!active) {
-      // Only clear metadata when audio session is fully torn down (user stopped
-      // playback). Clearing on every title/album change would briefly null the
-      // iOS Now Playing card mid-session, which can drop the lock-screen
-      // controls when advancing between surahs.
       navigator.mediaSession.metadata = null;
       return;
     }
@@ -64,12 +149,10 @@ export function useMediaSession({
       album,
       artwork: MEDIA_SESSION_ARTWORK,
     });
-    // Intentionally no cleanup — the metadata stays bound across title/album
-    // updates so the lock-screen card transitions seamlessly. It will be
-    // cleared by the `!active` branch above when audio is stopped.
-  }, [title, artist, album, active]);
+  }, [useNative, title, artist, album, active]);
 
   useEffect(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
 
     const playHandler = () => onPlayRef.current();
@@ -91,10 +174,10 @@ export function useMediaSession({
         navigator.mediaSession.setActionHandler('seekto', null);
       }
     };
-  }, []);
+  }, [useNative]);
 
-  // Register / unregister next & previous handlers based on whether callbacks are provided.
   useEffect(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     try {
       navigator.mediaSession.setActionHandler(
@@ -105,9 +188,10 @@ export function useMediaSession({
     return () => {
       try { navigator.mediaSession.setActionHandler('nexttrack', null); } catch {}
     };
-  }, [!!onNextTrack]);
+  }, [useNative, !!onNextTrack]);
 
   useEffect(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     try {
       navigator.mediaSession.setActionHandler(
@@ -118,14 +202,16 @@ export function useMediaSession({
     return () => {
       try { navigator.mediaSession.setActionHandler('previoustrack', null); } catch {}
     };
-  }, [!!onPreviousTrack]);
+  }, [useNative, !!onPreviousTrack]);
 
   useEffect(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
     navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-  }, [isPlaying]);
+  }, [useNative, isPlaying]);
 
   const updatePositionState = useCallback(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator) || !duration || duration <= 0) return;
     try {
       navigator.mediaSession.setPositionState({
@@ -135,11 +221,12 @@ export function useMediaSession({
       });
     } catch {
     }
-  }, [currentTime, duration, speed]);
+  }, [useNative, currentTime, duration, speed]);
 
   const positionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
+    if (useNative) return;
     if (!('mediaSession' in navigator)) return;
 
     if (isPlaying && duration > 0) {
@@ -161,5 +248,5 @@ export function useMediaSession({
         positionIntervalRef.current = null;
       }
     };
-  }, [isPlaying, duration, updatePositionState]);
+  }, [useNative, isPlaying, duration, updatePositionState]);
 }
