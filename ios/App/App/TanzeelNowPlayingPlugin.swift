@@ -32,7 +32,13 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async { [weak self] in
             self?.activateAudioSession()
             self?.registerCommands()
-            self?.registerInterruptionObserver()
+            // Interruption observer intentionally disabled — even with the
+            // defensive guard it was misbehaving on real iOS devices (audio
+            // would stutter / fail to play). The "auto-resume after phone
+            // call" feature it provided was a polish nicety, not core
+            // functionality. Leaving the observer code in place so it can
+            // be re-enabled and debugged on a real device later.
+            // self?.registerInterruptionObserver()
             self?.preloadArtwork()
         }
     }
