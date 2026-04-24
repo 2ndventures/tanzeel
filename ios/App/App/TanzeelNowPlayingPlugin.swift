@@ -185,6 +185,11 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
             if duration > 0 {
                 self.nowPlayingInfo[MPMediaItemPropertyPlaybackDuration] = duration
             }
+            // The "natural" playback rate for this item is 1.0×. iOS uses this
+            // to decide what counts as "playing back faster/slower than normal"
+            // for the system speed indicator and to set its scrubber's
+            // extrapolation baseline correctly when the user changes speed.
+            self.nowPlayingInfo[MPNowPlayingInfoPropertyDefaultPlaybackRate] = 1.0
             if let art = self.cachedArtwork {
                 self.nowPlayingInfo[MPMediaItemPropertyArtwork] = art
             }

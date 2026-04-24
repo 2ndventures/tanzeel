@@ -9,6 +9,20 @@ const MEDIA_SESSION_ARTWORK: MediaImage[] = [
   { src: '/icons/tanzeel-logo-media.jpg', sizes: '512x512', type: 'image/jpeg' },
 ];
 
+// Anything bigger than this between the value we last pushed (extrapolated
+// forward by playbackRate) and the new currentTime counts as a real seek
+// and gets a fresh snapshot pushed to the OS now-playing centre. Smaller
+// drifts are left alone — the OS extrapolates between snapshots from the
+// last `position + (now − lastPush) × playbackRate`, so re-pushing tiny
+// corrections every tick is what made the lock-screen scrubber visibly
+// snap backward 30–150 ms at a time on real iPhones (task #19).
+//
+// Chosen at 0.35 s: comfortably above normal extrapolation drift (audio
+// clock vs wall clock during steady playback measure ≤ 50 ms apart) but
+// low enough that a manual seek of just half a second still gets a fresh
+// push so the lock-screen scrubber doesn't sit permanently offset.
+const SEEK_DETECTION_THRESHOLD_S = 0.35;
+
 interface MediaSessionOptions {
   title: string;
   artist: string;
@@ -24,9 +38,9 @@ interface MediaSessionOptions {
   onPreviousTrack?: (() => void) | null;
   active?: boolean;
   // True when the underlying audio element is buffering (`waiting`/`stalled`)
-  // and the playback clock is frozen. While true we stop pushing 1Hz position
-  // updates and instead pin the OS scrubber at the current position so the
-  // lock-screen / Bluetooth UI doesn't keep advancing past silence.
+  // and the playback clock is frozen. While true we report `paused` to the
+  // OS so the lock-screen scrubber pins at the current position instead of
+  // extrapolating forward over silence.
   isStalled?: boolean;
 }
 
@@ -52,9 +66,20 @@ export function useMediaSession({
   const onNextTrackRef = useRef(onNextTrack);
   const onPreviousTrackRef = useRef(onPreviousTrack);
   const isPlayingRef = useRef(isPlaying);
+  const isStalledRef = useRef(isStalled);
   const currentTimeRef = useRef(currentTime);
   const durationRef = useRef(duration);
   const speedRef = useRef(speed);
+
+  // Snapshot bookkeeping — what was the last position we pushed to each
+  // surface, and at what wall-clock time. The seek-detection effects compare
+  // each new `currentTime` against the position the OS would have
+  // extrapolated to by now, and only push a fresh snapshot when the gap
+  // exceeds SEEK_DETECTION_THRESHOLD_S.
+  const lastNativePosRef = useRef(currentTime);
+  const lastNativeAtRef = useRef(Date.now());
+  const lastWebPosRef = useRef(currentTime);
+  const lastWebAtRef = useRef(Date.now());
 
   useEffect(() => { onPlayRef.current = onPlay; }, [onPlay]);
   useEffect(() => { onPauseRef.current = onPause; }, [onPause]);
@@ -62,13 +87,14 @@ export function useMediaSession({
   useEffect(() => { onNextTrackRef.current = onNextTrack; }, [onNextTrack]);
   useEffect(() => { onPreviousTrackRef.current = onPreviousTrack; }, [onPreviousTrack]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+  useEffect(() => { isStalledRef.current = isStalled; }, [isStalled]);
   useEffect(() => { currentTimeRef.current = currentTime; }, [currentTime]);
   useEffect(() => { durationRef.current = duration; }, [duration]);
   useEffect(() => { speedRef.current = speed; }, [speed]);
 
   const useNative = isNativeNowPlayingAvailable();
 
-  // Native iOS: register remote-command listeners once on mount.
+  // ── Native iOS: remote-command listeners (registered once) ────────────────
   useEffect(() => {
     if (!useNative) return;
     let handles: PluginListenerHandle[] = [];
@@ -104,7 +130,41 @@ export function useMediaSession({
     };
   }, [useNative]);
 
-  // Native iOS: push metadata + nav availability when active.
+  // ── Native iOS: event-driven snapshot push ────────────────────────────────
+  // Replaces the old 1 Hz polling loop. iOS's MPNowPlayingInfoCenter already
+  // extrapolates the displayed elapsed time as
+  //   displayedPos = lastPushedPosition + (now − lastPushedAt) × playbackRate
+  // so re-pushing JS's currentTime every second only contradicts that
+  // extrapolation by the bridge + React lag (~30–150 ms) and visibly snaps
+  // the scrubber backward each tick. We push exactly once per *event*
+  // (play, pause, speed change, surah change, stall begin/end, real seek)
+  // and let iOS handle the in-between motion. Reads everything from refs so
+  // the value is always current at the moment the event fires.
+  const pushNativeSnapshot = useCallback(() => {
+    if (!useNative || !active) return;
+    const dur = durationRef.current;
+    // Skip the brief duration=0 transient at chapter swap. The audio hook
+    // resets currentTime/duration to 0 synchronously on chapter change, then
+    // refills duration after `loadedmetadata` fires (~100–500 ms later).
+    // Pushing a 0/0 snapshot during that window would briefly blank the
+    // lock-screen scrubber. The metadata effect re-runs (it depends on
+    // duration) once the real value lands, which fires this push correctly.
+    if (!dur || dur <= 0) return;
+    const pos = currentTimeRef.current;
+    TanzeelNowPlaying.setPlaybackState({
+      isPlaying: isPlayingRef.current && !isStalledRef.current,
+      speed: speedRef.current,
+      position: pos,
+      duration: dur,
+    }).catch(() => {});
+    lastNativePosRef.current = pos;
+    lastNativeAtRef.current = Date.now();
+  }, [useNative, active]);
+
+  // Metadata + nav availability. Pushes title/artist/duration first, then a
+  // fresh position snapshot so elapsed time and total duration always reset
+  // together at surah change. Without the trailing snapshot the lock screen
+  // briefly shows the previous surah's elapsed time against the new total.
   useEffect(() => {
     if (!useNative) return;
     if (!active) {
@@ -116,61 +176,31 @@ export function useMediaSession({
       next: !!onNextTrack,
       previous: !!onPreviousTrack,
     }).catch(() => {});
-  }, [useNative, active, title, artist, album, duration, !!onNextTrack, !!onPreviousTrack]);
+    pushNativeSnapshot();
+  }, [useNative, active, title, artist, album, duration, !!onNextTrack, !!onPreviousTrack, pushNativeSnapshot]);
 
-  // Native iOS: push playback state changes immediately. Reads the latest
-  // position from the ref so play/pause flips never send a stale (one-tick
-  // behind) currentTime captured from closure.
+  // Push on play/pause flip, stall begin/end, speed change.
+  useEffect(() => {
+    pushNativeSnapshot();
+  }, [pushNativeSnapshot, isPlaying, isStalled, speed]);
+
+  // Seek detection. `currentTime` ticks up to ~12 Hz from the audio hook's
+  // rAF loop while playing — we never push at that cadence. Instead, on
+  // every change, compare to where iOS would have extrapolated to by now;
+  // only a real jump (slider drag, verse jump, chapter restart) gets a
+  // fresh push.
   useEffect(() => {
     if (!useNative || !active) return;
-    // While stalled, report paused to MPNowPlayingInfoCenter so the lock-
-    // screen play/pause glyph and scrubber both freeze. The hook's
-    // isPlaying state intentionally stays true (so the in-app UI keeps
-    // showing the spinner / pause icon) — only the OS view is masked.
-    TanzeelNowPlaying.setPlaybackState({
-      isPlaying: isPlaying && !isStalled,
-      speed,
-      position: currentTimeRef.current,
-      duration,
-    }).catch(() => {});
-  }, [useNative, active, isPlaying, isStalled, speed, duration]);
-
-  // Native iOS: throttle position updates (1Hz when playing) to keep the
-  // lock-screen scrubber fluid without flooding the bridge. Reads latest
-  // currentTime / duration / speed from refs each tick so the value is never
-  // stale. When paused, also re-pushes whenever currentTime changes so manual
-  // seeks (scrubber drag, verse jump) update the lock-screen position
-  // immediately instead of waiting for the next play.
-  useEffect(() => {
-    if (!useNative || !active) return;
-    // While stalled (or paused) push a single "frozen at X" snapshot and
-    // skip the 1Hz interval so MPNowPlayingInfoCenter doesn't keep
-    // extrapolating the scrubber forward while audio is buffering.
-    if (!isPlaying || isStalled) {
-      TanzeelNowPlaying.setPosition({
-        position: currentTimeRef.current,
-        duration: durationRef.current,
-        speed: speedRef.current,
-        isPlaying: false,
-      }).catch(() => {});
-      return;
+    const now = Date.now();
+    const elapsedSec = (now - lastNativeAtRef.current) / 1000;
+    const rate = isPlayingRef.current && !isStalledRef.current ? speedRef.current : 0;
+    const extrapolated = lastNativePosRef.current + elapsedSec * rate;
+    if (Math.abs(currentTime - extrapolated) > SEEK_DETECTION_THRESHOLD_S) {
+      pushNativeSnapshot();
     }
-    const id = setInterval(() => {
-      TanzeelNowPlaying.setPosition({
-        position: currentTimeRef.current,
-        duration: durationRef.current,
-        speed: speedRef.current,
-        isPlaying: true,
-      }).catch(() => {});
-    }, 1000);
-    return () => clearInterval(id);
-  }, [useNative, active, isPlaying, isStalled, isPlaying && !isStalled ? 0 : currentTime]);
+  }, [useNative, active, currentTime, pushNativeSnapshot]);
 
-  // Web MediaSession path. Runs on every platform (browser, PWA, Android, and
-  // iOS Capacitor) — on iOS it acts as a fallback in case the native plugin
-  // fails to register or initialize. Native MPNowPlayingInfoCenter takes
-  // visual precedence on iOS when it works; the duplicate handlers are
-  // harmless because play/pause/seek are idempotent.
+  // ── Web MediaSession path (Android lock screen, desktop browsers, BT) ─────
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
     if (!active) {
@@ -246,42 +276,42 @@ export function useMediaSession({
       isPlaying && !isStalled ? 'playing' : 'paused';
   }, [isPlaying, isStalled]);
 
-  // Web MediaSession position-state updates. Mirrors the native iOS path:
-  // when playing, runs a steady 1Hz interval that reads currentTime/duration/
-  // speed from refs (so the interval is created once and is not torn down on
-  // every state tick — calling setPositionState at the React update cadence
-  // confuses browser and OS media UIs and causes the lock-screen scrubber to
-  // jump). When paused, re-pushes whenever currentTime changes so manual
-  // scrubs / verse jumps update the lock screen immediately.
+  // Web MediaSession positionState — same event-driven model as native.
+  // Browsers extrapolate displayed position from `playbackRate` between
+  // setPositionState calls, so we only push on real events and let the
+  // browser handle the in-between motion.
+  const pushWebPositionState = useCallback(() => {
+    if (!('mediaSession' in navigator)) return;
+    const d = durationRef.current;
+    if (!d || d <= 0) return;
+    try {
+      const pos = Math.min(currentTimeRef.current, d);
+      navigator.mediaSession.setPositionState({
+        duration: d,
+        playbackRate: speedRef.current,
+        position: pos,
+      });
+      lastWebPosRef.current = pos;
+      lastWebAtRef.current = Date.now();
+    } catch {
+      // setPositionState throws on some browsers if duration/rate are 0
+      // mid-transition. Safe to ignore — the next event-driven push
+      // re-syncs.
+    }
+  }, []);
+
+  useEffect(() => {
+    pushWebPositionState();
+  }, [pushWebPositionState, isPlaying, isStalled, speed, duration]);
+
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
-
-    const push = () => {
-      const d = durationRef.current;
-      if (!d || d <= 0) return;
-      try {
-        // playbackRate must be > 0 per the Media Session spec, so we always
-        // send the real rate. Freezing the scrubber while stalled is handled
-        // by the playbackState effect above, which flips to 'paused' — the
-        // OS then stops extrapolating the position forward and pins it to
-        // the snapshot we send here.
-        navigator.mediaSession.setPositionState({
-          duration: d,
-          playbackRate: speedRef.current,
-          position: Math.min(currentTimeRef.current, d),
-        });
-      } catch {
-      }
-    };
-
-    // Stalled or paused → push one snapshot and stop the 1Hz interval.
-    // playbackState='paused' (set above) keeps the scrubber pinned.
-    if (!isPlaying || isStalled) {
-      push();
-      return;
+    const now = Date.now();
+    const elapsedSec = (now - lastWebAtRef.current) / 1000;
+    const rate = isPlayingRef.current && !isStalledRef.current ? speedRef.current : 0;
+    const extrapolated = lastWebPosRef.current + elapsedSec * rate;
+    if (Math.abs(currentTime - extrapolated) > SEEK_DETECTION_THRESHOLD_S) {
+      pushWebPositionState();
     }
-    push();
-    const id = setInterval(push, 1000);
-    return () => clearInterval(id);
-  }, [isPlaying, isStalled, isPlaying && !isStalled ? 0 : currentTime, duration > 0]);
+  }, [currentTime, pushWebPositionState]);
 }
