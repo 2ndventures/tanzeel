@@ -19,6 +19,10 @@ export async function initSentry(): Promise<void> {
 
   const environment = import.meta.env.PROD ? "production" : "development";
 
+  // Expose the SDK on window for in-browser debugging and ad-hoc captures.
+  // Safe even in production: it only gives access to the SDK, not to secrets.
+  (window as any).Sentry = SentryReact;
+
   try {
     if (isNative) {
       // @sentry/capacitor wraps @sentry/react and is only loaded on native
@@ -56,6 +60,7 @@ export async function initSentry(): Promise<void> {
           }),
         ],
       });
+      console.info(`[Sentry] web SDK initialised (env=${environment})`);
     }
   } catch (err) {
     console.warn("[Sentry] init failed:", err);
