@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
+import { captureException } from '@sentry/react';
 import { Button } from '@/components/ui/button';
 
 interface Props {
@@ -22,6 +23,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
+    // Forward to Sentry. captureException is a no-op until Sentry.init() runs,
+    // so this is safe even when no DSN is configured.
+    try {
+      captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
+    } catch {
+      // Never let the error reporter throw from inside the boundary.
+    }
   }
 
   handleReset = () => {

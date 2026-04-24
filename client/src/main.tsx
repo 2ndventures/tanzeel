@@ -1,6 +1,12 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import { initSentry } from "./lib/sentry";
+
+// Fire-and-forget — Sentry init is async because the SDK is dynamically
+// imported (so it doesn't block first paint). Errors that happen during
+// init itself are swallowed inside initSentry().
+initSentry();
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (isIOS) {

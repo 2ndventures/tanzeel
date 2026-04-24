@@ -56,6 +56,17 @@ A lightweight pub/sub system provides download activity state, displaying an ani
 
 ChapterView uses the Web `Screen Wake Lock` API to prevent the screen from dimming/locking during audio playback.
 
+## Error Monitoring (Sentry)
+
+The app reports runtime errors to three separate Sentry projects:
+- **Web** (`VITE_SENTRY_DSN_WEB`) via `@sentry/react` with browser tracing and on-error session replay (text masked, media blocked).
+- **iOS native** (`VITE_SENTRY_DSN_IOS`) via `@sentry/capacitor` wrapping `@sentry/react`. The Capacitor plugin is registered in `ios/App/Podfile` (`SentryCapacitor` pod) and requires `pod install` on macOS after `npx cap sync ios`.
+- **API** (`SENTRY_DSN_API`) via `@sentry/node` with `nodeProfilingIntegration`. Initialised in `server/instrument.ts` (imported first in `server/index.ts`); `Sentry.setupExpressErrorHandler(app)` runs after routes, before the custom error middleware.
+
+`client/src/lib/sentry.ts` chooses the DSN based on `Capacitor.isNativePlatform()`. The shared React `ErrorBoundary` in `client/src/components/ErrorBoundary.tsx` forwards uncaught render errors via `Sentry.captureException`. A hidden verification endpoint `GET /api/_debug/sentry` deliberately throws to test backend reporting.
+
+Note: full express auto-instrumentation requires running node/tsx with `--import ./server/instrument.ts`. Without that flag, error capture works but request-tracing spans are not auto-collected.
+
 ## Data Management
 
 Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored client-side. User preferences are managed using local storage. Word-level timing data is fetched dynamically.

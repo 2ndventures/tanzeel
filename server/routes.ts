@@ -27,6 +27,12 @@ const SAFE_PARAM = /^[a-zA-Z0-9_\-]+$/;
 const SAFE_NUM = /^[0-9]+$/;
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Hidden Sentry verification endpoint. Throws so the global error handler
+  // (Sentry's setupExpressErrorHandler) captures and reports it.
+  app.get("/api/_debug/sentry", (_req, _res) => {
+    throw new Error("Sentry test error from /api/_debug/sentry");
+  });
+
   app.get("/api/search", async (req, res) => {
     try {
       const q = (req.query.q as string || '').trim().toLowerCase();

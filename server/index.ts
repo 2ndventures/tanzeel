@@ -1,3 +1,8 @@
+// IMPORTANT: Sentry instrumentation must be imported FIRST, before any other
+// modules, so its hooks attach to the right module instances. Do not move.
+import "./instrument";
+import * as Sentry from "@sentry/node";
+
 import express, { type Request, Response, NextFunction } from "express";
 import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
@@ -65,6 +70,10 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+
+  // Sentry's Express error handler must be registered AFTER all routes but
+  // BEFORE any other error middleware, so it sees and reports unhandled errors.
+  Sentry.setupExpressErrorHandler(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

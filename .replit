@@ -44,3 +44,10 @@ integrations = ["javascript_openai_ai_integrations:2.0.0"]
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+VITE_SENTRY_DSN_WEB = "https://52dc6b267b69d08f226a2c02e1eb07a8@o4511252649410560.ingest.us.sentry.io/4511276553011200"
+VITE_SENTRY_DSN_IOS = "https://66c9f019ec77cce18839faefeca2fdf2@o4511252649410560.ingest.us.sentry.io/4511276556943360"
+SENTRY_DSN_API = "https://9dc2df097604df6bec5a6c391e8305ea@o4511252649410560.ingest.us.sentry.io/4511276555829248"
