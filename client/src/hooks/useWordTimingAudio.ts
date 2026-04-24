@@ -153,6 +153,15 @@ export function useWordTimingAudio(
   // Re-entry gate so the watchdog escalation and a near-simultaneous
   // native 'error' event don't both kick off recovery chains.
   const recoveryInFlightRef = useRef(false);
+  // Position to seek to once a backoff-retry's loadAudio reaches metadata.
+  // Tagged with chapter+reciter so a user-initiated chapter change between
+  // the retry timer firing and loadAudio consuming the ref can't seek the
+  // wrong chapter to a stale position.
+  const pendingResumePositionRef = useRef<{
+    chapterId: number;
+    reciterId: number;
+    position: number;
+  } | null>(null);
   const rafIdRef = useRef<number | null>(null);
   const currentVerseIndexRef = useRef<number>(-1);
   // Suppresses pause-state updates while the browser unloads/loads a new src.
@@ -1003,10 +1012,25 @@ export function useWordTimingAudio(
       if (retryCountRef.current < MAX_AUTO_RETRIES) {
         retryCountRef.current++;
         const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), RETRY_DELAY_CAP_MS);
+        // Capture position so the retry's loadAudio can seek back to it
+        // — a 30s dropout mid-surah should resume where it dropped, not
+        // restart from verse 1.
+        const resumeAt = audio.currentTime;
+        const resumeChapter = currentChapterIdRef.current;
+        const resumeReciter = reciterIdRef.current;
+        if (
+          resumeAt > 0 &&
+          isFinite(resumeAt) &&
+          resumeChapter !== null
+        ) {
+          pendingResumePositionRef.current = {
+            chapterId: resumeChapter,
+            reciterId: resumeReciter,
+            position: resumeAt,
+          };
+        }
         retryTimerRef.current = setTimeout(() => {
           retryTimerRef.current = null;
-          // Release the gate before reload — a fresh failure should be
-          // allowed to start a new recovery cycle.
           recoveryInFlightRef.current = false;
           loadAudioRef.current();
         }, delay);
@@ -1364,6 +1388,34 @@ export function useWordTimingAudio(
     audio.src = streamingUrl;
     audio.playbackRate = speedRef.current;
     audio.load();
+
+    // If a backoff-retry stashed a position, seek back to it so a network
+    // dropout resumes mid-surah instead of restarting from verse 1.
+    const pendingResume = pendingResumePositionRef.current;
+    pendingResumePositionRef.current = null;
+    if (
+      pendingResume &&
+      pendingResume.chapterId === chapterId &&
+      pendingResume.reciterId === reciterId
+    ) {
+      const seekToResume = () => {
+        const dur = audio.duration;
+        const target = isFinite(dur) && dur > 0
+          ? Math.min(pendingResume.position, dur - 0.1)
+          : pendingResume.position;
+        try {
+          audio.currentTime = Math.max(0, target);
+        } catch (err) {
+          console.warn('Tanzeel: resume-seek currentTime assignment failed:', err);
+        }
+      };
+      if (audio.readyState >= 1 /* HAVE_METADATA */) {
+        seekToResume();
+      } else {
+        audio.addEventListener('loadedmetadata', seekToResume, { once: true });
+      }
+    }
+
     if (autoplayRef.current) {
       playWhenReady(audio, () => {
         setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
