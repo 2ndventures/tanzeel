@@ -1048,15 +1048,10 @@ span.end {
 }
 .active-word {
   color: hsl(214 80% 38%);
-  background-color: hsl(214 80% 38% / 0.1);
-  border-radius: 0.25rem;
-  padding: 0 0.15em;
   text-shadow: 0 0 6px hsl(214 80% 38% / 0.25);
 }
 .dark .active-word {
   color: hsl(var(--glow-primary));
-  background-color: transparent;
-  padding: 0;
   text-shadow: 0 0 4px hsl(var(--glow-primary) / 0.35);
 }
 .verse-end-ornament {
