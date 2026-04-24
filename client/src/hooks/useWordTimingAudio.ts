@@ -122,9 +122,60 @@ export function useWordTimingAudio(
   const loadIdRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const retryCountRef = useRef(0);
-  const MAX_AUTO_RETRIES = 2;
+  // 5 attempts with exponential backoff (1s, 2s, 4s, 8s, 8s) → ~23s total
+  // before we surface a user-visible "Tap retry" error. On a real device
+  // this comfortably covers a brief LTE→WiFi handoff or elevator dead
+  // zone without the user ever seeing the failure.
+  const MAX_AUTO_RETRIES = 5;
+  const RETRY_DELAY_CAP_MS = 8000;
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const vbvSkipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Pre-buffer next chapter for gapless transitions ─────────────────────
+  // Once the active chapter crosses the 80% mark (or has ≤30s remaining)
+  // we warm a hidden <audio> element with the next chapter's URL. The
+  // browser progressively HTTP-caches the file; when handleEnded then
+  // sets the main element's src to the same URL, the load is effectively
+  // instant — sub-100ms gap instead of the typical 0.5–3s cold-network
+  // fetch on real iOS hardware. For chapters that are downloaded locally
+  // we instead pre-resolve the Filesystem URI so the on-end handoff
+  // doesn't pay an async stat round-trip either.
+  const prefetchAudioRef = useRef<HTMLAudioElement | null>(null);
+  const prefetchedRef = useRef<{
+    chapterId: number;
+    reciterId: number;
+    url: string;
+    isOffline: boolean;
+  } | null>(null);
+  // Marks which (chapter, reciter) target we've already kicked off a
+  // prefetch for — guards against re-triggering on every timeupdate
+  // (which fires ~4 Hz during steady playback).
+  const prefetchTriggeredForRef = useRef<{ chapterId: number; reciterId: number } | null>(null);
+  // Bridge ref so the audio-element listeners (defined in a useEffect
+  // closure) can call the up-to-date prefetch trigger without becoming
+  // a dep of that effect (which would re-tear-down/setup the audio
+  // element on every render).
+  const startPrefetchRef = useRef<() => void>(() => {});
+
+  // ── Stall watchdog ──────────────────────────────────────────────────────
+  // 'waiting'/'stalled' fire when the network stops delivering data, but
+  // neither comes with a timeout — on a flaky connection audio can sit
+  // frozen indefinitely with no signal past the spinner. After
+  // STALL_WATCHDOG_MS we trigger the same recovery path as 'error' so
+  // the offline-mid-track fallback / retry-with-backoff kicks in.
+  const stallWatchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const STALL_WATCHDOG_MS = 8000;
+  // Bridge ref so the audio-element listeners (defined in a useEffect
+  // closure) can call handleError without becoming a dep of that effect.
+  const triggerErrorRecoveryRef = useRef<() => void>(() => {});
+  // Re-entry gate for handleError. The watchdog escalation and the native
+  // 'error' event can fire in close succession (watchdog times out at
+  // T+8s, network failure surfaces at T+8.05s). Without a gate they each
+  // schedule their own retry timer / offline-fallback chain, doubling the
+  // recovery work and burning through MAX_AUTO_RETRIES twice as fast.
+  // Cleared on successful resume (handleCanPlay) or on any user-initiated
+  // load (top of loadAudio).
+  const recoveryInFlightRef = useRef(false);
   const rafIdRef = useRef<number | null>(null);
   const currentVerseIndexRef = useRef<number>(-1);
   // Suppresses pause-state updates while the browser unloads/loads a new src.
@@ -270,10 +321,26 @@ export function useWordTimingAudio(
     }, 10000);
   }, []);
 
-  useEffect(() => { repeatRef.current = repeat; }, [repeat]);
+  // Bridge ref so the autoplay/repeat sync effects below can call
+  // clearPrefetch without forward-referencing the useCallback (which is
+  // declared later in the file). Pointed at the real implementation as
+  // soon as the useCallback runs (see useEffect right after its declaration).
+  const clearPrefetchRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    repeatRef.current = repeat;
+    // Repeat → no chapter advance happens, so any pre-buffered next-
+    // chapter element is dead weight. Drop it to free network/memory.
+    if (repeat) clearPrefetchRef.current();
+  }, [repeat]);
   useEffect(() => { onVerseChangeRef.current = onVerseChange; }, [onVerseChange]);
   useEffect(() => { onEndedRef.current = onEnded; }, [onEnded]);
-  useEffect(() => { autoplayRef.current = autoplay; }, [autoplay]);
+  useEffect(() => {
+    autoplayRef.current = autoplay;
+    // Autoplay disabled → no chapter advance happens. Drop the prefetch
+    // (and re-arming gate) so we don't keep a hidden <audio> connected
+    // to the network for a transition that will never occur.
+    if (!autoplay) clearPrefetchRef.current();
+  }, [autoplay]);
   useEffect(() => { reciterIdRef.current = reciterId; }, [reciterId]);
 
   const syncSpeed = useCallback(async () => {
@@ -405,6 +472,159 @@ export function useWordTimingAudio(
     }
   }, []);
 
+  // Tear down any pre-buffered next-chapter element. Idempotent — safe to
+  // call from event handlers, loadAudio, and unmount cleanup. Does NOT
+  // touch the main audio element.
+  const clearPrefetch = useCallback(() => {
+    const a = prefetchAudioRef.current;
+    if (a) {
+      a.pause();
+      a.removeAttribute('src');
+      try { a.load(); } catch {}
+      a.remove();
+    }
+    prefetchAudioRef.current = null;
+    prefetchedRef.current = null;
+    prefetchTriggeredForRef.current = null;
+  }, []);
+  // Wire the forward-reference bridge so the autoplay/repeat sync
+  // effects above (which run earlier in the render order) can call the
+  // real implementation. Stable identity (useCallback []) means this
+  // assignment runs exactly once on mount.
+  clearPrefetchRef.current = clearPrefetch;
+
+  // Fire-and-forget warm of the next chapter's audio (and timing data).
+  // Idempotent per (chapter, reciter): the trigger ref guards against the
+  // ~4 Hz timeupdate firing rate. Three branches:
+  //   • Last chapter / repeat / autoplay-off → no-op (no advance happens)
+  //   • Next chapter is downloaded locally → pre-resolve the file URI so
+  //     the on-end handoff doesn't pay a Filesystem.stat round-trip
+  //   • Next chapter streams → warm a hidden <audio preload="auto"> with
+  //     the predictable URL so the browser HTTP-caches the file; setting
+  //     audio.src to the same URL on end then hits the cache instantly
+  // Timing JSON is warmed in parallel in both online/offline paths so
+  // word highlighting catches up immediately on chapter change.
+  const startPrefetchForNextChapter = useCallback(async () => {
+    if (repeatRef.current) return;
+    if (!autoplayRef.current) return;
+    const curChapter = currentChapterIdRef.current;
+    const curReciter = reciterIdRef.current;
+    if (curChapter === null || curChapter >= 114) return;
+    const nextChapterId = curChapter + 1;
+
+    const triggered = prefetchTriggeredForRef.current;
+    if (
+      triggered &&
+      triggered.chapterId === nextChapterId &&
+      triggered.reciterId === curReciter
+    ) {
+      return;
+    }
+    prefetchTriggeredForRef.current = { chapterId: nextChapterId, reciterId: curReciter };
+
+    const reciterString = quranComIdToReciterString(curReciter);
+
+    // Offline branch: pre-resolve URI + warm timing JSON.
+    if (reciterString && isFullChapterDownloaded(reciterString, nextChapterId)) {
+      try {
+        const uri = await getFullChapterAudioUri(reciterString, nextChapterId);
+        if (
+          currentChapterIdRef.current === curChapter &&
+          reciterIdRef.current === curReciter &&
+          uri
+        ) {
+          prefetchedRef.current = {
+            chapterId: nextChapterId,
+            reciterId: curReciter,
+            url: uri,
+            isOffline: true,
+          };
+        }
+      } catch {
+        // Non-fatal — handleEnded will fall back to the streaming URL,
+        // and the React-side loadAudio will re-resolve to offline shortly
+        // after the in-place advance.
+      }
+      if (!getTimingDataFromMemory(curReciter, nextChapterId)) {
+        try {
+          const off = await getOfflineTimingData(reciterString, nextChapterId) as TimingData | null;
+          if (off?.audio_files?.[0]) {
+            storeTimingDataInMemory(curReciter, nextChapterId, off);
+          }
+        } catch {}
+      }
+      return;
+    }
+
+    // Streaming branch: warm hidden <audio> + timing JSON.
+    const nextUrl = getChapterAudioUrl(curReciter, nextChapterId);
+    if (!nextUrl) return;
+
+    // Drain any prior prefetch element (e.g. reciter changed since the
+    // last prefetch). Don't leak hidden <audio> tags.
+    if (prefetchAudioRef.current) {
+      prefetchAudioRef.current.pause();
+      prefetchAudioRef.current.removeAttribute('src');
+      prefetchAudioRef.current.remove();
+      prefetchAudioRef.current = null;
+    }
+
+    const container = audioContainerRef.current;
+    if (container) {
+      const warmer = document.createElement('audio');
+      warmer.preload = 'auto';
+      // Belt-and-suspenders: a muted, never-played warmer can't possibly
+      // produce sound even if the browser auto-played it (it won't —
+      // there's no play() call).
+      warmer.muted = true;
+      warmer.src = nextUrl;
+      warmer.load();
+      container.appendChild(warmer);
+      prefetchAudioRef.current = warmer;
+    }
+    prefetchedRef.current = {
+      chapterId: nextChapterId,
+      reciterId: curReciter,
+      url: nextUrl,
+      isOffline: false,
+    };
+
+    if (!getTimingDataFromMemory(curReciter, nextChapterId)) {
+      try {
+        const r = await fetch(getTimingUrl(curReciter, nextChapterId));
+        if (r.ok) {
+          const raw = await r.json() as Record<string, unknown>;
+          const normalized = normalizeTimingResponse(raw);
+          const data: TimingData = { audio_files: normalized.audio_files as AudioFile[] };
+          // Re-validate before publishing — the user may have changed
+          // chapter/reciter while the timing fetch was in flight.
+          if (
+            currentChapterIdRef.current === curChapter &&
+            reciterIdRef.current === curReciter
+          ) {
+            storeTimingDataInMemory(curReciter, nextChapterId, data);
+          }
+        }
+      } catch {
+        // Non-fatal — loadAudio re-fetches if cache miss.
+      }
+    }
+  }, []);
+
+  // Keep the bridge ref pointed at the latest closure so the audio-element
+  // event handlers (whose effect doesn't depend on this callback) always
+  // call the most recent implementation.
+  useEffect(() => {
+    startPrefetchRef.current = startPrefetchForNextChapter;
+  }, [startPrefetchForNextChapter]);
+
+  const clearStallWatchdog = useCallback(() => {
+    if (stallWatchdogRef.current) {
+      clearTimeout(stallWatchdogRef.current);
+      stallWatchdogRef.current = null;
+    }
+  }, []);
+
   // Forward refs so the persistent audio listeners can call loaders defined below.
   const loadAudioRef = useRef<() => Promise<void>>(async () => {});
   const tryVbvFallbackRef = useRef<() => Promise<boolean>>(async () => false);
@@ -491,11 +711,31 @@ export function useWordTimingAudio(
           ...(needsPlayingSet && { isPlaying: true }),
         };
       });
+
+      // Pre-buffer next chapter for gapless transitions. Trigger when we
+      // cross 80% of duration OR have ≤30s remaining (whichever fires
+      // first — short surahs need the percentage gate, long ones need
+      // the absolute gate). The trigger ref inside makes this idempotent
+      // per (chapter, reciter), so the ~4 Hz timeupdate firing rate
+      // doesn't re-kick the prefetch every frame.
+      const dur = audio.duration;
+      if (
+        actuallyPlaying &&
+        isFinite(dur) &&
+        dur > 0 &&
+        (ct / dur >= 0.8 || dur - ct <= 30)
+      ) {
+        startPrefetchRef.current();
+      }
     };
 
     const handleCanPlay = () => {
       retryCountRef.current = 0;
       audio.playbackRate = speedRef.current;
+      // Audio is now ready — kill any pending stall watchdog and
+      // release the recovery gate so future failures can recover.
+      clearStallWatchdog();
+      recoveryInFlightRef.current = false;
       // Note: srcChangingRef is intentionally NOT cleared here. It only
       // clears once playback actually resumes (handlePlaying) or the
       // spurious post-swap pause is consumed (handlePause). Clearing on
@@ -525,6 +765,9 @@ export function useWordTimingAudio(
 
     const handlePlaying = () => {
       clearSrcFlag();
+      // Audio is actively producing samples — kill any pending stall
+      // watchdog (the network has clearly recovered).
+      clearStallWatchdog();
       setState(prev => ({ ...prev, isPlaying: true, isLoading: false, isStalled: false, error: null }));
     };
 
@@ -562,11 +805,27 @@ export function useWordTimingAudio(
     // buffered yet; `stalled` fires when the network stops delivering data.
     // Both indicate the audio clock is frozen — flip isStalled so the
     // Media Session layer can pin the OS scrubber until playback resumes.
+    // Also arm an 8s watchdog: if neither 'playing' nor 'canplay' clears
+    // it by then, treat the stall as a real network failure and kick off
+    // the same recovery path as `error` (offline-mid-track fallback or
+    // exponential-backoff retry). Without the watchdog a brief connection
+    // hiccup can leave audio frozen indefinitely.
     const handleWaiting = () => {
       setState(prev => {
         if (prev.isLoading && prev.isStalled) return prev;
         return { ...prev, isLoading: true, isStalled: true };
       });
+      if (stallWatchdogRef.current) clearTimeout(stallWatchdogRef.current);
+      stallWatchdogRef.current = setTimeout(() => {
+        stallWatchdogRef.current = null;
+        const a = audioRef.current;
+        if (!a || a !== audio) return;
+        // User paused while we were waiting → don't auto-recover.
+        if (a.paused) return;
+        // Already buffered enough to keep going → false alarm.
+        if (a.readyState >= 3) return;
+        triggerErrorRecoveryRef.current();
+      }, STALL_WATCHDOG_MS);
     };
 
     const handleEnded = () => {
@@ -657,11 +916,35 @@ export function useWordTimingAudio(
         return;
       }
 
-      // Full-chapter: in-place advance to next chapter
+      // Full-chapter: in-place advance to next chapter.
       const curChapter = currentChapterIdRef.current;
       if (autoplayRef.current && curChapter !== null && curChapter < 114) {
         const nextChapterId = curChapter + 1;
-        const nextUrl = getChapterAudioUrl(reciterIdRef.current, nextChapterId);
+        // Pick the best handoff URL in priority order:
+        //   1. Pre-resolved URL from prefetch — this is either the
+        //      browser-HTTP-cached streaming URL (instant src swap, the
+        //      gapless-transition win) or a pre-resolved local file URI
+        //      (no Filesystem.stat round-trip).
+        //   2. The predictable streaming URL — used when prefetch never
+        //      ran (autoplay just enabled, or user seeked past the
+        //      trigger threshold). Cold-network fetch latency applies.
+        // The downloaded-but-no-prefetch edge case falls into branch 2;
+        // the React-side loadAudio re-runs after onEndedRef and would
+        // re-resolve to offline if the in-place token didn't already
+        // claim the chapter. This is acceptable degradation for a rare
+        // race (autoplay flipped on inside the last 30s of a chapter).
+        const prefetched = prefetchedRef.current;
+        let nextUrl: string | null = null;
+        if (
+          prefetched &&
+          prefetched.chapterId === nextChapterId &&
+          prefetched.reciterId === reciterIdRef.current
+        ) {
+          nextUrl = prefetched.url;
+        } else {
+          nextUrl = getChapterAudioUrl(reciterIdRef.current, nextChapterId);
+        }
+
         if (nextUrl) {
           beginSrcSwap();
           // Mark this chapter as already-loaded so the React-side loadAudio
@@ -679,8 +962,17 @@ export function useWordTimingAudio(
             setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
           });
           currentChapterIdRef.current = nextChapterId;
-          timingDataRef.current = null;
+          // Hand off pre-warmed timing JSON synchronously so word
+          // highlighting catches up instantly on the new chapter. If the
+          // prefetch never warmed it, loadAudio's in-place branch
+          // re-fetches in the background.
+          const memCachedTiming = getTimingDataFromMemory(reciterIdRef.current, nextChapterId);
+          timingDataRef.current = memCachedTiming?.audio_files?.[0] ?? null;
           currentVerseIndexRef.current = -1;
+          // Tear down the consumed prefetch slot so the next
+          // startPrefetchForNextChapter call (now targeting
+          // nextChapterId+1) isn't blocked by the stale trigger guard.
+          clearPrefetch();
           setState(prev => ({
             ...prev,
             currentVerseKey: null,
@@ -701,8 +993,32 @@ export function useWordTimingAudio(
       onEndedRef.current?.();
     };
 
+    // Recovery cascade for streaming failures (real `error` events AND
+    // 8s+ stalls escalated by the watchdog). Tries the cheapest recovery
+    // first, escalating to the most disruptive only as a last resort:
+    //   1. Mid-track offline fallback — if the chapter is downloaded
+    //      locally, swap to the local file at the same playback position.
+    //      Free (no retry-counter increment) because it almost always
+    //      succeeds; the user hears at most a short buffer pause and
+    //      playback continues from where the stream cut out.
+    //   2. Exponential-backoff full reload — re-runs loadAudio. 5
+    //      attempts spaced 1s, 2s, 4s, 8s, 8s (~23s of grace) covers
+    //      LTE→WiFi handoffs, brief dead zones, transient CDN blips.
+    //   3. VBV fallback — if any verses of this chapter are downloaded,
+    //      switch to verse-by-verse playback (loses gapless-within-
+    //      chapter but at least finishes the surah).
+    //   4. Surface "Tap retry" error.
     const handleError = () => {
       clearSrcFlag();
+      clearStallWatchdog();
+      // Re-entry gate: the watchdog escalation and a native 'error' event
+      // can fire within milliseconds of each other on a real network
+      // failure. Without this guard each one schedules its own retry /
+      // offline fallback chain, doubling work and chewing through the
+      // retry budget.
+      if (recoveryInFlightRef.current) return;
+      recoveryInFlightRef.current = true;
+
       // VBV: surface error directly; no auto-retry.
       if (verseByVerseRef.current) {
         setState(prev => ({
@@ -713,11 +1029,88 @@ export function useWordTimingAudio(
         }));
         return;
       }
-      // Full-chapter: auto-retry, then fall back to VBV if available.
+
+      const reciterString = quranComIdToReciterString(reciterIdRef.current);
+      const chapter = currentChapterIdRef.current;
+      const savedPosition = audio.currentTime;
+
+      // Step 1: mid-track offline fallback.
+      if (
+        reciterString &&
+        chapter !== null &&
+        isFullChapterDownloaded(reciterString, chapter)
+      ) {
+        getFullChapterAudioUri(reciterString, chapter).then(uri => {
+          if (!uri) {
+            // Manifest entry stale (file vanished) — fall through to retry.
+            retryWithBackoff();
+            return;
+          }
+          // Bail if the user moved on while we were resolving the URI.
+          if (
+            audioRef.current !== audio ||
+            currentChapterIdRef.current !== chapter
+          ) {
+            recoveryInFlightRef.current = false;
+            return;
+          }
+          beginSrcSwap();
+          audio.src = uri;
+          audio.playbackRate = speedRef.current;
+          audio.load();
+          // Seek back to where the stream cut out, then resume playback.
+          // Two paths because the metadata may already be cached for a
+          // local file: when readyState >= HAVE_METADATA the listener
+          // would never fire, leaving recovery hung. {once: true} on the
+          // listener prevents a leak if both paths somehow race.
+          const seekBack = () => {
+            try {
+              if (savedPosition > 0 && isFinite(savedPosition)) {
+                const dur = audio.duration;
+                const target = isFinite(dur) && dur > 0
+                  ? Math.min(savedPosition, dur - 0.1)
+                  : savedPosition;
+                audio.currentTime = Math.max(0, target);
+              }
+            } catch {}
+            playWhenReady(audio, () => {
+              clearSrcFlag();
+              setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+            });
+          };
+          if (audio.readyState >= 1 /* HAVE_METADATA */) {
+            seekBack();
+          } else {
+            audio.addEventListener('loadedmetadata', seekBack, { once: true });
+          }
+        }).catch(() => {
+          retryWithBackoff();
+        });
+        return;
+      }
+
+      retryWithBackoff();
+    };
+
+    const retryWithBackoff = () => {
+      // Defensively cancel any in-flight retry timer before scheduling a
+      // new one. Prevents overlapping reloads if recovery gets re-entered
+      // (e.g. a second native 'error' fires after the gate is released by
+      // a transient canplay).
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+      // Step 2: exponential backoff reload, then step 3: VBV fallback.
       if (retryCountRef.current < MAX_AUTO_RETRIES) {
         retryCountRef.current++;
-        const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), 4000);
+        const delay = Math.min(1000 * Math.pow(2, retryCountRef.current - 1), RETRY_DELAY_CAP_MS);
         retryTimerRef.current = setTimeout(() => {
+          retryTimerRef.current = null;
+          // Release the gate just before reloading — loadAudio is the
+          // user-equivalent action and a fresh failure cycle should be
+          // allowed to start a new recovery.
+          recoveryInFlightRef.current = false;
           loadAudioRef.current();
         }, delay);
         return;
@@ -733,6 +1126,10 @@ export function useWordTimingAudio(
         }
       });
     };
+
+    // Bridge ref so the stall-watchdog timeout can call handleError
+    // without needing to be a dep of this useEffect.
+    triggerErrorRecoveryRef.current = handleError;
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
@@ -779,13 +1176,19 @@ export function useWordTimingAudio(
       }
       vbvPreloadRef.current.clear();
 
+      // Stop any in-flight stall watchdog and tear down the next-chapter
+      // pre-buffer element so the hidden <audio> doesn't outlive the hook.
+      clearStallWatchdog();
+      clearPrefetch();
+      triggerErrorRecoveryRef.current = () => {};
+
       currentChapterIdRef.current = null;
       currentVerseNumRef.current = null;
       verseByVerseRef.current = false;
       timingDataRef.current = null;
       currentVerseIndexRef.current = -1;
     };
-  }, [enabled, findCurrentSegment, findVbvWordIndex, preloadNextVerses]);
+  }, [enabled, findCurrentSegment, findVbvWordIndex, preloadNextVerses, clearPrefetch, clearStallWatchdog]);
 
   const loadVerseByVerseAudio = useCallback(async (
     verseNum: number,
@@ -966,6 +1369,14 @@ export function useWordTimingAudio(
     const signal = abortControllerRef.current.signal;
     const myLoadId = ++loadIdRef.current;
     retryCountRef.current = 0;
+    // Fresh user-initiated load — release the recovery gate so any
+    // failure during this load can start a new recovery cycle. Also
+    // cancel any pending retry timer the previous load may have armed.
+    recoveryInFlightRef.current = false;
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
 
     // Reset playback context for full-chapter mode targeting (chapterId, reciterId).
     verseByVerseRef.current = false;
@@ -981,6 +1392,12 @@ export function useWordTimingAudio(
       preload.remove();
     }
     vbvPreloadRef.current.clear();
+
+    // Drain any next-chapter prefetch from the previous (chapter, reciter)
+    // — it's now targeting a chapter we're no longer playing toward.
+    // Steady-state prefetch for the new chapter's successor will re-arm
+    // once playback crosses the 80% trigger threshold below.
+    clearPrefetch();
 
     setState(prev => ({
       ...prev,
@@ -1082,7 +1499,7 @@ export function useWordTimingAudio(
       // we don't trigger fallback here because audio may still be playing the
       // predicted URL successfully — only word highlighting will be missing.
     }
-  }, [chapterId, reciterId, syncSpeed]);
+  }, [chapterId, reciterId, syncSpeed, clearPrefetch]);
 
   loadAudioRef.current = loadAudio;
 
