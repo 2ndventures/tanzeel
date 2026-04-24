@@ -1047,6 +1047,10 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
+  color: hsl(var(--primary));
+  text-shadow: 0 0 4px hsl(var(--primary) / 0.25);
+}
+.dark .active-word {
   color: hsl(var(--glow-primary));
   text-shadow: 0 0 4px hsl(var(--glow-primary) / 0.35);
 }
