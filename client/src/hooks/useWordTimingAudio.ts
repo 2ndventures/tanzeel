@@ -150,6 +150,12 @@ export function useWordTimingAudio(
   // since it's always current).
   const isPlayingRef = useRef(false);
 
+  // Tracks the most recent in-flight "play when ready" attempt so a new
+  // src swap (or another playWhenReady call) can cancel it. Without this,
+  // a stale canplay listener from a prior src could fire after we've
+  // already moved on, causing two competing play() calls.
+  const pendingPlayRef = useRef<{ cancel: () => void } | null>(null);
+
   const [state, setState] = useState<WordTimingAudioState>({
     isPlaying: false,
     speed: initialSpeed,
@@ -179,6 +185,12 @@ export function useWordTimingAudio(
   const beginSrcSwap = useCallback(() => {
     srcChangingRef.current = true;
     srcChangingAtRef.current = Date.now();
+    // Cancel any pending "play when ready" from a prior src — the new src
+    // we're swapping in will install its own attempt below.
+    if (pendingPlayRef.current) {
+      pendingPlayRef.current.cancel();
+      pendingPlayRef.current = null;
+    }
     if (swapWatchdogRef.current) clearTimeout(swapWatchdogRef.current);
     swapWatchdogRef.current = setTimeout(() => {
       swapWatchdogRef.current = null;
@@ -189,6 +201,73 @@ export function useWordTimingAudio(
       const playing = !a.paused && !a.ended && a.readyState >= 2;
       setState(prev => prev.isPlaying === playing ? prev : { ...prev, isPlaying: playing });
     }, 2500);
+  }, []);
+
+  // Wait for the audio element to be ready before calling play(). On iOS
+  // WKWebView, calling play() immediately after `audio.src = ...; audio.load()`
+  // hits a race: the element is still initializing the new source and play()
+  // gets silently rejected (the device-log smoking gun was a "playing: Yes"
+  // followed 7ms later by "playing: No" on surah change). On the simulator
+  // and on desktop browsers this happens to work because the load is fast
+  // enough, which is why the bug only showed up on real hardware.
+  //
+  // This helper:
+  //   - cancels any prior pending attempt (so a rapid second swap doesn't
+  //     leave a stale canplay listener around that fires later)
+  //   - plays immediately if the element already has enough data buffered
+  //   - otherwise waits for the next `canplay` then plays
+  //   - falls back to the supplied onError after 10s if `canplay` never
+  //     arrives (e.g. CDN unreachable)
+  const playWhenReady = useCallback((audio: HTMLAudioElement, onError: () => void) => {
+    if (pendingPlayRef.current) {
+      pendingPlayRef.current.cancel();
+      pendingPlayRef.current = null;
+    }
+
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const cleanup = () => {
+      audio.removeEventListener('canplay', onCanPlay);
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      if (pendingPlayRef.current === handle) pendingPlayRef.current = null;
+    };
+
+    const attemptPlay = () => {
+      if (cancelled) return;
+      cleanup();
+      audio.play().catch(() => {
+        if (!cancelled) onError();
+      });
+    };
+
+    const onCanPlay = () => {
+      attemptPlay();
+    };
+
+    const handle = {
+      cancel: () => {
+        cancelled = true;
+        cleanup();
+      },
+    };
+    pendingPlayRef.current = handle;
+
+    // HAVE_FUTURE_DATA (3) or HAVE_ENOUGH_DATA (4) means we can play now.
+    if (audio.readyState >= 3) {
+      attemptPlay();
+      return;
+    }
+
+    audio.addEventListener('canplay', onCanPlay);
+    timer = setTimeout(() => {
+      if (cancelled) return;
+      cleanup();
+      onError();
+    }, 10000);
   }, []);
 
   useEffect(() => { repeatRef.current = repeat; }, [repeat]);
@@ -521,7 +600,7 @@ export function useWordTimingAudio(
               audio.src = nextUri;
               audio.playbackRate = speedRef.current;
               audio.load();
-              audio.play().catch(() => {
+              playWhenReady(audio, () => {
                 clearSrcFlag();
                 setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
               });
@@ -552,7 +631,7 @@ export function useWordTimingAudio(
               audio.src = uri;
               audio.playbackRate = speedRef.current;
               audio.load();
-              audio.play().catch(() => {
+              playWhenReady(audio, () => {
                 clearSrcFlag();
                 setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
               });
@@ -592,7 +671,7 @@ export function useWordTimingAudio(
           audio.src = nextUrl;
           audio.playbackRate = speedRef.current;
           audio.load();
-          audio.play().catch(() => {
+          playWhenReady(audio, () => {
             // play() rejected (autoplay policy, network, etc.) — clear the
             // swap window and reconcile state so the UI doesn't get stuck
             // showing isPlaying:true.
@@ -668,6 +747,12 @@ export function useWordTimingAudio(
     audio.addEventListener('error', handleError);
 
     return () => {
+      // Cancel any in-flight playWhenReady so its 10s timeout doesn't fire
+      // a setState after the component has unmounted.
+      if (pendingPlayRef.current) {
+        pendingPlayRef.current.cancel();
+        pendingPlayRef.current = null;
+      }
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('canplay', handleCanPlay);
@@ -782,12 +867,12 @@ export function useWordTimingAudio(
     audio.load();
 
     if (shouldPlay) {
-      audio.play().catch(() => {
+      playWhenReady(audio, () => {
         setState(prev => ({ ...prev, isPlaying: false, error: 'Tap play to start audio' }));
       });
     }
     preloadNextVerses(verseNum, reciterString);
-  }, [preloadNextVerses]);
+  }, [preloadNextVerses, playWhenReady]);
 
   const tryVerseByVerseFallback = useCallback(async (): Promise<boolean> => {
     if (verseByVerseRef.current) return false;
@@ -927,7 +1012,7 @@ export function useWordTimingAudio(
           audio.playbackRate = speedRef.current;
           audio.load();
           if (autoplayRef.current) {
-            audio.play().catch(() => {
+            playWhenReady(audio, () => {
               setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
             });
           }
@@ -952,7 +1037,7 @@ export function useWordTimingAudio(
     audio.playbackRate = speedRef.current;
     audio.load();
     if (autoplayRef.current) {
-      audio.play().catch(() => {
+      playWhenReady(audio, () => {
         setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
       });
     }
@@ -986,7 +1071,7 @@ export function useWordTimingAudio(
         audio.playbackRate = speedRef.current;
         audio.load();
         if (wasPlaying) {
-          audio.play().catch(() => {});
+          playWhenReady(audio, () => {});
         }
       }
     } catch (err) {
