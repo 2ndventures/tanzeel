@@ -28,13 +28,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Reactivate the audio session when returning from a phone call / Siri /
-        // other audio interruption so playback can resume on the next user action.
-        do {
-            try AVAudioSession.sharedInstance().setActive(true, options: [])
-        } catch {
-            print("Tanzeel: failed to reactivate AVAudioSession: \(error)")
-        }
+        // Intentionally a no-op. Do NOT call AVAudioSession.setActive(true)
+        // here. iOS fires applicationDidBecomeActive on every transition
+        // out of the inactive state — including when the user merely
+        // dismisses Control Center or returns from the home screen — and
+        // re-activating the session yanks it out from under the WKWebView's
+        // HTML5 <audio> element on real devices, which fires a native
+        // 'pause' event and stops playback. The session is activated once
+        // at launch in didFinishLaunchingWithOptions and again in the
+        // TanzeelNowPlaying plugin's load(); that is sufficient for the
+        // entire app lifecycle. See the matching NOTE in
+        // TanzeelNowPlayingPlugin.setPlaybackState for the same trap.
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
