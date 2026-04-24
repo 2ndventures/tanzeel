@@ -70,6 +70,7 @@ export function useMediaSession({
   const currentTimeRef = useRef(currentTime);
   const durationRef = useRef(duration);
   const speedRef = useRef(speed);
+  const activeRef = useRef(active);
 
   // Snapshot bookkeeping — what was the last position we pushed to each
   // surface, and at what wall-clock time. The seek-detection effects compare
@@ -91,6 +92,7 @@ export function useMediaSession({
   useEffect(() => { currentTimeRef.current = currentTime; }, [currentTime]);
   useEffect(() => { durationRef.current = duration; }, [duration]);
   useEffect(() => { speedRef.current = speed; }, [speed]);
+  useEffect(() => { activeRef.current = active; }, [active]);
 
   const useNative = isNativeNowPlayingAvailable();
 
@@ -282,6 +284,7 @@ export function useMediaSession({
   // browser handle the in-between motion.
   const pushWebPositionState = useCallback(() => {
     if (!('mediaSession' in navigator)) return;
+    if (!activeRef.current) return;
     const d = durationRef.current;
     if (!d || d <= 0) return;
     try {
@@ -306,6 +309,7 @@ export function useMediaSession({
 
   useEffect(() => {
     if (!('mediaSession' in navigator)) return;
+    if (!active) return;
     const now = Date.now();
     const elapsedSec = (now - lastWebAtRef.current) / 1000;
     const rate = isPlayingRef.current && !isStalledRef.current ? speedRef.current : 0;
@@ -313,5 +317,5 @@ export function useMediaSession({
     if (Math.abs(currentTime - extrapolated) > SEEK_DETECTION_THRESHOLD_S) {
       pushWebPositionState();
     }
-  }, [currentTime, pushWebPositionState]);
+  }, [active, currentTime, pushWebPositionState]);
 }
