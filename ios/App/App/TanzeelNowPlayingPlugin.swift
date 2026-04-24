@@ -39,7 +39,35 @@ public class TanzeelNowPlayingPlugin: CAPPlugin, CAPBridgedPlugin {
             // functionality. Leaving the observer code in place so it can
             // be re-enabled and debugged on a real device later.
             // self?.registerInterruptionObserver()
+            self?.registerRouteChangeObserver()
             self?.preloadArtwork()
+        }
+    }
+
+    /// Observe audio-route changes (headphones unplugged, Bluetooth
+    /// disconnect, AirPlay device removed). When the previously-routed
+    /// device disappears, Apple's HIG says playback should pause — this
+    /// is what every major audio app does. We just forward a `pause`
+    /// event to JS; no setActive() calls (which would re-trigger the
+    /// real-device stutter that the interruption observer caused).
+    private func registerRouteChangeObserver() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleRouteChange(_:)),
+            name: AVAudioSession.routeChangeNotification,
+            object: AVAudioSession.sharedInstance()
+        )
+    }
+
+    @objc private func handleRouteChange(_ notification: Notification) {
+        guard
+            let info = notification.userInfo,
+            let reasonRaw = info[AVAudioSessionRouteChangeReasonKey] as? UInt,
+            let reason = AVAudioSession.RouteChangeReason(rawValue: reasonRaw)
+        else { return }
+
+        if reason == .oldDeviceUnavailable && jsBelievesPlaying {
+            notifyListeners("pause", data: [:])
         }
     }
 
