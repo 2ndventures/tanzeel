@@ -639,7 +639,19 @@ export function useWordTimingAudio(
         return;
       }
 
-      // Full-chapter mode
+      // Full-chapter mode. Prefetch trigger runs independent of timing
+      // data — if the timing JSON fetch is slow or fails, gapless
+      // warmup must still happen based on duration/currentTime alone.
+      const durEarly = audio.duration;
+      if (
+        actuallyPlaying &&
+        isFinite(durEarly) &&
+        durEarly > 0 &&
+        (ct / durEarly >= 0.8 || durEarly - ct <= 30)
+      ) {
+        startPrefetchRef.current();
+      }
+
       if (!timingDataRef.current) {
         if (actuallyPlaying) {
           setState(prev => {
@@ -673,18 +685,6 @@ export function useWordTimingAudio(
           ...(needsPlayingSet && { isPlaying: true }),
         };
       });
-
-      // Pre-buffer next chapter at ≥80% OR ≤30s remaining (whichever
-      // fires first — short surahs need the %, long ones need the absolute).
-      const dur = audio.duration;
-      if (
-        actuallyPlaying &&
-        isFinite(dur) &&
-        dur > 0 &&
-        (ct / dur >= 0.8 || dur - ct <= 30)
-      ) {
-        startPrefetchRef.current();
-      }
     };
 
     const handleCanPlay = () => {
