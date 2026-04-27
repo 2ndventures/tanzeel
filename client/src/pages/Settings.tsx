@@ -598,6 +598,15 @@ export default function Settings({
                 <span className="text-sm text-foreground/80">Terms of Service</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </button>
+              <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+              <button
+                onClick={() => onNavigate?.("credits")}
+                className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 text-left"
+                data-testid="button-credits"
+              >
+                <span className="text-sm text-foreground/80">Credits &amp; Attribution</span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </button>
             </div>
           </div>
 

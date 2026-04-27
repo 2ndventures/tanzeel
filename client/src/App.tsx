@@ -11,6 +11,7 @@ import Bookmarks from "@/pages/Bookmarks";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsOfService from "@/pages/TermsOfService";
 import AudioManager from "@/pages/AudioManager";
+import Credits from "@/pages/Credits";
 import OnboardingScreen from "@/components/OnboardingScreen";
 import SplashScreen from "@/components/SplashScreen";
 import MiniPlayer from "@/components/MiniPlayer";
@@ -30,7 +31,7 @@ const CapApp = registerPlugin<{
   addListener: (eventName: string, callback: () => void) => Promise<{ remove: () => void }>;
 }>('App');
 
-type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service" | "audio-manager";
+type Page = "home" | "surah-juz" | "chapter" | "settings" | "bookmarks" | "privacy-policy" | "terms-of-service" | "audio-manager" | "credits";
 
 const PAGE_DEPTH: Record<Page, number> = {
   "home": 0,
@@ -41,6 +42,7 @@ const PAGE_DEPTH: Record<Page, number> = {
   "audio-manager": 1,
   "privacy-policy": 1,
   "terms-of-service": 1,
+  "credits": 1,
 };
 
 type NavDirection = "forward" | "back" | "tab";
@@ -306,6 +308,7 @@ function App() {
       case "privacy-policy":
       case "terms-of-service":
       case "audio-manager":
+      case "credits":
         navigateTo("settings", "back");
         setActiveTab("settings");
         break;
@@ -483,6 +486,15 @@ function App() {
             reciter={reciter}
           />
         );
+      case "credits":
+        return (
+          <Credits
+            onBack={() => {
+              navigateTo("settings", "back");
+              setActiveTab("settings");
+            }}
+          />
+        );
       default:
         return null;
     }
@@ -530,7 +542,7 @@ function App() {
                   {renderPage(currentPage)}
                 </div>
               </div>
-            <div className={["chapter", "privacy-policy", "terms-of-service", "audio-manager"].includes(currentPage) ? "hidden" : ""}>
+            <div className={["chapter", "privacy-policy", "terms-of-service", "audio-manager", "credits"].includes(currentPage) ? "hidden" : ""}>
               <BottomNav
                 activeTab={activeTab}
                 onTabChange={(tab) => {
@@ -546,7 +558,7 @@ function App() {
             </div>
             <MiniPlayer
               visible={currentPage !== "chapter"}
-              hasBottomNav={!["chapter", "privacy-policy", "terms-of-service", "audio-manager"].includes(currentPage)}
+              hasBottomNav={!["chapter", "privacy-policy", "terms-of-service", "audio-manager", "credits"].includes(currentPage)}
               onNavigateToChapter={(chapterId) => {
                 handleNavigate("chapter", chapterId);
               }}
