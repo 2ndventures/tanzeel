@@ -16,6 +16,8 @@ import SplashScreen from "@/components/SplashScreen";
 import MiniPlayer from "@/components/MiniPlayer";
 import BottomNav from "@/components/BottomNav";
 import { AudioProvider } from "@/contexts/AudioContext";
+import { NetworkProvider } from "@/contexts/NetworkContext";
+import OfflineBanner from "@/components/OfflineBanner";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
 import { Capacitor, registerPlugin } from "@capacitor/core";
@@ -492,7 +494,9 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <NetworkProvider>
         <TooltipProvider>
+          <OfflineBanner />
           {showSplash && (
             <SplashScreen onFinish={() => setSplashAnimDone(true)} />
           )}
@@ -550,6 +554,7 @@ function App() {
           </div>
         </AudioProvider>)}
       </TooltipProvider>
+        </NetworkProvider>
     </QueryClientProvider>
   </ErrorBoundary>
   );

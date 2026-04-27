@@ -1,6 +1,7 @@
 import { getDisplayArabicName } from "@/lib/quranMetadata";
 import { isSurahFullyCached } from "@/services/audioCache";
-import { CheckCircle2 } from "lucide-react";
+import { useNetworkStatus } from "@/contexts/NetworkContext";
+import { CheckCircle2, Lock } from "lucide-react";
 
 interface ChapterCardProps {
   number: number;
@@ -40,13 +41,29 @@ export default function ChapterCard({
     ? isSurahFullyCached(currentReciterId, number, verseCount)
     : false;
 
+  const { connected } = useNetworkStatus();
+  const isLocked = !connected && !isFullyCached;
+
+  const handleClick = () => {
+    if (isLocked) return;
+    onClick?.();
+  };
+
   return (
     <div
-      className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
+      className={`relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg animate-fade-in-up h-20 ${
+        isLocked
+          ? "opacity-50 cursor-not-allowed"
+          : "hover-elevate active-elevate-2 cursor-pointer"
+      }`}
       role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }}
+      tabIndex={isLocked ? -1 : 0}
+      aria-disabled={isLocked || undefined}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (isLocked) return;
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); }
+      }}
       style={style}
       data-testid={`card-chapter-${number}`}
     >
@@ -71,6 +88,13 @@ export default function ChapterCard({
                 <CheckCircle2
                   className="w-3.5 h-3.5 text-[hsl(var(--glow-primary))]/70 shrink-0"
                   data-testid={`icon-cached-${number}`}
+                />
+              )}
+              {isLocked && (
+                <Lock
+                  className="w-3.5 h-3.5 text-muted-foreground shrink-0"
+                  data-testid={`icon-locked-${number}`}
+                  aria-label="Offline — not downloaded"
                 />
               )}
             </div>
