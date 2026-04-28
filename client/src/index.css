@@ -1060,10 +1060,19 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  color: hsl(214 80% 38%);
+  color: hsl(var(--glow-primary));
+  background-color: hsl(214 80% 38% / 0.16);
+  border-radius: 0.25rem;
+  padding-inline: 0.15em;
+  margin-inline: -0.15em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .dark .active-word {
   color: hsl(var(--glow-primary));
+  background-color: transparent;
+  padding-inline: 0;
+  margin-inline: 0;
 }
 .verse-end-ornament {
   display: inline-flex;
