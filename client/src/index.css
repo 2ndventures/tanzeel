@@ -1060,14 +1060,15 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  color: hsl(var(--glow-primary));
+  color: hsl(214 80% 22%);
   text-shadow:
-    0 0 2px hsl(214 80% 38% / 0.95),
-    0 0 4px hsl(214 80% 38% / 0.85),
-    0 0 8px hsl(214 80% 38% / 0.6),
-    0 0 14px hsl(214 80% 38% / 0.35);
+    0 0 2px hsl(var(--glow-primary) / 0.95),
+    0 0 5px hsl(var(--glow-primary) / 0.8),
+    0 0 10px hsl(var(--glow-primary) / 0.55),
+    0 0 18px hsl(var(--glow-primary) / 0.3);
 }
 .dark .active-word {
+  color: hsl(var(--glow-primary));
   text-shadow: none;
 }
 .verse-end-ornament {
