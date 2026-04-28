@@ -744,7 +744,7 @@ export default function ChapterView({
                         <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Translation</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                            {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
+                            {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onTranslationFontSizeChange?.(s.value)}
@@ -769,7 +769,7 @@ export default function ChapterView({
                         <div className="flex items-center justify-between gap-3 py-2.5">
                           <span className="text-sm text-foreground/80 shrink-0">Transliteration</span>
                           <div className="flex gap-1.5 overflow-x-auto flex-nowrap">
-                            {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
+                            {([{ icon: true, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }] as { label?: string; icon?: boolean; value: string }[]).map((s) => (
                               <button
                                 key={s.value}
                                 onClick={() => onTransliterationFontSizeChange?.(s.value)}
