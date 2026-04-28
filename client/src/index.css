@@ -1061,11 +1061,14 @@ span.end {
 }
 .active-word {
   color: hsl(var(--glow-primary));
-  -webkit-text-stroke: 0.85px hsl(214 80% 38%);
-  paint-order: stroke fill;
+  text-shadow:
+    0 0 2px hsl(214 80% 38% / 0.95),
+    0 0 4px hsl(214 80% 38% / 0.85),
+    0 0 8px hsl(214 80% 38% / 0.6),
+    0 0 14px hsl(214 80% 38% / 0.35);
 }
 .dark .active-word {
-  -webkit-text-stroke: 0;
+  text-shadow: none;
 }
 .verse-end-ornament {
   display: inline-flex;
