@@ -1061,7 +1061,7 @@ span.end {
 }
 .active-word {
   color: hsl(var(--glow-primary));
-  -webkit-text-stroke: 0.5px hsl(214 80% 38%);
+  -webkit-text-stroke: 0.85px hsl(214 80% 38%);
   paint-order: stroke fill;
 }
 .dark .active-word {
