@@ -232,7 +232,7 @@ export default function OnboardingScreen({
                     {translationFontSize}
                   </span>
                 </div>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <button
                     onClick={() => onTranslationFontSizeChange("Off")}
                     className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
@@ -244,7 +244,7 @@ export default function OnboardingScreen({
                   >
                     Off
                   </button>
-                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map(opt => (
                     <button
                       key={opt.value}
                       onClick={() => onTranslationFontSizeChange(opt.value)}
@@ -269,7 +269,7 @@ export default function OnboardingScreen({
                     {transliterationFontSize}
                   </span>
                 </div>
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <button
                     onClick={() => onTransliterationFontSizeChange("Off")}
                     className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
@@ -281,7 +281,7 @@ export default function OnboardingScreen({
                   >
                     Off
                   </button>
-                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map(opt => (
                     <button
                       key={opt.value}
                       onClick={() => onTransliterationFontSizeChange(opt.value)}
