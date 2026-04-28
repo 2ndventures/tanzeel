@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Fragment } from "react";
 import { Icon } from "@iconify/react";
 import useEmblaCarousel from "embla-carousel-react";
 import { Verse, chapters, getDisplayArabicName } from "@/lib/quranMetadata";
@@ -253,31 +253,32 @@ export default function MushafPageView({
                               currentWordIndex === wIdx &&
                               currentWordIndex < words.length;
                             return isTajweed ? (
-                              <span
-                                key={`m-${chapterId}-${verse.number}-${wIdx}`}
-                                id={`word-${chapterId}-${verse.number}-${wIdx}`}
-                                className={`transition-colors duration-150 ${
-                                  isCurrentWord
-                                    ? "active-word"
-                                    : ""
-                                }`}
-                                dangerouslySetInnerHTML={{
-                                  __html: word + (wIdx < words.length - 1 ? " " : ""),
-                                }}
-                              />
-                            ) : (
-                              <span
-                                key={`m-${chapterId}-${verse.number}-${wIdx}`}
-                                id={`word-${chapterId}-${verse.number}-${wIdx}`}
-                                className={`transition-colors duration-150 ${
-                                  isCurrentWord
-                                    ? "active-word"
-                                    : ""
-                                }`}
-                              >
-                                {word}
+                              <Fragment key={`m-${chapterId}-${verse.number}-${wIdx}`}>
+                                <span
+                                  id={`word-${chapterId}-${verse.number}-${wIdx}`}
+                                  className={`transition-colors duration-150 ${
+                                    isCurrentWord
+                                      ? "active-word"
+                                      : ""
+                                  }`}
+                                  dangerouslySetInnerHTML={{ __html: word }}
+                                />
                                 {wIdx < words.length - 1 ? " " : ""}
-                              </span>
+                              </Fragment>
+                            ) : (
+                              <Fragment key={`m-${chapterId}-${verse.number}-${wIdx}`}>
+                                <span
+                                  id={`word-${chapterId}-${verse.number}-${wIdx}`}
+                                  className={`transition-colors duration-150 ${
+                                    isCurrentWord
+                                      ? "active-word"
+                                      : ""
+                                  }`}
+                                >
+                                  {word}
+                                </span>
+                                {wIdx < words.length - 1 ? " " : ""}
+                              </Fragment>
                             );
                           })}
                           {arabicScript !== 'indopak' && verse.number > 0 && (

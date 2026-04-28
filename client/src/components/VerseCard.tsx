@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, memo } from "react";
+import { useState, useCallback, useEffect, useRef, memo, Fragment } from "react";
 import { Icon } from "@iconify/react";
 import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
@@ -217,24 +217,28 @@ function VerseCardInner({
                 currentWordIndex === index &&
                 currentWordIndex < words.length;
               return arabicScript === 'tajweed' ? (
-                <span
-                  key={`word-${chapterId}-${verseNumber}-${index}`}
-                  id={`word-${chapterId}-${verseNumber}-${index}`}
-                  className={`transition-all duration-150 ${
-                    isCurrentWord ? 'active-word' : ''
-                  }`}
-                  dangerouslySetInnerHTML={{ __html: word + (index < words.length - 1 ? ' ' : '') }}
-                />
+                <Fragment key={`word-${chapterId}-${verseNumber}-${index}`}>
+                  <span
+                    id={`word-${chapterId}-${verseNumber}-${index}`}
+                    className={`transition-all duration-150 ${
+                      isCurrentWord ? 'active-word' : ''
+                    }`}
+                    dangerouslySetInnerHTML={{ __html: word }}
+                  />
+                  {index < words.length - 1 ? ' ' : ''}
+                </Fragment>
               ) : (
-                <span
-                  key={`word-${chapterId}-${verseNumber}-${index}`}
-                  id={`word-${chapterId}-${verseNumber}-${index}`}
-                  className={`transition-all duration-150 ${
-                    isCurrentWord ? 'active-word' : ''
-                  }`}
-                >
-                  {word}{index < words.length - 1 ? ' ' : ''}
-                </span>
+                <Fragment key={`word-${chapterId}-${verseNumber}-${index}`}>
+                  <span
+                    id={`word-${chapterId}-${verseNumber}-${index}`}
+                    className={`transition-all duration-150 ${
+                      isCurrentWord ? 'active-word' : ''
+                    }`}
+                  >
+                    {word}
+                  </span>
+                  {index < words.length - 1 ? ' ' : ''}
+                </Fragment>
               );
             })}
             {arabicScript !== 'indopak' && verseNumber > 0 && (

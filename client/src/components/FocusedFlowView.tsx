@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo, Fragment } from "react";
 import { Icon } from "@iconify/react";
 import { Verse } from "@/lib/quranMetadata";
 import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
@@ -330,24 +330,28 @@ export default function FocusedFlowView({
                       currentWordIndex !== null &&
                       currentWordIndex === globalWordIdx;
                     return page.isTajweed ? (
-                      <span
-                        key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
-                        id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
-                        className={`transition-all duration-150 ${
-                          isCurrentWord ? 'active-word' : ''
-                        }`}
-                        dangerouslySetInnerHTML={{ __html: word + (wIdx < page.words.length - 1 ? ' ' : '') }}
-                      />
+                      <Fragment key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}>
+                        <span
+                          id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
+                          className={`transition-all duration-150 ${
+                            isCurrentWord ? 'active-word' : ''
+                          }`}
+                          dangerouslySetInnerHTML={{ __html: word }}
+                        />
+                        {wIdx < page.words.length - 1 ? ' ' : ''}
+                      </Fragment>
                     ) : (
-                      <span
-                        key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
-                        id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
-                        className={`transition-all duration-150 ${
-                          isCurrentWord ? 'active-word' : ''
-                        }`}
-                      >
-                        {word}{wIdx < page.words.length - 1 ? ' ' : ''}
-                      </span>
+                      <Fragment key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}>
+                        <span
+                          id={`word-${chapterId}-${page.verseNumber}-${globalWordIdx}`}
+                          className={`transition-all duration-150 ${
+                            isCurrentWord ? 'active-word' : ''
+                          }`}
+                        >
+                          {word}
+                        </span>
+                        {wIdx < page.words.length - 1 ? ' ' : ''}
+                      </Fragment>
                     );
                   })}
                   {page.totalPages > 1 && page.pageIndex < page.totalPages - 1 && (
