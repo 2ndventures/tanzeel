@@ -1061,18 +1061,11 @@ span.end {
 }
 .active-word {
   color: hsl(var(--glow-primary));
-  background-color: hsl(214 80% 38% / 0.16);
-  border-radius: 0.25rem;
-  padding-inline: 0.15em;
-  margin-inline: -0.15em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  -webkit-text-stroke: 0.5px hsl(214 80% 38%);
+  paint-order: stroke fill;
 }
 .dark .active-word {
-  color: hsl(var(--glow-primary));
-  background-color: transparent;
-  padding-inline: 0;
-  margin-inline: 0;
+  -webkit-text-stroke: 0;
 }
 .verse-end-ornament {
   display: inline-flex;
