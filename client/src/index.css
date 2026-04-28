@@ -475,14 +475,27 @@ body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
     /* sits in front of content */
   }
 
-  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  /* Press-down feedback (touch + mouse) — always on. Mirrors native iOS row tap-darken. */
   .active-elevate:active:not(.no-default-active-elevate)::after {
     background-color: var(--elevate-1);
   }
 
-  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
   .active-elevate-2:active:not(.no-default-active-elevate)::after {
     background-color: var(--elevate-2);
+  }
+
+  /* Hover state — only on devices with a real hovering pointer (mouse/trackpad).
+     Gated to keep iOS / Android / Capacitor WebView from leaving rows visually
+     "stuck" highlighted after a tap (mobile Safari fires :hover on tap and
+     doesn't clear it until the next tap elsewhere). */
+  @media (hover: hover) and (pointer: fine) {
+    .hover-elevate:hover:not(.no-default-hover-elevate)::after {
+      background-color: var(--elevate-1);
+    }
+
+    .hover-elevate-2:hover:not(.no-default-hover-elevate)::after {
+      background-color: var(--elevate-2);
+    }
   }
 
   /* If there's a 1px border, adjust the inset so that it covers that parent's border */
