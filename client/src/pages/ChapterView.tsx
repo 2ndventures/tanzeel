@@ -11,13 +11,13 @@ import { chapters, getDisplayArabicName, Verse, LayoutMode } from "@/lib/quranMe
 import { lazyChapterService } from "@/services/lazyChapterService";
 import { useAudio } from "@/contexts/AudioContext";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
+import { useReciterPreview } from "@/hooks/useReciterPreview";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
-import { getVerseAudioUrl } from "@/lib/audioUrls";
 
 interface ChapterViewProps {
   chapterId: number;
@@ -173,89 +173,20 @@ export default function ChapterView({
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Ref to hold pauseAudio so startPreview can access it regardless of hook ordering
+  // Ref to hold pauseAudio so the reciter preview hook can access it regardless of hook ordering
   const pauseAudioRef = useRef<() => void>(() => {});
 
-  // Reciter preview state
-  const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
-  const [previewProgress, setPreviewProgress] = useState(0);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState<string | null>(null);
-  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
-  const previewTimerRef = useRef<number | null>(null);
-
-  const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const stopPreview = useCallback(() => {
-    if (previewAudioRef.current) {
-      previewAudioRef.current.pause();
-      previewAudioRef.current.src = '';
-      previewAudioRef.current = null;
-    }
-    if (previewTimerRef.current) {
-      cancelAnimationFrame(previewTimerRef.current);
-      previewTimerRef.current = null;
-    }
-    if (previewTimeoutRef.current) {
-      clearTimeout(previewTimeoutRef.current);
-      previewTimeoutRef.current = null;
-    }
-    setPreviewingReciter(null);
-    setPreviewProgress(0);
-    setPreviewLoading(false);
-  }, []);
-
-  const startPreview = useCallback((reciterId: string) => {
-    stopPreview();
-    setPreviewError(null);
-    pauseAudioRef.current();
-
-    const reciterData = getReciterById(reciterId);
-    if (!reciterData) return;
-
-    setPreviewingReciter(reciterId);
-    setPreviewLoading(true);
-
-    const audio = new Audio(getVerseAudioUrl(reciterData.everyAyahFolder, 1, 2));
-    previewAudioRef.current = audio;
-
-    const showError = () => {
-      setPreviewError("Preview unavailable offline");
-      stopPreview();
-      setTimeout(() => setPreviewError(null), 2500);
-    };
-
-    previewTimeoutRef.current = setTimeout(() => {
-      if (previewAudioRef.current === audio && audio.paused) {
-        showError();
-      }
-    }, 10000);
-
-    audio.addEventListener('canplay', () => {
-      setPreviewLoading(false);
-      if (previewTimeoutRef.current) {
-        clearTimeout(previewTimeoutRef.current);
-        previewTimeoutRef.current = null;
-      }
-      audio.play().catch(() => showError());
-    }, { once: true });
-
-    audio.addEventListener('error', () => showError(), { once: true });
-
-    audio.addEventListener('ended', () => stopPreview(), { once: true });
-
-    const updateProgress = () => {
-      if (audio && audio.duration && !audio.paused) {
-        setPreviewProgress(audio.currentTime / audio.duration);
-        previewTimerRef.current = requestAnimationFrame(updateProgress);
-      }
-    };
-    audio.addEventListener('play', () => {
-      previewTimerRef.current = requestAnimationFrame(updateProgress);
-    });
-
-    audio.load();
-  }, [stopPreview]);
+  // Reciter preview (shared with Settings via useReciterPreview)
+  const {
+    previewingReciter,
+    previewProgress,
+    previewLoading,
+    previewError,
+    startPreview,
+    stopPreview,
+  } = useReciterPreview({
+    pauseMainAudio: () => pauseAudioRef.current(),
+  });
 
   useEffect(() => {
     if (!isMenuOpen || menuView !== 'reciter') {
@@ -263,21 +194,6 @@ export default function ChapterView({
     }
   }, [isMenuOpen, menuView, stopPreview]);
 
-  useEffect(() => {
-    return () => {
-      if (previewAudioRef.current) {
-        previewAudioRef.current.pause();
-        previewAudioRef.current.src = '';
-      }
-      if (previewTimerRef.current) {
-        cancelAnimationFrame(previewTimerRef.current);
-      }
-      if (previewTimeoutRef.current) {
-        clearTimeout(previewTimeoutRef.current);
-      }
-    };
-  }, []);
-  
   // Load verses when chapter changes
   useEffect(() => {
     let isMounted = true;

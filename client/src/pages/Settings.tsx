@@ -8,9 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-import { ChevronRight, ChevronLeft, Check, CircleOff } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, CircleOff, Play, Pause, Loader2 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { getManifest } from "@/services/audioCache";
+import { useAudio } from "@/contexts/AudioContext";
+import { useReciterPreview } from "@/hooks/useReciterPreview";
 
 function getDownloadedSize(): number {
   const manifest = getManifest();
@@ -149,6 +151,15 @@ export default function Settings({
   onShowVerseNumbersChange,
 }: SettingsProps) {
   const allReciters = getAllReciters();
+  const { pauseAudio } = useAudio();
+  const {
+    previewingReciter,
+    previewProgress,
+    previewLoading,
+    previewError,
+    startPreview,
+    stopPreview,
+  } = useReciterPreview({ pauseMainAudio: pauseAudio });
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -156,6 +167,12 @@ export default function Settings({
   const [reciterView, setReciterView] = useState(false);
   const [scriptView, setScriptView] = useState(false);
   const [spacingView, setSpacingView] = useState(false);
+
+  useEffect(() => {
+    if (!reciterView) {
+      stopPreview();
+    }
+  }, [reciterView, stopPreview]);
   useEffect(() => {
     if (onRegisterBackHandler) {
       onRegisterBackHandler(() => {
@@ -229,30 +246,76 @@ export default function Settings({
           <div className="px-6 py-4 space-y-1">
             {allReciters.map((r) => {
               const isSelected = reciter === r.id;
+              const isPreviewing = previewingReciter === r.id;
+              const isLoadingPreview = isPreviewing && previewLoading;
+
               return (
-                <button
+                <div
                   key={r.id}
-                  onClick={() => {
-                    onReciterChange(r.id);
-                    setReciterView(false);
-                  }}
-                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors ${
-                    isSelected ? 'bg-primary/15' : 'hover-elevate'
-                  }`}
+                  className="flex items-center gap-2 rounded-md"
                   data-testid={`reciter-option-${r.id}`}
                 >
-                  <div className="text-left">
-                    <p className={`text-sm font-medium ${isSelected ? 'text-primary' : 'text-foreground/90'}`}>
-                      {r.name}
-                    </p>
-                    {r.style && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{r.style}</p>
+                  <button
+                    onClick={() => {
+                      onReciterChange(r.id);
+                      setReciterView(false);
+                    }}
+                    className="flex-1 flex items-center gap-2 p-4 hover-elevate active-elevate-2 rounded-md min-w-0"
+                    data-testid={`reciter-select-${r.id}`}
+                  >
+                    <div className="flex flex-col items-start min-w-0 flex-1">
+                      <span className="text-base text-foreground/90 flex items-center gap-2 flex-wrap">
+                        <span className="truncate">{r.name}{r.style ? ` (${r.style})` : ''}</span>
+                        {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
+                      </span>
+                      <span className="text-sm text-muted-foreground">{r.arabicName}</span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isPreviewing && !isLoadingPreview) {
+                        stopPreview();
+                      } else {
+                        startPreview(r.id);
+                      }
+                    }}
+                    className="relative flex items-center justify-center size-10 shrink-0 mr-2 rounded-full"
+                    aria-label={isPreviewing ? `Stop preview for ${r.name}` : `Preview ${r.name}`}
+                    data-testid={`reciter-preview-${r.id}`}
+                  >
+                    {isPreviewing && !isLoadingPreview && (
+                      <svg className="absolute inset-0 w-10 h-10 -rotate-90" viewBox="0 0 40 40">
+                        <circle cx="20" cy="20" r="17" fill="none" stroke="hsl(var(--sheet-muted))" strokeWidth="2.5" />
+                        <circle
+                          cx="20" cy="20" r="17"
+                          fill="none"
+                          stroke="hsl(var(--primary))"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeDasharray={`${2 * Math.PI * 17}`}
+                          strokeDashoffset={`${2 * Math.PI * 17 * (1 - previewProgress)}`}
+                          style={{ transition: 'stroke-dashoffset 0.1s linear' }}
+                        />
+                      </svg>
                     )}
-                  </div>
-                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
-                </button>
+                    {isLoadingPreview ? (
+                      <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    ) : isPreviewing ? (
+                      <Pause className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Play className="w-4 h-4 text-muted-foreground ml-0.5" />
+                    )}
+                  </button>
+                </div>
               );
             })}
+            {previewError && (
+              <div className="text-center py-2">
+                <span className="text-xs text-destructive dark:text-red-400">{previewError}</span>
+              </div>
+            )}
           </div>
         </div>
 
