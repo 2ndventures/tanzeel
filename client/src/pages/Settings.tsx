@@ -504,7 +504,7 @@ export default function Settings({
               <PillRow
                 label="Translation"
                 value={translationFontSize}
-                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
+                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }]}
                 onChange={onTranslationFontSizeChange}
                 testIdPrefix="button-translation-size"
               />
@@ -512,7 +512,7 @@ export default function Settings({
               <PillRow
                 label="Transliteration"
                 value={transliterationFontSize}
-                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }]}
+                options={[{ icon: <CircleOff className="w-3.5 h-3.5" />, value: "Off" }, { label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }]}
                 onChange={onTransliterationFontSizeChange}
                 testIdPrefix="button-transliteration-size"
               />
