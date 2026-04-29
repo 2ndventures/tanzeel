@@ -5,9 +5,11 @@ import ChapterCard from "@/components/ChapterCard";
 
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
-import { Search, BookOpen, ArrowRight, Loader } from "lucide-react";
+import { Search, BookOpen, ArrowRight, Loader, Lock } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
 import PullToRefresh from "@/components/PullToRefresh";
+import { useNetworkStatus } from "@/contexts/NetworkContext";
+import { isFullChapterDownloaded } from "@/services/audioCache";
 
 interface TopicResult {
   chapterId: number;
@@ -29,6 +31,7 @@ interface SurahJuzProps {
 }
 
 export default function SurahJuz({ onNavigate, activeTab = "surah", currentReciterId, audioCacheReady }: SurahJuzProps) {
+  const { connected } = useNetworkStatus();
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [mode, setMode] = useState<"surah" | "juz">("surah");
@@ -490,6 +493,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
               filteredJuz.map((juz, index) => {
                 const startChapter = chapters.find(ch => ch.id === juz.startChapter);
                 const endChapter = chapters.find(ch => ch.id === juz.endChapter);
+                const isJuzLocked = !connected && !(currentReciterId && isFullChapterDownloaded(currentReciterId, juz.startChapter));
                 const juzBadgeStyles = [
                   { bg: "bg-[hsl(var(--glow-primary)/0.18)]", text: "text-primary" },
                   { bg: "bg-[hsl(var(--glow-primary)/0.12)]", text: "text-primary" },
@@ -499,12 +503,17 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                 return (
                   <div
                     key={juz.id}
-                    className="relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg hover-elevate active-elevate-2 cursor-pointer animate-fade-in-up h-20"
+                    className={`relative group overflow-hidden rounded-3xl border border-border/50 shadow-lg animate-fade-in-up h-20 ${
+                      isJuzLocked
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover-elevate active-elevate-2 cursor-pointer"
+                    }`}
                     role="button"
-                    tabIndex={0}
+                    tabIndex={isJuzLocked ? -1 : 0}
+                    aria-disabled={isJuzLocked || undefined}
                     style={{ animationDelay: `${index * 30}ms` }}
-                    onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", juz.startChapter); }}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", juz.startChapter); } }}
+                    onClick={() => { if (isJuzLocked) return; (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", juz.startChapter); }}
+                    onKeyDown={(e) => { if (isJuzLocked) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", juz.startChapter); } }}
                     data-testid={`juz-card-${juz.id}`}
                   >
                     <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">
@@ -513,9 +522,17 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                           <span className={`${badge.text} text-lg font-bold`}>{juz.id}</span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-bold text-foreground mb-1">
-                            Juz {juz.id}
-                          </h3>
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <h3 className="text-lg font-bold text-foreground">
+                              Juz {juz.id}
+                            </h3>
+                            {isJuzLocked && (
+                              <Lock
+                                className="w-3.5 h-3.5 text-muted-foreground shrink-0"
+                                aria-label="Offline — not downloaded"
+                              />
+                            )}
+                          </div>
                           <p className="text-xs text-muted-foreground truncate">
                             {startChapter?.englishName} {juz.startVerse > 1 ? `(${juz.startVerse})` : ''} — {endChapter?.englishName}
                           </p>

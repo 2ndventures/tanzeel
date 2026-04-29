@@ -147,6 +147,7 @@ export function isVerseCached(reciterId: string, surahNum: number, verseNum: num
 
 export function isSurahFullyCached(reciterId: string, surahNum: number, totalVerses: number): boolean {
   if (!manifest) return false;
+  if (isFullChapterDownloaded(reciterId, surahNum)) return true;
   for (let v = 1; v <= totalVerses; v++) {
     if (!isVerseCached(reciterId, surahNum, v)) return false;
   }
