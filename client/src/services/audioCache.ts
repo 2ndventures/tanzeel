@@ -268,7 +268,7 @@ export async function saveFullChapterAudio(
     const chunkSize = 8192;
     for (let i = 0; i < bytes.length; i += chunkSize) {
       const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-      binary += String.fromCharCode(...slice);
+      binary += String.fromCharCode(...Array.from(slice));
     }
     const base64 = btoa(binary);
     await Filesystem.writeFile({

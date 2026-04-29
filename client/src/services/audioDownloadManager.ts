@@ -223,7 +223,7 @@ export async function deleteReciterDownloads(reciterId: string): Promise<void> {
     removeManifestEntry(key);
   }
 
-  for (const surahNum of surahsToClean) {
+  for (const surahNum of Array.from(surahsToClean)) {
     try {
       await Filesystem.deleteFile({
         path: `audio-downloads/${reciterId}/timing_${surahNum}.json`,
