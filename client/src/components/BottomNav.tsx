@@ -42,7 +42,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   if (keyboardVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 shrink-0 border-t border-border bg-card/80 backdrop-blur-xl shadow-2xl safe-area-bottom">
+    <nav role="navigation" aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-40 shrink-0 border-t border-border bg-card/80 backdrop-blur-xl shadow-2xl safe-area-bottom">
       <div className="flex items-center justify-around px-4 pt-3 pb-1">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -52,6 +52,8 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
               key={tab.id}
               onClick={() => { onTabChange(tab.id); }}
               className="relative flex flex-col items-center gap-1.5 min-h-[48px] min-w-[48px] justify-center rounded-lg px-2"
+              aria-label={tab.label}
+              aria-current={isActive ? "page" : undefined}
               data-testid={`button-nav-${tab.id}`}
             >
               {tab.id === "settings" && isDownloading && (
@@ -82,6 +84,6 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }
