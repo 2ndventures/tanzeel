@@ -622,12 +622,12 @@ export default function ChapterView({
                 data-testid="button-surah-dropdown"
               >
                 <div className="flex items-center gap-1">
-                  <h1 className="text-[15px] font-semibold text-foreground/90 dark:text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
+                  <h1 className="text-sm font-semibold text-foreground/90 dark:text-white/95 tracking-tight truncate" data-testid="text-chapter-title-english">
                     {chapterId}. {chapterInfo?.englishName || 'Al-Fatihah'}
                   </h1>
                   <ChevronDown className={`w-3.5 h-3.5 text-foreground/50 dark:text-white/50 transition-transform duration-200 shrink-0 ${surahDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
-                <p className="font-arabic text-muted-foreground dark:text-white/50 truncate text-[18px]" data-testid="text-surah-arabic-name">
+                <p className="font-arabic text-muted-foreground dark:text-white/50 truncate text-lg" data-testid="text-surah-arabic-name">
                   {chapterInfo ? getDisplayArabicName(chapterInfo.arabicName) : ''}
                 </p>
               </button>
@@ -671,7 +671,7 @@ export default function ChapterView({
                           }`}>
                             {ch.englishName}
                           </span>
-                          <span className={`font-arabic text-[15px] shrink-0 ${
+                          <span className={`font-arabic text-sm shrink-0 ${
                             isCurrent ? 'text-primary' : 'text-muted-foreground dark:text-white/40'
                           }`}>
                             {getDisplayArabicName(ch.arabicName)}

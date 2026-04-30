@@ -71,7 +71,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
                 style={isActive ? {filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'} : undefined}
               />
               <span className={cn(
-                "text-[10px] font-medium transition-colors",
+                "text-xs font-medium transition-colors",
                 isActive ? "text-primary font-semibold" : "text-muted-foreground"
               )}>
                 {tab.label}

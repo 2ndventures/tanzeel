@@ -109,7 +109,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
               <p className="text-sm font-semibold text-foreground truncate" data-testid="mini-player-title">
                 {chapter.englishName}
               </p>
-              <p className="text-[11px] text-muted-foreground font-arabic truncate" data-testid="mini-player-arabic">
+              <p className="text-xs text-muted-foreground font-arabic truncate" data-testid="mini-player-arabic">
                 {arabicName}
               </p>
             </div>

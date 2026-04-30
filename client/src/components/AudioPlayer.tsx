@@ -108,7 +108,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                   <p className={`text-sm font-semibold truncate ${
                     isSelected ? 'text-primary' : 'text-foreground dark:text-white/90'
                   }`} data-testid={`text-layout-label-${opt.mode}`}>{opt.label}</p>
-                  <p className="text-[11px] text-muted-foreground dark:text-white/45 truncate" data-testid={`text-layout-desc-${opt.mode}`}>{opt.desc}</p>
+                  <p className="text-xs text-muted-foreground dark:text-white/45 truncate" data-testid={`text-layout-desc-${opt.mode}`}>{opt.desc}</p>
                 </div>
               </button>
             );
@@ -345,10 +345,10 @@ export default function AudioPlayer({
             data-testid="slider-audio-progress"
           />
           <div className="flex items-center justify-between mt-1.5 px-0.5">
-            <span className="text-[11px] tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-current-time">
+            <span className="text-xs tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-current-time">
               {formatTime(isScrubbing ? scrubValue : safeCurrentTime)}
             </span>
-            <span className="text-[11px] tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-duration">
+            <span className="text-xs tabular-nums font-medium text-muted-foreground dark:text-white/50" data-testid="text-duration">
               -{formatTime(isScrubbing ? Math.max(0, duration - scrubValue) : remaining)}
             </span>
           </div>
@@ -379,7 +379,7 @@ export default function AudioPlayer({
             >
               <span className="text-sm font-bold leading-none">
                 {speed % 1 === 0 ? speed.toFixed(0) : parseFloat(speed.toFixed(2))}
-                <span className="text-[10px] relative -top-0.5">x</span>
+                <span className="text-xs relative -top-0.5">x</span>
               </span>
               <Icon icon="solar:alt-arrow-up-linear" className="size-3" aria-hidden="true" />
             </button>

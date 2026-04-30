@@ -42,7 +42,7 @@ export default function TajweedLegend() {
                   style={{ backgroundColor: `var(${item.varName})` }}
                   aria-hidden="true"
                 />
-                <span className="text-[11px] text-muted-foreground leading-tight">
+                <span className="text-xs text-muted-foreground leading-tight">
                   {item.label}
                 </span>
               </div>
