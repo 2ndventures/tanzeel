@@ -872,23 +872,14 @@ export function useWordTimingAudio(
       const curChapter = currentChapterIdRef.current;
       if (autoplayRef.current && curChapter !== null && curChapter < 114) {
         const nextChapterId = curChapter + 1;
-        // Prefer the prefetched URL (browser-cached stream or pre-resolved
-        // offline URI) for an instant handoff; fall back to the predictable
-        // streaming URL if prefetch never ran.
-        const prefetched = prefetchedRef.current;
-        const nextUrl =
-          prefetched &&
-          prefetched.chapterId === nextChapterId &&
-          prefetched.reciterId === reciterIdRef.current
-            ? prefetched.url
-            : getChapterAudioUrl(reciterIdRef.current, nextChapterId);
 
-        if (nextUrl) {
+        // Performs the in-place src swap synchronously once the target URL is
+        // known. Sets the in-place token so the React-triggered loadAudio call
+        // only fetches timing data instead of doing a full src reload.
+        const doInPlaceAdvance = (url: string) => {
           beginSrcSwap();
-          // Token tells the React-side loadAudio to skip the redundant src
-          // reload that would reset the element and flicker the UI.
           inPlaceAdvanceTokenRef.current = { chapterId: nextChapterId, reciterId: reciterIdRef.current };
-          audio.src = nextUrl;
+          audio.src = url;
           audio.playbackRate = speedRef.current;
           audio.load();
           playWhenReady(audio, () => {
@@ -911,6 +902,70 @@ export function useWordTimingAudio(
           }));
           // Notify React so AudioContext advances chapterId state.
           onEndedRef.current?.();
+        };
+
+        const prefetched = prefetchedRef.current;
+        const prefetchHit =
+          prefetched &&
+          prefetched.chapterId === nextChapterId &&
+          prefetched.reciterId === reciterIdRef.current;
+
+        if (prefetchHit) {
+          // Fast path: pre-resolved URL (streaming or offline).
+          doInPlaceAdvance(prefetched!.url);
+          return;
+        }
+
+        // No pre-resolved URL. If the next chapter is downloaded, resolve its
+        // local URI asynchronously before doing the src swap. Without this,
+        // the fallback would set audio.src to the CDN streaming URL and the
+        // in-place token would tell loadAudio to skip its offline-path check,
+        // making the audio stream from the network even though the file is
+        // on-device (fails entirely when offline).
+        const reciterStrFc = quranComIdToReciterString(reciterIdRef.current);
+        if (reciterStrFc && isFullChapterDownloaded(reciterStrFc, nextChapterId)) {
+          // Snapshot loadId so we can detect if the user navigates away
+          // (lock-screen next/prev tap) during the async resolution.
+          const myEndedLoadId = loadIdRef.current;
+          clearPrefetch();
+          // Show loading state while we resolve the local URI.
+          setState(prev => ({
+            ...prev,
+            isLoading: true,
+            currentVerseKey: null,
+            currentWordIndex: null,
+            currentTime: 0,
+            duration: 0,
+          }));
+          getFullChapterAudioUri(reciterStrFc, nextChapterId).then(uri => {
+            // If the user navigated while we were resolving, loadAudio for the
+            // new chapter is already running — bail and let it handle things.
+            if (loadIdRef.current !== myEndedLoadId) return;
+            const url = uri ?? getChapterAudioUrl(reciterIdRef.current, nextChapterId);
+            if (url) {
+              doInPlaceAdvance(url);
+            } else {
+              setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+              onEndedRef.current?.();
+            }
+          }).catch(() => {
+            if (loadIdRef.current !== myEndedLoadId) return;
+            // File system error — fall through to streaming.
+            const fallback = getChapterAudioUrl(reciterIdRef.current, nextChapterId);
+            if (fallback) {
+              doInPlaceAdvance(fallback);
+            } else {
+              setState(prev => ({ ...prev, isLoading: false, isPlaying: false }));
+              onEndedRef.current?.();
+            }
+          });
+          return;
+        }
+
+        // Not downloaded — use streaming URL as before.
+        const nextUrl = getChapterAudioUrl(reciterIdRef.current, nextChapterId);
+        if (nextUrl) {
+          doInPlaceAdvance(nextUrl);
           return;
         }
       }
@@ -1627,6 +1682,12 @@ export function useWordTimingAudio(
 
   const getTimingData = useCallback((): AudioFile | null => timingDataRef.current, []);
 
+  // Returns the audio element's live currentTime. Reads the DOM element
+  // directly so the value is always accurate even when the rAF loop is
+  // throttled (e.g. iOS lock screen, which pauses requestAnimationFrame
+  // while still running JS for background audio).
+  const getCurrentTime = useCallback((): number => audioRef.current?.currentTime ?? 0, []);
+
   return {
     ...state,
     togglePlayPause,
@@ -1636,6 +1697,7 @@ export function useWordTimingAudio(
     seekToVerse,
     setSpeed,
     getTimingData,
+    getCurrentTime,
     retry,
   };
 }

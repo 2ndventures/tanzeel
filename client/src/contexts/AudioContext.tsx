@@ -104,16 +104,21 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     if (!currentId) return;
     // Platform convention: "previous" within the first 3 seconds jumps to the
     // previous surah; after that it restarts the current surah from the start.
-    if (hookResult.currentTime > 3) {
+    // Use the live audio element time via getCurrentTime() rather than React
+    // state (hookCurrentTime), which is driven by the rAF loop. iOS pauses rAF
+    // when the screen locks, so React state freezes at the lock-time position
+    // while the audio continues playing — making hookCurrentTime stale.
+    if (hookResult.getCurrentTime() > 3) {
       hookResult.seek(0);
       return;
     }
     if (currentId > 1) {
       setActiveChapter(currentId - 1);
     } else {
+      // Chapter 1: restart from the beginning.
       hookResult.seek(0);
     }
-  }, [setActiveChapter, hookResult.currentTime, hookResult.seek]);
+  }, [setActiveChapter, hookResult.getCurrentTime, hookResult.seek]);
 
   const registerVerseChangeCallback = useCallback((cb: ((verseKey: string) => void) | null) => {
     verseChangeCallbackRef.current = cb;
@@ -129,7 +134,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     isLoading: hookIsLoading, error: hookError, speed: hookSpeed,
     isStalled: hookIsStalled,
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
-    setSpeed, getTimingData, retry,
+    setSpeed, getTimingData, getCurrentTime, retry,
   } = hookResult;
 
   const value = useMemo<AudioContextValue>(() => ({
@@ -175,7 +180,9 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
   const activeChapterInfo = activeChapterId ? chapters.find(c => c.id === activeChapterId) : null;
   const reciterDisplayName = getReciterById(reciter)?.name || 'Mishary Rashid Alafasy';
   const canGoNext = !!activeChapterId && activeChapterId < 114;
-  const canGoPrev = !!activeChapterId && activeChapterId > 1;
+  // Chapter 1 is still reachable (restarts from the beginning), so the
+  // previous button should be visible whenever a chapter is active.
+  const canGoPrev = !!activeChapterId;
   useMediaSession({
     title: activeChapterInfo?.englishName || 'Quran',
     artist: reciterDisplayName,
