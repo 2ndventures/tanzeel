@@ -8,12 +8,14 @@ export interface Bookmark {
   note: string;
   createdAt: number;
   updatedAt: number;
+  userId: string | null;
 }
 
 const STORAGE_KEY = 'quran_bookmarks';
 const FOLDERS_KEY = 'quran_bookmark_folders';
 const DEFAULT_FOLDER = 'Favorites';
 const MIGRATION_KEY = '__bookmarks_updatedAt_migration_done';
+const MIGRATION_KEY_USER_ID = '__bookmarks_userId_migration_done';
 
 async function loadBookmarks(): Promise<Bookmark[]> {
   try {
@@ -69,6 +71,7 @@ export async function addBookmark(
     note,
     createdAt: now,
     updatedAt: now,
+    userId: null,
   };
   bookmarks.push(bookmark);
   await saveBookmarks(bookmarks);
@@ -160,6 +163,21 @@ export async function migrateUpdatedAt(): Promise<void> {
     );
     await saveBookmarks(migrated);
     await setItem(MIGRATION_KEY, '1');
+  } catch {
+    // Non-fatal — next load will retry
+  }
+}
+
+export async function migrateUserId(): Promise<void> {
+  try {
+    const done = await getItem(MIGRATION_KEY_USER_ID);
+    if (done) return;
+    const raw: any[] = JSON.parse((await getItem(STORAGE_KEY)) ?? '[]');
+    const migrated = raw.map((b) =>
+      !('userId' in b) ? { ...b, userId: null } : b
+    );
+    await saveBookmarks(migrated);
+    await setItem(MIGRATION_KEY_USER_ID, '1');
   } catch {
     // Non-fatal — next load will retry
   }

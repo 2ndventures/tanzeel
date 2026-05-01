@@ -24,7 +24,7 @@ import type { LayoutMode } from "@/lib/quranMetadata";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { initStorage, getItem, setItem, removeItem } from "@/lib/storage";
 import { initAudioCache } from "@/services/audioCache";
-import { migrateUpdatedAt } from "@/lib/bookmarkService";
+import { migrateUpdatedAt, migrateUserId } from "@/lib/bookmarkService";
 import { triggerHaptic } from "@/lib/haptics";
 
 const CapApp = registerPlugin<{
@@ -104,6 +104,7 @@ function App() {
   useEffect(() => {
     initStorage().then(async () => {
       await migrateUpdatedAt();
+      await migrateUserId();
       const completed = await getItem('onboardingCompleted');
       setShowOnboarding(!completed);
 
