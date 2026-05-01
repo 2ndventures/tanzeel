@@ -7,11 +7,13 @@ export interface Bookmark {
   folder: string;
   note: string;
   createdAt: number;
+  updatedAt: number;
 }
 
 const STORAGE_KEY = 'quran_bookmarks';
 const FOLDERS_KEY = 'quran_bookmark_folders';
 const DEFAULT_FOLDER = 'Favorites';
+const MIGRATION_KEY = '__bookmarks_updatedAt_migration_done';
 
 async function loadBookmarks(): Promise<Bookmark[]> {
   try {
@@ -58,13 +60,15 @@ export async function addBookmark(
   );
   if (existing) return existing;
 
+  const now = Date.now();
   const bookmark: Bookmark = {
     id: `${chapterId}:${verseNumber}`,
     chapterId,
     verseNumber,
     folder,
     note,
-    createdAt: Date.now(),
+    createdAt: now,
+    updatedAt: now,
   };
   bookmarks.push(bookmark);
   await saveBookmarks(bookmarks);
@@ -94,6 +98,7 @@ export async function updateBookmark(
       await addFolder(updates.folder);
     }
     if (updates.note !== undefined) bookmarks[idx].note = updates.note;
+    bookmarks[idx].updatedAt = Date.now();
     await saveBookmarks(bookmarks);
   }
 }
@@ -123,8 +128,9 @@ export async function removeFolder(name: string): Promise<void> {
   if (name === DEFAULT_FOLDER) return;
   const folders = (await getFolders()).filter((f) => f !== name);
   await setItem(FOLDERS_KEY, JSON.stringify(folders));
+  const now = Date.now();
   const bookmarks = (await loadBookmarks()).map((b) =>
-    b.folder === name ? { ...b, folder: DEFAULT_FOLDER } : b
+    b.folder === name ? { ...b, folder: DEFAULT_FOLDER, updatedAt: now } : b
   );
   await saveBookmarks(bookmarks);
 }
@@ -136,9 +142,25 @@ export async function renameFolder(oldName: string, newName: string): Promise<bo
   if (existing.some((f) => f.toLowerCase() === trimmed.toLowerCase() && f !== oldName)) return false;
   const folders = existing.map((f) => (f === oldName ? trimmed : f));
   await setItem(FOLDERS_KEY, JSON.stringify(folders));
+  const now = Date.now();
   const bookmarks = (await loadBookmarks()).map((b) =>
-    b.folder === oldName ? { ...b, folder: trimmed } : b
+    b.folder === oldName ? { ...b, folder: trimmed, updatedAt: now } : b
   );
   await saveBookmarks(bookmarks);
   return true;
+}
+
+export async function migrateUpdatedAt(): Promise<void> {
+  try {
+    const done = await getItem(MIGRATION_KEY);
+    if (done) return;
+    const bookmarks = await loadBookmarks();
+    const migrated = bookmarks.map((b) =>
+      b.updatedAt == null ? { ...b, updatedAt: b.createdAt } : b
+    );
+    await saveBookmarks(migrated);
+    await setItem(MIGRATION_KEY, '1');
+  } catch {
+    // Non-fatal — next load will retry
+  }
 }
