@@ -134,7 +134,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     isLoading: hookIsLoading, error: hookError, speed: hookSpeed,
     isStalled: hookIsStalled,
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
-    setSpeed, getTimingData, getCurrentTime, retry,
+    setSpeed, getTimingData, retry,
   } = hookResult;
 
   const value = useMemo<AudioContextValue>(() => ({
