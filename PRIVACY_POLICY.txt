@@ -1,0 +1,122 @@
+PRIVACY POLICY
+2nd Ventures, LLC — Tanzeel
+Last Updated: November 14, 2025
+
+================================================================================
+INTRODUCTION
+================================================================================
+2nd Ventures, LLC ("we," "us," or "our") operates the Tanzeel mobile application
+(the "App"). This Privacy Policy explains our practices regarding the collection,
+use, and disclosure of information when you use our App. We are committed to
+protecting your privacy and complying with applicable privacy laws, including GDPR
+(General Data Protection Regulation) and CCPA (California Consumer Privacy Act).
+
+================================================================================
+INFORMATION WE COLLECT
+================================================================================
+Tanzeel does not collect, store, or transmit any personal data to our servers.
+
+All app functionality operates entirely on your device using local storage.
+This includes:
+  - Reading progress and bookmarks
+  - User preferences (theme, font size, reciter selection)
+  - Reading statistics and history
+  - Application settings
+
+This data is stored exclusively on your device and is never transmitted to us or
+any third party.
+
+================================================================================
+THIRD-PARTY SERVICES
+================================================================================
+The App uses the following third-party service:
+
+Quran.com API
+  We use the Quran.com API to provide audio recitation and word-level timing
+  data. When you play audio in the app, your device connects directly to
+  Quran.com's content delivery network to stream the audio files.
+
+  This connection may expose your IP address to Quran.com's servers. We
+  recommend reviewing Quran.com's privacy policy for information about how they
+  handle this data.
+
+================================================================================
+DATA STORAGE AND SECURITY
+================================================================================
+All user data is stored locally on your device using your device's native storage
+mechanisms. This data remains under your control and can be deleted at any time
+by uninstalling the app or clearing the app's data through your device settings.
+
+================================================================================
+IN-APP PURCHASES
+================================================================================
+The App may offer a one-time purchase option in the future. If implemented, all
+purchase transactions will be processed through Apple's App Store or Google Play
+Store. We do not collect or store any payment information. Please refer to Apple's
+or Google's privacy policies for information about how they handle payment data.
+
+================================================================================
+CHILDREN'S PRIVACY
+================================================================================
+Our App is suitable for users of all ages, including children. Because we do not
+collect any personal information, we do not knowingly collect data from children
+under 13 (or the applicable age in your jurisdiction). All data is stored locally
+on the device and remains under the control of the device owner.
+
+================================================================================
+YOUR RIGHTS
+================================================================================
+Since we do not collect or store any personal data on our servers, the following
+rights are inherently protected:
+
+  - Right to Access: All your data is stored on your device and accessible to
+    you at all times.
+  - Right to Delete: You can delete all app data by uninstalling the app or
+    clearing app data in device settings.
+  - Right to Portability: Your data never leaves your device.
+  - Right to Opt-Out: No data collection means no opt-out is necessary.
+
+================================================================================
+INTERNATIONAL DATA TRANSFERS
+================================================================================
+We do not transfer any personal data internationally because we do not collect or
+store personal data. The only data transfer that occurs is when your device
+connects to Quran.com's servers to stream audio content, which is governed by
+Quran.com's privacy policy.
+
+================================================================================
+CHANGES TO THIS PRIVACY POLICY
+================================================================================
+We may update this Privacy Policy from time to time. We will notify you of any
+changes by posting the new Privacy Policy in the app and updating the
+"Last Updated" date. You are advised to review this Privacy Policy periodically
+for any changes. Changes are effective when posted in the app.
+
+================================================================================
+CONTACT US
+================================================================================
+If you have any questions about this Privacy Policy, please contact us:
+
+  2nd Ventures, LLC
+  Email: support@2ndventures.ai
+
+================================================================================
+GDPR COMPLIANCE
+================================================================================
+For users in the European Economic Area (EEA), we comply with GDPR requirements.
+Since we do not collect personal data, most GDPR obligations do not apply.
+However, we maintain this privacy policy to ensure transparency about our
+practices.
+
+================================================================================
+CCPA COMPLIANCE
+================================================================================
+For California residents, we comply with the California Consumer Privacy Act
+(CCPA). We do not:
+  - Collect personal information
+  - Sell personal information
+  - Share personal information for behavioral advertising
+  - Retain personal information
+
+Therefore, the rights to opt-out, delete, and access do not apply as there is no
+data collection.

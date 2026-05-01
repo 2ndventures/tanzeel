@@ -1,0 +1,196 @@
+TERMS OF SERVICE
+2nd Ventures, LLC — Tanzeel
+Last Updated: November 14, 2025
+
+================================================================================
+AGREEMENT TO TERMS
+================================================================================
+These Terms of Service ("Terms") constitute a legally binding agreement between
+you and 2nd Ventures, LLC ("Company," "we," "us," or "our") concerning your
+access to and use of the Tanzeel mobile application (the "App"). By downloading,
+installing, or using the App, you agree to be bound by these Terms. If you do not
+agree to these Terms, you may not access or use the App.
+
+================================================================================
+LICENSE GRANT
+================================================================================
+Subject to your compliance with these Terms, we grant you a limited,
+non-exclusive, non-transferable, non-sublicensable, revocable license to:
+
+  - Download, install, and use the App on compatible devices that you own or
+    control.
+  - Access and use the App's features for your personal, non-commercial purposes.
+
+================================================================================
+RESTRICTIONS
+================================================================================
+You agree that you will not:
+
+  - Copy, modify, distribute, sell, or lease any part of the App.
+  - Reverse engineer, decompile, or attempt to extract the source code of the
+    App.
+  - Remove, alter, or obscure any proprietary notices on the App.
+  - Use the App for any illegal or unauthorized purpose.
+  - Violate any applicable laws or regulations while using the App.
+  - Interfere with or disrupt the App or servers or networks connected to the
+    App.
+  - Use any automated system to access the App.
+  - Attempt to gain unauthorized access to any portion of the App.
+
+================================================================================
+INTELLECTUAL PROPERTY RIGHTS
+================================================================================
+The App and its entire contents, features, and functionality (including but not
+limited to all information, software, text, displays, images, video, audio,
+design, and selection and arrangement thereof) are owned by 2nd Ventures, LLC,
+its licensors, or other providers of such material and are protected by United
+States and international copyright, trademark, patent, trade secret, and other
+intellectual property or proprietary rights laws.
+
+The Quranic text, translations, and audio recitations are provided by third-party
+sources and remain the intellectual property of their respective owners.
+
+================================================================================
+PURCHASES AND PAYMENTS
+================================================================================
+If we offer a one-time purchase option or any other paid features in the future:
+
+  - All purchases are processed through the Apple App Store or Google Play Store.
+  - Payment terms are governed by the respective platform's terms and conditions.
+  - All purchases are final and non-refundable except as required by applicable
+    law.
+  - Refund requests must be directed to Apple or Google, not to us.
+  - We reserve the right to modify pricing at any time.
+
+================================================================================
+USER CONTENT AND CONDUCT
+================================================================================
+While using the App, you agree to:
+
+  - Use the App in a manner consistent with Islamic values and respect for the
+    Holy Quran.
+  - Not use the App to store, display, or transmit offensive, defamatory, or
+    unlawful content.
+  - Respect the religious nature of the content provided.
+  - Not misrepresent the source or meaning of Quranic verses.
+
+================================================================================
+DISCLAIMER OF WARRANTIES
+================================================================================
+THE APP IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT WARRANTIES OF
+ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+
+  - Warranties of merchantability, fitness for a particular purpose, or
+    non-infringement.
+  - Warranties that the App will be uninterrupted, timely, secure, or error-free.
+  - Warranties regarding the accuracy, completeness, or reliability of any
+    content.
+
+While we strive for accuracy in presenting the Quranic text and translations, we
+do not warrant that all content is free from errors. Users should consult
+qualified Islamic scholars for religious guidance.
+
+================================================================================
+LIMITATION OF LIABILITY
+================================================================================
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL 2ND VENTURES, LLC, ITS
+AFFILIATES, DIRECTORS, EMPLOYEES, OR AGENTS BE LIABLE FOR ANY INDIRECT,
+INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT
+LIMITED TO:
+
+  - Loss of profits, data, use, or goodwill.
+  - Service interruption or data loss.
+  - Cost of substitute products or services.
+  - Any damages arising from your use of or inability to use the App.
+
+OUR TOTAL LIABILITY TO YOU FOR ALL CLAIMS ARISING FROM OR RELATED TO THE APP
+SHALL NOT EXCEED THE AMOUNT YOU PAID US TO USE THE APP, IF ANY, OR ONE HUNDRED
+DOLLARS ($100), WHICHEVER IS LESS.
+
+================================================================================
+INDEMNIFICATION
+================================================================================
+You agree to indemnify, defend, and hold harmless 2nd Ventures, LLC and its
+affiliates, officers, directors, employees, and agents from and against any
+claims, liabilities, damages, losses, costs, expenses, or fees (including
+reasonable attorneys' fees) arising from: (a) your use of the App; (b) your
+violation of these Terms; (c) your violation of any rights of another; or (d)
+any content you provide through the App.
+
+================================================================================
+TERMINATION
+================================================================================
+We reserve the right to suspend or terminate your access to the App at any time,
+with or without cause, with or without notice, effective immediately. Upon
+termination:
+
+  - Your license to use the App will immediately cease.
+  - You must cease all use of the App and delete all copies from your devices.
+  - All provisions of these Terms that by their nature should survive termination
+    shall survive.
+
+================================================================================
+GOVERNING LAW AND JURISDICTION
+================================================================================
+These Terms shall be governed by and construed in accordance with the laws of the
+State of Delaware, United States, without regard to its conflict of law
+provisions. You agree to submit to the exclusive jurisdiction of the state and
+federal courts located in Delaware for the resolution of any disputes.
+
+================================================================================
+DISPUTE RESOLUTION
+================================================================================
+Any dispute arising from these Terms or your use of the App shall be resolved
+through:
+
+  1. Informal Negotiation: Contact us at support@2ndventures.ai to resolve the
+     dispute informally.
+  2. Binding Arbitration: If informal negotiation fails, the dispute shall be
+     resolved through binding arbitration in accordance with the American
+     Arbitration Association's rules.
+  3. Class Action Waiver: You agree to resolve disputes on an individual basis
+     and waive any right to participate in class actions.
+
+================================================================================
+CHANGES TO TERMS
+================================================================================
+We reserve the right to modify these Terms at any time. We will notify you of any
+material changes by posting the updated Terms in the App and updating the
+"Last Updated" date. Your continued use of the App after such modifications
+constitutes your acceptance of the updated Terms.
+
+================================================================================
+THIRD-PARTY SERVICES
+================================================================================
+The App may contain links to or integrate with third-party services (such as
+Quran.com). We are not responsible for the content, privacy policies, or
+practices of any third-party services. Your use of third-party services is at
+your own risk and subject to their respective terms and conditions.
+
+================================================================================
+SEVERABILITY
+================================================================================
+If any provision of these Terms is found to be unenforceable or invalid, that
+provision will be limited or eliminated to the minimum extent necessary so that
+these Terms will otherwise remain in full force and effect and enforceable.
+
+================================================================================
+ENTIRE AGREEMENT
+================================================================================
+These Terms, together with our Privacy Policy, constitute the entire agreement
+between you and 2nd Ventures, LLC regarding the use of the App and supersede all
+prior agreements and understandings, whether written or oral.
+
+================================================================================
+CONTACT INFORMATION
+================================================================================
+If you have any questions about these Terms, please contact us:
+
+  2nd Ventures, LLC
+  Email: support@2ndventures.ai
+
+================================================================================
+ACKNOWLEDGMENT
+================================================================================
+BY USING THE APP, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE AND
+AGREE TO BE BOUND BY THEM.

@@ -30,3 +30,15 @@ id = "kTFL5-XQNlmtVaOMDwn0C"
 uri = "file://CODEBASE_AUDIT.md"
 type = "text"
 title = "Tanzeel Codebase Audit"
+
+[[outputs]]
+id = "1qu1Ryk8Rm9nhHcT5uJ-N"
+uri = "file://PRIVACY_POLICY.txt"
+type = "text"
+title = "Privacy Policy"
+
+[[outputs]]
+id = "51cDEjzt8vBFRKGPKISoS"
+uri = "file://TERMS_OF_SERVICE.txt"
+type = "text"
+title = "Terms of Service"
