@@ -1,12 +1,18 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
-import { initSentry } from "./lib/sentry";
+import { init, browserTracingIntegration } from "@sentry/capacitor";
 
-// Fire-and-forget — Sentry init is async because the SDK is dynamically
-// imported (so it doesn't block first paint). Errors that happen during
-// init itself are swallowed inside initSentry().
-initSentry();
+const _sentryDsn = import.meta.env.VITE_SENTRY_DSN as string | undefined;
+if (_sentryDsn) {
+  init({
+    dsn: _sentryDsn,
+    environment: import.meta.env.MODE,
+    sampleRate: 1.0,
+    tracesSampleRate: 0.2,
+    integrations: [browserTracingIntegration()],
+  });
+}
 
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 if (isIOS) {
