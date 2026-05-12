@@ -673,6 +673,19 @@ export default function Settings({
             </div>
           </div>
 
+          {import.meta.env.DEV && (
+            <div className="px-6 pb-4">
+              <Button
+                variant="destructive"
+                className="w-full"
+                data-testid="button-sentry-test"
+                onClick={() => { throw new Error('Sentry test error from Tanzeel'); }}
+              >
+                Test Sentry
+              </Button>
+            </div>
+          )}
+
           <div className="text-center text-xs text-muted-foreground/60 space-y-1 pb-8 pt-2">
             <p>Tanzeel</p>
             <p>Version 1.0.0</p>
