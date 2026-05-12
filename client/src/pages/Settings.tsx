@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import * as Sentry from '@sentry/capacitor';
 import { removeItem } from "@/lib/storage";
 import { Icon } from "@iconify/react";
 
@@ -679,7 +680,7 @@ export default function Settings({
                 variant="destructive"
                 className="w-full"
                 data-testid="button-sentry-test"
-                onClick={() => { throw new Error('Sentry test error from Tanzeel'); }}
+                onClick={() => { Sentry.captureException(new Error('Sentry test error from Tanzeel')); alert('Sentry test event sent!'); }}
               >
                 Test Sentry
               </Button>
