@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import * as Sentry from '@sentry/capacitor';
 import { Icon } from "@iconify/react";
 import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2, CircleOff } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -329,7 +330,7 @@ export default function ChapterView({
     document.addEventListener('visibilitychange', handleVisibility);
     return () => {
       document.removeEventListener('visibilitychange', handleVisibility);
-      wakeLock?.release().catch(() => {});
+      wakeLock?.release().catch((err) => { Sentry.captureException(err); });
     };
   }, [isPlaying]);
 

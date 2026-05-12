@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
+import * as Sentry from '@sentry/capacitor';
 
 const MIGRATION_FLAG = '__storage_migrated_v1';
 const MIGRATION_V2_FLAG = '__storage_migrated_v2';
@@ -132,7 +133,7 @@ export async function setItem(key: string, value: string): Promise<void> {
   cache.set(key, value);
 
   if (isNative()) {
-    await Preferences.set({ key, value }).catch(() => {});
+    await Preferences.set({ key, value }).catch((err) => { Sentry.captureException(err); });
   } else {
     try {
       localStorage.setItem(key, value);
@@ -145,7 +146,7 @@ export async function removeItem(key: string): Promise<void> {
   cache.delete(key);
 
   if (isNative()) {
-    await Preferences.remove({ key }).catch(() => {});
+    await Preferences.remove({ key }).catch((err) => { Sentry.captureException(err); });
   } else {
     try {
       localStorage.removeItem(key);

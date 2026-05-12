@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import * as Sentry from '@sentry/capacitor';
 import { getTimingDataFromMemory, storeTimingDataInMemory } from '@/lib/audioCache';
 import { getItem, setItem, removeItem } from '@/lib/storage';
 import {
@@ -783,6 +784,8 @@ export function useWordTimingAudio(
     const handleEnded = () => {
       if (repeatRef.current) {
         audio.currentTime = 0;
+        // Silenced: play() rejects when autoplay policy blocks resumption after
+        // repeat — this is an expected browser/OS restriction, not an app error.
         audio.play().catch(() => {});
         return;
       }
@@ -1677,7 +1680,7 @@ export function useWordTimingAudio(
     speedRef.current = newSpeed;
     if (audioRef.current) audioRef.current.playbackRate = newSpeed;
     setState(prev => ({ ...prev, speed: newSpeed }));
-    setGlobalSpeed(newSpeed).catch(() => {});
+    setGlobalSpeed(newSpeed).catch((err) => { Sentry.captureException(err); });
   }, []);
 
   const getTimingData = useCallback((): AudioFile | null => timingDataRef.current, []);

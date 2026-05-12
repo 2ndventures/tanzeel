@@ -1,5 +1,6 @@
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
+import * as Sentry from '@sentry/capacitor';
 
 export interface CachedFileEntry {
   reciterId: string;
@@ -114,7 +115,7 @@ export async function getCachedAudioUri(
     }
 
     entry.lastAccessedAt = new Date().toISOString();
-    saveManifest().catch(() => {});
+    saveManifest().catch((err) => { Sentry.captureException(err); });
 
     if (Capacitor.isNativePlatform()) {
       const uriResult = await Filesystem.getUri({
@@ -134,7 +135,7 @@ export async function getCachedAudioUri(
     console.error('[AudioCache] Downloaded file not found on disk, removing entry:', err);
     manifest.totalSizeBytes -= entry.sizeBytes;
     delete manifest.files[key];
-    saveManifest().catch(() => {});
+    saveManifest().catch((err) => { Sentry.captureException(err); });
     return null;
   }
 }
@@ -357,7 +358,7 @@ export async function getFullChapterAudioUri(
     }
 
     entry.lastAccessedAt = new Date().toISOString();
-    saveManifest().catch(() => {});
+    saveManifest().catch((err) => { Sentry.captureException(err); });
 
     if (Capacitor.isNativePlatform()) {
       const uriResult = await Filesystem.getUri({
@@ -377,7 +378,7 @@ export async function getFullChapterAudioUri(
     console.error('[AudioCache] Full chapter file not found on disk, removing entry:', err);
     manifest.totalSizeBytes -= entry.sizeBytes;
     delete manifest.files[key];
-    saveManifest().catch(() => {});
+    saveManifest().catch((err) => { Sentry.captureException(err); });
     return null;
   }
 }
