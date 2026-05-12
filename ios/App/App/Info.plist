@@ -75,6 +75,15 @@
                                 <key>NSExceptionRequiresForwardSecrecy</key>
                                 <true/>
                         </dict>
+                        <key>tanzeel.ai</key>
+                        <dict>
+                                <key>NSIncludesSubdomains</key>
+                                <true/>
+                                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                                <false/>
+                                <key>NSExceptionRequiresForwardSecrecy</key>
+                                <true/>
+                        </dict>
 
                 </dict>
         </dict>
