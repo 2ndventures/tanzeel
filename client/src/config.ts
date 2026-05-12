@@ -21,7 +21,7 @@ const getApiBaseUrl = (): string => {
     if (trimmed && /^https:\/\/[^\s/]+/i.test(trimmed)) {
       return trimmed.replace(/\/+$/, '');
     }
-    return 'https://api.tanzeel.ai';
+    return 'https://www.tanzeel.ai';
   }
   return '';
 };
