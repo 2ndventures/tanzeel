@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef, memo, Fragment } from "react"
 import { Icon } from "@iconify/react";
 import { tokenizeArabicWords, tokenizeTajweedWords, stripIndopakBoxChars } from "@/lib/arabicTokenizer";
 import { isBookmarked, addBookmark, removeBookmark } from "@/lib/bookmarkService";
+import { toast } from "@/hooks/use-toast";
 
 interface VerseCardProps {
   chapterId: number;
@@ -85,14 +86,23 @@ function VerseCardInner({
 
   const handleBookmarkToggle = useCallback(async (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
-    if (bookmarked) {
-      await removeBookmark(chapterId, verseNumber);
-      setBookmarked(false);
-    } else {
-      await addBookmark(chapterId, verseNumber);
-      setBookmarked(true);
+    try {
+      if (bookmarked) {
+        await removeBookmark(chapterId, verseNumber);
+        setBookmarked(false);
+      } else {
+        await addBookmark(chapterId, verseNumber);
+        setBookmarked(true);
+      }
+      onBookmarkChangeRef.current?.();
+    } catch (err) {
+      console.error('[VerseCard] Bookmark save failed:', err);
+      toast({
+        title: 'Bookmark failed',
+        description: 'Could not save your bookmark. Please try again.',
+        variant: 'destructive',
+      });
     }
-    onBookmarkChangeRef.current?.();
   }, [bookmarked, chapterId, verseNumber]);
 
   const handleBookmarkKeyDown = useCallback((e: React.KeyboardEvent) => {

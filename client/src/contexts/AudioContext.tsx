@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { toast } from '@/hooks/use-toast';
 import { useWordTimingAudio, type AudioFile } from '@/hooks/useWordTimingAudio';
 import { getQuranComReciterId, getReciterById } from '@/lib/reciters';
 import { chapters } from '@/lib/quranMetadata';
@@ -137,6 +138,24 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
     setSpeed, getTimingData, retry,
   } = hookResult;
+
+  // Show a toast whenever a new playback error surfaces while a chapter is
+  // active. The ref guards against re-toasting the same error on re-renders.
+  const prevErrorRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!enabled || !hookError) {
+      prevErrorRef.current = null;
+      return;
+    }
+    if (hookError !== prevErrorRef.current) {
+      toast({
+        title: 'Playback error',
+        description: hookError,
+        variant: 'destructive',
+      });
+    }
+    prevErrorRef.current = hookError;
+  }, [enabled, hookError]);
 
   const value = useMemo<AudioContextValue>(() => ({
     activeChapterId,

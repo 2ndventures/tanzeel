@@ -19,6 +19,7 @@ import BottomNav from "@/components/BottomNav";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { NetworkProvider } from "@/contexts/NetworkContext";
 import OfflineBanner from "@/components/OfflineBanner";
+import { Toaster } from "@/components/ui/toaster";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
 import { Capacitor, registerPlugin } from "@capacitor/core";
@@ -511,6 +512,7 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <NetworkProvider>
         <TooltipProvider>
+          <Toaster />
           <OfflineBanner />
           {showSplash && (
             <SplashScreen onFinish={() => setSplashAnimDone(true)} />
