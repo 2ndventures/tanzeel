@@ -708,7 +708,15 @@ export function useWordTimingAudio(
     };
 
     const handleLoadedData = () => {
-      // No-op: see handleCanPlay note about srcChangingRef timing.
+      // On iOS WKWebView, 'canplay' is suppressed until the user initiates
+      // playback via a gesture. 'loadeddata' fires freely (it only needs the
+      // server to respond, not a user gesture). Use it to clear the spinner
+      // when we're idle so the mini-player and player bar don't show a loading
+      // indicator for audio that is ready but simply not yet playing.
+      setState(prev => {
+        if (!prev.isLoading || prev.isPlaying) return prev;
+        return { ...prev, isLoading: false };
+      });
     };
 
     const handlePlay = () => {
@@ -765,8 +773,12 @@ export function useWordTimingAudio(
     // so a flaky connection escalates to recovery instead of hanging.
     const handleWaiting = () => {
       setState(prev => {
-        if (prev.isLoading && prev.isStalled) return prev;
-        return { ...prev, isLoading: true, isStalled: true };
+        if (prev.isStalled) return prev;
+        // Only show the buffering spinner when we're actively playing.
+        // If we're paused/idle, a 'waiting' event is a background network
+        // event and the user doesn't need to see a spinner for it.
+        const nowLoading = prev.isPlaying ? true : prev.isLoading;
+        return { ...prev, isLoading: nowLoading, isStalled: true };
       });
       if (stallWatchdogRef.current) clearTimeout(stallWatchdogRef.current);
       stallWatchdogRef.current = setTimeout(() => {
