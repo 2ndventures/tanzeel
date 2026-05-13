@@ -2,6 +2,19 @@ import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import * as Sentry from '@sentry/capacitor';
 
+/**
+ * Thrown by saveFullChapterAudio when a Filesystem.writeFile call fails with
+ * a device-storage or quota-exceeded error. Callers can catch this specifically
+ * to surface a user-facing "Not enough storage" message without swallowing
+ * other (network, permission, etc.) failures.
+ */
+export class StorageQuotaError extends Error {
+  constructor() {
+    super('Not enough storage. Free up space and try again.');
+    this.name = 'StorageQuotaError';
+  }
+}
+
 export interface CachedFileEntry {
   reciterId: string;
   surahNumber: number;
@@ -273,11 +286,28 @@ export async function saveFullChapterAudio(
       binary += String.fromCharCode(...Array.from(slice));
     }
     const base64 = btoa(binary);
-    await Filesystem.writeFile({
-      path: filePath,
-      data: base64,
-      directory: Directory.Data,
-    });
+    try {
+      await Filesystem.writeFile({
+        path: filePath,
+        data: base64,
+        directory: Directory.Data,
+      });
+    } catch (writeErr) {
+      // Re-throw as StorageQuotaError when the OS signals a disk-full / quota
+      // condition so callers can distinguish it from network/permission errors.
+      const msg = String(writeErr).toLowerCase();
+      if (
+        msg.includes('quota') ||
+        msg.includes('no space') ||
+        msg.includes('disk full') ||
+        msg.includes('storage full') ||
+        msg.includes('not enough space') ||
+        msg.includes('file too large')
+      ) {
+        throw new StorageQuotaError();
+      }
+      throw writeErr;
+    }
 
     let sizeBytes = 0;
     try {
@@ -306,6 +336,8 @@ export async function saveFullChapterAudio(
     await saveManifest();
     return true;
   } catch (err) {
+    // Propagate quota errors so callers can surface a user-facing message.
+    if (err instanceof StorageQuotaError) throw err;
     console.error('[AudioCache] Failed to save full chapter audio:', err);
     return false;
   }

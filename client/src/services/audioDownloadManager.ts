@@ -10,12 +10,18 @@ import {
   saveFullChapterAudio,
   saveOfflineTimingData,
   abortActiveDownload,
+  StorageQuotaError,
 } from '@/services/audioCache';
 import { chapters } from '@/lib/quranMetadata';
 import { setItem, getItem, removeItem } from '@/lib/storage';
 import { getTimingUrl, getChapterAudioUrl, normalizeTimingResponse } from '@/lib/audioUrls';
 
 const PENDING_DOWNLOAD_KEY = 'pendingDownload';
+
+/** 150 MB — minimum free space required before a download is allowed to start. */
+const MIN_FREE_BYTES = 150 * 1024 * 1024;
+
+const STORAGE_ERROR_MSG = 'Not enough storage. Free up space and try again.';
 
 export interface PendingDownload {
   type: 'surah' | 'all';
@@ -41,13 +47,48 @@ export async function clearPendingDownload(): Promise<void> {
   await removeItem(PENDING_DOWNLOAD_KEY);
 }
 
+/**
+ * Estimate available device storage.
+ *
+ * Steps:
+ *  1. Call Filesystem.getUri on the downloads directory to confirm the
+ *     filesystem is accessible (or at least that the API is present).
+ *  2. Use navigator.storage.estimate() to get quota/usage figures.
+ *
+ * Returns free bytes, or Infinity when the estimate is unavailable so the
+ * caller can proceed optimistically rather than blocking the user.
+ */
+async function getFreeSpaceBytes(): Promise<number> {
+  // Step 1 — confirm filesystem access via Filesystem.getUri.
+  // The directory may not exist yet (first download) — that's fine.
+  try {
+    await Filesystem.getUri({ path: 'audio-downloads', directory: Directory.Data });
+  } catch {
+    // Not an error: the path just hasn't been created yet.
+  }
+
+  // Step 2 — StorageManager estimate.
+  if (navigator.storage?.estimate) {
+    try {
+      const { quota = 0, usage = 0 } = await navigator.storage.estimate();
+      if (quota > 0) return quota - usage;
+    } catch {
+      // estimate() unavailable or threw — fall through.
+    }
+  }
+
+  // Can't determine free space; proceed optimistically.
+  return Infinity;
+}
+
 let cancelFlag = false;
 
 export async function downloadSurah(
   reciterId: string,
   surahNum: number,
   _totalVerses: number,
-  onProgress?: (percent: number) => void
+  onProgress?: (percent: number) => void,
+  onStorageError?: (message: string) => void
 ): Promise<void> {
   const reciter = getReciterById(reciterId);
   if (!reciter) {
@@ -62,6 +103,14 @@ export async function downloadSurah(
     return;
   }
 
+  // ── Pre-flight free-space check ───────────────────────────────────────────
+  const freeBytes = await getFreeSpaceBytes();
+  if (freeBytes < MIN_FREE_BYTES) {
+    console.warn(`[DownloadManager] Insufficient storage: ${Math.round(freeBytes / 1024 / 1024)} MB free`);
+    onStorageError?.(STORAGE_ERROR_MSG);
+    return;
+  }
+
   const quranComId = getQuranComReciterId(reciterId);
   const chapterUrl = getChapterAudioUrl(quranComId, surahNum);
   if (!chapterUrl) {
@@ -72,16 +121,28 @@ export async function downloadSurah(
   if (cancelFlag) return;
 
   let success = false;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    if (cancelFlag) return;
-    success = await saveFullChapterAudio(reciterId, surahNum, chapterUrl, (p) => {
-      onProgress?.(Math.round(p * 0.9));
-    });
-    if (success) break;
-    if (attempt === 0) {
-      console.warn(`[DownloadManager] Retry full chapter ${surahNum}`);
-      await new Promise(r => setTimeout(r, 500));
+  try {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (cancelFlag) return;
+      success = await saveFullChapterAudio(reciterId, surahNum, chapterUrl, (p) => {
+        onProgress?.(Math.round(p * 0.9));
+      });
+      if (success) break;
+      if (attempt === 0) {
+        console.warn(`[DownloadManager] Retry full chapter ${surahNum}`);
+        await new Promise(r => setTimeout(r, 500));
+      }
     }
+  } catch (err) {
+    if (err instanceof StorageQuotaError) {
+      // Mid-download write failed: disk filled up while saving.
+      cancelFlag = true;
+      abortActiveDownload();
+      console.warn(`[DownloadManager] Storage quota exceeded writing chapter ${surahNum}`);
+      onStorageError?.(STORAGE_ERROR_MSG);
+      return;
+    }
+    throw err;
   }
 
   if (!success) {
@@ -109,14 +170,13 @@ export async function downloadSurah(
 
   if (!timingSaved) {
     console.error(`[DownloadManager] Timing data missing for chapter ${surahNum}, removing audio`);
-    const key = chapterFileKey(reciterId, surahNum);
     try {
       await Filesystem.deleteFile({
         path: `audio-downloads/${reciterId}/chapter_${surahNum}.mp3`,
         directory: Directory.Data,
       });
     } catch {}
-    removeManifestEntry(key);
+    removeManifestEntry(chapterFileKey(reciterId, surahNum));
     await saveManifest();
     return;
   }
@@ -126,7 +186,8 @@ export async function downloadSurah(
 
 export async function downloadAllSurahs(
   reciterId: string,
-  onProgress?: (surahNum: number, percent: number) => void
+  onProgress?: (surahNum: number, percent: number) => void,
+  onStorageError?: (message: string) => void
 ): Promise<void> {
   cancelFlag = false;
 
@@ -140,7 +201,8 @@ export async function downloadAllSurahs(
       reciterId,
       chapter.id,
       chapter.verseCount,
-      (percent) => onProgress?.(chapter.id, percent)
+      (percent) => onProgress?.(chapter.id, percent),
+      onStorageError
     );
   }
 }

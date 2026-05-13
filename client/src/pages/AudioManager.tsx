@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, Download, Loader2, X, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { setDownloadActive } from "@/lib/downloadState";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,7 @@ interface ActiveDownload {
 }
 
 export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
+  const { toast } = useToast();
   const reciterData = getReciterById(reciter);
   const reciterName = reciterData?.name || "Unknown Reciter";
 
@@ -117,6 +119,8 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
     try {
       await downloadSurah(reciter, surahNum, ch.verseCount, (percent) => {
         setActiveDownload((prev) => (prev ? { ...prev, percent } : null));
+      }, (errorMsg) => {
+        toast({ title: "Download failed", description: errorMsg, variant: "destructive" });
       });
     } finally {
       downloadingRef.current = false;
@@ -145,6 +149,8 @@ export default function AudioManager({ onBack, reciter }: AudioManagerProps) {
         if (percent === 100) {
           refreshAll();
         }
+      }, (errorMsg) => {
+        toast({ title: "Download failed", description: errorMsg, variant: "destructive" });
       });
     } finally {
       downloadingRef.current = false;
