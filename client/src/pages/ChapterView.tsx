@@ -247,6 +247,7 @@ export default function ChapterView({
     currentTime,
     duration,
     error,
+    timingError,
     togglePlayPause,
     pauseAudio,
     playAudio,
@@ -1158,6 +1159,7 @@ export default function ChapterView({
         isLoading={isLoading}
         repeat={repeat}
         error={error}
+        timingError={timingError}
         onRetry={retryAudio}
         onPlayPause={togglePlayPause}
         onSeek={(time) => { didSeekRef.current = true; seek(time); }}

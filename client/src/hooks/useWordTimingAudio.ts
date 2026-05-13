@@ -80,6 +80,9 @@ interface WordTimingAudioState {
   // AudioContext so the Media Session layer can freeze the OS scrubber
   // while the underlying audio is buffering on a slow connection.
   isStalled: boolean;
+  // True when the timing/word-data fetch failed. Audio still plays; only
+  // word-level highlighting is unavailable. Non-blocking — no error state.
+  timingError: boolean;
 }
 
 function quranComIdToReciterString(quranComId: number): string | null {
@@ -204,6 +207,7 @@ export function useWordTimingAudio(
     currentVerseKey: null,
     currentWordIndex: null,
     isStalled: false,
+    timingError: false,
   });
 
   useEffect(() => { isPlayingRef.current = state.isPlaying; }, [state.isPlaying]);
@@ -1399,6 +1403,7 @@ export function useWordTimingAudio(
       isLoading: true,
       isStalled: false,
       error: null,
+      timingError: false,
       currentVerseKey: null,
       currentWordIndex: null,
       currentTime: 0,
@@ -1512,6 +1517,7 @@ export function useWordTimingAudio(
       if (!audioFile.audio_url) throw new Error('No audio URL in timing data');
 
       timingDataRef.current = audioFile;
+      setState(prev => prev.timingError ? { ...prev, timingError: false } : prev);
 
       // If timing data has a different URL than what we predicted, swap to it.
       if (audio.src !== audioFile.audio_url) {
@@ -1528,9 +1534,9 @@ export function useWordTimingAudio(
       if ((err as Error)?.name === 'AbortError') return;
       if (loadIdRef.current !== myLoadId) return;
       console.error('Tanzeel: timing fetch failed:', err);
-      // Error handler on the audio element (or this catch) drives retry/fallback;
-      // we don't trigger fallback here because audio may still be playing the
-      // predicted URL successfully — only word highlighting will be missing.
+      // Audio is still playing from the predicted URL — only word highlighting
+      // is affected. Surface a non-blocking indicator without blocking playback.
+      setState(prev => prev.timingError ? prev : { ...prev, timingError: true });
     }
   }, [chapterId, reciterId, syncSpeed, clearPrefetch]);
 

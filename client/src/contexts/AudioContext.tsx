@@ -13,6 +13,7 @@ interface AudioContextValue {
   currentWordIndex: number | null;
   isLoading: boolean;
   error: string | null;
+  timingError: boolean;
   speed: number;
   loadChapter: (chapterId: number) => void;
   stopAudio: () => void;
@@ -132,7 +133,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     isPlaying: hookIsPlaying, currentTime: hookCurrentTime, duration: hookDuration,
     currentVerseKey: hookCurrentVerseKey, currentWordIndex: hookCurrentWordIndex,
     isLoading: hookIsLoading, error: hookError, speed: hookSpeed,
-    isStalled: hookIsStalled,
+    isStalled: hookIsStalled, timingError: hookTimingError,
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
     setSpeed, getTimingData, retry,
   } = hookResult;
@@ -146,6 +147,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     currentWordIndex: enabled ? hookCurrentWordIndex : null,
     isLoading:        enabled ? hookIsLoading        : false,
     error:            enabled ? hookError            : null,
+    timingError:      enabled ? hookTimingError      : false,
     speed: hookSpeed,
     loadChapter,
     stopAudio,
@@ -165,7 +167,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     activeChapterId, enabled,
     hookIsPlaying, hookCurrentTime, hookDuration,
     hookCurrentVerseKey, hookCurrentWordIndex,
-    hookIsLoading, hookError, hookSpeed,
+    hookIsLoading, hookError, hookTimingError, hookSpeed,
     togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
     setSpeed, getTimingData, retry,
     loadChapter, stopAudio,

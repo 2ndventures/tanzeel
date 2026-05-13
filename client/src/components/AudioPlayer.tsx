@@ -55,6 +55,7 @@ interface AudioPlayerProps {
   compact?: boolean;
   verseTimings?: VerseTimingInfo[];
   error?: string | null;
+  timingError?: boolean;
   onRetry?: () => void;
 }
 
@@ -141,6 +142,7 @@ export default function AudioPlayer({
   compact = false,
   verseTimings,
   error = null,
+  timingError = false,
   onRetry,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
@@ -358,6 +360,12 @@ export default function AudioPlayer({
         {error && (
           <p className="text-center text-xs font-medium text-destructive dark:text-red-400 mt-2 mb-0 animate-in fade-in duration-200" data-testid="text-audio-error">
             {error}
+          </p>
+        )}
+
+        {!error && timingError && (
+          <p className="text-center text-xs text-muted-foreground/50 dark:text-white/30 mt-2 mb-0 animate-in fade-in duration-200" data-testid="text-timing-error">
+            Highlighting unavailable
           </p>
         )}
 
