@@ -428,6 +428,120 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
 
+  // ── Public privacy policy page (used as App Store Connect privacy URL) ──
+  app.get("/privacy", (_req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=86400");
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Tanzeel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0d1d35;
+      color: #e2e8f0;
+      line-height: 1.7;
+      padding: 2rem 1rem 4rem;
+    }
+    .container { max-width: 720px; margin: 0 auto; }
+    header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(245,200,74,0.2); }
+    .logo { width: 48px; height: 48px; border-radius: 12px; }
+    header h1 { font-size: 1.5rem; font-weight: 700; color: #f5c84a; }
+    header p { font-size: 0.85rem; color: #7e8a9f; margin-top: 0.1rem; }
+    h2 { font-size: 1.2rem; font-weight: 700; color: #f5c84a; margin-bottom: 0.75rem; margin-top: 2rem; }
+    p { color: #cbd5e1; margin-bottom: 0.75rem; }
+    ul { padding-left: 1.5rem; color: #cbd5e1; margin-bottom: 0.75rem; }
+    ul li { margin-bottom: 0.4rem; }
+    .callout { background: rgba(255,255,255,0.05); border: 1px solid rgba(245,200,74,0.15); border-radius: 10px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+    .callout h3 { font-size: 1rem; font-weight: 600; color: #f5c84a; margin-bottom: 0.5rem; }
+    .meta { font-size: 0.8rem; color: #7e8a9f; margin-bottom: 2rem; }
+    strong { color: #e2e8f0; }
+    a { color: #f5c84a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Tanzeel — Privacy Policy</h1>
+        <p>Quran Reading &amp; Recitation</p>
+      </div>
+    </header>
+
+    <p class="meta"><strong>Last Updated:</strong> November 14, 2025</p>
+
+    <h2>Introduction</h2>
+    <p>2nd Ventures, LLC ("we," "us," or "our") operates the Tanzeel mobile application (the "App"). This Privacy Policy explains our practices regarding the collection, use, and disclosure of information when you use our App. We are committed to protecting your privacy and complying with applicable privacy laws, including GDPR and CCPA.</p>
+
+    <h2>Information We Collect</h2>
+    <p><strong>Tanzeel does not collect, store, or transmit any personal data to our servers.</strong></p>
+    <p>All app functionality operates entirely on your device using local storage. This includes:</p>
+    <ul>
+      <li>Reading progress and bookmarks</li>
+      <li>User preferences (theme, font size, reciter selection)</li>
+      <li>Reading statistics and history</li>
+      <li>Application settings</li>
+    </ul>
+    <p>This data is stored exclusively on your device and is never transmitted to us or any third party.</p>
+
+    <h2>Third-Party Services</h2>
+    <p>The App uses the following third-party service:</p>
+    <div class="callout">
+      <h3>Quran.com API</h3>
+      <p>We use the Quran.com API to provide audio recitation and word-level timing data. When you play audio in the app, your device connects directly to Quran.com's content delivery network to stream the audio files.</p>
+      <p>This connection may expose your IP address to Quran.com's servers. We recommend reviewing <a href="https://quran.com/privacy" target="_blank">Quran.com's privacy policy</a> for information about how they handle this data.</p>
+    </div>
+
+    <h2>Data Storage and Security</h2>
+    <p>All user data is stored locally on your device using your device's native storage mechanisms. This data remains under your control and can be deleted at any time by uninstalling the app or clearing the app's data through your device settings.</p>
+
+    <h2>In-App Purchases</h2>
+    <p>The App may offer a one-time purchase option in the future. If implemented, all purchase transactions will be processed through Apple's App Store or Google Play Store. We do not collect or store any payment information.</p>
+
+    <h2>Children's Privacy</h2>
+    <p>Our App is suitable for users of all ages, including children. Because we do not collect any personal information, we do not knowingly collect data from children under 13 (or the applicable age in your jurisdiction). All data is stored locally on the device and remains under the control of the device owner.</p>
+
+    <h2>Your Rights</h2>
+    <p>Since we do not collect or store any personal data on our servers, the following rights are inherently protected:</p>
+    <ul>
+      <li><strong>Right to Access:</strong> All your data is stored on your device and accessible to you at all times</li>
+      <li><strong>Right to Delete:</strong> You can delete all app data by uninstalling the app or clearing app data in device settings</li>
+      <li><strong>Right to Portability:</strong> Your data never leaves your device</li>
+      <li><strong>Right to Opt-Out:</strong> No data collection means no opt-out is necessary</li>
+    </ul>
+
+    <h2>International Data Transfers</h2>
+    <p>We do not transfer any personal data internationally because we do not collect or store personal data. The only data transfer that occurs is when your device connects to Quran.com's servers to stream audio content, which is governed by Quran.com's privacy policy.</p>
+
+    <h2>GDPR Compliance</h2>
+    <p>For users in the European Economic Area (EEA), we comply with GDPR requirements. Since we do not collect personal data, most GDPR obligations do not apply. However, we maintain this privacy policy to ensure transparency about our practices.</p>
+
+    <h2>CCPA Compliance</h2>
+    <p>For California residents, we comply with the California Consumer Privacy Act (CCPA). We do not:</p>
+    <ul>
+      <li>Collect personal information</li>
+      <li>Sell personal information</li>
+      <li>Share personal information for behavioral advertising</li>
+      <li>Retain personal information</li>
+    </ul>
+
+    <h2>Changes to This Privacy Policy</h2>
+    <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy in the app and updating the "Last Updated" date above.</p>
+
+    <h2>Contact Us</h2>
+    <div class="callout">
+      <h3>2nd Ventures, LLC</h3>
+      <p>Email: <a href="mailto:support@2ndventures.ai">support@2ndventures.ai</a></p>
+    </div>
+  </div>
+</body>
+</html>`);
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
