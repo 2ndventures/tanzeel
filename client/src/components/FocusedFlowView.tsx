@@ -22,7 +22,7 @@ interface FocusedFlowViewProps {
   isLoadingVerses: boolean;
   versesError: string | null;
   chapterId: number;
-  currentVerse: number;
+  currentVerse: number | null;
   currentWordIndex: number | null;
   isPlaying: boolean;
   showTranslation: boolean;
@@ -289,8 +289,8 @@ export default function FocusedFlowView({
         className="vertical-verse-scroll flex flex-col overflow-y-auto overflow-x-hidden h-full"
       >
         {pages.map((page, globalIdx) => {
-          const distance = Math.abs(page.verseNumber - currentVerse);
-          const isCurrentVerse = distance === 0;
+          const distance = currentVerse !== null ? Math.abs(page.verseNumber - currentVerse) : Infinity;
+          const isCurrentVerse = currentVerse !== null && distance === 0;
 
           let scaleOpacityClass = 'opacity-100 scale-100';
           if (distance === 1) {

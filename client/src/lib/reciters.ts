@@ -113,9 +113,9 @@ export const DEFAULT_RECITER = "alafasy";
 
 export const RECITER_TO_QURAN_COM_ID: Record<string, number> = {
   'alafasy': 7,
-  'abdul_basit': 1,
-  'abdul_basit_mujawwad': 2,
-  'sudais': 12,
+  'abdul_basit': 2,          // Quran.com ID 2 → qdc/abdul_baset/murattal
+  'abdul_basit_mujawwad': 1, // Quran.com ID 1 → qdc/abdul_baset/mujawwad
+  'sudais': 11,              // Quran.com ID 11 → qdc/abdurrahmaan_as_sudais/murattal
   'ash_shaatree': 5,
   'hudhaify': 3,
   'hani_rifai': 9,

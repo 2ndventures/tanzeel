@@ -422,10 +422,12 @@ export default function ChapterView({
     });
   }, [initialVerse, isLoadingVerses, verses, chapterId, seekToVerse, playAudio]);
 
-  // Extract current verse number from verse key
+  // Extract current verse number from verse key.
+  // Returns null when no audio is loaded or the active chapter is different,
+  // so no verse card appears falsely highlighted.
   const currentVerse = currentVerseKey && currentVerseKey.startsWith(`${chapterId}:`)
     ? parseInt(currentVerseKey.split(':')[1])
-    : 1;
+    : null;
 
   useEffect(() => {
     const handleUserScroll = () => {
@@ -580,7 +582,7 @@ export default function ChapterView({
     >
       {/* Screen reader announcements for verse changes */}
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {currentVerseKey && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
+        {currentVerse !== null && `Now ${isPlaying ? 'playing' : 'at'} verse ${currentVerse} of ${verses.length}`}
       </div>
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
       <div

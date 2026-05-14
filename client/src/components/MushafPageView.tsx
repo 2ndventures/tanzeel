@@ -19,7 +19,7 @@ interface MushafPageViewProps {
   isLoadingVerses: boolean;
   versesError: string | null;
   chapterId: number;
-  currentVerse: number;
+  currentVerse: number | null;
   currentWordIndex: number | null;
   isPlaying: boolean;
   showTranslation: boolean;
@@ -133,7 +133,7 @@ export default function MushafPageView({
 
   // ── Auto page-flip during playback ──
   useEffect(() => {
-    if (!emblaApi || !isPlaying || pages.length === 0) return;
+    if (!emblaApi || !isPlaying || pages.length === 0 || currentVerse === null) return;
     const targetPage = getPageIndexForVerse(pages, currentVerse);
     if (targetPage !== currentPageIndex) {
       emblaApi.scrollTo(targetPage);

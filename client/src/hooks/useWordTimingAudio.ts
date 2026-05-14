@@ -1520,14 +1520,33 @@ export function useWordTimingAudio(
       setState(prev => prev.timingError ? { ...prev, timingError: false } : prev);
 
       // If timing data has a different URL than what we predicted, swap to it.
+      // Preserve the current playback position so the swap is seamless.
       if (audio.src !== audioFile.audio_url) {
         const wasPlaying = !audio.paused;
+        const savedPosition = audio.currentTime;
         beginSrcSwap();
         audio.src = audioFile.audio_url;
         audio.playbackRate = speedRef.current;
         audio.load();
-        if (wasPlaying) {
-          playWhenReady(audio, () => {});
+        const seekAndResume = () => {
+          if (savedPosition > 0 && isFinite(savedPosition)) {
+            const dur = audio.duration;
+            const target = isFinite(dur) && dur > 0
+              ? Math.min(savedPosition, dur - 0.1)
+              : savedPosition;
+            try { audio.currentTime = Math.max(0, target); } catch {}
+          }
+          if (wasPlaying) {
+            playWhenReady(audio, () => {
+              clearSrcFlag();
+              setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+            });
+          }
+        };
+        if (audio.readyState >= 1 /* HAVE_METADATA */) {
+          seekAndResume();
+        } else {
+          audio.addEventListener('loadedmetadata', seekAndResume, { once: true });
         }
       }
     } catch (err) {
