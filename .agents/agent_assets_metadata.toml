@@ -42,3 +42,33 @@ id = "51cDEjzt8vBFRKGPKISoS"
 uri = "file://TERMS_OF_SERVICE.txt"
 type = "text"
 title = "Terms of Service"
+
+[[outputs]]
+id = "1cvHwEJ-FQq850rYyxPuX"
+uri = "file://screenshots/home.jpg"
+type = "image"
+title = "Home — Dashboard"
+
+[[outputs]]
+id = "PZLpUtYTYsa2NYOcYlhRh"
+uri = "file://screenshots/surah-list.jpg"
+type = "image"
+title = "Surahs — Chapter List"
+
+[[outputs]]
+id = "FWIeHs_wVKF7RDkvGpdpF"
+uri = "file://screenshots/chapter-view.jpg"
+type = "image"
+title = "Chapter View — Reading + Audio Player"
+
+[[outputs]]
+id = "A-K3zS-xd3OGYgBIVqwxy"
+uri = "file://screenshots/bookmarks.jpg"
+type = "image"
+title = "Bookmarks"
+
+[[outputs]]
+id = "gdC8zJr7cDLc-uCrG6e__"
+uri = "file://screenshots/settings.jpg"
+type = "image"
+title = "Settings"
