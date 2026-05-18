@@ -586,13 +586,13 @@ export default function ChapterView({
       </div>
       {/* Opaque safe-area cover so content never bleeds into the Dynamic Island / status bar */}
       <div
-        className={`fixed top-0 left-0 right-0 z-[51] pointer-events-none transition-opacity duration-300 ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
+        className={`fixed top-0 left-0 right-0 z-[51] pointer-events-none transition-opacity duration-300 app-fixed-x ${shouldAutoHideHeader && !headerVisible ? 'opacity-0' : 'opacity-100'}`}
         style={{ height: 'env(safe-area-inset-top, 0px)', backgroundColor: 'var(--header-gradient-start)' }}
       />
 
       {/* Header */}
       <div
-        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-50 header-safe-padding transition-all duration-300 app-fixed-x ${
           shouldAutoHideHeader
             ? (headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none')
             : ''
@@ -1133,8 +1133,8 @@ export default function ChapterView({
         <div
           className={`fixed z-[60] top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-3 rounded-xl bg-foreground/80 dark:bg-white/80 text-background dark:text-black shadow-lg backdrop-blur-sm transition-all duration-300 ${
             swipeIndicator.direction === 'left'
-              ? 'right-4 animate-in slide-in-from-right-4'
-              : 'left-4 animate-in slide-in-from-left-4'
+              ? 'app-right-4 animate-in slide-in-from-right-4'
+              : 'app-left-4 animate-in slide-in-from-left-4'
           }`}
           data-testid={`swipe-indicator-${swipeIndicator.direction}`}
         >

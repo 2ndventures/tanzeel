@@ -78,7 +78,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
 
   return (
     <div
-      className={`fixed left-0 right-0 z-50 transition-all duration-300 ease-out ${
+      className={`fixed left-0 right-0 z-50 transition-all duration-300 ease-out app-fixed-x ${
         animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
       style={{ bottom: hasBottomNav ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 'env(safe-area-inset-bottom, 0px)' }}

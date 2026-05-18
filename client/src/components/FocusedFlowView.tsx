@@ -275,7 +275,7 @@ export default function FocusedFlowView({
       <button
         onClick={() => setTranslationVisible(v => !v)}
         style={{ top: 'calc(96px + env(safe-area-inset-top, 0px))' }}
-        className={`fixed right-6 z-30 size-12 rounded-full bg-muted/80 backdrop-blur-xl flex items-center justify-center shadow-lg ring-1 ring-border/50 transition-all duration-300 ${
+        className={`fixed app-right-6 z-30 size-12 rounded-full bg-muted/80 backdrop-blur-xl flex items-center justify-center shadow-lg ring-1 ring-border/50 transition-all duration-300 ${
           controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
         } ${translationVisible ? 'text-primary' : 'text-muted-foreground'}`}
         aria-label={translationVisible ? "Hide translation" : "Show translation"}

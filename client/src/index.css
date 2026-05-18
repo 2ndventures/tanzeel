@@ -309,15 +309,27 @@
   }
 
   #root {
+    --app-max-width: 430px;
+    --app-margin-x: max(0px, calc((100vw - var(--app-max-width)) / 2));
+    max-width: var(--app-max-width);
+    margin-left: auto;
+    margin-right: auto;
     height: 100%;
     width: 100%;
     overflow: hidden;
-    padding-left: constant(safe-area-inset-left);
-    padding-left: env(safe-area-inset-left);
-    padding-right: constant(safe-area-inset-right);
-    padding-right: env(safe-area-inset-right);
     box-sizing: border-box;
   }
+
+  /* Constrains viewport-fixed elements to the app's max-width column */
+  .app-fixed-x {
+    left: var(--app-margin-x) !important;
+    right: var(--app-margin-x) !important;
+  }
+  /* Right-anchored within the app column (replaces right-4 / right-6) */
+  .app-right-4 { right: calc(var(--app-margin-x) + 1rem) !important; }
+  .app-right-6 { right: calc(var(--app-margin-x) + 1.5rem) !important; }
+  /* Left-anchored within the app column */
+  .app-left-4 { left: calc(var(--app-margin-x) + 1rem) !important; }
 
   /* IndoPak / Nastaliq: enable OpenType layout features for proper ligatures */
   .font-indopak {

@@ -42,7 +42,7 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   if (keyboardVisible) return null;
 
   return (
-    <nav role="navigation" aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-40 shrink-0 border-t border-border bg-card/80 backdrop-blur-xl shadow-2xl safe-area-bottom">
+    <nav role="navigation" aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-40 shrink-0 border-t border-border bg-card/80 backdrop-blur-xl shadow-2xl safe-area-bottom app-fixed-x">
       <div className="flex items-center justify-around px-4 pt-3 pb-1">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;

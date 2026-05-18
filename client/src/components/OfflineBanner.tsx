@@ -7,7 +7,7 @@ export default function OfflineBanner() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium shadow-md backdrop-blur-xl bg-amber-500/95 text-amber-950 dark:bg-amber-600/95 dark:text-amber-50"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-2 px-4 py-2 text-xs font-medium shadow-md backdrop-blur-xl bg-amber-500/95 text-amber-950 dark:bg-amber-600/95 dark:text-amber-50 app-fixed-x"
       style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
       role="status"
       aria-live="polite"

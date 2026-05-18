@@ -295,7 +295,7 @@ export default function AudioPlayer({
   const remaining = Math.max(0, duration - safeCurrentTime);
 
   return (
-    <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 ${
+    <div className={`fixed inset-x-0 bottom-0 z-20 transition-all duration-300 app-fixed-x ${
       !isVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
     }`} data-testid="audio-player-wrapper" data-no-swipe="true" style={{ willChange: 'transform' }}>
       <div className="relative" data-testid="audio-player-content">
