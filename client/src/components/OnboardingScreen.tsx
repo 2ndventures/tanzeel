@@ -80,8 +80,8 @@ export default function OnboardingScreen({
   const exampleVerse = exampleVerses.length > 0 ? exampleVerses[0] : null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-background bg-screen-gradient">
-      <div className="absolute inset-y-0 flex flex-col items-center justify-center overflow-y-auto app-fixed-x safe-area-pad">
+    <div className="absolute inset-0 z-50 bg-background bg-screen-gradient">
+      <div className="absolute inset-0 flex flex-col items-center justify-center overflow-y-auto safe-area-pad">
         <div className="w-full px-8 py-6">
         {step === 0 && (
           <div className="text-center space-y-8 animate-fade-in">

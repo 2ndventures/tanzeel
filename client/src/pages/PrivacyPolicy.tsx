@@ -8,7 +8,7 @@ interface PrivacyPolicyProps {
 export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-background via-background/95 to-background">
-      <div className="fixed inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.10)] via-background/50 to-background/90 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.10)] via-background/50 to-background/90 pointer-events-none" />
 
       <div className="relative bg-card/90 backdrop-blur-xl border-b border-border header-safe-padding shrink-0 z-10">
         <div className="px-8 pt-4 pb-6">

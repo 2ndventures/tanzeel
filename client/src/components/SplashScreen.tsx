@@ -19,7 +19,7 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}
+      className={`absolute inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"}`}
       style={{ background: 'linear-gradient(to bottom, hsl(224, 28%, 16%), hsl(217, 44%, 11%))' }}
       role="img"
       aria-label="Tanzeel"

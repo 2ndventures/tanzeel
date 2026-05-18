@@ -294,13 +294,14 @@
 
   html,
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply font-sans antialiased text-foreground;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
     margin: 0;
     padding: 0;
     overscroll-behavior: none;
+    background-color: #000;
   }
 
   body {
@@ -311,6 +312,7 @@
   #root {
     --app-max-width: 430px;
     --app-margin-x: max(0px, calc((100vw - var(--app-max-width)) / 2));
+    @apply bg-background;
     max-width: var(--app-max-width);
     margin-left: auto;
     margin-right: auto;
@@ -318,6 +320,7 @@
     width: 100%;
     overflow: hidden;
     box-sizing: border-box;
+    position: relative;
   }
 
   /* Constrains viewport-fixed elements to the app's max-width column */
