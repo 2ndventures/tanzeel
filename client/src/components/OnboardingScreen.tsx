@@ -80,23 +80,24 @@ export default function OnboardingScreen({
   const exampleVerse = exampleVerses.length > 0 ? exampleVerses[0] : null;
 
   return (
-    <div className="absolute inset-0 z-50 bg-background bg-screen-gradient">
-      <div className="absolute inset-0 flex flex-col items-center justify-center overflow-y-auto safe-area-pad">
-        <div className="w-full px-8 py-6">
-        {step === 0 && (
-          <div className="text-center space-y-8 animate-fade-in">
+    <div className="absolute inset-0 z-50 bg-background bg-screen-gradient flex flex-col safe-area-pad">
+
+      {/* ── Step 0: Welcome ── scrollable, button inside scroll area ── */}
+      {step === 0 && (
+        <div className="flex-1 overflow-y-auto">
+          <div className="w-full px-8 py-8 flex flex-col items-center space-y-8 animate-fade-in">
             {/* Logo/Icon */}
             <div className="flex justify-center">
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[hsl(var(--glow-primary)/0.20)] to-[hsl(var(--glow-accent)/0.15)] flex items-center justify-center backdrop-blur-xl border border-border/50">
-                <Icon 
-                  icon="mdi:book-open-page-variant" 
+                <Icon
+                  icon="mdi:book-open-page-variant"
                   className="w-12 h-12 text-primary"
                 />
               </div>
             </div>
 
             {/* Welcome Text */}
-            <div className="space-y-4">
+            <div className="space-y-4 text-center">
               <h1 className="font-heading text-5xl font-black tracking-tighter text-foreground">
                 Tanzeel
               </h1>
@@ -106,7 +107,7 @@ export default function OnboardingScreen({
             </div>
 
             {/* Features List */}
-            <div className="space-y-3 text-left max-w-sm mx-auto">
+            <div className="space-y-3 text-left w-full max-w-sm">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-[hsl(var(--glow-primary)/0.12)] flex items-center justify-center flex-shrink-0">
                   <Icon icon="mdi:text" className="w-4 h-4 text-primary" />
@@ -127,7 +128,7 @@ export default function OnboardingScreen({
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-3 bg-card/60 backdrop-blur-sm rounded-2xl px-5 py-4 border border-border/30">
+            <div className="flex items-center justify-between gap-3 bg-card/60 backdrop-blur-sm rounded-2xl px-5 py-4 border border-border/30 w-full">
               <div>
                 <p className="text-sm font-medium text-foreground">Appearance</p>
                 <p className="text-xs text-muted-foreground">{darkMode ? "Dark mode" : "Light mode"}</p>
@@ -135,194 +136,186 @@ export default function OnboardingScreen({
               <ThemeToggle isDark={darkMode} onToggle={onDarkModeChange} />
             </div>
 
-            <div className="pt-4">
-              <Button
-                size="lg"
-                className="w-full"
-                onClick={() => setStep(1)}
-                data-testid="button-onboarding-continue"
-              >
-                Get Started
-              </Button>
-            </div>
+            <Button
+              size="lg"
+              className="w-full"
+              onClick={() => setStep(1)}
+              data-testid="button-onboarding-continue"
+            >
+              Get Started
+            </Button>
           </div>
-        )}
+        </div>
+      )}
 
-        {step === 1 && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Header */}
-            <div className="text-center space-y-2">
-              <h2 className="font-heading text-3xl font-bold text-foreground">
-                Customize Your Reading
-              </h2>
-              <p className="text-muted-foreground">
-                Adjust text sizes for comfortable reading
-              </p>
-            </div>
+      {/* ── Step 1: Customize – scrollable content + pinned footer ── */}
+      {step === 1 && (
+        <>
+          {/* Scrollable area */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="w-full px-8 pt-8 pb-4 space-y-6 animate-fade-in">
+              {/* Header */}
+              <div className="text-center space-y-2">
+                <h2 className="font-heading text-3xl font-bold text-foreground">
+                  Customize Your Reading
+                </h2>
+                <p className="text-muted-foreground">
+                  Adjust text sizes for comfortable reading
+                </p>
+              </div>
 
-            {/* Example Verse Preview */}
-            {exampleVerse && (
-              <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
-                {/* Gradient border */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
-                
-                {/* Inner glass panel */}
-                <div className="relative rounded-3xl backdrop-blur-xl bg-card/95 p-6 space-y-4">
-                  {/* Arabic Text */}
-                  <p
-                    className={`${getArabicFontSize(arabicFontSize)} font-arabic text-right text-foreground transition-all duration-300`}
-                    dir="rtl"
-                  >
-                    {exampleVerse.arabicText}
-                  </p>
-
-                  {transliterationFontSize !== "Off" && (
-                    <p className={`${getTransliterationFontSize(transliterationFontSize)} italic text-muted-foreground transition-all duration-300`}>
-                      {exampleVerse.transliteration}
+              {/* Example Verse Preview */}
+              {exampleVerse && (
+                <div className="relative overflow-hidden rounded-3xl p-[1px] shadow-lg">
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-border to-transparent" />
+                  <div className="relative rounded-3xl backdrop-blur-xl bg-card/95 p-6 space-y-4">
+                    <p
+                      className={`${getArabicFontSize(arabicFontSize)} font-arabic text-right text-foreground transition-all duration-300`}
+                      dir="rtl"
+                    >
+                      {exampleVerse.arabicText}
                     </p>
-                  )}
+                    {transliterationFontSize !== "Off" && (
+                      <p className={`${getTransliterationFontSize(transliterationFontSize)} italic text-muted-foreground transition-all duration-300`}>
+                        {exampleVerse.transliteration}
+                      </p>
+                    )}
+                    {translationFontSize !== "Off" && (
+                      <p className={`${getTranslationFontSize(translationFontSize)} text-foreground/90 transition-all duration-300`}>
+                        {exampleVerse.translation}
+                      </p>
+                    )}
+                    <div className="pt-2 border-t border-border/50">
+                      <p className="text-xs text-muted-foreground">
+                        {exampleChapter?.englishName || "Al-Fatiha"} (Chapter {exampleChapter?.id || 1}, Verse 1)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                  {translationFontSize !== "Off" && (
-                    <p className={`${getTranslationFontSize(translationFontSize)} text-foreground/90 transition-all duration-300`}>
-                      {exampleVerse.translation}
-                    </p>
-                  )}
+              {/* Font Size Controls */}
+              <div className="space-y-5">
+                {/* Arabic Font Size */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">Arabic Text Size</label>
+                    <span className="text-xs text-muted-foreground">{arabicFontSize}</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => onArabicFontSizeChange(opt.value)}
+                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                          arabicFontSize === opt.value
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted text-muted-foreground hover-elevate'
+                        }`}
+                        data-testid={`button-arabic-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-                  {/* Chapter Info */}
-                  <div className="pt-2 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground">
-                      {exampleChapter?.englishName || "Al-Fatiha"} (Chapter {exampleChapter?.id || 1}, Verse 1)
-                    </p>
+                {/* Translation */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">Translation</label>
+                    <span className="text-xs text-muted-foreground">{translationFontSize}</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button
+                      onClick={() => onTranslationFontSizeChange("Off")}
+                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                        translationFontSize === "Off"
+                          ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
+                          : 'bg-muted text-muted-foreground hover-elevate'
+                      }`}
+                      data-testid="button-translation-size-off"
+                    >
+                      Off
+                    </button>
+                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => onTranslationFontSizeChange(opt.value)}
+                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                          translationFontSize === opt.value
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted text-muted-foreground hover-elevate'
+                        }`}
+                        data-testid={`button-translation-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Transliteration */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground">Transliteration</label>
+                    <span className="text-xs text-muted-foreground">{transliterationFontSize}</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <button
+                      onClick={() => onTransliterationFontSizeChange("Off")}
+                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                        transliterationFontSize === "Off"
+                          ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
+                          : 'bg-muted text-muted-foreground hover-elevate'
+                      }`}
+                      data-testid="button-transliteration-size-off"
+                    >
+                      Off
+                    </button>
+                    {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => onTransliterationFontSizeChange(opt.value)}
+                        className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
+                          transliterationFontSize === opt.value
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted text-muted-foreground hover-elevate'
+                        }`}
+                        data-testid={`button-transliteration-size-${opt.value.toLowerCase().replace(' ', '-')}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
-            )}
-
-            {/* Font Size Controls */}
-            <div className="space-y-5">
-              {/* Arabic Font Size */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">Arabic Text Size</label>
-                  <span className="text-xs text-muted-foreground">{arabicFontSize}</span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }, { label: "XL", value: "Extra Large" }].map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => onArabicFontSizeChange(opt.value)}
-                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                        arabicFontSize === opt.value
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-muted text-muted-foreground hover-elevate'
-                      }`}
-                      data-testid={`button-arabic-size-${opt.value.toLowerCase().replace(' ', '-')}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Translation */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">Translation</label>
-                  <span className="text-xs text-muted-foreground">
-                    {translationFontSize}
-                  </span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  <button
-                    onClick={() => onTranslationFontSizeChange("Off")}
-                    className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                      translationFontSize === "Off"
-                        ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
-                        : 'bg-muted text-muted-foreground hover-elevate'
-                    }`}
-                    data-testid="button-translation-size-off"
-                  >
-                    Off
-                  </button>
-                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => onTranslationFontSizeChange(opt.value)}
-                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                        translationFontSize === opt.value
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-muted text-muted-foreground hover-elevate'
-                      }`}
-                      data-testid={`button-translation-size-${opt.value.toLowerCase().replace(' ', '-')}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Transliteration */}
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-sm font-medium text-foreground">Transliteration</label>
-                  <span className="text-xs text-muted-foreground">
-                    {transliterationFontSize}
-                  </span>
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  <button
-                    onClick={() => onTransliterationFontSizeChange("Off")}
-                    className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                      transliterationFontSize === "Off"
-                        ? 'bg-muted/60 ring-1 ring-inset ring-border text-foreground'
-                        : 'bg-muted text-muted-foreground hover-elevate'
-                    }`}
-                    data-testid="button-transliteration-size-off"
-                  >
-                    Off
-                  </button>
-                  {[{ label: "S", value: "Small" }, { label: "M", value: "Medium" }, { label: "L", value: "Large" }].map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => onTransliterationFontSizeChange(opt.value)}
-                      className={`py-3.5 rounded-xl text-sm font-semibold transition-all active:scale-95 ${
-                        transliterationFontSize === opt.value
-                          ? 'bg-primary text-primary-foreground shadow-sm'
-                          : 'bg-muted text-muted-foreground hover-elevate'
-                      }`}
-                      data-testid={`button-transliteration-size-${opt.value.toLowerCase().replace(' ', '-')}`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => setStep(0)}
-                data-testid="button-onboarding-back"
-                className="flex-1"
-              >
-                Back
-              </Button>
-              <Button
-                size="lg"
-                onClick={onComplete}
-                data-testid="button-onboarding-complete"
-                className="flex-1"
-              >
-                Start Reading
-              </Button>
             </div>
           </div>
-        )}
-      </div>
-      </div>
+
+          {/* Pinned footer – always visible, never scrolls away */}
+          <div className="shrink-0 flex gap-3 px-8 pt-3 pb-6">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setStep(0)}
+              data-testid="button-onboarding-back"
+              className="flex-1"
+            >
+              Back
+            </Button>
+            <Button
+              size="lg"
+              onClick={onComplete}
+              data-testid="button-onboarding-complete"
+              className="flex-1"
+            >
+              Start Reading
+            </Button>
+          </div>
+        </>
+      )}
+
     </div>
   );
 }
