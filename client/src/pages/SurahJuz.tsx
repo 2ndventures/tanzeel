@@ -255,6 +255,12 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onBlur={handleSearchBlur}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      searchInputRef.current?.blur();
+                    }
+                  }}
                   aria-label="Search surahs, topics, or keywords"
                   data-testid="input-search"
                 />
@@ -353,14 +359,14 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                             <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
                           </div>
                           <p className="text-xs text-muted-foreground mt-0.5 truncate" data-testid={`search-result-topic-${result.chapterId}-${result.verseNumber}`}>
-                            {result.topic}
+                            {highlightMatch(result.topic, searchQuery.trim())}
                           </p>
                           {translationCache[`${result.chapterId}:${result.verseNumber}`] && (
                             <p
                               className="text-xs text-muted-foreground/70 mt-1.5 line-clamp-3 leading-relaxed"
                               data-testid={`search-result-preview-${result.chapterId}-${result.verseNumber}`}
                             >
-                              "{translationCache[`${result.chapterId}:${result.verseNumber}`]}"
+                              "{highlightMatch(translationCache[`${result.chapterId}:${result.verseNumber}`], searchQuery.trim())}"
                             </p>
                           )}
                         </div>
