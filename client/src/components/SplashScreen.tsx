@@ -56,8 +56,6 @@ export default function SplashScreen({ onFinish }: SplashScreenProps) {
         }}
       />
 
-      {/* Bottom pill */}
-      <div className="absolute bottom-10 w-32 h-1.5 rounded-full bg-[hsl(44,92%,53%)]/50" />
     </div>
   );
 }
