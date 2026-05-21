@@ -40,6 +40,8 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_openai_ai_integrations:2.0.0", "github:1.0.0"]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
 
 [postMerge]
 path = "scripts/post-merge.sh"
