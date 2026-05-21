@@ -1075,12 +1075,12 @@ span.end {
   font-size: 0.75em;
 }
 .active-word {
-  color: hsl(214 80% 22%);
+  color: hsl(var(--glow-primary));
   text-shadow:
-    0 0 2px hsl(var(--glow-primary) / 0.95),
-    0 0 5px hsl(var(--glow-primary) / 0.8),
-    0 0 10px hsl(var(--glow-primary) / 0.55),
-    0 0 18px hsl(var(--glow-primary) / 0.3);
+    0 0 2px hsl(224 28% 16% / 0.95),
+    0 0 5px hsl(224 28% 16% / 0.8),
+    0 0 10px hsl(224 28% 16% / 0.55),
+    0 0 18px hsl(224 28% 16% / 0.3);
 }
 .dark .active-word {
   color: hsl(var(--glow-primary));
