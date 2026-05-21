@@ -5,7 +5,7 @@ import ChapterCard from "@/components/ChapterCard";
 
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
-import { Search, BookOpen, ArrowRight, Loader, Lock } from "lucide-react";
+import { Search, BookOpen, ArrowRight, Loader, Lock, X } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useNetworkStatus } from "@/contexts/NetworkContext";
@@ -258,9 +258,24 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                   aria-label="Search surahs, topics, or keywords"
                   data-testid="input-search"
                 />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <Search className="w-5 h-5 text-muted-foreground" />
-                </div>
+                {searchQuery.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery("");
+                      searchInputRef.current?.focus();
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex size-8 items-center justify-center rounded-full bg-muted/60 hover:bg-muted active:opacity-70 transition-colors"
+                    aria-label="Clear search"
+                    data-testid="button-clear-search"
+                  >
+                    <X className="w-4 h-4 text-foreground" />
+                  </button>
+                ) : (
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <Search className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -355,8 +370,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                 })}
               </div>
 
-              {(filteredChapters.length > 0 || showVerseSearch) && (
-                <div className="flex items-center gap-2 mt-6 mb-2">
+              {filteredChapters.length > 0 && (
+                <div className="flex items-center gap-2 mt-4 mb-2">
                   <Search className="w-4 h-4 text-muted-foreground" />
                   <h2 className="text-sm font-semibold text-muted-foreground">Matching Surahs</h2>
                 </div>
