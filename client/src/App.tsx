@@ -70,16 +70,72 @@ function App() {
   }, [storageReady, splashAnimDone]);
 
   useEffect(() => {
-    const handler = (e: PointerEvent) => {
+    const SELECTOR = 'button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="radio"]';
+    const MOVE_THRESHOLD = 8;
+    let pointerId: number | null = null;
+    let startX = 0;
+    let startY = 0;
+    let startTarget: Element | null = null;
+    let cancelled = false;
+
+    const reset = () => {
+      pointerId = null;
+      startTarget = null;
+      cancelled = false;
+    };
+
+    const onDown = (e: PointerEvent) => {
       const target = e.target as Element | null;
       if (!target) return;
-      const interactive = target.closest(
-        'button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="radio"]'
-      );
-      if (interactive) triggerHaptic('light');
+      const interactive = target.closest(SELECTOR);
+      if (!interactive) return;
+      pointerId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      startTarget = interactive;
+      cancelled = false;
     };
-    document.addEventListener('pointerdown', handler, { passive: true });
-    return () => document.removeEventListener('pointerdown', handler);
+
+    const onMove = (e: PointerEvent) => {
+      if (cancelled || pointerId === null || e.pointerId !== pointerId) return;
+      if (Math.hypot(e.clientX - startX, e.clientY - startY) > MOVE_THRESHOLD) {
+        cancelled = true;
+      }
+    };
+
+    const onUp = (e: PointerEvent) => {
+      if (pointerId === null || e.pointerId !== pointerId) return;
+      const fire =
+        !cancelled &&
+        startTarget &&
+        Math.hypot(e.clientX - startX, e.clientY - startY) <= MOVE_THRESHOLD &&
+        startTarget.contains(e.target as Node | null);
+      if (fire) triggerHaptic('light');
+      reset();
+    };
+
+    const onCancel = (e: PointerEvent) => {
+      if (pointerId === null || e.pointerId !== pointerId) return;
+      reset();
+    };
+
+    const onScroll = () => {
+      if (pointerId !== null) cancelled = true;
+    };
+
+    document.addEventListener('pointerdown', onDown, { passive: true });
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerup', onUp, { passive: true });
+    document.addEventListener('pointercancel', onCancel, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+      document.removeEventListener('pointercancel', onCancel);
+      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+    };
   }, []);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
