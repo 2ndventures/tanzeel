@@ -72,33 +72,17 @@ function App() {
   useEffect(() => {
     const SELECTOR = 'button, [role="button"], [role="tab"], [role="option"], [role="menuitem"], [role="radio"]';
     const MOVE_THRESHOLD = 8;
-    const FIRE_DELAY_MS = 60;
+    const SCROLL_CAPTURE: AddEventListenerOptions = { passive: true, capture: true };
     let pointerId: number | null = null;
     let startX = 0;
     let startY = 0;
     let startTarget: Element | null = null;
-    let pending: ReturnType<typeof setTimeout> | null = null;
-    let fired = false;
-
-    const fireNow = () => {
-      if (fired) return;
-      fired = true;
-      if (pending !== null) { clearTimeout(pending); pending = null; }
-      triggerHaptic('light');
-    };
-
-    const cancel = () => {
-      if (pending !== null) { clearTimeout(pending); pending = null; }
-      pointerId = null;
-      startTarget = null;
-      fired = false;
-    };
+    let cancelled = false;
 
     const reset = () => {
-      if (pending !== null) { clearTimeout(pending); pending = null; }
       pointerId = null;
       startTarget = null;
-      fired = false;
+      cancelled = false;
     };
 
     const onDown = (e: PointerEvent) => {
@@ -106,30 +90,25 @@ function App() {
       if (!target) return;
       const interactive = target.closest(SELECTOR);
       if (!interactive) return;
-      if (pending !== null) clearTimeout(pending);
       pointerId = e.pointerId;
       startX = e.clientX;
       startY = e.clientY;
       startTarget = interactive;
-      fired = false;
-      pending = setTimeout(fireNow, FIRE_DELAY_MS);
+      cancelled = false;
     };
 
     const onMove = (e: PointerEvent) => {
-      if (pointerId === null || e.pointerId !== pointerId) return;
-      if (fired) return;
+      if (cancelled || pointerId === null || e.pointerId !== pointerId) return;
       if (Math.hypot(e.clientX - startX, e.clientY - startY) > MOVE_THRESHOLD) {
-        cancel();
+        cancelled = true;
       }
     };
 
     const onUp = (e: PointerEvent) => {
       if (pointerId === null || e.pointerId !== pointerId) return;
-      if (!fired) {
-        const within = Math.hypot(e.clientX - startX, e.clientY - startY) <= MOVE_THRESHOLD;
-        const contained = startTarget?.contains(e.target as Node | null);
-        if (within && contained) fireNow();
-      }
+      const within = Math.hypot(e.clientX - startX, e.clientY - startY) <= MOVE_THRESHOLD;
+      const contained = !!startTarget?.contains(e.target as Node | null);
+      if (!cancelled && within && contained) triggerHaptic('light');
       reset();
     };
 
@@ -139,22 +118,21 @@ function App() {
     };
 
     const onScroll = () => {
-      if (pointerId !== null && !fired) cancel();
+      if (pointerId !== null) cancelled = true;
     };
 
     document.addEventListener('pointerdown', onDown, { passive: true });
     document.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('pointerup', onUp, { passive: true });
     document.addEventListener('pointercancel', onCancel, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    window.addEventListener('scroll', onScroll, SCROLL_CAPTURE);
 
     return () => {
-      if (pending !== null) clearTimeout(pending);
       document.removeEventListener('pointerdown', onDown);
       document.removeEventListener('pointermove', onMove);
       document.removeEventListener('pointerup', onUp);
       document.removeEventListener('pointercancel', onCancel);
-      window.removeEventListener('scroll', onScroll, { capture: true } as any);
+      window.removeEventListener('scroll', onScroll, SCROLL_CAPTURE);
     };
   }, []);
 
