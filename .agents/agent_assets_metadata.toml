@@ -72,3 +72,9 @@ id = "gdC8zJr7cDLc-uCrG6e__"
 uri = "file://screenshots/settings.jpg"
 type = "image"
 title = "Settings"
+
+[[outputs]]
+id = "JFeq1QVbRKpPPzcDi7K39"
+uri = "file://exports/tanzeel-search-logic.md"
+type = "text"
+title = "Tanzeel — Search Logic Export"
