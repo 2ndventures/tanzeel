@@ -84,3 +84,9 @@ id = "AzaIHp15LBzgM8GDmzwdc"
 uri = "file://exports/tanzeel-search-logic.docx"
 type = "word_document"
 title = "Tanzeel — Search Logic (Word)"
+
+[[outputs]]
+id = "_twAFaS38Iy8O3dQAIE63"
+uri = "file://exports/tanzeel-vs-quran-com-search.docx"
+type = "word_document"
+title = "Tanzeel vs Quran.com Search (Word)"
