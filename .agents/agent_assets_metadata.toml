@@ -78,3 +78,9 @@ id = "JFeq1QVbRKpPPzcDi7K39"
 uri = "file://exports/tanzeel-search-logic.md"
 type = "text"
 title = "Tanzeel — Search Logic Export"
+
+[[outputs]]
+id = "AzaIHp15LBzgM8GDmzwdc"
+uri = "file://exports/tanzeel-search-logic.docx"
+type = "word_document"
+title = "Tanzeel — Search Logic (Word)"
