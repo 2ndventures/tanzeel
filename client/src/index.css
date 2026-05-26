@@ -1076,14 +1076,15 @@ span.end {
 }
 .active-word {
   color: hsl(var(--glow-primary));
+  paint-order: stroke fill;
+  -webkit-text-stroke: 0.5px hsl(224 28% 16% / 0.9);
   text-shadow:
-    0 0 2px hsl(224 28% 16% / 0.95),
-    0 0 5px hsl(224 28% 16% / 0.8),
-    0 0 10px hsl(224 28% 16% / 0.55),
-    0 0 18px hsl(224 28% 16% / 0.3);
+    0 0 1px hsl(224 28% 16% / 0.95),
+    0 0 3px hsl(224 28% 16% / 0.6);
 }
 .dark .active-word {
   color: hsl(var(--glow-primary));
+  -webkit-text-stroke: 0;
   text-shadow: none;
 }
 .verse-end-ornament {
