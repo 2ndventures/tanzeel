@@ -34,23 +34,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/search", async (req, res) => {
-    try {
-      const q = (req.query.q as string || '').trim().toLowerCase();
-      if (q.length < 2) return res.json({ results: [] });
+    const q = (req.query.q as string || '').trim().slice(0, 200);
+    if (q.length < 2) return res.json({ results: [] });
 
+    type Hit = { chapterId: number; verseNumber: number; translation: string };
+
+    const localSearch = async (): Promise<Hit[]> => {
+      const lower = q.toLowerCase();
       const index = await getSearchIndex();
-      const results: Array<{ chapterId: number; verseNumber: number; translation: string }> = [];
-      const limit = 30;
-
+      const hits: Hit[] = [];
+      const limit = 50;
       for (const entry of index) {
-        if (entry.translation.toLowerCase().includes(q)) {
-          results.push(entry);
-          if (results.length >= limit) break;
+        if (entry.translation.toLowerCase().includes(lower)) {
+          hits.push(entry);
+          if (hits.length >= limit) break;
         }
       }
+      return hits;
+    };
 
+    const stripHtml = (s: string) => s.replace(/<[^>]+>/g, '');
+
+    const remoteSearch = async (): Promise<Hit[]> => {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 4000);
+      try {
+        const translations = '20,85,19,22,17,95,84,131,203,167';
+        const url = `https://api.quran.com/api/v4/search?q=${encodeURIComponent(q)}&size=50&language=en&translations=${translations}`;
+        const r = await fetch(url, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json', 'User-Agent': 'tanzeel-app/1.0' },
+        });
+        if (!r.ok) throw new Error(`quran.com ${r.status}`);
+        const data: any = await r.json();
+        const raw: any[] = data?.search?.results || [];
+        const seen = new Set<string>();
+        const hits: Hit[] = [];
+        for (const item of raw) {
+          const key: string | undefined = item?.verse_key;
+          if (!key) continue;
+          const [cStr, vStr] = key.split(':');
+          const chapterId = Number(cStr);
+          const verseNumber = Number(vStr);
+          if (!chapterId || !verseNumber) continue;
+          const dedupeKey = `${chapterId}:${verseNumber}`;
+          if (seen.has(dedupeKey)) continue;
+          seen.add(dedupeKey);
+          const tr = Array.isArray(item.translations) && item.translations.length
+            ? stripHtml(String(item.translations[0].text || ''))
+            : stripHtml(String(item.text || ''));
+          hits.push({ chapterId, verseNumber, translation: tr });
+        }
+        return hits;
+      } finally {
+        clearTimeout(timer);
+      }
+    };
+
+    try {
+      const [remoteRes, localRes] = await Promise.allSettled([remoteSearch(), localSearch()]);
+      const remote = remoteRes.status === 'fulfilled' ? remoteRes.value : [];
+      const local = localRes.status === 'fulfilled' ? localRes.value : [];
+      if (remoteRes.status === 'rejected') {
+        console.warn('quran.com search failed:', (remoteRes.reason as Error)?.message);
+      }
+      const seen = new Set<string>();
+      const merged: Hit[] = [];
+      for (const hit of [...remote, ...local]) {
+        const k = `${hit.chapterId}:${hit.verseNumber}`;
+        if (seen.has(k)) continue;
+        seen.add(k);
+        merged.push(hit);
+      }
+      const source =
+        remote.length > 0 && local.length > 0 ? 'merged' :
+        remote.length > 0 ? 'remote' :
+        local.length > 0 ? 'local' : 'none';
       res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.json({ results });
+      res.setHeader('X-Search-Source', source);
+      res.json({ results: merged });
     } catch (error) {
       console.error('Search error:', error);
       res.status(500).json({ error: 'Search failed' });
