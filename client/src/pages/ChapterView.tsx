@@ -961,7 +961,7 @@ export default function ChapterView({
                       return (
                         <div
                           key={r.id}
-                          className="flex items-center gap-2 rounded-md"
+                          className="flex items-center gap-3 rounded-md"
                           data-testid={`reciter-option-${r.id}`}
                         >
                           <button
@@ -972,12 +972,12 @@ export default function ChapterView({
                             className="flex-1 flex items-center gap-2 p-4 hover-elevate active-elevate-2 rounded-md min-w-0"
                             data-testid={`reciter-select-${r.id}`}
                           >
-                            <div className="flex flex-col items-start min-w-0 flex-1">
-                              <span className="text-base text-foreground/90 flex items-center gap-2 flex-wrap">
-                                <span className="truncate">{r.name}{r.style ? ` (${r.style})` : ''}</span>
+                            <div className="flex flex-col items-start min-w-0 flex-1 w-full">
+                              <span className="w-full text-base text-foreground/90 flex items-center gap-2 min-w-0">
+                                <span className="truncate min-w-0 flex-1">{r.name}{r.style ? ` (${r.style})` : ''}</span>
                                 {isSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
                               </span>
-                              <span className="text-sm text-muted-foreground">{r.arabicName}</span>
+                              <span className="w-full text-sm text-muted-foreground truncate">{r.arabicName}</span>
                             </div>
                           </button>
 
