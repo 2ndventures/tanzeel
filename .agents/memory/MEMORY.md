@@ -1,1 +1,2 @@
 - [Two audioCache modules](audio-cache-modules.md) — lib/ (in-memory word timing) and services/ (filesystem MP3) are both live, not duplicates.
+- [Offline search corpus](search-corpus.md) — search-corpus.json is a checked-in generated artifact (not built by vite); re-run the generator when translations change.

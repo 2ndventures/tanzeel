@@ -7,6 +7,8 @@ import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
 import { searchTopicIndex } from "@/lib/topicIndex";
 import { Search, BookOpen, ArrowRight, Loader, Lock, X } from "lucide-react";
 import { lazyChapterService } from "@/services/lazyChapterService";
+import { searchVersesLocal, tokenize, stemWord } from "@/services/searchService";
+import { API_BASE_URL } from "@/config";
 import PullToRefresh from "@/components/PullToRefresh";
 import { useNetworkStatus } from "@/contexts/NetworkContext";
 import { isFullChapterDownloaded } from "@/services/audioCache";
@@ -21,6 +23,7 @@ interface VerseSearchResult {
   chapterId: number;
   verseNumber: number;
   translation: string;
+  translationName?: string;
 }
 
 interface SurahJuzProps {
@@ -135,26 +138,52 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
     verseSearchRef.current = setTimeout(() => {
       const controller = new AbortController();
       searchAbortRef.current = controller;
-      fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: controller.signal })
-        .then(r => {
-          if (!r.ok) throw new Error('Search failed');
-          return r.json();
-        })
-        .then(data => {
-          if (!controller.signal.aborted) {
-            setVerseSearchResults(data.results || []);
-            setIsSearchingVerses(false);
+      (async () => {
+        try {
+          // Primary: fully on-device search across all bundled translations
+          // with stemming. Works offline.
+          const local = await searchVersesLocal(q);
+          if (controller.signal.aborted) return;
+          setVerseSearchResults(local);
+          setIsSearchingVerses(false);
+
+          // Online bonus: merge in remote Quran.com results for extra recall.
+          if (connected) {
+            try {
+              const r = await fetch(
+                `${API_BASE_URL}/api/search?q=${encodeURIComponent(q)}`,
+                { signal: controller.signal },
+              );
+              if (r.ok) {
+                const data = await r.json();
+                if (!controller.signal.aborted && Array.isArray(data.results)) {
+                  setVerseSearchResults((prev) => {
+                    const seen = new Set(prev.map((p) => `${p.chapterId}:${p.verseNumber}`));
+                    const merged = [...prev];
+                    for (const hit of data.results as VerseSearchResult[]) {
+                      const k = `${hit.chapterId}:${hit.verseNumber}`;
+                      if (seen.has(k)) continue;
+                      seen.add(k);
+                      merged.push(hit);
+                    }
+                    return merged;
+                  });
+                }
+              }
+            } catch {
+              // Offline or aborted — local results stand.
+            }
           }
-        })
-        .catch((err) => {
-          if (err.name !== 'AbortError') {
+        } catch (err) {
+          if (!controller.signal.aborted) {
             setVerseSearchResults([]);
             setIsSearchingVerses(false);
           }
-        });
+        }
+      })();
     }, 400);
     return () => { if (verseSearchRef.current) clearTimeout(verseSearchRef.current); };
-  }, [searchQuery]);
+  }, [searchQuery, connected]);
 
   useEffect(() => {
     if (topicResults.length === 0) return;
@@ -183,20 +212,40 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
   const showTopicResults = hasSearchQuery && topicResults.length > 0;
   const showVerseSearch = hasSearchQuery && verseSearchResults.length > 0;
 
-  function highlightMatch(text: string, query: string) {
-    const idx = text.toLowerCase().indexOf(query.toLowerCase());
-    if (idx === -1) return text;
+  function renderSnippet(text: string, idx: number, len: number) {
     const start = Math.max(0, idx - 60);
-    const end = Math.min(text.length, idx + query.length + 60);
-    const snippet = (start > 0 ? '...' : '') + text.slice(start, end) + (end < text.length ? '...' : '');
-    const snipIdx = snippet.toLowerCase().indexOf(query.toLowerCase());
+    const end = Math.min(text.length, idx + len + 60);
+    const pre = (start > 0 ? '...' : '') + text.slice(start, idx);
+    const mid = text.slice(idx, idx + len);
+    const post = text.slice(idx + len, end) + (end < text.length ? '...' : '');
     return (
       <span>
-        {snippet.slice(0, snipIdx)}
-        <span className="bg-primary/20 text-primary font-medium rounded-sm px-0.5">{snippet.slice(snipIdx, snipIdx + query.length)}</span>
-        {snippet.slice(snipIdx + query.length)}
+        {pre}
+        <span className="bg-primary/20 text-primary font-medium rounded-sm px-0.5">{mid}</span>
+        {post}
       </span>
     );
+  }
+
+  function highlightMatch(text: string, query: string) {
+    const q = query.trim();
+    if (!q) return text;
+    // 1) Exact substring of the full query.
+    const idx = text.toLowerCase().indexOf(q.toLowerCase());
+    if (idx !== -1) return renderSnippet(text, idx, q.length);
+    // 2) Stem-based word match (e.g. "mercy" highlights "merciful").
+    const queryStems = new Set(tokenize(q).map(stemWord));
+    if (queryStems.size > 0) {
+      const wordRe = /[A-Za-z']+/g;
+      let m: RegExpExecArray | null;
+      while ((m = wordRe.exec(text)) !== null) {
+        if (queryStems.has(stemWord(m[0]))) {
+          return renderSnippet(text, m.index, m[0].length);
+        }
+      }
+    }
+    // 3) Fallback: leading snippet, no highlight.
+    return <span>{text.length > 140 ? text.slice(0, 140) + '...' : text}</span>;
   }
 
   const handlePullRefresh = useCallback(async () => {
@@ -422,6 +471,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                           <p className="text-xs text-muted-foreground/70 mt-1.5 line-clamp-3 leading-relaxed">
                             {highlightMatch(result.translation, searchQuery.trim())}
                           </p>
+                          {result.translationName && (
+                            <span className="text-[10px] uppercase tracking-wide text-muted-foreground/50 mt-1 inline-block">
+                              {result.translationName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </button>
@@ -474,6 +528,11 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                           <p className="text-xs text-muted-foreground/70 mt-1.5 line-clamp-3 leading-relaxed">
                             {highlightMatch(result.translation, searchQuery.trim())}
                           </p>
+                          {result.translationName && (
+                            <span className="text-[10px] uppercase tracking-wide text-muted-foreground/50 mt-1 inline-block">
+                              {result.translationName}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </button>
