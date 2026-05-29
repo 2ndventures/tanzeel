@@ -176,12 +176,3 @@ export async function addReadingTime(seconds: number): Promise<void> {
   await saveReadingStats(stats);
   await updateDayStreak();
 }
-
-export function formatReadingTime(minutes: number): string {
-  if (minutes < 60) {
-    return `${Math.round(minutes)}m`;
-  }
-  const hours = Math.floor(minutes / 60);
-  const mins = Math.round(minutes % 60);
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-}

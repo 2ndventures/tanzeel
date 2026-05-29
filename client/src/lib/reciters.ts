@@ -100,14 +100,6 @@ export const isValidReciterId = (id: string): boolean => {
   return RECITERS.some(r => r.id === id);
 };
 
-// Get reciter display name
-export const getReciterDisplayName = (id: string): string => {
-  const reciter = getReciterById(id);
-  if (!reciter) return "Mishary Rashid Alafasy"; // Default
-  
-  return reciter.name;
-};
-
 // Default reciter
 export const DEFAULT_RECITER = "alafasy";
 

@@ -154,7 +154,3 @@ export async function removeItem(key: string): Promise<void> {
     }
   }
 }
-
-export function isReady(): boolean {
-  return initialized;
-}
