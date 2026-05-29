@@ -22,8 +22,11 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const OUT_DIR = join(ROOT, 'client', 'public', 'data');
-const OUT_FILE = join(OUT_DIR, 'search-corpus.json');
+// Keep both data dirs in sync, matching the existing data convention.
+const OUT_DIRS = [
+  join(ROOT, 'client', 'public', 'data'),
+  join(ROOT, 'public', 'data'),
+];
 const CHAPTERS_DIR = join(ROOT, 'client', 'public', 'data', 'chapters');
 
 const CHAPTER_COUNT = 114;
@@ -116,12 +119,15 @@ async function main() {
   verses.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
 
   const corpus = { names: TRANSLATION_NAMES, verses };
-  await mkdir(OUT_DIR, { recursive: true });
-  await writeFile(OUT_FILE, JSON.stringify(corpus));
-
-  const bytes = Buffer.byteLength(JSON.stringify(corpus));
+  const json = JSON.stringify(corpus);
+  const bytes = Buffer.byteLength(json);
   console.log(`\nWrote ${verses.length} verses x ${TRANSLATION_NAMES.length} translations`);
-  console.log(`  ${OUT_FILE}`);
+  for (const dir of OUT_DIRS) {
+    await mkdir(dir, { recursive: true });
+    const file = join(dir, 'search-corpus.json');
+    await writeFile(file, json);
+    console.log(`  ${file}`);
+  }
   console.log(`  ${(bytes / 1024 / 1024).toFixed(2)} MB`);
   if (missing) console.warn(`  ${missing} missing translation cells (left empty)`);
 }
