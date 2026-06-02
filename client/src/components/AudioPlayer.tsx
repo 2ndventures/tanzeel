@@ -118,7 +118,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
       </DrawerHeader>
       <div className="pb-8 relative z-10">
         <div
-          className="overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
+          className="overflow-hidden py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
           ref={emblaRef}
           role="group"
           aria-roledescription="carousel"
