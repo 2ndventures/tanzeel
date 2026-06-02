@@ -22,6 +22,7 @@ import OfflineBanner from "@/components/OfflineBanner";
 import { Toaster } from "@/components/ui/toaster";
 import { DEFAULT_RECITER, getLegacyReciterId, isValidReciterId, LEGACY_RECITER_MAP } from "@/lib/reciters";
 import type { LayoutMode } from "@/lib/quranMetadata";
+import type { ThemeMode } from "@/components/ui/theme-mode-selector";
 import { Capacitor, registerPlugin } from "@capacitor/core";
 import { initStorage, getItem, setItem, removeItem } from "@/lib/storage";
 import { initAudioCache } from "@/services/audioCache";
@@ -155,7 +156,11 @@ function App() {
   }, []);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [themeMode, setThemeMode] = useState<ThemeMode>('dark');
+  const [systemPrefersDark, setSystemPrefersDark] = useState(
+    () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+  const darkMode = themeMode === 'system' ? systemPrefersDark : themeMode === 'dark';
   
   const [arabicScript, setArabicScript] = useState<'uthmani' | 'indopak' | 'tajweed'>('uthmani');
   const [reciter, setReciter] = useState(DEFAULT_RECITER);
@@ -181,8 +186,18 @@ function App() {
       const completed = await getItem('onboardingCompleted');
       setShowOnboarding(!completed);
 
-      const savedDark = await getItem('darkMode');
-      if (savedDark !== null) setDarkMode(JSON.parse(savedDark));
+      const savedThemeMode = await getItem('themeMode');
+      if (savedThemeMode === 'light' || savedThemeMode === 'dark' || savedThemeMode === 'system') {
+        setThemeMode(savedThemeMode);
+      } else {
+        const savedDark = await getItem('darkMode');
+        if (savedDark !== null) {
+          const migratedMode: ThemeMode = JSON.parse(savedDark) ? 'dark' : 'light';
+          setThemeMode(migratedMode);
+          await setItem('themeMode', migratedMode);
+          await removeItem('darkMode');
+        }
+      }
 
       const savedTranslit = await getItem('transliteration');
       const savedTranslation = await getItem('showTranslation');
@@ -290,8 +305,19 @@ function App() {
       document.head.appendChild(meta);
     }
     meta.setAttribute('content', themeColor);
-    if (storageReady) setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode, storageReady]);
+  }, [darkMode]);
+
+  useEffect(() => {
+    if (storageReady) setItem('themeMode', themeMode);
+  }, [themeMode, storageReady]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => setSystemPrefersDark(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     if (!storageReady) return;
@@ -479,7 +505,8 @@ function App() {
             onAutoScrollChange={setAutoScroll}
             onRepeatChange={setRepeat}
             onAutoplayChange={setAutoplay}
-            onDarkModeChange={setDarkMode}
+            themeMode={themeMode}
+            onThemeModeChange={setThemeMode}
             onReciterChange={setReciter}
             arabicFontSize={arabicFontSize}
             translationFontSize={translationFontSize}
@@ -509,7 +536,8 @@ function App() {
             onNavigate={handleNavigate}
             onRegisterBackHandler={(handler) => { settingsBackHandlerRef.current = handler; }}
             darkMode={darkMode}
-            onDarkModeChange={setDarkMode}
+            themeMode={themeMode}
+            onThemeModeChange={setThemeMode}
             arabicScript={arabicScript}
             onArabicScriptChange={setArabicScript}
             reciter={reciter}
@@ -575,7 +603,7 @@ function App() {
         return null;
     }
   }, [handleNavigate, activeTab, reciter, audioCacheReady, selectedChapter, initialVerse,
-      transliteration, showTranslation, autoScroll, repeat, autoplay, darkMode,
+      transliteration, showTranslation, autoScroll, repeat, autoplay, darkMode, themeMode,
       arabicFontSize, translationFontSize, transliterationFontSize, lineSpacing,
       showVerseNumbers, arabicScript, layoutMode, translation, navigateTo]);
 
@@ -600,7 +628,8 @@ function App() {
               transliterationFontSize={transliterationFontSize}
               onTransliterationFontSizeChange={setTransliterationFontSize}
               darkMode={darkMode}
-              onDarkModeChange={setDarkMode}
+              themeMode={themeMode}
+              onThemeModeChange={setThemeMode}
             />
           )}
 

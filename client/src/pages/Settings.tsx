@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 import { ChevronRight, ChevronLeft, Check, CircleOff, Play, Pause, Loader2 } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeModeSelector, type ThemeMode } from "@/components/ui/theme-mode-selector";
 import { getManifest } from "@/services/audioCache";
 import { useAudio } from "@/contexts/AudioContext";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
@@ -39,7 +39,8 @@ interface SettingsProps {
   onNavigate?: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
   onRegisterBackHandler?: (handler: () => boolean) => void;
   darkMode: boolean;
-  onDarkModeChange: (value: boolean) => void;
+  themeMode: ThemeMode;
+  onThemeModeChange: (mode: ThemeMode) => void;
   arabicScript: 'uthmani' | 'indopak' | 'tajweed';
   onArabicScriptChange: (value: 'uthmani' | 'indopak' | 'tajweed') => void;
   reciter: string;
@@ -99,13 +100,12 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
   );
 }
 
-function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeToggle }: {
+function ToggleRow({ label, sublabel, checked, onCheckedChange, testId }: {
   label: string;
   sublabel?: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   testId: string;
-  isThemeToggle?: boolean;
 }) {
   return (
     <div className="flex items-center justify-between py-3">
@@ -113,11 +113,7 @@ function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeT
         <p className="text-sm text-foreground/80">{label}</p>
         {sublabel && <p className="text-xs text-muted-foreground mt-0.5">{sublabel}</p>}
       </div>
-      {isThemeToggle ? (
-        <ThemeToggle isDark={checked} onToggle={onCheckedChange} />
-      ) : (
-        <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} />
-      )}
+      <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} />
     </div>
   );
 }
@@ -127,7 +123,8 @@ export default function Settings({
   onNavigate,
   onRegisterBackHandler,
   darkMode,
-  onDarkModeChange,
+  themeMode,
+  onThemeModeChange,
   arabicScript,
   onArabicScriptChange,
   reciter,
@@ -459,7 +456,13 @@ export default function Settings({
               Display
             </h3>
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-              <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
+              <div className="flex items-center justify-between py-3">
+                <div className="flex-1 pr-4">
+                  <p className="text-sm text-foreground/80">Theme</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{themeMode === 'system' ? 'Auto' : darkMode ? 'Dark' : 'Light'}</p>
+                </div>
+                <ThemeModeSelector value={themeMode} onChange={onThemeModeChange} />
+              </div>
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <button
                 onClick={() => setScriptView(true)}

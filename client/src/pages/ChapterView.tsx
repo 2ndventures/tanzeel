@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import * as Sentry from '@sentry/capacitor';
 import { Icon } from "@iconify/react";
 import { ArrowLeft, Check, ChevronRight, ChevronLeft, ChevronDown, Play, Pause, Loader2, CircleOff } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeModeSelector, type ThemeMode } from "@/components/ui/theme-mode-selector";
 import VerseCard from "@/components/VerseCard";
 import AudioPlayer from "@/components/AudioPlayer";
 import FocusedFlowView from "@/components/FocusedFlowView";
@@ -32,10 +32,11 @@ interface ChapterViewProps {
   repeat: boolean;
   autoplay: boolean;
   darkMode: boolean;
+  themeMode: ThemeMode;
   onAutoScrollChange: (enabled: boolean) => void;
   onRepeatChange: (enabled: boolean) => void;
   onAutoplayChange: (enabled: boolean) => void;
-  onDarkModeChange: (enabled: boolean) => void;
+  onThemeModeChange: (mode: ThemeMode) => void;
   onReciterChange: (reciter: string) => void;
   arabicFontSize: string;
   translationFontSize: string;
@@ -65,10 +66,11 @@ export default function ChapterView({
   repeat,
   autoplay,
   darkMode,
+  themeMode,
   onAutoScrollChange,
   onRepeatChange,
   onAutoplayChange,
-  onDarkModeChange,
+  onThemeModeChange,
   onReciterChange,
   arabicFontSize,
   translationFontSize,
@@ -866,7 +868,7 @@ export default function ChapterView({
                       <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
                         <div className="flex items-center justify-between py-2.5" data-testid="menu-item-theme">
                           <span className="text-sm text-foreground/80">Theme</span>
-                          <ThemeToggle isDark={darkMode} onToggle={(v) => { onDarkModeChange(v); }} />
+                          <ThemeModeSelector value={themeMode} onChange={onThemeModeChange} />
                         </div>
                         <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
                         <div className="flex items-center justify-between py-2.5" data-testid="menu-item-verse-numbers">
