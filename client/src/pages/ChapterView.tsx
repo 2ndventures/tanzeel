@@ -14,7 +14,6 @@ import { useAudio } from "@/contexts/AudioContext";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
@@ -701,7 +700,7 @@ export default function ChapterView({
                   <Icon icon="solar:settings-linear" className="w-5 h-5 text-foreground/80 dark:text-white/90" aria-hidden="true" />
                 </button>
               </SheetTrigger>
-            <SheetContent side="bottom" className="h-[73vh] flex flex-col overflow-hidden bg-screen-gradient" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
+            <SheetContent side="bottom" className="max-h-[85vh] flex flex-col overflow-hidden bg-screen-gradient" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
               {menuView !== 'main' && (
                 <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
                   <ChevronLeft className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
@@ -717,9 +716,46 @@ export default function ChapterView({
               </SheetHeader>
 
 
-              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-16 relative z-10 px-4">
+              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-6 relative z-10 px-4">
                 {menuView === 'main' && (
                   <div className="space-y-4">
+                    {/* Appearance Section */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-appearance">
+                        Appearance
+                      </h3>
+                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
+                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-theme">
+                          <span className="text-sm text-foreground/80">Theme</span>
+                          <ThemeModeSelector value={themeMode} onChange={onThemeModeChange} />
+                        </div>
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <button
+                          onClick={() => setMenuView('script')}
+                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
+                          data-testid="menu-item-script"
+                        >
+                          <span className="text-sm text-foreground/80">Arabic Script</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">{{ uthmani: 'Uthmani', indopak: 'IndoPak', tajweed: 'Tajweed' }[arabicScript] || arabicScript}</span>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </button>
+                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                        <button
+                          onClick={() => setMenuView('spacing')}
+                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
+                          data-testid="menu-item-spacing"
+                        >
+                          <span className="text-sm text-foreground/80">Line Spacing</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">{lineSpacing}</span>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+
                     {/* Text Size Section */}
                     <div>
                       <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-text-size">
@@ -799,38 +835,6 @@ export default function ChapterView({
                       </div>
                     </div>
 
-                    {/* Appearance Section */}
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-appearance">
-                        Appearance
-                      </h3>
-                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-                        <button
-                          onClick={() => setMenuView('script')}
-                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
-                          data-testid="menu-item-script"
-                        >
-                          <span className="text-sm text-foreground/80">Arabic Script</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">{{ uthmani: 'Uthmani', indopak: 'IndoPak', tajweed: 'Tajweed' }[arabicScript] || arabicScript}</span>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                          </div>
-                        </button>
-                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <button
-                          onClick={() => setMenuView('spacing')}
-                          className="w-full flex items-center justify-between py-2.5 hover-elevate active-elevate-2 rounded-md"
-                          data-testid="menu-item-spacing"
-                        >
-                          <span className="text-sm text-foreground/80">Line Spacing</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">{lineSpacing}</span>
-                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-
                     {/* Audio Section */}
                     <div>
                       <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-audio">
@@ -848,37 +852,6 @@ export default function ChapterView({
                             <ChevronRight className="w-4 h-4 text-muted-foreground" />
                           </div>
                         </button>
-                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-autoplay">
-                          <span className="text-sm text-foreground/80">Autoplay next surah</span>
-                          <Switch 
-                            checked={autoplay} 
-                            onCheckedChange={(v) => { onAutoplayChange(v); }}
-                            data-testid="switch-autoplay"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Display Section */}
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground/70 uppercase tracking-wide mb-2" data-testid="section-display">
-                        Display
-                      </h3>
-                      <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-theme">
-                          <span className="text-sm text-foreground/80">Theme</span>
-                          <ThemeModeSelector value={themeMode} onChange={onThemeModeChange} />
-                        </div>
-                        <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
-                        <div className="flex items-center justify-between py-2.5" data-testid="menu-item-verse-numbers">
-                          <span className="text-sm text-foreground/80">Verse numbers</span>
-                          <Switch 
-                            checked={showVerseNumbers} 
-                            onCheckedChange={(v) => { onShowVerseNumbersChange?.(v); }}
-                            data-testid="switch-verse-numbers"
-                          />
-                        </div>
                       </div>
                     </div>
 
