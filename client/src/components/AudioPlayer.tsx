@@ -10,6 +10,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerDescription,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
@@ -121,14 +122,15 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.12)] via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(var(--glow-accent)/0.08)] via-transparent to-transparent" />
       </div>
-      <DrawerClose className="z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
+      <DrawerClose className="z-50 rounded-full size-11 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
         <X className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
         <span className="sr-only">Close</span>
       </DrawerClose>
       <DrawerHeader className="relative z-10">
         <DrawerTitle>Select Layout</DrawerTitle>
+        <DrawerDescription className="sr-only">Choose how the Quran text is displayed while reading</DrawerDescription>
       </DrawerHeader>
-      <div className="pb-8 relative z-10">
+      <div className="relative z-10" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
         <div
           className="overflow-hidden py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
           style={{ visibility: isReady ? 'visible' : 'hidden' }}

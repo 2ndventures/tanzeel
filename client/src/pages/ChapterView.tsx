@@ -13,7 +13,7 @@ import { lazyChapterService } from "@/services/lazyChapterService";
 import { useAudio } from "@/contexts/AudioContext";
 import { getFeaturedReciters, getReciterById } from "@/lib/reciters";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
@@ -702,7 +702,7 @@ export default function ChapterView({
               </SheetTrigger>
             <SheetContent side="bottom" className="max-h-[85vh] flex flex-col overflow-hidden bg-screen-gradient" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
               {menuView !== 'main' && (
-                <button className="absolute left-4 top-4 z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
+                <button className="absolute left-4 top-4 z-50 rounded-full size-11 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={() => setMenuView('main')} data-testid="button-sheet-back">
                   <ChevronLeft className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
                 </button>
               )}
@@ -713,10 +713,11 @@ export default function ChapterView({
                   {menuView === 'script' && 'Arabic Script'}
                   {menuView === 'spacing' && 'Line Spacing'}
                 </SheetTitle>
+                <SheetDescription className="sr-only">Reading options including theme, text size, Arabic script, line spacing, and reciter</SheetDescription>
               </SheetHeader>
 
 
-              <div className="overflow-y-auto overflow-x-hidden flex-1 pb-6 relative z-10 px-4">
+              <div className="overflow-y-auto overflow-x-hidden flex-1 relative z-10 px-4" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                 {menuView === 'main' && (
                   <div className="space-y-4">
                     {/* Appearance Section */}

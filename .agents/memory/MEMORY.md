@@ -1,1 +1,2 @@
 - [Vaul drawer + embla carousel open jank](drawer-carousel-open-jank.md) — preload preview images + visibility-gate the carousel until embla re-measures so the drawer only slides up/down, no internal reflow.
+- [Bottom sheet / drawer safe-area](bottom-sheet-safe-area.md) — add env(safe-area-inset-bottom) in ONE layer so popups clear the iPhone home indicator; SheetContent already has p-6 base.
