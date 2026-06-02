@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, type KeyboardEvent } from "react";
 import { Icon } from "@iconify/react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Slider } from "@/components/ui/slider";
 import { X } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptics";
@@ -61,6 +62,46 @@ interface AudioPlayerProps {
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
   const isDark = document.documentElement.classList.contains('dark');
+  const initialIndex = Math.max(0, LAYOUT_OPTIONS.findIndex((o) => o.mode === layoutMode));
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'center',
+    containScroll: false,
+    startIndex: initialIndex,
+    duration: prefersReducedMotion ? 0 : 22,
+  });
+  const [centeredIndex, setCenteredIndex] = useState(initialIndex);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      const idx = emblaApi.selectedScrollSnap();
+      setCenteredIndex((prev) => {
+        if (prev !== idx) triggerHaptic('light');
+        return idx;
+      });
+    };
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi]);
+
+  const scrollTo = useCallback((idx: number) => emblaApi?.scrollTo(idx), [emblaApi]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); emblaApi?.scrollPrev(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); emblaApi?.scrollNext(); }
+  }, [emblaApi]);
+
+  const centered = LAYOUT_OPTIONS[centeredIndex] ?? LAYOUT_OPTIONS[0];
+  const isCurrentApplied = layoutMode === centered.mode;
+
   return (
     <DrawerContent className="overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
       <div className="absolute inset-0 pointer-events-none">
@@ -75,45 +116,90 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
       <DrawerHeader className="relative z-10">
         <DrawerTitle>Select Layout</DrawerTitle>
       </DrawerHeader>
-      <div className="px-4 pb-8 relative z-10">
-        <div className="grid grid-cols-2 gap-3">
-          {LAYOUT_OPTIONS.map((opt) => {
-            const isSelected = layoutMode === opt.mode;
-            return (
-              <button
-                key={opt.mode}
-                onClick={() => { onLayoutModeChange?.(opt.mode); }}
-                className={`relative rounded-xl overflow-hidden transition-all ${
-                  isSelected
-                    ? 'ring-2 ring-primary shadow-md shadow-primary/15'
-                    : 'ring-1 ring-border/40 dark:ring-white/8'
-                }`}
-                data-testid={`layout-option-${opt.mode}`}
-              >
-                <div className="aspect-square w-full overflow-hidden bg-muted/20">
-                  <img
-                    src={isDark ? opt.previewDark : opt.previewLight}
-                    alt={`${opt.label} layout preview`}
-                    className="w-full h-full object-cover"
-                    data-testid={`img-layout-preview-${opt.mode}`}
-                  />
-                  {isSelected && (
-                    <div className="absolute inset-0 bg-primary/10" />
-                  )}
+      <div className="pb-8 relative z-10">
+        <div
+          className="overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
+          ref={emblaRef}
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Reading layout previews"
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+        >
+          <div className="flex touch-pan-y items-stretch">
+            {LAYOUT_OPTIONS.map((opt, i) => {
+              const isCentered = i === centeredIndex;
+              const isApplied = layoutMode === opt.mode;
+              return (
+                <div key={opt.mode} className="flex-[0_0_70%] min-w-0 px-2">
+                  <button
+                    type="button"
+                    onClick={() => scrollTo(i)}
+                    aria-current={isApplied ? 'true' : undefined}
+                    aria-label={`${opt.label} — ${opt.desc}${isApplied ? ' (current layout)' : ''}`}
+                    data-testid={`layout-option-${opt.mode}`}
+                    className={`relative block w-full rounded-2xl overflow-hidden ring-1 transition-all duration-300 ${
+                      isCentered ? 'opacity-100 scale-100' : 'opacity-45 scale-[0.9]'
+                    } ${
+                      isApplied
+                        ? 'ring-2 ring-primary shadow-lg shadow-primary/20'
+                        : 'ring-border/40 dark:ring-white/10'
+                    }`}
+                    style={{ transformOrigin: 'center' }}
+                  >
+                    <div className="relative w-full overflow-hidden bg-muted/20" style={{ height: 'clamp(280px, 44vh, 440px)' }}>
+                      <img
+                        src={isDark ? opt.previewDark : opt.previewLight}
+                        alt={`${opt.label} layout preview`}
+                        className="w-full h-full object-cover object-top"
+                        draggable={false}
+                        data-testid={`img-layout-preview-${opt.mode}`}
+                      />
+                      {isApplied && (
+                        <div className="absolute top-2 left-2 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 shadow-md">
+                          Current
+                        </div>
+                      )}
+                    </div>
+                  </button>
                 </div>
-                <div className={`px-3 py-2.5 text-left ${
-                  isSelected
-                    ? 'bg-primary/10 dark:bg-primary/15'
-                    : 'bg-muted/30'
-                }`}>
-                  <p className={`text-sm font-semibold truncate ${
-                    isSelected ? 'text-primary' : 'text-foreground dark:text-white/90'
-                  }`} data-testid={`text-layout-label-${opt.mode}`}>{opt.label}</p>
-                  <p className="text-xs text-muted-foreground dark:text-white/45 truncate" data-testid={`text-layout-desc-${opt.mode}`}>{opt.desc}</p>
-                </div>
-              </button>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="text-center mt-4 px-4">
+          <p className="text-base font-semibold text-foreground dark:text-white/90" data-testid="text-layout-label">{centered.label}</p>
+          <p className="text-sm text-muted-foreground dark:text-white/50" data-testid="text-layout-desc">{centered.desc}</p>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-3" role="group" aria-label="Layout preview navigation">
+          {LAYOUT_OPTIONS.map((opt, i) => (
+            <button
+              key={opt.mode}
+              type="button"
+              onClick={() => scrollTo(i)}
+              aria-current={i === centeredIndex ? 'true' : undefined}
+              aria-label={`Show ${opt.label}`}
+              data-testid={`dot-layout-${opt.mode}`}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === centeredIndex ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30 dark:bg-white/25'
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="px-4 mt-5">
+          <DrawerClose asChild>
+            <button
+              type="button"
+              onClick={() => { triggerHaptic('medium'); onLayoutModeChange?.(centered.mode); }}
+              data-testid="button-select-layout"
+              className="w-full rounded-xl py-3.5 text-sm font-semibold bg-primary text-primary-foreground shadow-md shadow-primary/25 transition-transform active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {isCurrentApplied ? `Keep ${centered.label}` : `Use ${centered.label}`}
+            </button>
+          </DrawerClose>
         </div>
       </div>
     </DrawerContent>
