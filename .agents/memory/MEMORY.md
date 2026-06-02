@@ -1,4 +1,1 @@
-- [Two audioCache modules](audio-cache-modules.md) — lib/ (in-memory word timing) and services/ (filesystem MP3) are both live, not duplicates.
-- [Offline search corpus](search-corpus.md) — search-corpus.json is a checked-in generated artifact (not built by vite); re-run the generator when translations change.
-- [SurahJuz verse search](surahjuz-search.md) — fully client-side 3-tier (exact>stem>concept); every tier must set matchedTranslationCount; no external/server search.
-- [Default reading translation (Khattab)](khattab-translation.md) — bundled offline; sourced from fawazahmed0 (Quran.com 131 is dead/copyrighted); both data dirs + search corpus must stay in sync.
+- [Vaul drawer + embla carousel open jank](drawer-carousel-open-jank.md) — preload preview images + visibility-gate the carousel until embla re-measures so the drawer only slides up/down, no internal reflow.

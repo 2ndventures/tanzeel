@@ -28,6 +28,8 @@ const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: str
   { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Medinan page view', previewDark: layoutMushafImg, previewLight: layoutMushafLightImg },
 ];
 
+const LAYOUT_PREVIEW_SRCS = LAYOUT_OPTIONS.flatMap((o) => [o.previewLight, o.previewDark]);
+
 interface VerseTimingInfo {
   timestamp_from: number;
   timestamp_to: number;
@@ -74,6 +76,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
     duration: prefersReducedMotion ? 0 : 22,
   });
   const [centeredIndex, setCenteredIndex] = useState(initialIndex);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -86,7 +89,16 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
     };
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+    // Re-measure once the drawer's open transform has begun, then reveal the
+    // carousel already centered on the current layout. This guarantees the
+    // user only sees the drawer slide up — never an internal snap/reflow.
+    const raf = requestAnimationFrame(() => {
+      emblaApi.reInit();
+      onSelect();
+      setIsReady(true);
+    });
     return () => {
+      cancelAnimationFrame(raf);
       emblaApi.off('select', onSelect);
       emblaApi.off('reInit', onSelect);
     };
@@ -119,6 +131,7 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
       <div className="pb-8 relative z-10">
         <div
           className="overflow-hidden py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
+          style={{ visibility: isReady ? 'visible' : 'hidden' }}
           ref={emblaRef}
           role="group"
           aria-roledescription="carousel"
@@ -255,6 +268,15 @@ export default function AudioPlayer({
       document.removeEventListener('pointerup', handleGlobalPointerUp);
       document.removeEventListener('touchend', handleGlobalPointerUp);
     };
+  }, []);
+
+  // Preload the layout preview images so the layout drawer renders fully on
+  // first open — the user only sees it slide up, never images popping in.
+  useEffect(() => {
+    LAYOUT_PREVIEW_SRCS.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
   }, []);
 
   const getVerseAtTime = useCallback((timeSeconds: number): string | null => {
