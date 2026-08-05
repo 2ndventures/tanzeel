@@ -9,12 +9,13 @@ android {
 
 apply from: "../capacitor-cordova-android-plugins/cordova.variables.gradle"
 dependencies {
+    implementation project(':capacitor-community-safe-area')
     implementation project(':capacitor-filesystem')
     implementation project(':capacitor-haptics')
     implementation project(':capacitor-keyboard')
     implementation project(':capacitor-network')
     implementation project(':capacitor-preferences')
-    implementation project(':capgo-native-audio')
+    implementation project(':sentry-capacitor')
 
 }
 

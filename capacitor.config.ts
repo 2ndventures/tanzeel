@@ -14,6 +14,9 @@ const config: CapacitorConfig = {
     backgroundColor: '#000000'
   },
   plugins: {
+    SystemBars: {
+      insetsHandling: 'disable'
+    },
     Keyboard: {
       resize: 'none',
       style: 'DARK'
