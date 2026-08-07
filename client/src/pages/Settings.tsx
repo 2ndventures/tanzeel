@@ -596,14 +596,26 @@ export default function Settings({
               <Sheet open={feedbackOpen} onOpenChange={setFeedbackOpen}>
                 <SheetTrigger asChild>
                   <button
-                    className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 text-left"
+                    className="w-full flex items-center justify-between gap-3 py-3 hover-elevate active-elevate-2 text-left"
                     data-testid="button-give-feedback"
                   >
-                    <div>
-                      <p className="text-sm text-foreground/80">Give Feedback</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Share your thoughts with us</p>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+                        style={{
+                          backgroundColor: 'hsl(var(--glow-primary) / 0.15)',
+                          border: '1px solid hsl(var(--glow-primary) / 0.35)',
+                          boxShadow: '0 0 12px hsl(var(--glow-primary) / 0.25)',
+                        }}
+                      >
+                        <Icon icon="solar:chat-round-like-bold" className="w-5 h-5" style={{ color: 'hsl(var(--glow-primary))' }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">Give Feedback</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Share your thoughts with us</p>
+                      </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--glow-primary))' }} />
                   </button>
                 </SheetTrigger>
                 <SheetContent
@@ -648,7 +660,13 @@ export default function Settings({
                       </Button>
                       <Button
                         onClick={handleFeedbackSubmit}
-                        className="flex-1 min-h-12"
+                        className="flex-1 min-h-12 border"
+                        style={{
+                          backgroundColor: 'hsl(var(--glow-primary))',
+                          color: 'hsl(234 34% 10%)',
+                          borderColor: 'hsl(var(--glow-primary))',
+                          boxShadow: '0 0 16px hsl(var(--glow-primary) / 0.35)',
+                        }}
                         disabled={isSubmitting}
                         data-testid="button-submit-feedback"
                       >
