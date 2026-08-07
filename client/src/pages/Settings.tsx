@@ -12,6 +12,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, ChevronLeft, Check, CircleOff, Play, Pause, Loader2 } from "lucide-react";
 import { ThemeModeSelector, type ThemeMode } from "@/components/ui/theme-mode-selector";
 import { getManifest } from "@/services/audioCache";
+import { toast } from "@/hooks/use-toast";
+
+// Formspree form that receives "Give Feedback" submissions (delivered to the
+// account owner's email inbox). Replace the form ID if the form is recreated.
+const FEEDBACK_ENDPOINT = "https://formspree.io/f/xbljowyl";
 import { useAudio } from "@/contexts/AudioContext";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
 
@@ -199,7 +204,7 @@ export default function Settings({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://formspree.io/f/xbljowyl", {
+      const response = await fetch(FEEDBACK_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -214,8 +219,20 @@ export default function Settings({
       if (response.ok) {
         setFeedback("");
         setFeedbackOpen(false);
+        toast({ title: "Feedback sent", description: "Thank you for helping us improve Tanzeel." });
+      } else {
+        toast({
+          title: "Couldn't send feedback",
+          description: "Something went wrong on our end. Please try again later.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      toast({
+        title: "Couldn't send feedback",
+        description: "Check your internet connection and try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
