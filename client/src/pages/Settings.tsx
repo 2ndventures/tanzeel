@@ -19,6 +19,7 @@ import { toast } from "@/hooks/use-toast";
 const FEEDBACK_ENDPOINT = "https://formspree.io/f/mdenkqww";
 import { useAudio } from "@/contexts/AudioContext";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 function getDownloadedSize(): number {
   const manifest = getManifest();
@@ -167,6 +168,7 @@ export default function Settings({
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const keyboardHeight = useKeyboardHeight();
   const [reciterView, setReciterView] = useState(false);
   const [scriptView, setScriptView] = useState(false);
   const [spacingView, setSpacingView] = useState(false);
@@ -604,7 +606,21 @@ export default function Settings({
                     <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-[55vh] rounded-t-3xl overflow-hidden bg-screen-gradient" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
+                <SheetContent
+                  side="bottom"
+                  className="h-[55vh] rounded-t-3xl overflow-hidden bg-screen-gradient"
+                  style={{
+                    backgroundColor: 'hsl(var(--sheet-bg))',
+                    borderColor: 'hsl(var(--sheet-muted))',
+                    // Lift the sheet above the on-screen keyboard (iOS uses
+                    // Keyboard.resize 'none', so the WebView never shrinks).
+                    bottom: keyboardHeight,
+                    maxHeight: keyboardHeight
+                      ? `calc(100vh - ${keyboardHeight}px - env(safe-area-inset-top, 0px))`
+                      : undefined,
+                    transition: 'bottom 0.25s ease-out',
+                  }}
+                >
                   <SheetHeader className="relative z-10">
                     <SheetTitle className="text-xl font-semibold text-foreground">Send Feedback</SheetTitle>
                   </SheetHeader>

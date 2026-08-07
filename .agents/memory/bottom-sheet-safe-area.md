@@ -28,6 +28,13 @@ rely on SheetContent's p-6 for the base.
   (`.safe-area-bottom`, `.pb-nav-clearance`, `.header-safe-padding`) using
   constant()+env() with 0px fallback.
 
+**Keyboard overlap:** iOS uses Keyboard.resize 'none', so the WebView never
+shrinks and bottom sheets with inputs get covered by the keyboard. Use
+`useKeyboardHeight()` (client/src/hooks/useKeyboardHeight.ts — native
+keyboardWillShow on iOS, visualViewport fallback elsewhere) and set the sheet's
+inline `bottom: keyboardHeight` plus a maxHeight cap. Android (adjustResize)
+and web report ~0, so no double-shift.
+
 **Other popup App-Store nits:** keep close/back controls >= 44px (size-11, not
 size-10); give Radix/vaul popups an sr-only Sheet/DrawerDescription to satisfy
 the missing-description a11y warning. Do NOT enlarge tightly-spaced (~16px)
