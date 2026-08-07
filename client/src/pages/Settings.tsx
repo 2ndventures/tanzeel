@@ -16,7 +16,7 @@ import { toast } from "@/hooks/use-toast";
 
 // Formspree form that receives "Give Feedback" submissions (delivered to the
 // account owner's email inbox). Replace the form ID if the form is recreated.
-const FEEDBACK_ENDPOINT = "https://formspree.io/f/xbljowyl";
+const FEEDBACK_ENDPOINT = "https://formspree.io/f/mdenkqww";
 import { useAudio } from "@/contexts/AudioContext";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
 
