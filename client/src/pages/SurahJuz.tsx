@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
 
 import { chapters, juzData, surahMeanings } from "@/lib/quranMetadata";
+import { chapterMatchesQuery, normalizeSearch } from "@/lib/surahSearch";
 import { Search, BookOpen, ArrowRight, Loader, Lock, X } from "lucide-react";
 import { searchVersesLocal, tokenize, stemWord } from "@/services/searchService";
 import type { VerseSearchResult, MatchType } from "@/services/searchService";
@@ -64,45 +65,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
     return () => clearTimeout(timer);
   }, []);
 
-  const normalizeSearch = (text: string): string => {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/^(al-|ar-|as-|an-|at-|az-)/i, '')
-      .replace(/aa/g, 'a')
-      .replace(/ee/g, 'e')
-      .replace(/ii/g, 'i')
-      .replace(/oo/g, 'o')
-      .replace(/uu/g, 'u')
-      .replace(/[-']/g, '');
-  };
-
-  const filteredChapters = chapters.filter((chapter) => {
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return true;
-    const englishName = chapter.englishName.toLowerCase();
-    const arabicName = chapter.arabicName.toLowerCase();
-
-    if (englishName.includes(query) || arabicName.includes(query) || chapter.id.toString().includes(query)) {
-      return true;
-    }
-
-    const meaning = (surahMeanings[chapter.id] || '').toLowerCase();
-    if (meaning.includes(query)) return true;
-
-    const normalizedQuery = normalizeSearch(query);
-    const normalizedEnglish = normalizeSearch(englishName);
-
-    if (normalizedEnglish.includes(normalizedQuery)) return true;
-
-    if (normalizedQuery.endsWith('h')) {
-      if (normalizedEnglish.includes(normalizedQuery.slice(0, -1))) return true;
-    } else {
-      if (normalizedEnglish.includes(normalizedQuery + 'h')) return true;
-    }
-
-    return false;
-  });
+  const filteredChapters = chapters.filter((chapter) => chapterMatchesQuery(chapter, searchQuery));
 
   useEffect(() => {
     if (verseSearchRef.current) clearTimeout(verseSearchRef.current);

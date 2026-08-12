@@ -61,6 +61,10 @@ interface AudioPlayerProps {
   error?: string | null;
   timingError?: boolean;
   onRetry?: () => void;
+  /** Opens the surah picker sheet (rendered by the parent). */
+  onOpenSurahPicker?: () => void;
+  /** Opens the reciter picker sheet (rendered by the parent). */
+  onOpenReciterPicker?: () => void;
 }
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
@@ -245,6 +249,8 @@ export default function AudioPlayer({
   error = null,
   timingError = false,
   onRetry,
+  onOpenSurahPicker,
+  onOpenReciterPicker,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
@@ -413,20 +419,45 @@ export default function AudioPlayer({
 
         <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 
-        {/* ── Surah info: bold name left, Arabic right ── */}
-        <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
-          <div className="flex flex-col gap-0.5 min-w-0">
-            <h2 className="text-lg font-bold text-foreground dark:text-white/95 tracking-tight truncate" data-testid="text-surah-english">
-              {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
-            </h2>
+        {/* ── Surah info: tappable name left (opens picker), Arabic right ── */}
+        <div className="flex items-start justify-between mb-3 px-1" data-testid="surah-info">
+          <div className="flex flex-col gap-1 min-w-0">
+            {/* Each row is its own ≥44px tap target so surah/reciter taps can't be confused */}
+            <button
+              type="button"
+              onClick={onOpenSurahPicker}
+              disabled={!onOpenSurahPicker}
+              className="flex items-center gap-1.5 min-h-11 min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
+              aria-label="Change surah"
+              data-testid="button-playbar-surah"
+            >
+              <h2 className="text-lg font-bold text-foreground dark:text-white/95 tracking-tight truncate" data-testid="text-surah-english">
+                {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
+              </h2>
+              {onOpenSurahPicker && (
+                <Icon icon="solar:alt-arrow-down-linear" className="w-4 h-4 shrink-0 text-muted-foreground dark:text-white/60" aria-hidden="true" />
+              )}
+            </button>
             {reciterName && (
-              <p className="text-xs font-medium text-muted-foreground dark:text-white/75 truncate" data-testid="text-reciter-name">
-                {reciterName}
-              </p>
+              <button
+                type="button"
+                onClick={onOpenReciterPicker}
+                disabled={!onOpenReciterPicker}
+                className="flex items-center gap-1.5 min-h-11 min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
+                aria-label="Change reciter"
+                data-testid="button-playbar-reciter"
+              >
+                <p className="text-xs font-medium text-muted-foreground dark:text-white/75 truncate" data-testid="text-reciter-name">
+                  {reciterName}
+                </p>
+                {onOpenReciterPicker && (
+                  <Icon icon="solar:alt-arrow-down-linear" className="w-3.5 h-3.5 shrink-0 text-muted-foreground dark:text-white/60" aria-hidden="true" />
+                )}
+              </button>
             )}
           </div>
           {surahNameArabic && (
-            <span className="font-arabic text-lg text-muted-foreground dark:text-white/70 shrink-0 ml-4" data-testid="text-surah-arabic">
+            <span className="font-arabic text-lg text-muted-foreground dark:text-white/70 shrink-0 ml-4 mt-1" data-testid="text-surah-arabic">
               {surahNameArabic}
             </span>
           )}

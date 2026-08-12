@@ -16,6 +16,8 @@ import { useReciterPreview } from "@/hooks/useReciterPreview";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { VerseCardSkeleton } from "@/components/VerseCard";
+import SurahPickerSheet from "@/components/SurahPickerSheet";
+import ReciterPickerSheet from "@/components/ReciterPickerSheet";
 import { incrementVersesRead, addReadingTime } from "@/lib/readingStats";
 import TajweedLegend from "@/components/TajweedLegend";
 
@@ -177,6 +179,10 @@ export default function ChapterView({
 
   // Ref to hold pauseAudio so the reciter preview hook can access it regardless of hook ordering
   const pauseAudioRef = useRef<() => void>(() => {});
+
+  // Playbar picker sheets (surah / reciter)
+  const [surahPickerOpen, setSurahPickerOpen] = useState(false);
+  const [reciterPickerOpen, setReciterPickerOpen] = useState(false);
 
   // Reciter preview (shared with Settings via useReciterPreview)
   const {
@@ -1153,6 +1159,25 @@ export default function ChapterView({
         onLayoutModeChange={onLayoutModeChange}
         compact={false}
         verseTimings={getTimingData()?.verse_timings}
+        onOpenSurahPicker={() => setSurahPickerOpen(true)}
+        onOpenReciterPicker={() => setReciterPickerOpen(true)}
+      />
+
+      <SurahPickerSheet
+        open={surahPickerOpen}
+        onOpenChange={setSurahPickerOpen}
+        currentChapterId={chapterId}
+        onSelect={(id) => {
+          if (id !== chapterId) onNavigate('chapter', id);
+        }}
+      />
+
+      <ReciterPickerSheet
+        open={reciterPickerOpen}
+        onOpenChange={setReciterPickerOpen}
+        currentReciterId={reciter}
+        onSelect={onReciterChange}
+        pauseMainAudio={() => pauseAudioRef.current()}
       />
     </div>
   );
