@@ -420,14 +420,17 @@ export default function AudioPlayer({
         <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 
         {/* ── Surah info: tappable name left (opens picker), Arabic right ── */}
-        <div className="flex items-start justify-between mb-3 px-1" data-testid="surah-info">
-          <div className="flex flex-col gap-1 min-w-0">
-            {/* Each row is its own ≥44px tap target so surah/reciter taps can't be confused */}
+        <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
+          <div className="flex flex-col gap-0.5 min-w-0">
+            {/* Tap zones extend invisibly (padding + matching negative margin) so layout stays
+                compact. The surah zone grows upward (free space above), the reciter zone grows
+                downward into the mb-4 gap (stops short of the slider). The boundary sits in the
+                2px gap between the rows, so the two hit regions never overlap. */}
             <button
               type="button"
               onClick={onOpenSurahPicker}
               disabled={!onOpenSurahPicker}
-              className="flex items-center gap-1.5 min-h-11 min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
+              className="flex items-center gap-1.5 pt-[15px] -mt-[15px] pb-px -mb-px min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
               aria-label="Change surah"
               data-testid="button-playbar-surah"
             >
@@ -443,7 +446,7 @@ export default function AudioPlayer({
                 type="button"
                 onClick={onOpenReciterPicker}
                 disabled={!onOpenReciterPicker}
-                className="flex items-center gap-1.5 min-h-11 min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
+                className="flex items-center gap-1.5 pt-px -mt-px pb-3.5 -mb-3.5 min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
                 aria-label="Change reciter"
                 data-testid="button-playbar-reciter"
               >
@@ -457,7 +460,7 @@ export default function AudioPlayer({
             )}
           </div>
           {surahNameArabic && (
-            <span className="font-arabic text-lg text-muted-foreground dark:text-white/70 shrink-0 ml-4 mt-1" data-testid="text-surah-arabic">
+            <span className="font-arabic text-lg text-muted-foreground dark:text-white/70 shrink-0 ml-4" data-testid="text-surah-arabic">
               {surahNameArabic}
             </span>
           )}
