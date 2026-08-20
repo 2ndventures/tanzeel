@@ -46,7 +46,10 @@ export default function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
       role="navigation"
       aria-label="Main navigation"
       className="fixed bottom-0 left-0 right-0 z-40 shrink-0 border-t border-border bg-card/80 backdrop-blur-xl shadow-2xl app-fixed-x"
-      style={{ paddingBottom: "max(4px, calc(env(safe-area-inset-bottom) - 14px))" }}
+      style={{
+        height: "var(--bottom-nav-height)",
+        paddingBottom: "var(--bottom-nav-safe-padding)",
+      }}
     >
       <div className="flex items-center justify-around px-4 pt-3 pb-1">
         {tabs.map((tab) => {
