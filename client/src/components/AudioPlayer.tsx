@@ -111,6 +111,18 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
 
   const scrollTo = useCallback((idx: number) => emblaApi?.scrollTo(idx), [emblaApi]);
 
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  const handlePreviewTap = useCallback((idx: number) => {
+    if (idx !== centeredIndex) {
+      scrollTo(idx);
+      return;
+    }
+    triggerHaptic('medium');
+    onLayoutModeChange?.(LAYOUT_OPTIONS[idx].mode);
+    closeRef.current?.click();
+  }, [centeredIndex, scrollTo, onLayoutModeChange]);
+
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'ArrowLeft') { e.preventDefault(); emblaApi?.scrollPrev(); }
     else if (e.key === 'ArrowRight') { e.preventDefault(); emblaApi?.scrollNext(); }
@@ -129,6 +141,9 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
       <DrawerClose className="z-50 rounded-full size-11 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
         <X className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
         <span className="sr-only">Close</span>
+      </DrawerClose>
+      <DrawerClose asChild>
+        <button ref={closeRef} type="button" className="hidden" aria-hidden="true" tabIndex={-1} data-testid="button-layout-hidden-close" />
       </DrawerClose>
       <DrawerHeader className="relative z-10">
         <DrawerTitle>Select Layout</DrawerTitle>
@@ -153,9 +168,11 @@ function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: L
                 <div key={opt.mode} className="flex-[0_0_70%] min-w-0 px-2">
                   <button
                     type="button"
-                    onClick={() => scrollTo(i)}
+                    onClick={() => handlePreviewTap(i)}
                     aria-current={isApplied ? 'true' : undefined}
-                    aria-label={`${opt.label} — ${opt.desc}${isApplied ? ' (current layout)' : ''}`}
+                    aria-label={isCentered
+                      ? `Use ${opt.label} — ${opt.desc}${isApplied ? ' (current layout)' : ''}`
+                      : `Show ${opt.label} — ${opt.desc}${isApplied ? ' (current layout)' : ''}`}
                     data-testid={`layout-option-${opt.mode}`}
                     className={`relative block w-full rounded-2xl overflow-hidden ring-1 transition-all duration-300 ${
                       isCentered ? 'opacity-100 scale-100' : 'opacity-45 scale-[0.9]'
