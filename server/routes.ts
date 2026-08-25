@@ -1,11 +1,21 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Readable, pipeline } from "stream";
+import path from "path";
 
 const SAFE_PARAM = /^[a-zA-Z0-9_\-]+$/;
 const SAFE_NUM = /^[0-9]+$/;
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Public, no-JavaScript privacy policy URL for app-store reviewers and
+  // users who need to read the policy outside the native app.
+  app.get("/privacy-policy", (_req, res) => {
+    const policyPath = process.env.NODE_ENV === "production"
+      ? path.resolve(import.meta.dirname, "public", "privacy-policy.html")
+      : path.resolve(import.meta.dirname, "..", "client", "public", "privacy-policy.html");
+    res.sendFile(policyPath);
+  });
+
   // Hidden Sentry verification endpoint. Throws so the global error handler
   // (Sentry's setupExpressErrorHandler) captures and reports it.
   app.get("/api/_debug/sentry", (_req, _res) => {

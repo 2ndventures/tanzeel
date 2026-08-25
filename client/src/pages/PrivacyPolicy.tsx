@@ -34,7 +34,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         <div className="px-8 max-w-3xl mx-auto pt-6">
           <div className="prose prose-slate dark:prose-invert max-w-none">
             <p className="text-sm text-muted-foreground mb-8">
-              <strong>Last Updated:</strong> November 14, 2025
+              <strong>Last Updated:</strong> August 25, 2026
             </p>
 
             <section className="mb-8">
