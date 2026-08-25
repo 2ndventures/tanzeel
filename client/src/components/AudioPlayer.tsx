@@ -1,5 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, type KeyboardEvent } from "react";
 import { Icon } from "@iconify/react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Slider } from "@/components/ui/slider";
 import { X } from "lucide-react";
 import { triggerHaptic } from "@/lib/haptics";
@@ -9,6 +10,7 @@ import {
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
+  DrawerDescription,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 
@@ -26,6 +28,8 @@ const LAYOUT_OPTIONS: { mode: LayoutMode; icon: string; label: string; desc: str
   { mode: 'focused-flow', icon: 'solar:book-2-bold', label: 'Focused Flow', desc: 'Vertical reading', previewDark: layoutFocusedImg, previewLight: layoutFocusedLightImg },
   { mode: 'mushaf', icon: 'solar:notebook-bold', label: 'Classic Mushaf', desc: 'Medinan page view', previewDark: layoutMushafImg, previewLight: layoutMushafLightImg },
 ];
+
+const LAYOUT_PREVIEW_SRCS = LAYOUT_OPTIONS.flatMap((o) => [o.previewLight, o.previewDark]);
 
 interface VerseTimingInfo {
   timestamp_from: number;
@@ -57,63 +61,181 @@ interface AudioPlayerProps {
   error?: string | null;
   timingError?: boolean;
   onRetry?: () => void;
+  /** Opens the surah picker sheet (rendered by the parent). */
+  onOpenSurahPicker?: () => void;
+  /** Opens the reciter picker sheet (rendered by the parent). */
+  onOpenReciterPicker?: () => void;
 }
 
 function LayoutDrawerContent({ layoutMode, onLayoutModeChange }: { layoutMode: LayoutMode; onLayoutModeChange?: (mode: LayoutMode) => void }) {
   const isDark = document.documentElement.classList.contains('dark');
+  const initialIndex = Math.max(0, LAYOUT_OPTIONS.findIndex((o) => o.mode === layoutMode));
+  const prefersReducedMotion = typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'center',
+    containScroll: false,
+    startIndex: initialIndex,
+    duration: prefersReducedMotion ? 0 : 22,
+  });
+  const [centeredIndex, setCenteredIndex] = useState(initialIndex);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      const idx = emblaApi.selectedScrollSnap();
+      setCenteredIndex((prev) => {
+        if (prev !== idx) triggerHaptic('light');
+        return idx;
+      });
+    };
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
+    // Re-measure once the drawer's open transform has begun, then reveal the
+    // carousel already centered on the current layout. This guarantees the
+    // user only sees the drawer slide up — never an internal snap/reflow.
+    const raf = requestAnimationFrame(() => {
+      emblaApi.reInit();
+      onSelect();
+      setIsReady(true);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
+    };
+  }, [emblaApi]);
+
+  const scrollTo = useCallback((idx: number) => emblaApi?.scrollTo(idx), [emblaApi]);
+
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  const handlePreviewTap = useCallback((idx: number) => {
+    if (idx !== centeredIndex) {
+      scrollTo(idx);
+      return;
+    }
+    triggerHaptic('medium');
+    onLayoutModeChange?.(LAYOUT_OPTIONS[idx].mode);
+    closeRef.current?.click();
+  }, [centeredIndex, scrollTo, onLayoutModeChange]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); emblaApi?.scrollPrev(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); emblaApi?.scrollNext(); }
+  }, [emblaApi]);
+
+  const centered = LAYOUT_OPTIONS[centeredIndex] ?? LAYOUT_OPTIONS[0];
+  const isCurrentApplied = layoutMode === centered.mode;
+
   return (
-    <DrawerContent className="overflow-hidden" style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
+    <DrawerContent className="overflow-hidden" data-no-swipe="true" style={{ backgroundColor: 'hsl(var(--sheet-bg))' }}>
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--glow-primary)/0.10)] via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[hsl(var(--glow-primary)/0.12)] via-transparent to-transparent" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[hsl(var(--glow-accent)/0.08)] via-transparent to-transparent" />
       </div>
-      <DrawerClose className="z-50 rounded-full size-10 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
+      <DrawerClose className="z-50 rounded-full size-11 flex items-center justify-center bg-muted/60 ring-1 ring-border shadow-md transition-opacity opacity-80 hover:opacity-100 active:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring pointer-events-auto" style={{ position: 'absolute', right: '1rem', top: '1rem' }}>
         <X className="h-5 w-5 text-foreground" style={{filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))'}} />
         <span className="sr-only">Close</span>
       </DrawerClose>
+      <DrawerClose asChild>
+        <button ref={closeRef} type="button" className="hidden" aria-hidden="true" tabIndex={-1} data-testid="button-layout-hidden-close" />
+      </DrawerClose>
       <DrawerHeader className="relative z-10">
         <DrawerTitle>Select Layout</DrawerTitle>
+        <DrawerDescription className="sr-only">Choose how the Quran text is displayed while reading</DrawerDescription>
       </DrawerHeader>
-      <div className="px-4 pb-8 relative z-10">
-        <div className="grid grid-cols-2 gap-3">
-          {LAYOUT_OPTIONS.map((opt) => {
-            const isSelected = layoutMode === opt.mode;
-            return (
-              <button
-                key={opt.mode}
-                onClick={() => { onLayoutModeChange?.(opt.mode); }}
-                className={`relative rounded-xl overflow-hidden transition-all ${
-                  isSelected
-                    ? 'ring-2 ring-primary shadow-md shadow-primary/15'
-                    : 'ring-1 ring-border/40 dark:ring-white/8'
-                }`}
-                data-testid={`layout-option-${opt.mode}`}
-              >
-                <div className="aspect-square w-full overflow-hidden bg-muted/20">
-                  <img
-                    src={isDark ? opt.previewDark : opt.previewLight}
-                    alt={`${opt.label} layout preview`}
-                    className="w-full h-full object-cover"
-                    data-testid={`img-layout-preview-${opt.mode}`}
-                  />
-                  {isSelected && (
-                    <div className="absolute inset-0 bg-primary/10" />
-                  )}
+      <div className="relative z-10" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))' }}>
+        <div
+          className="overflow-hidden py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 rounded-xl"
+          style={{ visibility: isReady ? 'visible' : 'hidden' }}
+          ref={emblaRef}
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Reading layout previews"
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+        >
+          <div className="flex touch-pan-y items-stretch">
+            {LAYOUT_OPTIONS.map((opt, i) => {
+              const isCentered = i === centeredIndex;
+              const isApplied = layoutMode === opt.mode;
+              return (
+                <div key={opt.mode} className="flex-[0_0_70%] min-w-0 px-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePreviewTap(i)}
+                    aria-current={isApplied ? 'true' : undefined}
+                    aria-label={isCentered
+                      ? `Use ${opt.label} — ${opt.desc}${isApplied ? ' (current layout)' : ''}`
+                      : `Show ${opt.label} — ${opt.desc}${isApplied ? ' (current layout)' : ''}`}
+                    data-testid={`layout-option-${opt.mode}`}
+                    className={`relative block w-full rounded-2xl overflow-hidden ring-1 transition-all duration-300 ${
+                      isCentered ? 'opacity-100 scale-100' : 'opacity-45 scale-[0.9]'
+                    } ${
+                      isApplied
+                        ? 'ring-2 ring-primary shadow-lg shadow-primary/20'
+                        : 'ring-border/40 dark:ring-white/10'
+                    }`}
+                    style={{ transformOrigin: 'center' }}
+                  >
+                    <div className="relative w-full overflow-hidden bg-muted/20" style={{ height: 'clamp(280px, 44vh, 440px)' }}>
+                      <img
+                        src={isDark ? opt.previewDark : opt.previewLight}
+                        alt={`${opt.label} layout preview`}
+                        className="w-full h-full object-cover object-top"
+                        draggable={false}
+                        data-testid={`img-layout-preview-${opt.mode}`}
+                      />
+                      {isApplied && (
+                        <div className="absolute top-2 left-2 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold px-2 py-0.5 shadow-md">
+                          Current
+                        </div>
+                      )}
+                    </div>
+                  </button>
                 </div>
-                <div className={`px-3 py-2.5 text-left ${
-                  isSelected
-                    ? 'bg-primary/10 dark:bg-primary/15'
-                    : 'bg-muted/30'
-                }`}>
-                  <p className={`text-sm font-semibold truncate ${
-                    isSelected ? 'text-primary' : 'text-foreground dark:text-white/90'
-                  }`} data-testid={`text-layout-label-${opt.mode}`}>{opt.label}</p>
-                  <p className="text-xs text-muted-foreground dark:text-white/45 truncate" data-testid={`text-layout-desc-${opt.mode}`}>{opt.desc}</p>
-                </div>
-              </button>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="text-center mt-4 px-4">
+          <p className="text-base font-semibold text-foreground dark:text-white/90" data-testid="text-layout-label">{centered.label}</p>
+          <p className="text-sm text-muted-foreground dark:text-white/50" data-testid="text-layout-desc">{centered.desc}</p>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 mt-3" role="group" aria-label="Layout preview navigation">
+          {LAYOUT_OPTIONS.map((opt, i) => (
+            <button
+              key={opt.mode}
+              type="button"
+              onClick={() => scrollTo(i)}
+              aria-current={i === centeredIndex ? 'true' : undefined}
+              aria-label={`Show ${opt.label}`}
+              data-testid={`dot-layout-${opt.mode}`}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === centeredIndex ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/30 dark:bg-white/25'
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="px-4 mt-5">
+          <DrawerClose asChild>
+            <button
+              type="button"
+              onClick={() => { triggerHaptic('medium'); onLayoutModeChange?.(centered.mode); }}
+              data-testid="button-select-layout"
+              className="w-full rounded-xl py-3.5 text-sm font-semibold bg-primary text-primary-foreground shadow-md shadow-primary/25 transition-transform active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {isCurrentApplied ? `Keep ${centered.label}` : `Use ${centered.label}`}
+            </button>
+          </DrawerClose>
         </div>
       </div>
     </DrawerContent>
@@ -144,6 +266,8 @@ export default function AudioPlayer({
   error = null,
   timingError = false,
   onRetry,
+  onOpenSurahPicker,
+  onOpenReciterPicker,
 }: AudioPlayerProps) {
   const speedOptions = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
@@ -169,6 +293,15 @@ export default function AudioPlayer({
       document.removeEventListener('pointerup', handleGlobalPointerUp);
       document.removeEventListener('touchend', handleGlobalPointerUp);
     };
+  }, []);
+
+  // Preload the layout preview images so the layout drawer renders fully on
+  // first open — the user only sees it slide up, never images popping in.
+  useEffect(() => {
+    LAYOUT_PREVIEW_SRCS.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
   }, []);
 
   const getVerseAtTime = useCallback((timeSeconds: number): string | null => {
@@ -303,16 +436,44 @@ export default function AudioPlayer({
 
         <div className="relative px-6 pt-10 pb-5 safe-area-bottom">
 
-        {/* ── Surah info: bold name left, Arabic right ── */}
+        {/* ── Surah info: tappable name left (opens picker), Arabic right ── */}
         <div className="flex items-end justify-between mb-4 px-1" data-testid="surah-info">
           <div className="flex flex-col gap-0.5 min-w-0">
-            <h2 className="text-lg font-bold text-foreground dark:text-white/95 tracking-tight truncate" data-testid="text-surah-english">
-              {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
-            </h2>
+            {/* Tap zones extend invisibly (padding + matching negative margin) so layout stays
+                compact. The surah zone grows upward (free space above), the reciter zone grows
+                downward into the mb-4 gap (stops short of the slider). The boundary sits in the
+                2px gap between the rows, so the two hit regions never overlap. */}
+            <button
+              type="button"
+              onClick={onOpenSurahPicker}
+              disabled={!onOpenSurahPicker}
+              className="flex items-center gap-1.5 pt-[15px] -mt-[15px] pb-px -mb-px min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
+              aria-label="Change surah"
+              data-testid="button-playbar-surah"
+            >
+              <h2 className="text-lg font-bold text-foreground dark:text-white/95 tracking-tight truncate" data-testid="text-surah-english">
+                {surahNumber ? `${surahNumber}. ` : ''}{surahNameEnglish || 'Al-Fatihah'}
+              </h2>
+              {onOpenSurahPicker && (
+                <Icon icon="solar:alt-arrow-down-linear" className="w-4 h-4 shrink-0 text-muted-foreground dark:text-white/60" aria-hidden="true" />
+              )}
+            </button>
             {reciterName && (
-              <p className="text-xs font-medium text-muted-foreground dark:text-white/75 truncate" data-testid="text-reciter-name">
-                {reciterName}
-              </p>
+              <button
+                type="button"
+                onClick={onOpenReciterPicker}
+                disabled={!onOpenReciterPicker}
+                className="flex items-center gap-1.5 pt-px -mt-px pb-3.5 -mb-3.5 min-w-0 text-left rounded-md active:opacity-60 transition-opacity disabled:pointer-events-none"
+                aria-label="Change reciter"
+                data-testid="button-playbar-reciter"
+              >
+                <p className="text-xs font-medium text-muted-foreground dark:text-white/75 truncate" data-testid="text-reciter-name">
+                  {reciterName}
+                </p>
+                {onOpenReciterPicker && (
+                  <Icon icon="solar:alt-arrow-down-linear" className="w-3.5 h-3.5 shrink-0 text-muted-foreground dark:text-white/60" aria-hidden="true" />
+                )}
+              </button>
             )}
           </div>
           {surahNameArabic && (

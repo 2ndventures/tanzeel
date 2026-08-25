@@ -9,6 +9,7 @@ const V2_NEW_KEYS = ['translation'];
 const KNOWN_KEYS: string[] = [
   'onboardingCompleted',
   'darkMode',
+  'themeMode',
   'transliteration',
   'showTranslation',
   'arabicScript',

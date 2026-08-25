@@ -4,6 +4,14 @@
 
 /* LIGHT MODE — antique Mushaf paper. Paper, ink, and gilding only. */
 :root {
+  /* Shared fixed chrome geometry. Keep MiniPlayer, BottomNav, and scrolling
+     content clearance in sync so the dock never covers the final list item. */
+  /* The fixed 73px includes BottomNav's 1px top border and its 72px tab row. */
+  --bottom-nav-content-height: 73px;
+  --bottom-nav-safe-padding: max(4px, calc(env(safe-area-inset-bottom, 0px) - 14px));
+  --bottom-nav-height: calc(var(--bottom-nav-content-height) + var(--bottom-nav-safe-padding));
+  --mini-player-height: 64px;
+
   --button-outline: rgba(30, 37, 53, .10);
   --badge-outline: rgba(30, 37, 53, .06);
 
@@ -378,8 +386,11 @@
 }
 
 .pb-nav-clearance {
-  padding-bottom: calc(80px + constant(safe-area-inset-bottom));
-  padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--bottom-nav-height) + 12px);
+}
+
+body[data-mini-player-visible]:not([data-no-bottom-nav]) .pb-nav-clearance {
+  padding-bottom: calc(var(--bottom-nav-height) + var(--mini-player-height) + 12px);
 }
 
 body[data-no-bottom-nav] .pb-nav-clearance {
@@ -388,8 +399,8 @@ body[data-no-bottom-nav] .pb-nav-clearance {
 }
 
 body[data-no-bottom-nav][data-mini-player-visible] .pb-nav-clearance {
-  padding-bottom: calc(76px + constant(safe-area-inset-bottom));
-  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  padding-bottom: calc(16px + var(--mini-player-height) + constant(safe-area-inset-bottom));
+  padding-bottom: calc(16px + var(--mini-player-height) + env(safe-area-inset-bottom));
 }
 
 .header-safe-padding {

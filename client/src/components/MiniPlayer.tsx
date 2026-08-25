@@ -81,11 +81,11 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
       className={`fixed left-0 right-0 z-50 transition-all duration-300 ease-out app-fixed-x ${
         animateIn ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
-      style={{ bottom: hasBottomNav ? 'calc(72px + env(safe-area-inset-bottom, 0px))' : 'env(safe-area-inset-bottom, 0px)' }}
+      style={{ bottom: hasBottomNav ? 'var(--bottom-nav-height)' : 'env(safe-area-inset-bottom, 0px)' }}
       data-testid="mini-player"
       data-no-swipe="true"
     >
-      <div className="mx-3 rounded-2xl bg-card/95 backdrop-blur-2xl shadow-lg ring-1 ring-border/40 overflow-hidden">
+      <div className="border-t border-border/70 bg-card/95 backdrop-blur-2xl shadow-[0_-8px_24px_rgba(0,0,0,0.16)] overflow-hidden">
         <div className="h-[3px] bg-foreground/10 dark:bg-white/10">
           <div
             className="h-full transition-[width] duration-100 ease-linear"
@@ -94,7 +94,7 @@ export default function MiniPlayer({ onNavigateToChapter, visible, hasBottomNav 
           />
         </div>
 
-        <div className="flex items-center gap-3 px-4 py-2.5">
+        <div className="flex h-[60px] items-center gap-3 px-4">
           <button
             className="flex-1 min-w-0 flex items-center gap-3"
             onClick={() => {

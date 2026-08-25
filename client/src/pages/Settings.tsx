@@ -10,10 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 import { ChevronRight, ChevronLeft, Check, CircleOff, Play, Pause, Loader2 } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeModeSelector, type ThemeMode } from "@/components/ui/theme-mode-selector";
 import { getManifest } from "@/services/audioCache";
+import { toast } from "@/hooks/use-toast";
+
+// Formspree form that receives "Give Feedback" submissions (delivered to the
+// account owner's email inbox). Replace the form ID if the form is recreated.
+const FEEDBACK_ENDPOINT = "https://formspree.io/f/mdenkqww";
 import { useAudio } from "@/contexts/AudioContext";
 import { useReciterPreview } from "@/hooks/useReciterPreview";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 function getDownloadedSize(): number {
   const manifest = getManifest();
@@ -39,7 +45,8 @@ interface SettingsProps {
   onNavigate?: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks") => void;
   onRegisterBackHandler?: (handler: () => boolean) => void;
   darkMode: boolean;
-  onDarkModeChange: (value: boolean) => void;
+  themeMode: ThemeMode;
+  onThemeModeChange: (mode: ThemeMode) => void;
   arabicScript: 'uthmani' | 'indopak' | 'tajweed';
   onArabicScriptChange: (value: 'uthmani' | 'indopak' | 'tajweed') => void;
   reciter: string;
@@ -99,13 +106,12 @@ function PillRow({ label, value, options, onChange, testIdPrefix }: {
   );
 }
 
-function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeToggle }: {
+function ToggleRow({ label, sublabel, checked, onCheckedChange, testId }: {
   label: string;
   sublabel?: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   testId: string;
-  isThemeToggle?: boolean;
 }) {
   return (
     <div className="flex items-center justify-between py-3">
@@ -113,11 +119,7 @@ function ToggleRow({ label, sublabel, checked, onCheckedChange, testId, isThemeT
         <p className="text-sm text-foreground/80">{label}</p>
         {sublabel && <p className="text-xs text-muted-foreground mt-0.5">{sublabel}</p>}
       </div>
-      {isThemeToggle ? (
-        <ThemeToggle isDark={checked} onToggle={onCheckedChange} />
-      ) : (
-        <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} />
-      )}
+      <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={label} data-testid={testId} />
     </div>
   );
 }
@@ -127,7 +129,8 @@ export default function Settings({
   onNavigate,
   onRegisterBackHandler,
   darkMode,
-  onDarkModeChange,
+  themeMode,
+  onThemeModeChange,
   arabicScript,
   onArabicScriptChange,
   reciter,
@@ -165,6 +168,7 @@ export default function Settings({
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const keyboardHeight = useKeyboardHeight();
   const [reciterView, setReciterView] = useState(false);
   const [scriptView, setScriptView] = useState(false);
   const [spacingView, setSpacingView] = useState(false);
@@ -202,7 +206,7 @@ export default function Settings({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://formspree.io/f/xbljowyl", {
+      const response = await fetch(FEEDBACK_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -217,8 +221,20 @@ export default function Settings({
       if (response.ok) {
         setFeedback("");
         setFeedbackOpen(false);
+        toast({ title: "Feedback sent", description: "Thank you for helping us improve Tanzeel." });
+      } else {
+        toast({
+          title: "Couldn't send feedback",
+          description: "Something went wrong on our end. Please try again later.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
+      toast({
+        title: "Couldn't send feedback",
+        description: "Check your internet connection and try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -459,7 +475,13 @@ export default function Settings({
               Display
             </h3>
             <div className="rounded-2xl px-4 py-1" style={{ backgroundColor: 'hsl(var(--sheet-muted) / 0.4)', border: '1px solid hsl(var(--sheet-muted))' }}>
-              <ToggleRow label="Theme" sublabel={darkMode ? "Dark" : "Light"} checked={darkMode} onCheckedChange={onDarkModeChange} testId="toggle-theme" isThemeToggle />
+              <div className="flex items-center justify-between py-3">
+                <div className="flex-1 pr-4">
+                  <p className="text-sm text-foreground/80">Theme</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{themeMode === 'system' ? 'Auto' : darkMode ? 'Dark' : 'Light'}</p>
+                </div>
+                <ThemeModeSelector value={themeMode} onChange={onThemeModeChange} />
+              </div>
               <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
               <button
                 onClick={() => setScriptView(true)}
@@ -574,17 +596,43 @@ export default function Settings({
               <Sheet open={feedbackOpen} onOpenChange={setFeedbackOpen}>
                 <SheetTrigger asChild>
                   <button
-                    className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 text-left"
+                    className="w-full flex items-center justify-between gap-3 py-3 hover-elevate active-elevate-2 text-left"
                     data-testid="button-give-feedback"
                   >
-                    <div>
-                      <p className="text-sm text-foreground/80">Give Feedback</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Share your thoughts with us</p>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+                        style={{
+                          backgroundColor: 'hsl(var(--glow-primary) / 0.15)',
+                          border: '1px solid hsl(var(--glow-primary) / 0.35)',
+                          boxShadow: '0 0 12px hsl(var(--glow-primary) / 0.25)',
+                        }}
+                      >
+                        <Icon icon="solar:chat-round-like-bold" className="w-5 h-5" style={{ color: 'hsl(var(--glow-primary))' }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">Give Feedback</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">Share your thoughts with us</p>
+                      </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <ChevronRight className="w-4 h-4 shrink-0" style={{ color: 'hsl(var(--glow-primary))' }} />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="bottom" className="h-[55vh] rounded-t-3xl overflow-hidden bg-screen-gradient" style={{ backgroundColor: 'hsl(var(--sheet-bg))', borderColor: 'hsl(var(--sheet-muted))' }}>
+                <SheetContent
+                  side="bottom"
+                  className="h-[55vh] rounded-t-3xl overflow-hidden bg-screen-gradient"
+                  style={{
+                    backgroundColor: 'hsl(var(--sheet-bg))',
+                    borderColor: 'hsl(var(--sheet-muted))',
+                    // Lift the sheet above the on-screen keyboard (iOS uses
+                    // Keyboard.resize 'none', so the WebView never shrinks).
+                    bottom: keyboardHeight,
+                    maxHeight: keyboardHeight
+                      ? `calc(100vh - ${keyboardHeight}px - env(safe-area-inset-top, 0px))`
+                      : undefined,
+                    transition: 'bottom 0.25s ease-out',
+                  }}
+                >
                   <SheetHeader className="relative z-10">
                     <SheetTitle className="text-xl font-semibold text-foreground">Send Feedback</SheetTitle>
                   </SheetHeader>
@@ -612,7 +660,13 @@ export default function Settings({
                       </Button>
                       <Button
                         onClick={handleFeedbackSubmit}
-                        className="flex-1 min-h-12"
+                        className="flex-1 min-h-12 border"
+                        style={{
+                          backgroundColor: 'hsl(var(--glow-primary))',
+                          color: 'hsl(234 34% 10%)',
+                          borderColor: 'hsl(var(--glow-primary))',
+                          boxShadow: '0 0 16px hsl(var(--glow-primary) / 0.35)',
+                        }}
                         disabled={isSubmitting}
                         data-testid="button-submit-feedback"
                       >

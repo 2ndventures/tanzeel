@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeModeSelector, type ThemeMode } from "@/components/ui/theme-mode-selector";
 import { chapters, Verse } from "@/lib/quranMetadata";
 import { lazyChapterService } from "@/services/lazyChapterService";
 
@@ -14,7 +14,8 @@ interface OnboardingScreenProps {
   transliterationFontSize: string;
   onTransliterationFontSizeChange: (value: string) => void;
   darkMode: boolean;
-  onDarkModeChange: (isDark: boolean) => void;
+  themeMode: ThemeMode;
+  onThemeModeChange: (mode: ThemeMode) => void;
 }
 
 export default function OnboardingScreen({
@@ -26,7 +27,8 @@ export default function OnboardingScreen({
   transliterationFontSize,
   onTransliterationFontSizeChange,
   darkMode,
-  onDarkModeChange,
+  themeMode,
+  onThemeModeChange,
 }: OnboardingScreenProps) {
   const [step, setStep] = useState(0);
   const [exampleVerses, setExampleVerses] = useState<Verse[]>([]);
@@ -131,9 +133,9 @@ export default function OnboardingScreen({
             <div className="flex items-center justify-between gap-3 bg-card/60 backdrop-blur-sm rounded-2xl px-5 py-4 border border-border/30 w-full">
               <div>
                 <p className="text-sm font-medium text-foreground">Appearance</p>
-                <p className="text-xs text-muted-foreground">{darkMode ? "Dark mode" : "Light mode"}</p>
+                <p className="text-xs text-muted-foreground">{themeMode === 'system' ? 'Auto (system)' : darkMode ? 'Dark mode' : 'Light mode'}</p>
               </div>
-              <ThemeToggle isDark={darkMode} onToggle={onDarkModeChange} />
+              <ThemeModeSelector value={themeMode} onChange={onThemeModeChange} />
             </div>
 
             <Button

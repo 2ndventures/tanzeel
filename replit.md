@@ -71,6 +71,8 @@ Note: full express auto-instrumentation requires running node/tsx with `--import
 
 Quran data (chapters, verses, Arabic text, English translations, transliterations) is statically stored client-side. User preferences are managed using local storage. Word-level timing data is fetched dynamically.
 
+The default reading translation is **Dr. Mustafa Khattab — "The Clear Quran"** (Allah edition, so the divine name renders as "Allah"). It is bundled into every chapter file's `translation` field, so reading works fully offline with no runtime API call. The text uses ornate brackets `˹…˺` for translator clarifications (intentional house style, preserved). Sourced from the freely-mirrored `fawazahmed0/quran-api` (`eng-mustafakhattaba`) because Quran.com's public API no longer serves this copyrighted edition. The one-time migration script is `scripts/apply-khattab-translation.mjs`. There is no in-app translation selector yet (possible future feature).
+
 # External Dependencies
 
 - **Third-Party UI Libraries**: Radix UI Primitives, shadcn/ui, Embla Carousel, cmdk, lucide-react.
@@ -82,5 +84,6 @@ Quran data (chapters, verses, Arabic text, English translations, transliteration
 - **Tajweed Color System**: CSS colors for `<tajweed>` HTML tags mapping to Quran.com V4 COLRv1 font's CPAL dark palette.
 - **External APIs & Data Sources**:
     - **Quran.com Audio API**: For continuous chapter audio and word-level timing data.
-    - **Al-Quran Cloud API**: For static Quran text data (Arabic, Sahih International English translation, transliteration).
+    - **Al-Quran Cloud API**: For static Quran text data (Arabic, transliteration) and the additional searchable English translations in the offline search corpus (Sahih International, Yusuf Ali, Pickthall, Shakir, Hilali & Khan).
+    - **fawazahmed0/quran-api (jsDelivr CDN)**: Source of the default reading translation — Dr. Mustafa Khattab's "The Clear Quran" (Allah edition).
 - **Mobile Deployment**: Capacitor for native iOS/Android, @capacitor/haptics, @capacitor/filesystem, @capacitor/network.

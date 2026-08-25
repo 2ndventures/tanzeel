@@ -9,11 +9,14 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
   ios: {
-    contentInset: 'always',
+    contentInset: 'never',
     scrollEnabled: false,
     backgroundColor: '#000000'
   },
   plugins: {
+    SystemBars: {
+      insetsHandling: 'disable'
+    },
     Keyboard: {
       resize: 'none',
       style: 'DARK'
