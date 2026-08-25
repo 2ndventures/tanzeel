@@ -331,6 +331,16 @@
     position: relative;
   }
 
+  /* Native builds keep the narrow phone canvas; desktop web uses the full
+     viewport instead of rendering the app between black side gutters. */
+  @media (min-width: 768px) {
+    #root {
+      --app-max-width: 100vw;
+      --app-margin-x: 0px;
+      max-width: none;
+    }
+  }
+
   /* Constrains viewport-fixed elements to the app's max-width column */
   .app-fixed-x {
     left: var(--app-margin-x) !important;
