@@ -197,7 +197,7 @@ function VerseCardInner({
                 }`}
                 data-testid={`text-verse-number-${verseNumber}`}
               >
-                {verseNumber === 0 ? 'Preamble' : `${chapterId}:${verseNumber}`}
+                {`${chapterId}:${verseNumber}`}
               </span>
             )}
             {!showVerseNumbers && <span />}

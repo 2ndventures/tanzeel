@@ -299,11 +299,9 @@ export default function FocusedFlowView({
             scaleOpacityClass = 'opacity-20 scale-75';
           }
 
-          const verseLabel = page.verseNumber === 0
-            ? 'Preamble'
-            : page.totalPages > 1
-              ? `${chapterId}:${page.verseNumber} (${page.pageIndex + 1}/${page.totalPages})`
-              : `${chapterId}:${page.verseNumber}`;
+          const verseLabel = page.totalPages > 1
+            ? `${chapterId}:${page.verseNumber} (${page.pageIndex + 1}/${page.totalPages})`
+            : `${chapterId}:${page.verseNumber}`;
 
           return (
             <div
