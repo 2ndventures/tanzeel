@@ -1015,6 +1015,12 @@ export function useWordTimingAudio(
           audio.load();
           playWhenReady(audio, () => {
             clearSrcFlag();
+            // The preamble clip never became playable (e.g. backend not yet
+            // deployed with this route) — skip it rather than get stuck.
+            if (inPreambleRef.current) {
+              transitionFromPreambleToChapter();
+              return;
+            }
             setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
           });
           if (preambleUrl) {
@@ -1121,6 +1127,18 @@ export function useWordTimingAudio(
       clearStallWatchdog();
       if (recoveryInFlightRef.current) return;
       recoveryInFlightRef.current = true;
+
+      // The Bismillah clip failed to load (backend down, not yet deployed with
+      // this route, network hiccup, etc.) — it's an optional intro, not the
+      // chapter itself, so skip it and play the target chapter's own audio
+      // directly rather than running the full retry/offline-fallback cascade
+      // below (which is built for a real streaming failure and would otherwise
+      // block the whole surah on a clip that may never load).
+      if (inPreambleRef.current) {
+        recoveryInFlightRef.current = false;
+        transitionFromPreambleToChapter();
+        return;
+      }
 
       // VBV: surface error directly; no auto-retry.
       if (verseByVerseRef.current) {
@@ -1634,6 +1652,22 @@ export function useWordTimingAudio(
 
     if (autoplayRef.current) {
       playWhenReady(audio, () => {
+        // The preamble clip never became playable (e.g. backend not yet
+        // deployed with this route) — skip it and play the chapter's own
+        // audio directly rather than surfacing an error for an optional intro.
+        if (inPreambleRef.current && resolvedChapterUrlRef.current) {
+          inPreambleRef.current = false;
+          beginSrcSwap();
+          audio.src = resolvedChapterUrlRef.current;
+          audio.playbackRate = speedRef.current;
+          audio.load();
+          playWhenReady(audio, () => {
+            setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
+          });
+          currentVerseIndexRef.current = -1;
+          setState(prev => ({ ...prev, currentVerseKey: null, currentWordIndex: null, currentTime: 0 }));
+          return;
+        }
         setState(prev => ({ ...prev, isPlaying: false, isLoading: false, error: 'Tap play to start audio' }));
       });
     }
@@ -1875,6 +1909,23 @@ export function useWordTimingAudio(
       audio.load();
       playWhenReady(audio, () => {
         clearSrcFlag();
+        // The clip never became playable — fall back to the chapter's own
+        // audio (from the top) rather than leaving playback stuck on nothing.
+        if (inPreambleRef.current && resolvedChapterUrlRef.current) {
+          inPreambleRef.current = false;
+          const chapterUrl = resolvedChapterUrlRef.current;
+          beginSrcSwap();
+          audio.src = chapterUrl;
+          audio.playbackRate = speedRef.current;
+          audio.load();
+          playWhenReady(audio, () => {
+            clearSrcFlag();
+            setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+          });
+          currentVerseIndexRef.current = -1;
+          setState(prev => ({ ...prev, currentVerseKey: null, currentWordIndex: null, currentTime: 0 }));
+          return;
+        }
         setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
       });
       currentVerseIndexRef.current = -1;
