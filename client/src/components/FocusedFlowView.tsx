@@ -91,7 +91,7 @@ export default function FocusedFlowView({
     const isTajweed = arabicScript === 'tajweed';
 
     verses.forEach((verse, index) => {
-      const verseNumber = index + 1;
+      const verseNumber = verse.number;
 
       if (isTajweed) {
         const tajweedWords = tokenizeTajweedWords(verse.arabicText);
@@ -210,7 +210,7 @@ export default function FocusedFlowView({
   }, []);
 
   useEffect(() => {
-    if (!scrollContainerRef.current || !currentVerse || !isPlaying || userScrollingFFRef.current) return;
+    if (!scrollContainerRef.current || currentVerse === null || !isPlaying || userScrollingFFRef.current) return;
 
     let targetPageIdx = -1;
     if (currentWordIndex !== null && currentWordIndex >= 0) {

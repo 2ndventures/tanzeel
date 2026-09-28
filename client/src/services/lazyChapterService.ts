@@ -65,7 +65,7 @@ class LazyChapterService {
 
     // Merge: replace arabicText (and arabicWords if provided) with the script edition
     const verses: Verse[] = baseChapter.verses.map((verse, index) => {
-      const verseKey = `${chapterId}:${verse.number || index + 1}`;
+      const verseKey = `${chapterId}:${verse.number ?? index + 1}`;
       const scriptEntry = scriptByKey.get(verseKey);
       return {
         ...verse,

@@ -29,6 +29,7 @@ const KNOWN_KEYS: string[] = [
   'quran-reading-stats',
   'quran-playback-speed',
   'quran-chapter-speeds',
+  'quran-rate-prompt-state',
 ];
 
 const cache = new Map<string, string>();

@@ -58,6 +58,12 @@ async function main() {
       apiByNum.set(verseNum, v.text_uthmani);
     }
 
+    // NOTE: this loop iterates and mutates localData.verses in place \u2014 it
+    // never rebuilds the array from the API response \u2014 so the synthetic
+    // verse-0 Bismillah preamble (present on every surah except Al-Fatiha
+    // and At-Tawbah) is never dropped. apiByNum has no entry for verse 0
+    // (the API doesn't return one), so `apiText` is undefined for it and it
+    // simply falls through to the "unchanged" branch untouched.
     let chapterChanged = false;
     for (const verse of localData.verses) {
       totalVerses++;
