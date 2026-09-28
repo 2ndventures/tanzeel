@@ -4,6 +4,7 @@ import { useWordTimingAudio, type AudioFile } from '@/hooks/useWordTimingAudio';
 import { getQuranComReciterId, getReciterById } from '@/lib/reciters';
 import { chapters } from '@/lib/quranMetadata';
 import { useMediaSession } from '@/hooks/useMediaSession';
+import { notifyChapterCompleted } from '@/lib/rateApp';
 
 interface AudioContextValue {
   activeChapterId: number | null;
@@ -61,6 +62,9 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
 
   const onEnded = useCallback(() => {
     const currentId = activeChapterIdRef.current;
+    if (currentId) {
+      notifyChapterCompleted();
+    }
     // Always advance the audio at the context level so background lock-screen and
     // mini-player playback continue even if no UI is mounted to handle navigation.
     // The chapter-change callback is what UIs register with to mirror the URL.

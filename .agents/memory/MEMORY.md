@@ -1,3 +1,4 @@
 - [Vaul drawer + embla carousel open jank](drawer-carousel-open-jank.md) — preload preview images + visibility-gate the carousel until embla re-measures so the drawer only slides up/down, no internal reflow.
 - [Android safe-area edge-to-edge](android-safe-area-edge-to-edge.md) — CSS env() owns insets on both platforms; iOS contentInset 'never', Android EdgeToEdge + safe-area@7 polyfill + SystemBars insetsHandling 'disable'.
 - [Bottom sheet / drawer safe-area](bottom-sheet-safe-area.md) — add env(safe-area-inset-bottom) in ONE layer so popups clear the iPhone home indicator; SheetContent already has p-6 base.
+- [Workflow process ownership](workflow-process-ownership.md) — use one managed dev workflow; a separate default Run command can leave a detached server on the preview port.

@@ -91,7 +91,7 @@ export default function FocusedFlowView({
     const isTajweed = arabicScript === 'tajweed';
 
     verses.forEach((verse, index) => {
-      const verseNumber = index + 1;
+      const verseNumber = verse.number;
 
       if (isTajweed) {
         const tajweedWords = tokenizeTajweedWords(verse.arabicText);
@@ -210,7 +210,7 @@ export default function FocusedFlowView({
   }, []);
 
   useEffect(() => {
-    if (!scrollContainerRef.current || !currentVerse || !isPlaying || userScrollingFFRef.current) return;
+    if (!scrollContainerRef.current || currentVerse === null || !isPlaying || userScrollingFFRef.current) return;
 
     let targetPageIdx = -1;
     if (currentWordIndex !== null && currentWordIndex >= 0) {
@@ -299,11 +299,9 @@ export default function FocusedFlowView({
             scaleOpacityClass = 'opacity-20 scale-75';
           }
 
-          const verseLabel = page.verseNumber === 0
-            ? 'Preamble'
-            : page.totalPages > 1
-              ? `${chapterId}:${page.verseNumber} (${page.pageIndex + 1}/${page.totalPages})`
-              : `${chapterId}:${page.verseNumber}`;
+          const verseLabel = page.totalPages > 1
+            ? `${chapterId}:${page.verseNumber} (${page.pageIndex + 1}/${page.totalPages})`
+            : `${chapterId}:${page.verseNumber}`;
 
           return (
             <div
@@ -326,9 +324,12 @@ export default function FocusedFlowView({
                 >
                   {page.words.map((word, wIdx) => {
                     const globalWordIdx = page.wordOffset + wIdx;
-                    const isCurrentWord = isCurrentVerse &&
-                      currentWordIndex !== null &&
-                      currentWordIndex === globalWordIdx;
+                    // The Bismillah preamble has no word-by-word timing of its own —
+                    // light up the whole phrase as one unit whenever it's active.
+                    const isCurrentWord = isCurrentVerse && (
+                      page.verseNumber === 0 ||
+                      (currentWordIndex !== null && currentWordIndex === globalWordIdx)
+                    );
                     return page.isTajweed ? (
                       <Fragment key={`fw-${chapterId}-${page.verseNumber}-${globalWordIdx}`}>
                         <span
