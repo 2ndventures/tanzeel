@@ -2,105 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { Readable, pipeline } from "stream";
 import path from "path";
-import { spawn } from "child_process";
-import fsp from "fs/promises";
-import os from "os";
-import ffmpegPath from "ffmpeg-static";
 
 const SAFE_PARAM = /^[a-zA-Z0-9_\-]+$/;
 const SAFE_NUM = /^[0-9]+$/;
-
-// ── Bismillah preamble clip cache ───────────────────────────────────────────
-// Every surah but At-Tawbah recites the Bismillah, and Al-Fatiha's own verse 1
-// *is* the Bismillah — so chapter 1's own audio (same reciter, same recording
-// session) is trimmed at verse "1:1"'s own boundary into a small, clean,
-// standalone clip, cached per reciter (NOT per chapter — one clip covers every
-// target chapter for that reciter, since it's the same few seconds every time).
-//
-// Deliberately never touches the target chapter's (potentially 100MB+) audio —
-// this codebase already hit production timeout issues proxying full chapters
-// through this backend (see the /api/audio-timing comment below), so that
-// audio is left to stream client-to-CDN exactly as it always has. Only this
-// small, one-time-per-reciter clip is processed server-side.
-//
-// ffmpeg-static's bundled binary segfaults on remote https:// input in this
-// environment (a known class of issue with statically-linked TLS in these
-// builds) but is solid on local files — so the source is always fetched via
-// Node's own fetch() first and handed to ffmpeg as a local file, never a URL.
-const BISMILLAH_CACHE_DIR = path.join(os.tmpdir(), "tanzeel-bismillah-cache");
-const bismillahInFlight = new Map<number, Promise<Buffer>>();
-
-async function getBismillahClip(reciterId: number): Promise<Buffer> {
-  const cachePath = path.join(BISMILLAH_CACHE_DIR, `${reciterId}.mp3`);
-
-  try {
-    return await fsp.readFile(cachePath);
-  } catch {
-    // Not cached yet — fall through to generate it.
-  }
-
-  const existing = bismillahInFlight.get(reciterId);
-  if (existing) return existing;
-
-  const generate = (async (): Promise<Buffer> => {
-    await fsp.mkdir(BISMILLAH_CACHE_DIR, { recursive: true });
-
-    const timingUrl = `https://api.qurancdn.com/api/qdc/audio/reciters/${reciterId}/audio_files?chapter=1&segments=true`;
-    const timingRes = await fetch(timingUrl);
-    if (!timingRes.ok) throw new Error(`Chapter 1 timing fetch failed: ${timingRes.status}`);
-    const timingData = await timingRes.json() as Record<string, unknown>;
-    const audioFilesRaw = timingData.audio_files ?? (timingData.audio_file ? [timingData.audio_file] : null);
-    const audioFile = Array.isArray(audioFilesRaw) ? audioFilesRaw[0] as Record<string, unknown> : null;
-    const audioUrl = audioFile?.audio_url as string | undefined;
-    if (!audioUrl) throw new Error("No audio_url in chapter 1 timing response");
-    const verseTimings = audioFile?.verse_timings as Array<{ verse_key: string; timestamp_to: number }> | undefined;
-    const v1 = verseTimings?.find(t => t.verse_key === "1:1");
-    if (!v1) throw new Error('No "1:1" verse timing in chapter 1 response');
-    const boundarySec = v1.timestamp_to / 1000;
-
-    console.log(`📡 Fetching chapter 1 audio for Bismillah clip (reciter ${reciterId}): ${audioUrl}`);
-    const audioRes = await fetch(audioUrl);
-    if (!audioRes.ok) throw new Error(`Chapter 1 audio fetch failed: ${audioRes.status}`);
-    const audioBuf = Buffer.from(await audioRes.arrayBuffer());
-
-    const tempInPath = path.join(BISMILLAH_CACHE_DIR, `${reciterId}-src.mp3`);
-    await fsp.writeFile(tempInPath, audioBuf);
-
-    if (!ffmpegPath) throw new Error("ffmpeg-static returned no binary path for this platform");
-    const ffmpegBin: string = ffmpegPath;
-
-    try {
-      await new Promise<void>((resolve, reject) => {
-        const proc = spawn(ffmpegBin, [
-          "-y", "-loglevel", "error",
-          "-i", tempInPath,
-          "-t", boundarySec.toFixed(3),
-          "-vn", "-acodec", "libmp3lame", "-b:a", "128k",
-          cachePath,
-        ]);
-        let stderr = "";
-        proc.stderr.on("data", (d) => { stderr += d.toString(); });
-        proc.on("error", reject);
-        proc.on("exit", (code) => {
-          if (code === 0) resolve();
-          else reject(new Error(`ffmpeg exited ${code}: ${stderr}`));
-        });
-      });
-    } finally {
-      await fsp.unlink(tempInPath).catch(() => {});
-    }
-
-    console.log(`✓ Cached Bismillah clip for reciter ${reciterId} (boundary ${boundarySec.toFixed(3)}s)`);
-    return fsp.readFile(cachePath);
-  })();
-
-  bismillahInFlight.set(reciterId, generate);
-  try {
-    return await generate;
-  } finally {
-    bismillahInFlight.delete(reciterId);
-  }
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Public, no-JavaScript privacy policy URL for app-store reviewers and
@@ -118,25 +22,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     throw new Error("Sentry test error from /api/_debug/sentry");
   });
 
-
-  // Bismillah preamble clip — see getBismillahClip above for how/why this is
-  // generated (chapter 1's own audio trimmed at verse "1:1", cached per reciter).
-  app.get("/api/audio/bismillah-clip/:reciterId", async (req, res) => {
-    try {
-      const { reciterId } = req.params;
-      if (!SAFE_NUM.test(reciterId)) {
-        return res.status(400).json({ error: "Invalid parameters" });
-      }
-      const buf = await getBismillahClip(parseInt(reciterId, 10));
-      res.setHeader("Content-Type", "audio/mpeg");
-      res.setHeader("Content-Length", buf.length.toString());
-      res.setHeader("Cache-Control", "public, max-age=31536000");
-      res.send(buf);
-    } catch (error) {
-      console.error("❌ Bismillah clip error:", error);
-      res.status(500).send("Failed to generate Bismillah clip");
-    }
-  });
 
   // Verse-by-verse audio proxy for EveryAyah.com
   app.get("/api/verse-audio/:reciterFolder/:surah/:ayah", async (req, res) => {

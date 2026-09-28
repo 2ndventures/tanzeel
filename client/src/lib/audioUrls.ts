@@ -37,15 +37,6 @@ export function getChapterAudioUrl(reciterId: number, chapterId: number): string
   return `${QURAN_AUDIO_CDN}/${info.path}/${chapter}.mp3`;
 }
 
-// Our own server's clean, pre-trimmed Bismillah clip for this reciter (chapter 1's
-// own audio, cut exactly at verse "1:1" and cached — see getBismillahClip in
-// server/routes.ts). Always goes through our backend on both platforms since,
-// unlike the CDN endpoints above, no public URL for an isolated Bismillah clip
-// exists anywhere to point at directly.
-export function getBismillahClipUrl(reciterId: number): string {
-  return `${API_BASE_URL}/api/audio/bismillah-clip/${reciterId}`;
-}
-
 export function getVerseAudioUrl(everyAyahFolder: string, surahNum: number, verseNum: number): string {
   const surah = String(surahNum).padStart(3, '0');
   const ayah = String(verseNum).padStart(3, '0');

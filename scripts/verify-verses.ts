@@ -81,15 +81,7 @@ async function main() {
     }
 
     const localByNum = new Map<number, string>();
-    for (const v of localVerses) {
-      // Verse 0 is a synthetic local-only Bismillah preamble (added to every
-      // surah except Al-Fatiha, where it's the real verse 1, and At-Tawbah,
-      // where it isn't recited). The upstream API never returns a verse 0,
-      // so it must be excluded from comparison rather than flagged as an
-      // "extra" verse present locally but missing from the API.
-      if (v.number === 0) continue;
-      localByNum.set(v.number, v.arabicText);
-    }
+    for (const v of localVerses) localByNum.set(v.number, v.arabicText);
 
     const apiByNum = new Map<number, string>();
     for (const v of apiVerses) {
@@ -97,13 +89,8 @@ async function main() {
       apiByNum.set(verseNum, v.text_uthmani);
     }
 
-    // Every surah except Al-Fatiha (1) and At-Tawbah (9) carries one extra
-    // local verse — the synthetic verse-0 Bismillah preamble — that the API
-    // never returns, so it's excluded from the raw count comparison.
-    const hasBismillahPreamble = i !== 1 && i !== 9 && localVerses.some((v) => v.number === 0);
-    const comparableLocalCount = hasBismillahPreamble ? localVerses.length - 1 : localVerses.length;
-    if (comparableLocalCount !== apiVerses.length) {
-      countIssues.push(`Chapter ${i}: Local has ${comparableLocalCount} verses (excluding Bismillah preamble), API has ${apiVerses.length} verses`);
+    if (localVerses.length !== apiVerses.length) {
+      countIssues.push(`Chapter ${i}: Local has ${localVerses.length} verses, API has ${apiVerses.length} verses`);
     }
 
     for (const [num] of localByNum) {

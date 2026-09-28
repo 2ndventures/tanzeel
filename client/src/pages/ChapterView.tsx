@@ -1045,7 +1045,7 @@ export default function ChapterView({
 
             {/* Verses */}
             {!isLoadingVerses && !versesError && verses.map((verse, index) => {
-              const verseNumber = verse.number;
+              const verseNumber = index + 1;
               const isCurrentVerse = currentVerse === verseNumber;
 
               return (
