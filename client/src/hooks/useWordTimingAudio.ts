@@ -10,7 +10,7 @@ import {
   getFullChapterAudioUri,
 } from '@/services/audioCache';
 import { RECITER_TO_QURAN_COM_ID } from '@/lib/reciters';
-import { getTimingUrl, getChapterAudioUrl, normalizeTimingResponse } from '@/lib/audioUrls';
+import { getTimingUrl, getChapterAudioUrl, getBismillahClipUrl, normalizeTimingResponse } from '@/lib/audioUrls';
 
 const GLOBAL_SPEED_KEY = 'quran-playback-speed';
 const OLD_CHAPTER_SPEEDS_KEY = 'quran-chapter-speeds';
@@ -92,6 +92,18 @@ function quranComIdToReciterString(quranComId: number): string | null {
   return null;
 }
 
+// URL of the Bismillah preamble clip to splice in before a chapter's own audio —
+// or null when there's nothing to splice (Al-Fatiha already has it as its real
+// verse 1; At-Tawbah doesn't recite it). Deliberately just a plain string builder,
+// same as getChapterAudioUrl — the clip has no word-level timing of its own (it's
+// highlighted as a single solid block, not word-by-word — see VerseCard/
+// FocusedFlowView/MushafPageView's `verseNumber === 0` handling), so there's no
+// timing data to fetch or cache client-side, and therefore no cache to go stale.
+function getPreambleAudioUrl(reciterId: number, chapterId: number): string | null {
+  if (chapterId === 1 || chapterId === 9) return null;
+  return getBismillahClipUrl(reciterId);
+}
+
 export function useWordTimingAudio(
   chapterId: number,
   reciterId: number = 7,
@@ -148,6 +160,7 @@ export function useWordTimingAudio(
   // closure) reach into callbacks declared later in the file without
   // becoming deps of that effect.
   const startPrefetchRef = useRef<() => void>(() => {});
+  const prefetchTargetChapterNowRef = useRef<(targetChapterId: number, curReciter: number) => void>(() => {});
 
   // Stall watchdog: 'waiting'/'stalled' has no built-in timeout, so escalate
   // to the error-recovery cascade after 8s of no progress.
@@ -190,6 +203,13 @@ export function useWordTimingAudio(
   // fallback only — the audio element's `paused` property is preferred
   // since it's always current).
   const isPlayingRef = useRef(false);
+
+  // True while `audio.src` holds the Bismillah preamble clip rather than the
+  // target chapter's own audio. resolvedChapterUrlRef is the target chapter's
+  // audio URL, prefetched immediately so the handoff (on the clip's natural
+  // 'ended' event) is instant.
+  const inPreambleRef = useRef(false);
+  const resolvedChapterUrlRef = useRef<string | null>(null);
 
   // Tracks the most recent in-flight "play when ready" attempt so a new
   // src swap (or another playWhenReady call) can cancel it. Without this,
@@ -477,38 +497,38 @@ export function useWordTimingAudio(
   }, []);
   clearPrefetchRef.current = clearPrefetch;
 
-  // Fire-and-forget warm of the next chapter's audio + timing JSON.
-  // Idempotent per (chapter, reciter) target.
-  const startPrefetchForNextChapter = useCallback(async () => {
-    if (repeatRef.current || !autoplayRef.current) return;
-    const curChapter = currentChapterIdRef.current;
-    const curReciter = reciterIdRef.current;
-    if (curChapter === null || curChapter >= 114) return;
-    const nextChapterId = curChapter + 1;
-
+  // Warms the audio + timing data for targetChapterId, so a later src swap to it
+  // (chapter-to-chapter auto-advance, or the Bismillah preamble handing off to its
+  // own target chapter) is instant. curChapter/curReciter are what was active when
+  // the prefetch started, used to detect the user navigating away mid-fetch.
+  const prefetchChapterAudioCore = useCallback(async (
+    targetChapterId: number,
+    curChapter: number,
+    curReciter: number
+  ) => {
     const triggered = prefetchTriggeredForRef.current;
     if (
       triggered &&
-      triggered.chapterId === nextChapterId &&
+      triggered.chapterId === targetChapterId &&
       triggered.reciterId === curReciter
     ) {
       return;
     }
-    prefetchTriggeredForRef.current = { chapterId: nextChapterId, reciterId: curReciter };
+    prefetchTriggeredForRef.current = { chapterId: targetChapterId, reciterId: curReciter };
 
     const reciterString = quranComIdToReciterString(curReciter);
 
     // Offline branch: pre-resolve the local file URI + warm timing JSON.
-    if (reciterString && isFullChapterDownloaded(reciterString, nextChapterId)) {
+    if (reciterString && isFullChapterDownloaded(reciterString, targetChapterId)) {
       try {
-        const uri = await getFullChapterAudioUri(reciterString, nextChapterId);
+        const uri = await getFullChapterAudioUri(reciterString, targetChapterId);
         if (
           currentChapterIdRef.current === curChapter &&
           reciterIdRef.current === curReciter &&
           uri
         ) {
           prefetchedRef.current = {
-            chapterId: nextChapterId,
+            chapterId: targetChapterId,
             reciterId: curReciter,
             url: uri,
             isOffline: true,
@@ -519,11 +539,11 @@ export function useWordTimingAudio(
         // loadAudio re-resolves offline on the React-side advance.
         console.warn('Tanzeel: prefetch URI resolve failed:', err);
       }
-      if (!getTimingDataFromMemory(curReciter, nextChapterId)) {
+      if (!getTimingDataFromMemory(curReciter, targetChapterId)) {
         try {
-          const off = await getOfflineTimingData(reciterString, nextChapterId) as TimingData | null;
+          const off = await getOfflineTimingData(reciterString, targetChapterId) as TimingData | null;
           if (off?.audio_files?.[0]) {
-            storeTimingDataInMemory(curReciter, nextChapterId, off);
+            storeTimingDataInMemory(curReciter, targetChapterId, off);
           }
         } catch (err) {
           console.warn('Tanzeel: prefetch offline timing failed:', err);
@@ -533,8 +553,8 @@ export function useWordTimingAudio(
     }
 
     // Streaming branch: warm a hidden <audio> so the browser HTTP-caches.
-    const nextUrl = getChapterAudioUrl(curReciter, nextChapterId);
-    if (!nextUrl) return;
+    const targetUrl = getChapterAudioUrl(curReciter, targetChapterId);
+    if (!targetUrl) return;
 
     if (prefetchAudioRef.current) {
       prefetchAudioRef.current.pause();
@@ -548,21 +568,21 @@ export function useWordTimingAudio(
       const warmer = document.createElement('audio');
       warmer.preload = 'auto';
       warmer.muted = true; // never produce sound; we never call play()
-      warmer.src = nextUrl;
+      warmer.src = targetUrl;
       warmer.load();
       container.appendChild(warmer);
       prefetchAudioRef.current = warmer;
     }
     prefetchedRef.current = {
-      chapterId: nextChapterId,
+      chapterId: targetChapterId,
       reciterId: curReciter,
-      url: nextUrl,
+      url: targetUrl,
       isOffline: false,
     };
 
-    if (!getTimingDataFromMemory(curReciter, nextChapterId)) {
+    if (!getTimingDataFromMemory(curReciter, targetChapterId)) {
       try {
-        const r = await fetch(getTimingUrl(curReciter, nextChapterId));
+        const r = await fetch(getTimingUrl(curReciter, targetChapterId));
         if (r.ok) {
           const raw = await r.json() as Record<string, unknown>;
           const normalized = normalizeTimingResponse(raw);
@@ -572,7 +592,7 @@ export function useWordTimingAudio(
             currentChapterIdRef.current === curChapter &&
             reciterIdRef.current === curReciter
           ) {
-            storeTimingDataInMemory(curReciter, nextChapterId, data);
+            storeTimingDataInMemory(curReciter, targetChapterId, data);
           }
         }
       } catch (err) {
@@ -581,9 +601,31 @@ export function useWordTimingAudio(
     }
   }, []);
 
+  // Fire-and-forget warm of the next chapter's audio + timing JSON.
+  // Idempotent per (chapter, reciter) target.
+  const startPrefetchForNextChapter = useCallback(async () => {
+    if (repeatRef.current || !autoplayRef.current) return;
+    const curChapter = currentChapterIdRef.current;
+    const curReciter = reciterIdRef.current;
+    if (curChapter === null || curChapter >= 114) return;
+    await prefetchChapterAudioCore(curChapter + 1, curChapter, curReciter);
+  }, [prefetchChapterAudioCore]);
+
+  // Warms the audio + timing for the chapter whose Bismillah preamble is about to
+  // play (or is already playing), called immediately rather than waiting for
+  // playback to reach 80% through — the preamble clip is only a few seconds long,
+  // so the handoff needs it ready almost right away to stay gapless.
+  const prefetchTargetChapterNow = useCallback((targetChapterId: number, curReciter: number) => {
+    void prefetchChapterAudioCore(targetChapterId, targetChapterId, curReciter);
+  }, [prefetchChapterAudioCore]);
+
   useEffect(() => {
     startPrefetchRef.current = startPrefetchForNextChapter;
   }, [startPrefetchForNextChapter]);
+
+  useEffect(() => {
+    prefetchTargetChapterNowRef.current = prefetchTargetChapterNow;
+  }, [prefetchTargetChapterNow]);
 
   const clearStallWatchdog = useCallback(() => {
     if (stallWatchdogRef.current) {
@@ -612,6 +654,13 @@ export function useWordTimingAudio(
     audioRef.current = audio;
 
     const handleLoadedMetadata = () => {
+      // Skip while the preamble clip is loaded — this would otherwise report its
+      // own short duration, making the progress bar jump around confusingly
+      // before the target chapter's real audio takes over. Left at whatever it
+      // was (0, from the reset at the top of loadAudio) until the handoff loads
+      // the target chapter's real audio and fires this again with inPreambleRef
+      // now false.
+      if (inPreambleRef.current) return;
       const dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
       setState(prev => ({ ...prev, duration: dur }));
     };
@@ -619,6 +668,32 @@ export function useWordTimingAudio(
     const handleTimeUpdate = () => {
       const ct = audio.currentTime;
       const actuallyPlaying = !audio.paused && !audio.ended;
+
+      if (inPreambleRef.current) {
+        // The clip has no word-level timing of its own — just keep the Preamble
+        // verse marked active (VerseCard highlights the whole phrase as one unit
+        // for verse 0) and isPlaying/isLoading accurate. The clip's natural
+        // 'ended' event (handleEnded) is what triggers the handoff to the target
+        // chapter, not anything here.
+        const chapter = currentChapterIdRef.current;
+        if (chapter === null) return;
+        const verseKey = `${chapter}:0`;
+        setState(prev => {
+          const needsLoadingClear = actuallyPlaying && prev.isLoading;
+          const needsPlayingSet = actuallyPlaying && !prev.isPlaying;
+          const needsVerseSet = prev.currentVerseKey !== verseKey || prev.currentWordIndex !== null;
+          if (!needsLoadingClear && !needsPlayingSet && !needsVerseSet) return prev;
+          if (verseKey !== prev.currentVerseKey) onVerseChangeRef.current?.(verseKey);
+          return {
+            ...prev,
+            currentVerseKey: verseKey,
+            currentWordIndex: null,
+            ...(needsLoadingClear && { isLoading: false }),
+            ...(needsPlayingSet && { isPlaying: true }),
+          };
+        });
+        return;
+      }
 
       if (verseByVerseRef.current) {
         const verseNum = currentVerseNumRef.current;
@@ -797,7 +872,37 @@ export function useWordTimingAudio(
       }, STALL_WATCHDOG_MS);
     };
 
+    // The Bismillah preamble clip is a clean, server-trimmed file that ends
+    // exactly at the intended boundary, so its natural 'ended' event (handled
+    // below) is what triggers this — no boundary-position polling needed. Hands
+    // off to the target chapter's own audio, already prefetched via
+    // prefetchTargetChapterNowRef so this swap is effectively instant.
+    const transitionFromPreambleToChapter = () => {
+      if (!inPreambleRef.current) return; // defensive — shouldn't double-fire
+      const chapterUrl = resolvedChapterUrlRef.current;
+      inPreambleRef.current = false;
+      if (!chapterUrl) {
+        setState(prev => ({ ...prev, isPlaying: false }));
+        return;
+      }
+      beginSrcSwap();
+      audio.src = chapterUrl;
+      audio.playbackRate = speedRef.current;
+      audio.load();
+      playWhenReady(audio, () => {
+        clearSrcFlag();
+        setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+      });
+      currentVerseIndexRef.current = -1;
+      setState(prev => ({ ...prev, currentVerseKey: null, currentWordIndex: null, currentTime: 0 }));
+    };
+
     const handleEnded = () => {
+      if (inPreambleRef.current) {
+        transitionFromPreambleToChapter();
+        return;
+      }
+
       if (repeatRef.current) {
         audio.currentTime = 0;
         // Silenced: play() rejects when autoplay policy blocks resumption after
@@ -898,13 +1003,26 @@ export function useWordTimingAudio(
         const doInPlaceAdvance = (url: string) => {
           beginSrcSwap();
           inPlaceAdvanceTokenRef.current = { chapterId: nextChapterId, reciterId: reciterIdRef.current };
-          audio.src = url;
+          resolvedChapterUrlRef.current = url;
+
+          // Route through nextChapterId's own Bismillah preamble first (a plain
+          // URL, always available synchronously — no fetch/cache to be cold).
+          const preambleUrl = getPreambleAudioUrl(reciterIdRef.current, nextChapterId);
+          inPreambleRef.current = !!preambleUrl;
+
+          audio.src = preambleUrl ?? url;
           audio.playbackRate = speedRef.current;
           audio.load();
           playWhenReady(audio, () => {
             clearSrcFlag();
             setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
           });
+          if (preambleUrl) {
+            // We diverted to the preamble clip instead of playing `url` directly —
+            // start warming the target chapter's own audio right away so the
+            // handoff on the clip's 'ended' event is instant.
+            prefetchTargetChapterNowRef.current(nextChapterId, reciterIdRef.current);
+          }
           currentChapterIdRef.current = nextChapterId;
           // Hand off pre-warmed timing JSON synchronously; loadAudio
           // re-fetches if it wasn't warmed.
@@ -1379,6 +1497,11 @@ export function useWordTimingAudio(
     currentVerseNumRef.current = null;
     timingDataRef.current = null;
     currentVerseIndexRef.current = -1;
+    // Reset here; the online-streaming branch below re-arms it when this chapter
+    // has a preamble to play. Offline chapters intentionally skip the preamble
+    // (no cached clip to splice in) and just play the downloaded audio directly.
+    inPreambleRef.current = false;
+    resolvedChapterUrlRef.current = null;
 
     // Drain any preloaded VBV elements left over from a prior VBV session.
     for (const [, preload] of Array.from(vbvPreloadRef.current.entries())) {
@@ -1458,11 +1581,29 @@ export function useWordTimingAudio(
       setState(prev => ({ ...prev, isLoading: false, error: 'No audio URL available for this chapter' }));
       return;
     }
+    resolvedChapterUrlRef.current = streamingUrl;
+
+    // A backoff-retry resuming mid-chapter (network dropout recovery) should land
+    // directly back in the chapter's own audio, not replay the preamble from the top.
+    const resumingMidChapter = !!(
+      pendingResumePositionRef.current &&
+      pendingResumePositionRef.current.chapterId === chapterId &&
+      pendingResumePositionRef.current.reciterId === reciterId
+    );
+    const preambleUrl = resumingMidChapter ? null : getPreambleAudioUrl(reciterId, chapterId);
+    inPreambleRef.current = !!preambleUrl;
 
     beginSrcSwap();
-    audio.src = streamingUrl;
+    audio.src = preambleUrl ?? streamingUrl;
     audio.playbackRate = speedRef.current;
     audio.load();
+
+    if (preambleUrl) {
+      // Warm the target chapter's own audio immediately — the preamble clip is
+      // only a few seconds long, so this can't wait for the usual 80%-through
+      // prefetch trigger, which is tuned for whole-chapter playback.
+      prefetchTargetChapterNowRef.current(chapterId, reciterId);
+    }
 
     // If a backoff-retry stashed a position, seek back to it so a network
     // dropout resumes mid-surah instead of restarting from verse 1.
@@ -1520,8 +1661,13 @@ export function useWordTimingAudio(
       setState(prev => prev.timingError ? { ...prev, timingError: false } : prev);
 
       // If timing data has a different URL than what we predicted, swap to it.
-      // Preserve the current playback position so the swap is seamless.
-      if (audio.src !== audioFile.audio_url) {
+      // Preserve the current playback position so the swap is seamless. Skipped
+      // while the preamble clip is still playing — audio.src is intentionally
+      // our Bismillah clip there, not a stale guess to correct — but the
+      // authoritative target-chapter URL is still recorded for the eventual handoff.
+      if (inPreambleRef.current) {
+        resolvedChapterUrlRef.current = audioFile.audio_url;
+      } else if (audio.src !== audioFile.audio_url) {
         const wasPlaying = !audio.paused;
         const savedPosition = audio.currentTime;
         beginSrcSwap();
@@ -1598,7 +1744,14 @@ export function useWordTimingAudio(
       const audio = audioRef.current;
       if (audio) {
         const t = audio.currentTime;
-        if (verseByVerseRef.current) {
+        if (inPreambleRef.current) {
+          // Nothing to update here — the clip has no word-level timing to track,
+          // and currentTime is intentionally left frozen (see handleLoadedMetadata).
+          // handleTimeUpdate (native 'timeupdate') keeps currentVerseKey/isPlaying
+          // accurate; this loop would otherwise wrongly match the clip's own
+          // playback position against the *target* chapter's verse_timings, which
+          // are already being fetched in the background for the handoff.
+        } else if (verseByVerseRef.current) {
           if (Math.abs(t - lastPushedTime) >= TIME_DELTA_S) {
             lastPushedTime = t;
             setState(prev => prev.currentTime === t ? prev : { ...prev, currentTime: t });
@@ -1697,11 +1850,75 @@ export function useWordTimingAudio(
       return;
     }
 
+    const audio = audioRef.current;
+    if (!audio) return;
+    const targetVerseNum = parseInt(verseKey.split(':')[1], 10);
+    if (isNaN(targetVerseNum)) return;
+
+    // Target is the Bismillah preamble itself.
+    if (targetVerseNum === 0) {
+      const chapter = currentChapterIdRef.current;
+      if (chapter === null) return;
+      if (inPreambleRef.current) {
+        // Already on the clip — just rewind it.
+        audio.currentTime = 0;
+        currentVerseIndexRef.current = -1;
+        setState(prev => ({ ...prev, currentTime: 0, currentVerseKey: `${chapter}:0`, currentWordIndex: null }));
+        return;
+      }
+      const clipUrl = getPreambleAudioUrl(reciterIdRef.current, chapter);
+      if (!clipUrl) return;
+      inPreambleRef.current = true;
+      beginSrcSwap();
+      audio.src = clipUrl;
+      audio.playbackRate = speedRef.current;
+      audio.load();
+      playWhenReady(audio, () => {
+        clearSrcFlag();
+        setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+      });
+      currentVerseIndexRef.current = -1;
+      setState(prev => ({ ...prev, currentVerseKey: `${chapter}:0`, currentWordIndex: null, currentTime: 0 }));
+      return;
+    }
+
+    // Target is a real verse, but we're still on the preamble clip — swap into
+    // the chapter's own audio first, then seek within it as usual.
+    if (inPreambleRef.current) {
+      const chapterUrl = resolvedChapterUrlRef.current;
+      if (!chapterUrl) return;
+      inPreambleRef.current = false;
+      beginSrcSwap();
+      audio.src = chapterUrl;
+      audio.playbackRate = speedRef.current;
+      audio.load();
+      const doSeek = () => {
+        currentVerseIndexRef.current = -1;
+        if (timingDataRef.current) {
+          const verseTiming = timingDataRef.current.verse_timings.find(t => t.verse_key === verseKey);
+          const seekTime = verseTiming ? verseTiming.timestamp_from / 1000 : 0;
+          try { audio.currentTime = seekTime; } catch {}
+          const { verseKey: nk, wordIndex: nw } = findCurrentSegment(seekTime);
+          setState(prev => ({ ...prev, currentTime: seekTime, currentVerseKey: nk, currentWordIndex: nw }));
+        }
+        playWhenReady(audio, () => {
+          clearSrcFlag();
+          setState(prev => ({ ...prev, isPlaying: false, isLoading: false }));
+        });
+      };
+      if (audio.readyState >= 1 /* HAVE_METADATA */) {
+        doSeek();
+      } else {
+        audio.addEventListener('loadedmetadata', doSeek, { once: true });
+      }
+      return;
+    }
+
     if (!timingDataRef.current) return;
     const verseTiming = timingDataRef.current.verse_timings.find(t => t.verse_key === verseKey);
-    if (verseTiming && audioRef.current) {
+    if (verseTiming) {
       const seekTime = verseTiming.timestamp_from / 1000;
-      audioRef.current.currentTime = seekTime;
+      audio.currentTime = seekTime;
       currentVerseIndexRef.current = -1;
       const { verseKey: newVerseKey, wordIndex: newWordIndex } = findCurrentSegment(seekTime);
       setState(prev => ({

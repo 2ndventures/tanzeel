@@ -222,10 +222,15 @@ function VerseCardInner({
             data-testid={`text-arabic-${verseNumber}`}
           >
             {words.map((word, index) => {
-              const isCurrentWord = highlighted &&
-                currentWordIndex !== null &&
-                currentWordIndex === index &&
-                currentWordIndex < words.length;
+              // The Bismillah preamble has no word-by-word timing of its own —
+              // light up the whole phrase as one unit whenever it's the active
+              // verse, rather than tracking an individual current word.
+              const isCurrentWord = highlighted && (
+                verseNumber === 0 ||
+                (currentWordIndex !== null &&
+                  currentWordIndex === index &&
+                  currentWordIndex < words.length)
+              );
               return arabicScript === 'tajweed' ? (
                 <Fragment key={`word-${chapterId}-${verseNumber}-${index}`}>
                   <span

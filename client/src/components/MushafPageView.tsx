@@ -247,11 +247,15 @@ export default function MushafPageView({
                           onClick={() => onVerseClick(verse.number)}
                         >
                           {words.map((word, wIdx) => {
+                            // The Bismillah preamble has no word-by-word timing of
+                            // its own — light up the whole phrase as one unit
+                            // whenever it's the active verse.
                             const isCurrentWord =
                               isActive &&
-                              currentWordIndex !== null &&
-                              currentWordIndex === wIdx &&
-                              currentWordIndex < words.length;
+                              (verse.number === 0 ||
+                                (currentWordIndex !== null &&
+                                  currentWordIndex === wIdx &&
+                                  currentWordIndex < words.length));
                             return isTajweed ? (
                               <Fragment key={`m-${chapterId}-${verse.number}-${wIdx}`}>
                                 <span
