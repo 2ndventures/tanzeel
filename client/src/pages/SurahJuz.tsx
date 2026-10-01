@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import ChapterCard from "@/components/ChapterCard";
@@ -18,6 +18,17 @@ const MATCH_META: Record<MatchType, { label: string; cls: string }> = {
   concept: { label: "Concept", cls: "bg-violet-500/15 text-violet-600 dark:text-violet-400" },
 };
 
+// Remembers the list's state when the user opens a chapter, so pressing back
+// returns them to the same spot instead of the top. Module-level because the
+// page unmounts while the chapter is open.
+interface SavedListState {
+  scrollTop: number;
+  mode: "surah" | "juz";
+  searchQuery: string;
+  verseSearchResults: VerseSearchResult[];
+}
+let savedListState: SavedListState | null = null;
+
 interface SurahJuzProps {
   onNavigate: (page: string, chapterId?: number, tab?: "home" | "surah" | "settings" | "bookmarks", verseNumber?: number) => void;
   activeTab?: "home" | "surah" | "settings" | "bookmarks";
@@ -27,12 +38,15 @@ interface SurahJuzProps {
 
 export default function SurahJuz({ onNavigate, activeTab = "surah", currentReciterId, audioCacheReady }: SurahJuzProps) {
   const { connected } = useNetworkStatus();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [mode, setMode] = useState<"surah" | "juz">("surah");
+  // Not cleared on read: App re-mounts this page for its exit animation, and
+  // that mount must not use up the state the return trip needs.
+  const [restored] = useState(() => savedListState);
+  const [searchQuery, setSearchQuery] = useState(restored?.searchQuery ?? "");
+  const [isLoading, setIsLoading] = useState(!restored);
+  const [mode, setMode] = useState<"surah" | "juz">(restored?.mode ?? "surah");
   const hasActiveSearch = searchQuery.trim().length >= 3;
 
-  const [verseSearchResults, setVerseSearchResults] = useState<VerseSearchResult[]>([]);
+  const [verseSearchResults, setVerseSearchResults] = useState<VerseSearchResult[]>(restored?.verseSearchResults ?? []);
   const [isSearchingVerses, setIsSearchingVerses] = useState(false);
   const verseSearchRef = useRef<ReturnType<typeof setTimeout>>();
   const searchAbortRef = useRef<AbortController | null>(null);
@@ -49,21 +63,42 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
   useEffect(() => {
     const scrollEl = scrollContainerRef.current;
     if (!scrollEl) return;
-    const handleScroll = () => {
+    // Only dismiss the keyboard on a real finger drag. Listening to 'scroll'
+    // also caught layout-driven scroll changes (list shrinking while typing,
+    // verse results appearing), which closed the keyboard mid-search.
+    const handleTouchMove = () => {
       if (document.activeElement === searchInputRef.current) {
         searchInputRef.current?.blur();
       }
     };
-    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
-    return () => scrollEl.removeEventListener('scroll', handleScroll);
+    scrollEl.addEventListener('touchmove', handleTouchMove, { passive: true });
+    return () => scrollEl.removeEventListener('touchmove', handleTouchMove);
   }, []);
 
   useEffect(() => {
+    if (restored) return;
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 600);
     return () => clearTimeout(timer);
-  }, []);
+  }, [restored]);
+
+  useLayoutEffect(() => {
+    if (restored && scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = restored.scrollTop;
+    }
+  }, [restored]);
+
+  const openChapter = (chapterId: number, verseNumber?: number) => {
+    (document.activeElement as HTMLElement)?.blur();
+    savedListState = {
+      scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
+      mode,
+      searchQuery,
+      verseSearchResults,
+    };
+    onNavigate("chapter", chapterId, undefined, verseNumber);
+  };
 
   const filteredChapters = chapters.filter((chapter) => chapterMatchesQuery(chapter, searchQuery));
 
@@ -279,7 +314,7 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                     <button
                       key={`vs-${result.chapterId}-${result.verseNumber}-${idx}`}
                       className="w-full text-left rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 hover-elevate active-elevate-2 transition-all min-h-[76px]"
-                      onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", result.chapterId, undefined, result.verseNumber); }}
+                      onClick={() => openChapter(result.chapterId, result.verseNumber)}
                       data-testid={`verse-search-result-${result.chapterId}-${result.verseNumber}`}
                     >
                       <div className="flex items-start gap-3">
@@ -388,9 +423,9 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                     role="button"
                     tabIndex={isJuzLocked ? -1 : 0}
                     aria-disabled={isJuzLocked || undefined}
-                    style={{ animationDelay: `${index * 30}ms` }}
-                    onClick={() => { if (isJuzLocked) return; (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", juz.startChapter); }}
-                    onKeyDown={(e) => { if (isJuzLocked) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate("chapter", juz.startChapter); } }}
+                    style={{ animationDelay: restored ? undefined : `${index * 30}ms` }}
+                    onClick={() => { if (isJuzLocked) return; openChapter(juz.startChapter); }}
+                    onKeyDown={(e) => { if (isJuzLocked) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openChapter(juz.startChapter); } }}
                     data-testid={`juz-card-${juz.id}`}
                   >
                     <div className="relative overflow-hidden rounded-3xl bg-card/80 backdrop-blur-xl px-5 h-full flex items-center">
@@ -443,8 +478,8 @@ export default function SurahJuz({ onNavigate, activeTab = "surah", currentRecit
                 englishName={chapter.englishName}
                 verseCount={chapter.verseCount}
                 meaning={surahMeanings[chapter.id] || chapter.revelationType}
-                onClick={() => { (document.activeElement as HTMLElement)?.blur(); onNavigate("chapter", chapter.id); }}
-                style={{ animationDelay: `${index * 30}ms` }}
+                onClick={() => openChapter(chapter.id)}
+                style={{ animationDelay: restored ? undefined : `${index * 30}ms` }}
                 isFirst={index === 0}
                 currentReciterId={currentReciterId}
                 audioCacheReady={audioCacheReady}
