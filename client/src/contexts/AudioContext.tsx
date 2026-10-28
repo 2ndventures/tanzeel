@@ -4,7 +4,7 @@ import { useWordTimingAudio, type AudioFile } from '@/hooks/useWordTimingAudio';
 import { getQuranComReciterId, getReciterById } from '@/lib/reciters';
 import { chapters } from '@/lib/quranMetadata';
 import { useMediaSession } from '@/hooks/useMediaSession';
-import { notifyChapterCompleted } from '@/lib/rateApp';
+import { onNaturalPause, flushListening } from '@/lib/rateApp';
 
 interface AudioContextValue {
   activeChapterId: number | null;
@@ -60,10 +60,17 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     verseChangeCallbackRef.current?.(verseKey);
   }, []);
 
+  const autoplayRef = useRef(autoplay);
+  autoplayRef.current = autoplay;
+
   const onEnded = useCallback(() => {
     const currentId = activeChapterIdRef.current;
-    if (currentId) {
-      notifyChapterCompleted();
+    // Playback stopped on its own (last chapter, or autoplay off) — a natural
+    // pause, so this is one of the moments we may ask for an App Store review.
+    // With autoplay on and more chapters left, the hook advances in place and
+    // recitation continues, so no prompt.
+    if (currentId && (currentId >= 114 || !autoplayRef.current)) {
+      void onNaturalPause('playback_ended');
     }
     // Always advance the audio at the context level so background lock-screen and
     // mini-player playback continue even if no UI is mounted to handle navigation.
@@ -97,6 +104,31 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     hookResult.pauseAudio();
     setActiveChapterId(null);
   }, [hookResult.pauseAudio]);
+
+  // User-initiated pause (play/pause button, verse tap, mini-player, lock
+  // screen) is a natural pause: flush listening time and maybe ask for a
+  // review. Only fires when audio was actually playing.
+  const pauseAudio = useCallback(() => {
+    const wasPlaying = hookResult.isPlaying;
+    hookResult.pauseAudio();
+    if (wasPlaying) void onNaturalPause('user_pause');
+  }, [hookResult.pauseAudio, hookResult.isPlaying]);
+
+  const togglePlayPause = useCallback(() => {
+    const wasPlaying = hookResult.isPlaying;
+    hookResult.togglePlayPause();
+    if (wasPlaying) void onNaturalPause('user_pause');
+  }, [hookResult.togglePlayPause, hookResult.isPlaying]);
+
+  // Persist accumulated listening time when the app goes to the background so
+  // a later termination doesn't lose it.
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState !== 'visible') flushListening();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
 
   const goToNextChapter = useCallback(() => {
     const currentId = activeChapterIdRef.current;
@@ -139,7 +171,7 @@ export function AudioProvider({ children, reciter, repeat, autoplay }: AudioProv
     currentVerseKey: hookCurrentVerseKey, currentWordIndex: hookCurrentWordIndex,
     isLoading: hookIsLoading, error: hookError, speed: hookSpeed,
     isStalled: hookIsStalled, timingError: hookTimingError,
-    togglePlayPause, pauseAudio, playAudio, seek, seekToVerse,
+    playAudio, seek, seekToVerse,
     setSpeed, getTimingData, retry,
   } = hookResult;
 

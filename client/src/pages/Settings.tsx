@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import * as Sentry from '@sentry/capacitor';
 import { removeItem } from "@/lib/storage";
+import { Capacitor } from "@capacitor/core";
+import { APP_STORE_WRITE_REVIEW_URL } from "@/lib/rateApp";
 import { Icon } from "@iconify/react";
 
 import { getAllReciters, getReciterById } from "@/lib/reciters";
@@ -725,6 +727,19 @@ export default function Settings({
                 <span className="text-sm text-foreground/80">Credits &amp; Attribution</span>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
               </button>
+              {Capacitor.getPlatform() === 'ios' && (
+                <>
+                  <div className="border-t" style={{ borderColor: 'hsl(var(--sheet-muted))' }} />
+                  <button
+                    onClick={() => { window.location.href = APP_STORE_WRITE_REVIEW_URL; }}
+                    className="w-full flex items-center justify-between py-3 hover-elevate active-elevate-2 text-left"
+                    data-testid="button-rate-app"
+                  >
+                    <span className="text-sm text-foreground/80">Rate Tanzeel</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 

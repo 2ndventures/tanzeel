@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import * as Sentry from '@sentry/capacitor';
 import { getTimingDataFromMemory, storeTimingDataInMemory } from '@/lib/audioCache';
 import { getItem, setItem, removeItem } from '@/lib/storage';
+import { recordListening } from '@/lib/rateApp';
 import {
   getCachedAudioUri,
   getDownloadedVerseNumbers,
@@ -136,6 +137,9 @@ export function useWordTimingAudio(
   const vbvPreloadRef = useRef<Map<number, HTMLAudioElement>>(new Map());
 
   const loadIdRef = useRef(0);
+  // Wall-clock timestamp of the last timeupdate seen while actually playing;
+  // null whenever playback is not progressing. See handleTimeUpdate.
+  const lastListenTickRef = useRef<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const retryCountRef = useRef(0);
   // Backoff: 1s, 2s, 4s, 8s, 8s ≈ 23s total before surfacing "Tap retry".
@@ -669,6 +673,23 @@ export function useWordTimingAudio(
       const ct = audio.currentTime;
       const actuallyPlaying = !audio.paused && !audio.ended;
 
+      // Listening-time accounting for the App Store review prompt. Wall-clock
+      // delta between consecutive timeupdate events while the element is
+      // actually playing (any source: full chapter, in-place advance, preamble,
+      // verse-by-verse, offline). A gap over 2s means a stall or a suspended
+      // JS context, so it is dropped rather than counted.
+      const nowWall = Date.now();
+      if (actuallyPlaying && !audio.seeking) {
+        const last = lastListenTickRef.current;
+        if (last !== null) {
+          const delta = (nowWall - last) / 1000;
+          if (delta > 0 && delta <= 2) recordListening(delta);
+        }
+        lastListenTickRef.current = nowWall;
+      } else {
+        lastListenTickRef.current = null;
+      }
+
       if (inPreambleRef.current) {
         // The clip has no word-level timing of its own — just keep the Preamble
         // verse marked active (VerseCard highlights the whole phrase as one unit
@@ -818,6 +839,7 @@ export function useWordTimingAudio(
     };
 
     const handlePause = () => {
+      lastListenTickRef.current = null;
       // Pause events that arrive within 300ms of a src swap are treated
       // as the browser's own teardown of the previous source and are
       // suppressed (state.isPlaying stays as-is). Outside that window
@@ -851,6 +873,7 @@ export function useWordTimingAudio(
     // Media Session layer can pin the OS scrubber, and arm the watchdog
     // so a flaky connection escalates to recovery instead of hanging.
     const handleWaiting = () => {
+      lastListenTickRef.current = null;
       setState(prev => {
         if (prev.isStalled) return prev;
         // Only show the buffering spinner when we're actively playing.
@@ -898,6 +921,7 @@ export function useWordTimingAudio(
     };
 
     const handleEnded = () => {
+      lastListenTickRef.current = null;
       if (inPreambleRef.current) {
         transitionFromPreambleToChapter();
         return;
@@ -1123,6 +1147,7 @@ export function useWordTimingAudio(
     //   3. VBV fallback for partially-downloaded chapters.
     //   4. Surface "Tap retry" error.
     const handleError = () => {
+      lastListenTickRef.current = null;
       clearSrcFlag();
       clearStallWatchdog();
       if (recoveryInFlightRef.current) return;

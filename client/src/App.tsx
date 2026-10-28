@@ -16,7 +16,8 @@ import OnboardingScreen from "@/components/OnboardingScreen";
 import SplashScreen from "@/components/SplashScreen";
 import MiniPlayer from "@/components/MiniPlayer";
 import BottomNav from "@/components/BottomNav";
-import { AudioProvider } from "@/contexts/AudioContext";
+import { AudioProvider, useAudio } from "@/contexts/AudioContext";
+import { initReviewPrompt, onNaturalPause } from "@/lib/rateApp";
 import { NetworkProvider } from "@/contexts/NetworkContext";
 import OfflineBanner from "@/components/OfflineBanner";
 import { Toaster } from "@/components/ui/toaster";
@@ -49,6 +50,25 @@ const PAGE_DEPTH: Record<Page, number> = {
 };
 
 type NavDirection = "forward" | "back" | "tab";
+
+// Arriving on Home or Bookmarks while nothing is playing is a natural pause
+// where the App Store review prompt may be requested. Lives inside
+// AudioProvider so it can read playback state; rendered once (not keyed by
+// page) so the effect runs on page changes only.
+function ReviewPromptNavWatcher({ page }: { page: Page }) {
+  const { isPlaying } = useAudio();
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
+  const firstRunRef = useRef(true);
+  useEffect(() => {
+    // Landing on Home at app open is not a navigation; skip the initial mount.
+    if (firstRunRef.current) { firstRunRef.current = false; return; }
+    if (isPlayingRef.current) return;
+    if (page === "home") void onNaturalPause('navigate_home');
+    else if (page === "bookmarks") void onNaturalPause('navigate_bookmarks');
+  }, [page]);
+  return null;
+}
 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
@@ -183,6 +203,7 @@ function App() {
     initStorage().then(async () => {
       await migrateUpdatedAt();
       await migrateUserId();
+      await initReviewPrompt();
       const completed = await getItem('onboardingCompleted');
       setShowOnboarding(!completed);
 
@@ -634,6 +655,7 @@ function App() {
           )}
 
           {storageReady && !showOnboarding && (<AudioProvider reciter={reciter} repeat={repeat} autoplay={autoplay}>
+            <ReviewPromptNavWatcher page={currentPage} />
             <div className="h-full">
               <div className={isTransitioning ? "page-transition-container" : "h-full"}>
                 {isTransitioning && prevPage && (
