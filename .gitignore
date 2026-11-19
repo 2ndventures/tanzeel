@@ -6,3 +6,8 @@ vite.config.ts.*
 *.tar.gz
 .env.local
 .env.*.local
+# Android signing material - never commit
+*.jks
+*.keystore
+keystore.properties
+tanzeel-upload*
